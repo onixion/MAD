@@ -20,7 +20,7 @@ namespace JobSystemTest
             {
                 Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
 
-                request = WebRequest.Create("http://" + options.target.ToString());
+                request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" + options.targetPort);
 
                 try
                 {
@@ -34,7 +34,6 @@ namespace JobSystemTest
                 }
 
                 request.Abort();
-
 
                 Console.WriteLine(success);
 

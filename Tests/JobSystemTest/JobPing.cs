@@ -17,7 +17,7 @@ namespace JobSystemTest
 
             ping = new Ping();
             pingOptions = new PingOptions(200, true);
-            reply = ping.Send(options.target, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
+            reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
         }
 
         public override void DoJob()

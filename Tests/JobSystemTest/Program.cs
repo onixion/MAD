@@ -49,11 +49,12 @@ namespace JobSystemTest
                         Console.WriteLine("JOB LIST:");
                         foreach (Job temp in system.jobs)
                         {
-                            Console.WriteLine("ID:        " + temp.jobID);
-                            Console.WriteLine("Name:      " + temp.options.jobName);
-                            Console.WriteLine("Type:      " + temp.options.type);
-                            Console.WriteLine("Delaytime: " + temp.options.delayTime);
-                            Console.WriteLine("Target:    " + temp.options.target);
+                            Console.WriteLine("ID:           " + temp.jobID);
+                            Console.WriteLine("Name:         " + temp.options.jobName);
+                            Console.WriteLine("Type:         " + temp.options.type);
+                            Console.WriteLine("Delaytime:    " + temp.options.delayTime);
+                            Console.WriteLine("IpAddress:    " + temp.options.targetAddress);
+                            Console.WriteLine("Port:         " + temp.options.targetAddress);
                             Console.WriteLine();
                         }
                         break;
@@ -61,24 +62,35 @@ namespace JobSystemTest
                     case "create":
                         Console.Write("Name: ");
                         list.Add(Console.ReadLine());
-                        Console.Write("Delaytime: ");
-                        list.Add(Console.ReadLine());
-                        Console.Write("Target: ");
-                        list.Add(Console.ReadLine());
                         Console.Write("Type (p = ping, h = http, s = portscan): ");
                         list.Add(Console.ReadLine());
-                        switch(list[3])
+                        Console.Write("Delaytime: ");
+                        list.Add(Console.ReadLine());
+                        Console.Write("IP-Address: ");
+                        list.Add(Console.ReadLine());
+                        Console.Write("PORT: ");
+                        list.Add(Console.ReadLine());
+                        switch(list[1])
                         {
                             default:
                                 break;
                             case "p":
-                                system.AddJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.PingRequest, IPAddress.Parse(list[2])));
+                                system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.PingRequest, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
                                 break;
                             case "h":
-                                system.AddJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.HttpRequest, IPAddress.Parse(list[2])));
+                                system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.HttpRequest, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
+                                break;
+                            case "s":
+                                system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.PortScan, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
                                 break;
                         }
                         list.Clear();
+                        break;
+
+                    case "delete":
+                        Console.Write("ID: ");
+                        input = Console.ReadLine();
+                        system.DeleteJob(Int32.Parse(input));
                         break;
 
                     case "start":
