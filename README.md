@@ -1,6 +1,4 @@
-MAD
-===
-
+#MAD
 ##Network Monitoring Program
 
 ===
@@ -14,6 +12,9 @@ The main aim is to get a simple, esay-to-use, esay-understandable and nice-writt
 
 - Gui
 - JobSystem
+- JobPing (ping request)
+- JobHttp (http request)
+- JobPortScanner (scan a specific port; open/closed)
 - ...
 
 ===
