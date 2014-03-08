@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Net.NetworkInformation;
 using System.Text;
 
@@ -7,38 +6,34 @@ namespace JobSystemTest
 {
     class JobPing : Job
     {
-        // JobPing spezific variables
-        PingOptions pingOptions;
         Ping ping;
+        PingOptions pingOptions;
         PingReply reply;
 
         public JobPing(JobOptions options)
         {
             this.options = options;
-            InitJob();
+            InitJob();   
 
-            // PING SHIT
-            pingOptions = new PingOptions(200, true);
             ping = new Ping();
+            pingOptions = new PingOptions(200, true);
             reply = ping.Send(options.target, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
-            // PING SHIT
         }
 
         public override void DoJob()
         {
             while (true)
             {
-                Console.Write("JobID: " + jobID + " PING -> ");
+                Console.Write("JobID: " + jobID + " PING Erfolgreich? -> ");
 
                 if (reply.Status == IPStatus.Success)
-                    Console.Write("Erfolgreicher Ping! :)");
+                    success = true;
                 else
-                    Console.Write("Nicht erfolgreicher Ping! :(");
+                    success = false;
 
-                Console.WriteLine();
+                Console.WriteLine(success);
 
-                // wait delayTime
-                Thread.Sleep(options.delayTime);
+                Wait(options.delayTime);
             }
         }
     }

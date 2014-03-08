@@ -7,13 +7,12 @@ namespace JobSystemTest
     abstract class Job : IDisposable
     {
         // variables
+        public JobOptions options;
         public Thread jobThread;
-        public static long jobsCount = 0;
-        public long jobID;
+        public static int jobsCount = 0;
+        public int jobID;
         public bool success;
         private bool disposed = false;
-
-        public JobOptions options;
 
         // methodes
         public abstract void DoJob();
@@ -30,18 +29,27 @@ namespace JobSystemTest
 
         public void Start()
         {
-            if (!jobThread.ThreadState.Equals(ThreadState.Running))
+            if (!jobThread.IsAlive)
             {
                 jobThread.Start();
+            }
+            else
+            {
+                jobThread.Resume();
             }
         }
 
         public void Stop()
         {
-            if (!jobThread.ThreadState.Equals(ThreadState.Stopped))
+            if (jobThread.IsAlive)
             {
-                jobThread.Abort();
+                jobThread.Suspend();
             }
+        }
+
+        public void Wait(int delayTime)
+        {
+            Thread.Sleep(delayTime);
         }
 
         public bool IsRunning()
@@ -52,14 +60,13 @@ namespace JobSystemTest
             return false;
         }
 
-        public void WriteConsole()
-        {
-            Console.WriteLine("JobID: " + jobID);
-        }
-
         public void Dispose()
         {
-
+            if (disposed == false)
+            {
+                GC.SuppressFinalize(this);
+                disposed = true;
+            }
         }
     }
 }

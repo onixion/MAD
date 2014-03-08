@@ -72,20 +72,25 @@ namespace JobSystemTest
                             default:
                                 break;
                             case "p":
-                                system.CreateJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.PingRequest, IPAddress.Parse(list[2])));
+                                system.AddJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.PingRequest, IPAddress.Parse(list[2])));
                                 break;
                             case "h":
-                                system.CreateJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.HttpRequest, IPAddress.Parse(list[2])));
+                                system.AddJob(new JobOptions(list[0], Int32.Parse(list[1]), JobOptions.JobTypes.HttpRequest, IPAddress.Parse(list[2])));
                                 break;
                         }
-
                         list.Clear();
                         break;
 
                     case "start":
                         Console.Write("ID: ");
                         input = Console.ReadLine();
-                        system.StartJob(Convert.ToInt64(input));
+                        system.StartJob(Int32.Parse(input));
+                        break;
+
+                    case "stop":
+                        Console.Write("ID: ");
+                        input = Console.ReadLine();
+                        system.StopJob(Int32.Parse(input));
                         break;
                 }
             }

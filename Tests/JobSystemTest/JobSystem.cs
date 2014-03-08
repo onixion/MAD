@@ -13,25 +13,38 @@ namespace JobSystemTest
         
         }
 
-        public void CreateJob(JobOptions options)
+        public void AddJob(JobOptions options)
         {
+            Console.WriteLine(options.type.ToString());
             switch (options.type.ToString())
             { 
                 case "PingRequest":
                     jobs.Add(new JobPing(options));
                     break;
 
-                case "HttpReqeust":
-
+                case "HttpRequest":
+                    jobs.Add(new JobHttp(options));
                     break;
 
                 case "PortScan":
-
+                    jobs.Add(new JobPort(options));
                     break;
             }
         }
 
-        public void StartJob(long JobID)
+        public void DeleteJob(int JobID)
+        {
+            foreach (Job temp in jobs)
+            {
+                if (temp.jobID == JobID)
+                {
+                    jobs.RemoveAt((int)JobID);
+                    break;
+                }
+            }
+        }
+
+        public void StartJob(int JobID)
         {
             foreach(Job temp in jobs)
             {
@@ -40,7 +53,18 @@ namespace JobSystemTest
                     temp.Start();
                     break;
                 }
+            }
+        }
 
+        public void StopJob(int JobID)
+        {
+            foreach (Job temp in jobs)
+            {
+                if (temp.jobID == JobID)
+                {
+                    temp.Stop();
+                    break;
+                }
             }
         }
     }
