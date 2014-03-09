@@ -5,7 +5,7 @@ namespace JobSystemTest
 {
     class JobSystem
     {
-        public List<Job> jobs; // list with all jobs
+        public List<Job> jobs;
 
         public JobSystem()
         { 
@@ -30,7 +30,7 @@ namespace JobSystemTest
             }
         }
 
-        public void DeleteJob(int JobID)
+        public void RemoveJob(int JobID)
         {
             foreach (Job temp in jobs)
             {
@@ -40,6 +40,11 @@ namespace JobSystemTest
                     break;
                 }
             }
+        }
+
+        public void ClearJobs()
+        {
+            jobs.Clear();
         }
 
         public void StartJob(int JobID)

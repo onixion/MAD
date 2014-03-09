@@ -11,7 +11,7 @@ namespace JobSystemTest
         public JobHttp(JobOptions options)
         {
             this.options = options;
-            InitJob();
+            Init();
         }
 
         public override void DoJob()

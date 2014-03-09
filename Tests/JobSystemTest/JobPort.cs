@@ -11,7 +11,7 @@ namespace JobSystemTest
         public JobPort(JobOptions options)
         {
             this.options = options;
-            InitJob();
+            Init();
         }
 
         public override void DoJob()

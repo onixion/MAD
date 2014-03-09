@@ -13,7 +13,7 @@ namespace JobSystemTest
         public JobPing(JobOptions options)
         {
             this.options = options;
-            InitJob();   
+            Init();   
 
             ping = new Ping();
             pingOptions = new PingOptions(200, true);

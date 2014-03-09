@@ -59,7 +59,7 @@ namespace JobSystemTest
                         }
                         break;
                     
-                    case "create":
+                    case "add":
                         Console.Write("Name: ");
                         list.Add(Console.ReadLine());
                         Console.Write("Type (p = ping, h = http, s = portscan): ");
@@ -90,10 +90,14 @@ namespace JobSystemTest
                         list.Clear();
                         break;
 
-                    case "delete":
+                    case "remove":
                         Console.Write("ID: ");
                         input = Console.ReadLine();
-                        system.DeleteJob(Int32.Parse(input));
+                        system.RemoveJob(Int32.Parse(input));
+                        break;
+
+                    case "clear":
+                        system.ClearJobs();
                         break;
 
                     case "start":
