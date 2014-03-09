@@ -26,7 +26,7 @@ namespace JobSystemTest
             while (true)
             {
                 DoJob();
-                Wait(options.delayTime);
+                Wait();
             }
         }
 
@@ -49,9 +49,9 @@ namespace JobSystemTest
             }
         }
 
-        public void Wait(int delayTime)
+        public void Wait()
         {
-            Thread.Sleep(delayTime);
+            Thread.Sleep(options.delayTime);
         }
 
         public bool IsRunning()
