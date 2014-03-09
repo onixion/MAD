@@ -5,17 +5,15 @@ namespace JobSystemTest
 {
     class JobSystem
     {
-        public List<Job> jobs = new List<Job>();
+        public List<Job> jobs; // list with all jobs
 
         public JobSystem()
         { 
-        
-        
+            jobs = new List<Job>();
         }
 
         public void AddJob(JobOptions options)
         {
-            Console.WriteLine(options.type.ToString());
             switch (options.type.ToString())
             { 
                 case "PingRequest":

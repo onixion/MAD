@@ -8,7 +8,6 @@ namespace JobSystemTest
     {
         Socket socket;
 
-
         public JobPort(JobOptions options)
         {
             this.options = options;
@@ -34,6 +33,7 @@ namespace JobSystemTest
                 }
 
                 socket.Close();
+
                 Console.WriteLine(success);
 
                 Wait(options.delayTime);

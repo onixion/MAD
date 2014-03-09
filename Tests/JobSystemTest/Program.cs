@@ -54,7 +54,7 @@ namespace JobSystemTest
                             Console.WriteLine("Type:         " + temp.options.type);
                             Console.WriteLine("Delaytime:    " + temp.options.delayTime);
                             Console.WriteLine("IpAddress:    " + temp.options.targetAddress);
-                            Console.WriteLine("Port:         " + temp.options.targetAddress);
+                            Console.WriteLine("Port:         " + temp.options.targetPort);
                             Console.WriteLine();
                         }
                         break;
@@ -68,19 +68,22 @@ namespace JobSystemTest
                         list.Add(Console.ReadLine());
                         Console.Write("IP-Address: ");
                         list.Add(Console.ReadLine());
-                        Console.Write("PORT: ");
-                        list.Add(Console.ReadLine());
+
                         switch(list[1])
                         {
                             default:
                                 break;
                             case "p":
-                                system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.PingRequest, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
+                                system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.PingRequest, Int32.Parse(list[2]), IPAddress.Parse(list[3]), 80));
                                 break;
                             case "h":
+                                Console.Write("PORT: ");
+                                list.Add(Console.ReadLine());
                                 system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.HttpRequest, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
                                 break;
                             case "s":
+                                Console.Write("PORT: ");
+                                list.Add(Console.ReadLine());
                                 system.AddJob(new JobOptions(list[0], JobOptions.JobTypes.PortScan, Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
                                 break;
                         }

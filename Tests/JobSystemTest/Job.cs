@@ -4,7 +4,7 @@ using System.Net;
 
 namespace JobSystemTest
 {
-    abstract class Job : IDisposable
+    abstract class Job
     {
         // variables
         public JobOptions options;
@@ -12,7 +12,6 @@ namespace JobSystemTest
         public static int jobsCount = 0;
         public int jobID;
         public bool success;
-        private bool disposed = false;
 
         // methodes
         public abstract void DoJob();
@@ -29,22 +28,17 @@ namespace JobSystemTest
 
         public void Start()
         {
-            if (!jobThread.IsAlive)
-            {
+            if (jobThread.ThreadState == ThreadState.Unstarted)
                 jobThread.Start();
-            }
             else
-            {
-                jobThread.Resume();
-            }
+                if (jobThread.ThreadState == ThreadState.Suspended)
+                    jobThread.Resume();
         }
 
         public void Stop()
         {
-            if (jobThread.IsAlive)
-            {
+            if (jobThread.ThreadState == ThreadState.WaitSleepJoin || jobThread.ThreadState == ThreadState.Running)
                 jobThread.Suspend();
-            }
         }
 
         public void Wait(int delayTime)
@@ -58,15 +52,6 @@ namespace JobSystemTest
                 return true;
 
             return false;
-        }
-
-        public void Dispose()
-        {
-            if (disposed == false)
-            {
-                GC.SuppressFinalize(this);
-                disposed = true;
-            }
         }
     }
 }

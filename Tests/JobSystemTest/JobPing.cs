@@ -17,7 +17,6 @@ namespace JobSystemTest
 
             ping = new Ping();
             pingOptions = new PingOptions(200, true);
-            reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
         }
 
         public override void DoJob()
@@ -25,6 +24,8 @@ namespace JobSystemTest
             while (true)
             {
                 Console.Write("JobID: " + jobID + " PING Erfolgreich? -> ");
+
+                reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
                 if (reply.Status == IPStatus.Success)
                     success = true;
