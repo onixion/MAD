@@ -21,21 +21,16 @@ namespace JobSystemTest
 
         public override void DoJob()
         {
-            while (true)
-            {
-                Console.Write("JobID: " + jobID + " PING Erfolgreich? -> ");
+            Console.Write("JobID: " + jobID + " PING Erfolgreich? -> ");
 
-                reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
+            reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
-                if (reply.Status == IPStatus.Success)
-                    success = true;
-                else
-                    success = false;
+            if (reply.Status == IPStatus.Success)
+                success = true;
+            else
+                success = false;
 
-                Console.WriteLine(success);
-
-                Wait(options.delayTime);
-            }
+            Console.WriteLine(success);
         }
     }
 }

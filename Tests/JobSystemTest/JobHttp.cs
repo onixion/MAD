@@ -16,29 +16,24 @@ namespace JobSystemTest
 
         public override void DoJob()
         {
-            while (true)
+            Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
+
+            request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" + options.targetPort);
+
+            try
             {
-                Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
-
-                request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" + options.targetPort);
-
-                try
-                {
-                    response = request.GetResponse();
-                    success = true;
-                    response.Close();
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                }
-
-                request.Abort();
-
-                Console.WriteLine(success);
-
-                Wait(options.delayTime);
+                response = request.GetResponse();
+                success = true;
+                response.Close();
             }
+            catch (Exception e)
+            {
+                success = false;
+            }
+
+            request.Abort();
+
+            Console.WriteLine(success);
         }
     }
 }

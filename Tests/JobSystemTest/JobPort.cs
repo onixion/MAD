@@ -16,28 +16,25 @@ namespace JobSystemTest
 
         public override void DoJob()
         {
-            while (true)
+            Console.Write("JobID: " + jobID + " PORT-SCAN on " + options.targetPort + " -> ");
+
+            socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            try
             {
-                Console.Write("JobID: " + jobID + " PORT-SCAN on " + options.targetPort + " -> ");
-
-                socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                try
-                {
-                    socket.Connect(new IPEndPoint(options.targetAddress, options.targetPort));
-                    success = true;
-                }
-                catch (Exception e)
-                {
-                    success = false;
-                }
-
-                socket.Close();
-
-                Console.WriteLine(success);
-
-                Wait(options.delayTime);
+                socket.Connect(new IPEndPoint(options.targetAddress, options.targetPort));
+                success = true;
             }
+            catch (Exception e)
+            {
+                success = false;
+            }
+
+            socket.Close();
+
+            Console.WriteLine(success);
         }
     }
 }
+
+

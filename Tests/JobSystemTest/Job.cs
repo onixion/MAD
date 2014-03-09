@@ -21,11 +21,20 @@ namespace JobSystemTest
             jobsCount++;
         }
 
+        public void WorkerThread()
+        {
+            while (true)
+            {
+                DoJob();
+                Wait(options.delayTime);
+            }
+        }
+
         public void Start()
         {
             if (jobThread == null)
             {
-                jobThread = new Thread(new ThreadStart(DoJob));
+                jobThread = new Thread(new ThreadStart(WorkerThread));
                 jobThread.Start();
             }
         }
@@ -47,7 +56,7 @@ namespace JobSystemTest
 
         public bool IsRunning()
         {
-            if (jobThread.ThreadState.Equals(ThreadState.Running))
+            if (jobThread != null)
                 return true;
 
             return false;

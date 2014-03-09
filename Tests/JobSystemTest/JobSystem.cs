@@ -36,7 +36,9 @@ namespace JobSystemTest
             {
                 if (temp.jobID == JobID)
                 {
-                    jobs.RemoveAt((int)JobID);
+                    if(!temp.IsRunning())
+                        jobs.RemoveAt((int)JobID);
+
                     break;
                 }
             }
@@ -44,7 +46,11 @@ namespace JobSystemTest
 
         public void ClearJobs()
         {
-            jobs.Clear();
+            for(int i = 0; i < jobs.Count; i++)
+            {
+                if (!jobs[i].IsRunning())
+                    jobs.RemoveAt(i);
+            }
         }
 
         public void StartJob(int JobID)
