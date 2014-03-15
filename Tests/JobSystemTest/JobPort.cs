@@ -8,15 +8,15 @@ namespace JobSystemTest
     {
         Socket socket;
 
-        public JobPort(JobOptions options)
+        public JobPort(/*JobOptions options*/)
         {
-            this.options = options;
-            Init();
+            //this.options = options;
+            //Init();
         }
 
         public override void DoJob()
         {
-            Console.Write("JobID: " + jobID + " PORT-SCAN on " + options.targetPort + " -> ");
+            /*Console.Write("JobID: " + jobID + " PORT-SCAN on " + options.targetPort + " -> ");
 
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -32,7 +32,7 @@ namespace JobSystemTest
 
             socket.Close();
 
-            Console.WriteLine(success);
+            Console.WriteLine(success);*/
         }
     }
 }

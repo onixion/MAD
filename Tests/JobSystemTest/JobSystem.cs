@@ -12,23 +12,16 @@ namespace JobSystemTest
             jobs = new List<Job>();
         }
 
-        public void AddJob(JobOptions options)
+        public void AddJob(JobPingOptions options)
         {
-            switch (options.type.ToString())
-            { 
-                case "PingRequest":
-                    jobs.Add(new JobPing(options));
-                    break;
-
-                case "HttpRequest":
-                    jobs.Add(new JobHttp(options));
-                    break;
-
-                case "PortScan":
-                    jobs.Add(new JobPort(options));
-                    break;
-            }
+            jobs.Add(new JobPing(options));
         }
+
+        public void AddJob(JobHttpOptions options)
+        {
+            jobs.Add(new JobHttp(options));
+        }
+
 
         public void RemoveJob(int JobID)
         {

@@ -39,8 +39,10 @@
   <ItemGroup>
     <Compile Include="Job.cs" />
     <Compile Include="JobHttp.cs" />
+    <Compile Include="JobHttpOptions.cs" />
     <Compile Include="JobOptions.cs" />
     <Compile Include="JobPing.cs" />
+    <Compile Include="JobPingOptions.cs" />
     <Compile Include="JobPort.cs" />
     <Compile Include="JobSystem.cs" />
     <Compile Include="Program.cs" />
