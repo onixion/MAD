@@ -9,14 +9,16 @@ namespace JobSystemTest
         Ping ping;
         PingOptions pingOptions;
         PingReply reply;
+        int ttl;
         
-        public JobPing(JobPingOptions options)
+        public JobPing(JobOptions options, int ttl)
         {
-            Init();
+            InitJob();
             this.options = options;
+            this.ttl = ttl;
 
             ping = new Ping();
-            pingOptions = new PingOptions(options.ttl, true);
+            pingOptions = new PingOptions(ttl, true);
         }
 
         public override void DoJob()
@@ -32,5 +34,15 @@ namespace JobSystemTest
 
             Console.WriteLine(success);
         }
+
+        public override void JobStatus()
+        {
+            base.JobStatus();
+
+            Console.WriteLine("TTL: " + options.ttl);
+        }
+        
+        
+        
     }
 }

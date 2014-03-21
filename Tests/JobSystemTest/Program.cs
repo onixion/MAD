@@ -77,7 +77,7 @@ namespace JobSystemTest
                             case "p":
                                 Console.Write("TTL: ");
                                 list.Add(Console.ReadLine());
-                                system.AddJob(new JobPingOptions(list[0], Int32.Parse(list[2]), IPAddress.Parse(list[3]), Int32.Parse(list[4])));
+                                system.AddJob(new JobOptions);
                                 break;
                             case "h":
                                 Console.Write("PORT: ");

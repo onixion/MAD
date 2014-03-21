@@ -5,14 +5,12 @@ namespace JobSystemTest
 {
     class JobHttp : Job
     {
-        JobHttpOptions options;
-
         WebRequest request;
         WebResponse response;
 
-        public JobHttp(JobHttpOptions options)
+        public JobHttp(JobOptions options, int port)
         {
-            Init();
+            InitJob();
             this.options = options;
         }
 
@@ -20,7 +18,7 @@ namespace JobSystemTest
         {
             Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
 
-            request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" + options.port);
+            request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" /*+ options.port*/);
 
             try
             {

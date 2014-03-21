@@ -3,12 +3,24 @@ using System.Net;
 
 namespace JobSystemTest
 {
-    abstract class JobOptions
+    class JobOptions
     {
-        public string jobType;
         public string jobName;
         public int delayTime;
         public IPAddress targetAddress;
-        public bool jobSuccsess;
+
+        public enum JobType
+        { 
+            PingRequest,
+            HttpRequest,
+            PortRequest
+        }
+
+        public JobOptions(string jobName, JobType jobType, int delayTime, IPAddress targetAddress)
+        {
+            this.jobName = jobName;
+            this.delayTime = delayTime;
+            this.targetAddress = targetAddress;
+        }
     }
 }

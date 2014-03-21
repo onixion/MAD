@@ -14,7 +14,7 @@ namespace JobSystemTest
 
         public abstract void DoJob();
 
-        public void Init()
+        public void InitJob()
         {
             // set/get JobID
             jobID = jobsCount;
@@ -60,6 +60,15 @@ namespace JobSystemTest
                 return true;
 
             return false;
+        }
+
+        public virtual void JobStatus()
+        {
+            Console.WriteLine("Job-ID:           " + jobID);
+            Console.WriteLine("Job-Name:         " + options.jobName);
+            Console.WriteLine("Job-Type:         " + options.jobType);
+            Console.WriteLine("Target-Address:   " + options.targetAddress);
+            Console.WriteLine("Delaytime:        " + options.delayTime);
         }
     }
 }
