@@ -1,6 +1,8 @@
 ﻿// MAD - Network Monitoring
+// _________________________
 
 using System;
+using MadCLI;
 
 namespace MAD
 {
@@ -8,9 +10,8 @@ namespace MAD
     {
         static void Main(string[] args)
         {
-            // TEST CLI
-
-            //
+            MadCLI.MadCLI test = new MadCLI.MadCLI();
+            test.Start();
         }
     }
 }

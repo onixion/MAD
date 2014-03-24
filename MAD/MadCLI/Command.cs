@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD
+namespace MadCLI
 {
-    abstract class Command
+    public abstract class Command
     {
         public string mainCommand;
         public List<string[]> args;
@@ -30,6 +30,9 @@ namespace MAD
                 return false;
         }
 
+        /// <summary>
+        /// Returns true if the arguments exists
+        /// </summary>
         public bool ArgumentExists(string indicator)
         {
             if (requiredIndicators.Contains(indicator))

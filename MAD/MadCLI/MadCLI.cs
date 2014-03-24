@@ -2,13 +2,12 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace MAD
+namespace MadCLI
 {
-    class MadCLI
+    public class MadCLI
     {
         public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
 
-        // console variables
         public string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor textColor = ConsoleColor.White;
@@ -24,13 +23,17 @@ namespace MAD
 
         public MadCLI()
         {
-            InitCLI();
-        }
-
-        public void InitCLI()
-        {
             UpdateWindowTitle();
             Console.ForegroundColor = textColor;
+
+            InitCommands();
+        }
+
+        private void InitCommands()
+        {
+            commands.Add("clear");
+            commands.Add("help");
+            commands.Add("header");
         }
 
         public void UpdateWindowTitle()
@@ -50,21 +53,31 @@ namespace MAD
                 PrintCursor();
                 cliInput = Console.ReadLine();
 
-                mainCommand = GetMainCommand(cliInput);
-                args = GetCommandArgs(cliInput);
-
-                if (CommandExists(mainCommand))
+                if (cliInput != "")
                 {
-                    CreateCommand(mainCommand);
+                    mainCommand = GetMainCommand(cliInput);
+                    args = GetCommandArgs(cliInput);
 
-                    if (command.ValidArguments(args))
+                    if (CommandExists(mainCommand))
                     {
-                        command.args = args;
-                        command.Execute();
+                        if (CheckArguments(args))
+                        {
+                            CreateCommand(mainCommand);
+
+                            if (command.ValidArguments(args))
+                            {
+                                command.args = args;
+                                command.Execute();
+                            }
+                            else
+                                ErrorMessage("Missing or wrong arguments!");
+                        }
+                        else
+                            ErrorMessage("Argument NULL Exception!");
                     }
+                    else
+                        ErrorMessage("Command \"" + mainCommand + "\" not found!");
                 }
-                else
-                    ErrorMessage("Command \"" + mainCommand + "\" not found!");
             }
             
         }
@@ -81,26 +94,36 @@ namespace MAD
         /// </summary>
         public string GetMainCommand(string input)
         {
-            string[] buffer = input.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.None);
+            buffer[0] = buffer[0].Trim();
+
             return buffer[0];
+        }
+
+        private bool CheckArguments(List<string[]> args)
+        {
+            foreach (string[] temp in args)
+                if (temp.Length == 0)
+                    return false;
+
+            return true;
         }
 
         /// <summary>
         /// Get Arguments
         /// </summary>
-        /// <param name="inputCLI"></param>
-        /// <returns>Returns all arguments in a list with string[]</returns>
         public List<string[]> GetCommandArgs(string inputCLI)
         {
             List<string[]> temp1 = new List<string[]>();
             string[] temp2 = cliInput.Split(new char[] {'-'});
 
-            for (int i = 0; i < temp2.Length; i++)
+            for (int i = 1; i < temp2.Length; i++)
                 temp2[i] = temp2[i].Trim();
 
             for (int i = 1; i < temp2.Length; i++)
             {
                 string[] temp3 = temp2[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
                 temp1.Add(temp3);
             }
 
@@ -122,14 +145,15 @@ namespace MAD
         {
             switch (input)
             {
-                case "test":
-                    command = new TestCommand();
-                    break;
-
                 case "help":
                     command = new HelpCommand();
                     break;
-
+                case "clear":
+                    command = new ClearCommand();
+                    break;
+                case "header":
+                    command = new HeaderCommand(this);
+                    break;
                 default:
                     break;
             }
