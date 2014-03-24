@@ -24,6 +24,9 @@ namespace JobSystemTest
             {
                 response = request.GetResponse();
                 success = true;
+
+                //Console.WriteLine(response.Headers);
+
                 response.Close();
             }
             catch (Exception e)

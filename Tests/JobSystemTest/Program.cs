@@ -49,6 +49,7 @@ namespace JobSystemTest
                         Console.WriteLine("JOB LIST:");
                         foreach (Job temp in system.jobs)
                         {
+                            Console.WriteLine();
                             Console.WriteLine("ID:           " + temp.jobID);
                             Console.WriteLine("Name:         " + temp.options.jobName);
                             Console.WriteLine("Type:         " + temp.options.type);
