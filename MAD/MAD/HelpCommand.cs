@@ -5,20 +5,20 @@ using System.Text;
 
 namespace MAD
 {
-    class TestCommand : Command
+    class HelpCommand : Command
     {
-        public TestCommand()
+        public HelpCommand()
         {
-            mainCommand = "test";
+            mainCommand = "help";
 
             requiredIndicators = new List<string>();
-            requiredIndicators.Add("-a");
-            requiredIndicators.Add("-d");
+            optionalIndicators = new List<string>();
+            optionalIndicators.Add("-a");
         }
 
         public override void Execute()
         {
-            Console.WriteLine("EXECUTE");
+            Console.WriteLine("Help Page --------------- ");
         }
     }
 }
