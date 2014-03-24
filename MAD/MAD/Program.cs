@@ -1,5 +1,4 @@
 ﻿// MAD - Network Monitoring
-// VERSION 0.0.0.1
 
 using System;
 
@@ -9,6 +8,9 @@ namespace MAD
     {
         static void Main(string[] args)
         {
+            // TEST CLI
+
+            //
         }
     }
 }
