@@ -9,14 +9,16 @@ namespace JobSystemTest
         Ping ping;
         PingOptions pingOptions;
         PingReply reply;
-
-        public JobPing(JobOptions options)
+        int ttl;
+        
+        public JobPing(JobOptions options, int ttl)
         {
+            InitJob();
             this.options = options;
-            Init();   
+            this.ttl = ttl;
 
             ping = new Ping();
-            pingOptions = new PingOptions(200, true);
+            pingOptions = new PingOptions(ttl, true);
         }
 
         public override void DoJob()
@@ -26,11 +28,21 @@ namespace JobSystemTest
             reply = ping.Send(options.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
             if (reply.Status == IPStatus.Success)
-                success = true;
+               options.jobSuccsess = true;
             else
-                success = false;
+               options.jobSuccsess = false;
 
             Console.WriteLine(success);
         }
+
+        public override void JobStatus()
+        {
+            base.JobStatus();
+
+            Console.WriteLine("TTL: " + options.ttl);
+        }
+        
+        
+        
     }
 }

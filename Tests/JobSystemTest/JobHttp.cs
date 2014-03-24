@@ -8,17 +8,17 @@ namespace JobSystemTest
         WebRequest request;
         WebResponse response;
 
-        public JobHttp(JobOptions options)
+        public JobHttp(JobOptions options, int port)
         {
+            InitJob();
             this.options = options;
-            Init();
         }
 
         public override void DoJob()
         {
             Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
 
-            request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" + options.targetPort);
+            request = WebRequest.Create("http://" + options.targetAddress.ToString() + ":" /*+ options.port*/);
 
             try
             {

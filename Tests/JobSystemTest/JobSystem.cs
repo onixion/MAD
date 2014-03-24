@@ -12,21 +12,25 @@ namespace JobSystemTest
             jobs = new List<Job>();
         }
 
-        public void AddJob(JobOptions options)
+        public void AddJob(JobOptions options, params object[] args)
         {
-            switch (options.type.ToString())
+            switch (options.jobType.ToString())
             { 
                 case "PingRequest":
-                    jobs.Add(new JobPing(options));
+                    if (args.Length == 1)
+                        jobs.Add(new JobPing(options, (int)args[0]));
+                    else
+                        jobs.Add(new JobPing(options, 200));
                     break;
 
                 case "HttpRequest":
-                    jobs.Add(new JobHttp(options));
+                    if (args.Length == 1)
+                        jobs.Add(new JobHttp(options, (int)args[0]));
+                    else
+                        jobs.Add(new JobHttp(options, 80));
                     break;
-
-                case "PortScan":
-                    jobs.Add(new JobPort(options));
-                    break;
+            
+            
             }
         }
 
