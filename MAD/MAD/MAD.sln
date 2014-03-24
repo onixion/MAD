@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAD", "MAD.csproj", "{402C604E-F083-4902-99D3-6742F7CF32D4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAD", "MAD.csproj", "{0A1F0057-E91E-41C6-A224-9850C5D17B5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,10 +9,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{402C604E-F083-4902-99D3-6742F7CF32D4}.Debug|x86.ActiveCfg = Debug|x86
-		{402C604E-F083-4902-99D3-6742F7CF32D4}.Debug|x86.Build.0 = Debug|x86
-		{402C604E-F083-4902-99D3-6742F7CF32D4}.Release|x86.ActiveCfg = Release|x86
-		{402C604E-F083-4902-99D3-6742F7CF32D4}.Release|x86.Build.0 = Release|x86
+		{0A1F0057-E91E-41C6-A224-9850C5D17B5B}.Debug|x86.ActiveCfg = Debug|x86
+		{0A1F0057-E91E-41C6-A224-9850C5D17B5B}.Debug|x86.Build.0 = Debug|x86
+		{0A1F0057-E91E-41C6-A224-9850C5D17B5B}.Release|x86.ActiveCfg = Release|x86
+		{0A1F0057-E91E-41C6-A224-9850C5D17B5B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,5 @@
 ﻿// MAD - Network Monitoring
 // VERSION 0.0.0.1
-// _____________________________
 
 using System;
 
@@ -10,9 +9,6 @@ namespace MAD
     {
         static void Main(string[] args)
         {
-            // init MadCLI
-            MadCLI cli = new MadCLI();
-            cli.Start();
         }
     }
 }
