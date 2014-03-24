@@ -1,23 +1,38 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 
 namespace MAD
 {
     class MadCLI
     {
-        public Command command;
-
-        public List<string[]> commandArguments;
+        public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
 
         public string cursor = "=> ";
-        private string cliInput;
-        private string[] cliInputArray;
-
+        public ConsoleColor cursorColor = ConsoleColor.Cyan;
+        public ConsoleColor textColor = ConsoleColor.White;
         public string windowTitle = "MAD - Network Monitoring";
 
-        public MadCLI()
-        { 
+        public Command command;
+        public List<string> commands = new List<string>();
 
+        private string cliInput;
+
+        public string mainCommand;
+        public List<string[]> args;
+
+        public MadCLI()
+        {
+            InitCLI();
+
+            commands.Add("help");
+            commands.Add("test");
+        }
+
+        public void InitCLI()
+        {
+            UpdateWindowTitle();
+            Console.ForegroundColor = textColor;
         }
 
         public void UpdateWindowTitle()
@@ -28,31 +43,38 @@ namespace MAD
         /// <summary>
         /// Start CLI
         /// </summary>
-
         public void Start()
         {
+            PrintHeader();
+
             while (true)
             {
-                Console.Write(cursor);
+                PrintCursor();
                 cliInput = Console.ReadLine();
-                cliInputArray = cliInput.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (CommandExists(cliInputArray[0]))
+                GetCommandArgs(cliInput);
+
+                if (CommandExists(mainCommand))
                 {
-                    commandArguments = GetCommandArgs(cliInput);
+                    CreateCommand(mainCommand);
 
-                    if (command.ValidArguments(commandArguments))
+                    if (command.ValidArguments(args))
                     {
-                        string[] buffer = commandArguments[0];
-                        CommandCreate(buffer[0]);
+                        command.args = args;
                         command.Execute();
                     }
-                    else
-                        Console.WriteLine("Wrong syntax or missing arguments!");
                 }
                 else
-                    Console.WriteLine("Command not found!");
+                    ErrorMessage("Command \"" + mainCommand + "\" not found!");
             }
+            
+        }
+
+        public void PrintCursor()
+        {
+            Console.ForegroundColor = cursorColor;
+            Console.Write(cursor);
+            Console.ForegroundColor = textColor;
         }
 
         /// <summary>
@@ -60,46 +82,37 @@ namespace MAD
         /// </summary>
         /// <param name="inputCLI"></param>
         /// <returns>Returns all arguments in a list with string[]</returns>
-
-        public List<string[]> GetCommandArgs(string inputCLI)
+        public void GetCommandArgs(string inputCLI)
         {
-            List<string[]> temp = new List<string[]>();
-            string[] temp2 = cliInput.Split('-');
+            List<string[]> temp1 = new List<string[]>();
+            string[] temp2 = cliInput.Split(new char[] {'-'});
 
             for (int i = 0; i < temp2.Length; i++)
+                temp2[i] = temp2[i].Trim();
+
+            mainCommand = temp2[0];
+
+            for (int i = 1; i < temp2.Length; i++)
             {
                 string[] temp3 = temp2[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                temp.Add(temp3);
+                temp1.Add(temp3);
             }
 
-            return temp;
+            args = temp1;
         }
 
         /// <summary>
-        /// Checks if a command exists and creates it
+        /// Checks if a command exists
         /// </summary>
-
         public bool CommandExists(string input)
         {
-            switch (input)
-            {
-                case "test":
-                    return true;
-
-                case "help":
-                    return true;
-
-                case "":
-                    break;
-
-                default:
-                    break;
-            }
-
-            return false;
+            return commands.Contains(input);
         }
 
-        public void CommandCreate(string input)
+        /// <summary>
+        /// creates the command
+        /// </summary>
+        public void CreateCommand(string input)
         {
             switch (input)
             {
@@ -116,13 +129,26 @@ namespace MAD
             }
         }
 
+        public void ErrorMessage(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("[ERROR] ");
+            Console.ForegroundColor = textColor;
+            Console.WriteLine(message);
+        }
+
         /// <summary>
         /// Print the MAD-Logo on the CLI
         /// </summary>
-
         public void PrintHeader()
-        { 
-        
+        {
+            Console.WriteLine(@"___  ___ ___ ______");
+            Console.WriteLine(@"|  \/  |/ _ \|  _  \");
+            Console.WriteLine(@"| .  . / /_\ \ | | |");
+            Console.WriteLine(@"| |\/| |  _  | | | |    NETWORK MONITORING");
+            Console.WriteLine(@"| |  | | | | | |/ /     VERSION " + version);
+            Console.WriteLine(@"\_|  |_\_| |_/___/___________________________ ");
+            Console.WriteLine();
         }
     }
 }

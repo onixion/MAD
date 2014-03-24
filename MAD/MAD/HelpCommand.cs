@@ -10,15 +10,16 @@ namespace MAD
         public HelpCommand()
         {
             mainCommand = "help";
-
-            requiredIndicators = new List<string>();
-            optionalIndicators = new List<string>();
-            optionalIndicators.Add("-a");
         }
 
         public override void Execute()
         {
-            Console.WriteLine("Help Page --------------- ");
+            Console.WriteLine();
+            Console.WriteLine("----< HELP PAGE >---------------------------------------");
+            Console.WriteLine("--< general commands >----------------------------------");
+            Console.WriteLine();
+            Console.WriteLine(" help                        print this help page");
+            Console.WriteLine();
         }
     }
 }

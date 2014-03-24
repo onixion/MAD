@@ -6,18 +6,23 @@ namespace MAD
     abstract class Command
     {
         public string mainCommand;
-        public List<string> requiredIndicators;
-        public List<string> optionalIndicators;
+        public List<string[]> args;
 
-        public virtual bool ValidArguments(List<string[]> indicators)
+        public List<string> requiredIndicators = new List<string>();
+        public List<string> optionalIndicators = new List<string>();
+
+        public virtual bool ValidArguments(List<string[]> args)
         {
-            int i = 0;
+            // check if all arguments are known by the command
+            foreach (string[] temp in args)
+                if (!ArgumentExists(temp[0]))
+                    return false;
 
-            foreach (string[] temp in indicators)
-            {
+            // check if all needed arguments are known
+            int i = 0;
+            foreach (string[] temp in args)
                 if (requiredIndicators.Contains(temp[0]))
                     i++;
-            }
 
             if (requiredIndicators.Count == i)
                 return true;
@@ -25,10 +30,20 @@ namespace MAD
                 return false;
         }
 
+        public bool ArgumentExists(string indicator)
+        {
+            if (requiredIndicators.Contains(indicator))
+                return true;
+
+            if (optionalIndicators.Contains(indicator))
+                return true;
+        
+            return false;
+        }
+
         /// <summary>
         /// Execute command
         /// </summary>
-
         public abstract void Execute();
     }
 }

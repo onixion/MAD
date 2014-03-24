@@ -12,8 +12,6 @@ namespace MAD
         {
             // init MadCLI
             MadCLI cli = new MadCLI();
-            cli.UpdateWindowTitle();
-            cli.PrintHeader();
             cli.Start();
         }
     }
