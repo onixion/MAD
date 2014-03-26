@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace MadCLI
+namespace MAD
 {
     public class MadCLI
     {
@@ -15,11 +15,16 @@ namespace MadCLI
 
         public List<string> commands = new List<string>();
         public Command command;
+        public int executeStatusCode;
 
         private string cliInput;
 
-        public string mainCommand;
+        public string commandInput;
         public List<string[]> args;
+
+        //
+        JobSystem system = new JobSystem();
+        
 
         public MadCLI()
         {
@@ -29,13 +34,21 @@ namespace MadCLI
             InitCommands();
         }
 
+        /// <summary>
+        /// Initial all available commands
+        /// </summary>
         private void InitCommands()
         {
-            commands.Add("clear");
             commands.Add("help");
+            commands.Add("clear");
+            commands.Add("exit");
+            commands.Add("close");
             commands.Add("header");
         }
 
+        /// <summary>
+        /// Update windowtitle
+        /// </summary>
         public void UpdateWindowTitle()
         {
             Console.Title = windowTitle;
@@ -55,33 +68,39 @@ namespace MadCLI
 
                 if (cliInput != "")
                 {
-                    mainCommand = GetMainCommand(cliInput);
-                    args = GetCommandArgs(cliInput);
+                    commandInput = GetMainCommand(cliInput);
 
-                    if (CommandExists(mainCommand))
+                    if (commandInput != null)
                     {
-                        if (CheckArguments(args))
+                        if (CommandExists(commandInput))
                         {
-                            CreateCommand(mainCommand);
+                            CreateCommand(commandInput);
 
-                            if (command.ValidArguments(args))
-                            {
-                                command.args = args;
-                                command.Execute();
-                            }
-                            else
-                                ErrorMessage("Missing or wrong arguments!");
+                            args = GetArgs(cliInput);
+
+                                if (command.ValidArguments(args))
+                                {
+                                    command.SetArguments(args);
+
+                                    executeStatusCode = command.Execute();
+
+                                    if (executeStatusCode != 0)
+                                        ErrorMessage(ErrorText(executeStatusCode));
+                                }
+                                else
+                                    ErrorMessage("Missing or wrong arguments!");
                         }
                         else
-                            ErrorMessage("Argument NULL Exception!");
+                            ErrorMessage("Command \"" + commandInput + "\" not found!");
                     }
-                    else
-                        ErrorMessage("Command \"" + mainCommand + "\" not found!");
                 }
             }
             
         }
 
+        /// <summary>
+        /// Print cursor to cli
+        /// </summary>
         public void PrintCursor()
         {
             Console.ForegroundColor = cursorColor;
@@ -89,30 +108,32 @@ namespace MadCLI
             Console.ForegroundColor = textColor;
         }
 
+        public string ErrorText(int statusCode)
+        {
+            switch (statusCode)
+            { 
+                default:
+                    return "Errorcode: " + statusCode;
+            }
+        }
+
         /// <summary>
         /// Get main command
         /// </summary>
         public string GetMainCommand(string input)
         {
-            string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.None);
-            buffer[0] = buffer[0].Trim();
+            string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.RemoveEmptyEntries);
+
+            if (buffer[0] == "")
+                return null;
 
             return buffer[0];
-        }
-
-        private bool CheckArguments(List<string[]> args)
-        {
-            foreach (string[] temp in args)
-                if (temp.Length == 0)
-                    return false;
-
-            return true;
         }
 
         /// <summary>
         /// Get Arguments
         /// </summary>
-        public List<string[]> GetCommandArgs(string inputCLI)
+        public List<string[]> GetArgs(string inputCLI)
         {
             List<string[]> temp1 = new List<string[]>();
             string[] temp2 = cliInput.Split(new char[] {'-'});
@@ -130,6 +151,14 @@ namespace MadCLI
             return temp1;
         }
 
+        public string GetCommands(string inputCLI)
+        {
+            string[] temp = inputCLI.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            temp = temp[0].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+            return temp[0];
+        }
+
         /// <summary>
         /// Checks if a command exists
         /// </summary>
@@ -139,7 +168,7 @@ namespace MadCLI
         }
 
         /// <summary>
-        /// creates the command
+        /// Creates the command
         /// </summary>
         public void CreateCommand(string input)
         {
@@ -151,8 +180,17 @@ namespace MadCLI
                 case "clear":
                     command = new ClearCommand();
                     break;
+                case "exit":
+                    command = new ExitCommand();
+                    break;
+                case "close":
+                    command = new ExitCommand();
+                    break;
                 case "header":
                     command = new HeaderCommand(this);
+                    break;
+                case "info":
+                    command = new InfoCommand();
                     break;
                 default:
                     break;
@@ -172,12 +210,12 @@ namespace MadCLI
         /// </summary>
         public void PrintHeader()
         {
-            Console.WriteLine(@"___  ___ ___ ______");
+            Console.WriteLine(@" __  __   _   ____ ");
             Console.WriteLine(@"|  \/  |/ _ \|  _  \");
             Console.WriteLine(@"| .  . / /_\ \ | | |");
             Console.WriteLine(@"| |\/| |  _  | | | |    NETWORK MONITORING");
-            Console.WriteLine(@"| |  | | | | | |/ /     VERSION " + version);
-            Console.WriteLine(@"\_|  |_\_| |_/___/___________________________ ");
+            Console.WriteLine(@"| |  | | | | | |_/ |    VERSION " + version);
+            Console.WriteLine(@"|_|  |_\_| |_/____/ __________________________ ");
             Console.WriteLine();
         }
     }

@@ -37,14 +37,17 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Command.cs" />
+    <Compile Include="Job.cs" />
+    <Compile Include="JobHttp.cs" />
+    <Compile Include="JobOptions.cs" />
+    <Compile Include="JobPing.cs" />
+    <Compile Include="JobPort.cs" />
+    <Compile Include="JobSystem.cs" />
+    <Compile Include="MadCLI.cs" />
+    <Compile Include="MadCLICommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MadCLI\MadCLI.csproj">
-      <Project>{7E5D9ADF-1598-4E7C-93A2-5929A1B35AD5}</Project>
-      <Name>MadCLI</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
