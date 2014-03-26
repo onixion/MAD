@@ -10,9 +10,7 @@ namespace MAD
         private Thread jobThread;
         public static int jobsCount = 0;
         public int jobID;
-        public string[] jobOutput;
-
-        public string output;
+        public string jobOutput;
 
         public abstract void DoJob();
 
@@ -53,7 +51,7 @@ namespace MAD
 
         public void Wait()
         {
-            Thread.Sleep(jobOptions.delayTime);
+            Thread.Sleep(jobOptions.delay);
         }
 
         public bool IsRunning()
@@ -69,7 +67,7 @@ namespace MAD
             Console.WriteLine("Job-ID:           " + jobID);
             Console.WriteLine("Job-Name:         " + jobOptions.jobName);
             Console.WriteLine("Target-Address:   " + jobOptions.targetAddress);
-            Console.WriteLine("Delaytime:        " + jobOptions.delayTime);
+            Console.WriteLine("Delaytime:        " + jobOptions.delay);
         }
     }
 }

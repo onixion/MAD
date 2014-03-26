@@ -6,33 +6,31 @@ namespace MAD
 {
     class JobPort : Job
     {
-        Socket socket;
+        public JobPortOptions portJobOptions;
+        private Socket socket;
 
-        public JobPort(/*JobOptions options*/)
+        public JobPort(JobPortOptions portJobOptions)
         {
-            //this.options = options;
-            //Init();
+            InitJob();
+            this.portJobOptions = portJobOptions;
+            this.jobOptions = (JobOptions) portJobOptions;
         }
 
         public override void DoJob()
         {
-            /*Console.Write("JobID: " + jobID + " PORT-SCAN on " + options.targetPort + " -> ");
-
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
-                socket.Connect(new IPEndPoint(options.targetAddress, options.targetPort));
-                success = true;
+                socket.Connect(new IPEndPoint(jobOptions.targetAddress, portJobOptions.port));
+                jobOutput = "TRUE";
             }
             catch (Exception e)
             {
-                success = false;
+                jobOutput = "FALSE";
             }
 
             socket.Close();
-
-            Console.WriteLine(success);*/
         }
     }
 }

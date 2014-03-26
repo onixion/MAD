@@ -8,58 +8,34 @@ namespace MAD
     {
         public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
 
+        public string cliVersion = "0.0.0.2";
         public string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor textColor = ConsoleColor.White;
         public string windowTitle = "MAD - Network Monitoring";
 
-        public List<string> commands = new List<string>();
+        private string cliInput;
+        public List<string> commands = new List<string> { "help", "clear", "exit", "close", "logo", "info", "cursor" };
         public Command command;
         public int executeStatusCode;
 
-        private string cliInput;
-
         public string commandInput;
         public List<string[]> args;
-
-        //
-        JobSystem system = new JobSystem();
-        
 
         public MadCLI()
         {
             UpdateWindowTitle();
             Console.ForegroundColor = textColor;
-
-            InitCommands();
         }
 
-        /// <summary>
-        /// Initial all available commands
-        /// </summary>
-        private void InitCommands()
-        {
-            commands.Add("help");
-            commands.Add("clear");
-            commands.Add("exit");
-            commands.Add("close");
-            commands.Add("header");
-        }
-
-        /// <summary>
-        /// Update windowtitle
-        /// </summary>
         public void UpdateWindowTitle()
         {
             Console.Title = windowTitle;
         }
 
-        /// <summary>
-        /// Start CLI
-        /// </summary>
         public void Start()
         {
-            PrintHeader();
+            PrintLogo();
 
             while (true)
             {
@@ -68,7 +44,7 @@ namespace MAD
 
                 if (cliInput != "")
                 {
-                    commandInput = GetMainCommand(cliInput);
+                    commandInput = GetCommand(cliInput);
 
                     if (commandInput != null)
                     {
@@ -81,14 +57,15 @@ namespace MAD
                                 if (command.ValidArguments(args))
                                 {
                                     command.SetArguments(args);
-
+                                    
+                                    // EXECUTE COMMAND
                                     executeStatusCode = command.Execute();
 
                                     if (executeStatusCode != 0)
-                                        ErrorMessage(ErrorText(executeStatusCode));
+                                        ErrorMessage(GetErrorText(executeStatusCode));
                                 }
                                 else
-                                    ErrorMessage("Missing or wrong arguments!");
+                                    ErrorMessage("Wrong or missing arguments!");
                         }
                         else
                             ErrorMessage("Command \"" + commandInput + "\" not found!");
@@ -98,9 +75,6 @@ namespace MAD
             
         }
 
-        /// <summary>
-        /// Print cursor to cli
-        /// </summary>
         public void PrintCursor()
         {
             Console.ForegroundColor = cursorColor;
@@ -108,31 +82,29 @@ namespace MAD
             Console.ForegroundColor = textColor;
         }
 
-        public string ErrorText(int statusCode)
+        public string GetErrorText(int statusCode)
         {
             switch (statusCode)
             { 
+                case 1:
+                    return "Missing or wrong arguments!";
                 default:
                     return "Errorcode: " + statusCode;
             }
         }
 
-        /// <summary>
-        /// Get main command
-        /// </summary>
-        public string GetMainCommand(string input)
+        public string GetCommand(string input)
         {
             string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.RemoveEmptyEntries);
 
             if (buffer[0] == "")
                 return null;
 
+            buffer[0] = buffer[0].Trim();
+
             return buffer[0];
         }
 
-        /// <summary>
-        /// Get Arguments
-        /// </summary>
         public List<string[]> GetArgs(string inputCLI)
         {
             List<string[]> temp1 = new List<string[]>();
@@ -144,32 +116,17 @@ namespace MAD
             for (int i = 1; i < temp2.Length; i++)
             {
                 string[] temp3 = temp2[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
                 temp1.Add(temp3);
             }
 
             return temp1;
         }
 
-        public string GetCommands(string inputCLI)
-        {
-            string[] temp = inputCLI.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
-            temp = temp[0].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-            return temp[0];
-        }
-
-        /// <summary>
-        /// Checks if a command exists
-        /// </summary>
         public bool CommandExists(string input)
         {
             return commands.Contains(input);
         }
 
-        /// <summary>
-        /// Creates the command
-        /// </summary>
         public void CreateCommand(string input)
         {
             switch (input)
@@ -186,13 +143,14 @@ namespace MAD
                 case "close":
                     command = new ExitCommand();
                     break;
-                case "header":
-                    command = new HeaderCommand(this);
+                case "logo":
+                    command = new LogoCommand(this);
                     break;
                 case "info":
-                    command = new InfoCommand();
+                    command = new InfoCommand(this);
                     break;
-                default:
+                case "cursor":
+                    command = new CursorCommand(this);
                     break;
             }
         }
@@ -205,16 +163,13 @@ namespace MAD
             Console.WriteLine(message);
         }
 
-        /// <summary>
-        /// Print the MAD-Logo on the CLI
-        /// </summary>
-        public void PrintHeader()
+        public void PrintLogo()
         {
             Console.WriteLine(@" __  __   _   ____ ");
             Console.WriteLine(@"|  \/  |/ _ \|  _  \");
-            Console.WriteLine(@"| .  . / /_\ \ | | |");
-            Console.WriteLine(@"| |\/| |  _  | | | |    NETWORK MONITORING");
-            Console.WriteLine(@"| |  | | | | | |_/ |    VERSION " + version);
+            Console.WriteLine(@"| .  . / /_\ \ | | |    MONITORING LIKE A BOZZ!");
+            Console.WriteLine(@"| |\/| |  _  | | | |");
+            Console.WriteLine(@"| |  | | | | | |_/ |    MadCLI-VERSION " + cliVersion);
             Console.WriteLine(@"|_|  |_\_| |_/____/ __________________________ ");
             Console.WriteLine();
         }

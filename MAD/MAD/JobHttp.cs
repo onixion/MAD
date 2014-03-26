@@ -5,36 +5,31 @@ namespace MAD
 {
     class JobHttp : Job
     {
-        JobHttpOptions httpOptions;
+        public JobHttpOptions httpJobOptions;
+        private WebRequest request;
+        private WebResponse response;
 
-        WebRequest request;
-        WebResponse response;
-
-        public JobHttp(JobOptions jobOptions, JobHttpOptions httpOptions)
+        public JobHttp(JobHttpOptions httpJobOptions)
         {
             InitJob();
-            jobOutput = new string[1];
-
-            this.jobOptions = jobOptions;
-            this.httpOptions = httpOptions;
+            this.httpJobOptions = httpJobOptions;
+            this.jobOptions = (JobOptions)httpJobOptions;
         }
 
         public override void DoJob()
         {
-            Console.Write("JobID: " + jobID + " HTTP Erfolgreich? -> ");
-
-            request = WebRequest.Create("http://" + jobOptions.targetAddress.ToString() + ":" + httpOptions.port);
+            request = WebRequest.Create("http://" + jobOptions.targetAddress.ToString() + ":" + httpJobOptions.port);
 
             try
             {
                 response = request.GetResponse();
-                jobOutput[0] = "HTTP WEBSERVER FOUND";
+                jobOutput = "HTTP WEBSERVER FOUND!";
 
                 response.Close();
             }
             catch (Exception e)
             {
-                jobOutput[0] = "NO HTTP WEBSERVER FOUND!";
+                jobOutput = "NO HTTP WEBSERVER FOUND!";
             }
 
             request.Abort();

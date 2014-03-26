@@ -6,38 +6,35 @@ namespace MAD
 {
     class JobPing : Job
     {
-        Ping ping;
-        PingOptions pingOptions;
-        PingReply reply;
-        int ttl;
+        public JobPingOptions pingJobOptions;
+        private Ping ping;
+        private PingOptions pingOptions;
+        private PingReply reply;
         
-        public JobPing(JobOptions options, int ttl)
+        public JobPing(JobPingOptions pingJobOptions)
         {
             InitJob();
-            this.jobOptions = jobOptions;
-            this.ttl = ttl;
+            this.pingJobOptions = pingJobOptions;
+            this.jobOptions = (JobOptions)pingJobOptions;
 
             ping = new Ping();
-            pingOptions = new PingOptions(ttl, true);
+            pingOptions = new PingOptions(pingJobOptions.ttl, true);
         }
 
         public override void DoJob()
         {
-            jobOutput = new string[1];
-
-            Console.Write("JobID: " + jobID + " PING Erfolgreich? -> ");
-
             reply = ping.Send(jobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
             if (reply.Status == IPStatus.Success)
-                jobOutput[0] = "TRUE";
+                jobOutput = "TRUE";
             else
-                jobOutput[0] = "FALSE";
+                jobOutput = "FALSE";
         }
 
         public override void JobStatus()
         {
             base.JobStatus();
+            Console.WriteLine("TTL:              " + pingJobOptions.ttl);
         }
         
         

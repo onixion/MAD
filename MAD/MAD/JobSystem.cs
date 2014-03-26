@@ -13,12 +13,20 @@ namespace MAD
             jobs = new List<Job>();
         }
 
-        public void AddJob(JobOptions jobOptions, object jobTypeOptions)
+        public void AddJob(JobOptions jobOptions)
         {
-            switch (jobOptions.jobType)
+            int jobType = (int) jobOptions.jobType;
+
+            switch (jobType)
             { 
-                case "HttpRequest":
-                    jobs.Add(new JobHttp(jobOptions, (JobHttpOptions) jobTypeOptions));
+                case 0: // PING REQUEST
+                    jobs.Add(new JobPing((JobPingOptions)jobOptions));
+                    break;
+                case 1: // PORT SCAN
+                    jobs.Add(new JobPort((JobPortOptions)jobOptions));
+                    break;
+                case 2: // HTTP REQUEST
+                    jobs.Add(new JobHttp((JobHttpOptions)jobOptions));
                     break;
             }
         }

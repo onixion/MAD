@@ -40,9 +40,12 @@
     <Compile Include="Command.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="JobHttp.cs" />
+    <Compile Include="JobHttpOptions.cs" />
     <Compile Include="JobOptions.cs" />
     <Compile Include="JobPing.cs" />
+    <Compile Include="JobPingOptions.cs" />
     <Compile Include="JobPort.cs" />
+    <Compile Include="JobPortOptions.cs" />
     <Compile Include="JobSystem.cs" />
     <Compile Include="MadCLI.cs" />
     <Compile Include="MadCLICommands.cs" />
