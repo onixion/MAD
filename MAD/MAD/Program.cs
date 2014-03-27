@@ -14,8 +14,8 @@ namespace MAD
             // IF THIS IS NOT EMPTY, THE MERGE PROCESS COULD CAUSE AN ERROR. TO AVOID THIS JUST
             // KEEP THIS METHOD HERE CLEAN. THANKS!
 
-            MadCLI cli = new MadCLI();
-            cli.Start();
+            // MyProgram p = new MyProgram();
+            // p.Run();
         }
     }
 }
