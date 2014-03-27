@@ -47,6 +47,7 @@
     <Compile Include="JobPort.cs" />
     <Compile Include="JobPortOptions.cs" />
     <Compile Include="JobSystem.cs" />
+    <Compile Include="JobSystemCommands.cs" />
     <Compile Include="MadCLI.cs" />
     <Compile Include="MadCLICommands.cs" />
     <Compile Include="Program.cs" />

@@ -8,18 +8,13 @@ namespace MAD
         public List<string> requiredIndicators = new List<string>();
         public List<string> optionalIndicators = new List<string>();
 
-        public List<string[]> args;
+        public List<string[]> args = new List<string[]>();
 
         public bool ValidArguments(List<string[]> args)
         {
-            // check if any args are empty
-            foreach (string[] temp in args)
-                if (temp.Length == 0)
-                    return false;
-
             // check if all arguments are known by the command
             foreach (string[] temp in args)
-                if (!ArgumentExists(temp[0]))
+                if (!ArgumentSupported(temp[0]))
                     return false; 
 
             // check if all needed arguments are known
@@ -55,17 +50,38 @@ namespace MAD
             return null;
         }
 
-        /// <summary>
-        /// Returns true if the arguments exists
-        /// </summary>
-        public bool ArgumentExists(string indicator)
+        public bool ArgumentSupported(string indicator)
         {
-            if (requiredIndicators.Contains(indicator))
-                return true;
+            foreach (string temp in requiredIndicators)
+                if (temp == indicator)
+                    return true;
 
-            if (optionalIndicators.Contains(indicator))
-                return true;
-        
+            foreach (string temp in optionalIndicators)
+                if (temp == indicator)
+                    return true;
+
+            return false;
+        }
+
+        public bool OptionalArgumentExists(string indicator)
+        {
+            for (int i = 0; i < args.Count; i++)
+            {
+                string[] buffer = args[i];
+
+                if (buffer[0] == indicator)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool ArgumentEmpty(string indicator)
+        {
+            foreach (string[] temp in args)
+                if (temp[0] == indicator)
+                    if (temp.Length == 1)
+                        return true;
             return false;
         }
 

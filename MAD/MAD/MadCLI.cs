@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -15,17 +16,25 @@ namespace MAD
         public string windowTitle = "MAD - Network Monitoring";
 
         private string cliInput;
-        public List<string> commands = new List<string> { "help", "clear", "exit", "close", "logo", "info", "cursor" };
+        public List<string> commands = new List<string> { "help", "clear", "exit", "close", "logo", "info", "cursor", "jobstatus" };
         public Command command;
         public int executeStatusCode;
 
         public string commandInput;
         public List<string[]> args;
 
+        //
+        JobSystem js = new JobSystem();
+        //
+
         public MadCLI()
         {
             UpdateWindowTitle();
             Console.ForegroundColor = textColor;
+
+            //
+            js.AddJob(new JobHttpOptions("lol", JobOptions.JobType.HttpRequest, 2000, IPAddress.Parse("127.0.0.1"), 8080));
+            js.AddJob(new JobPingOptions("lol", JobOptions.JobType.PingRequest, 2000, IPAddress.Parse("127.0.0.1"), 200));
         }
 
         public void UpdateWindowTitle()
@@ -88,6 +97,12 @@ namespace MAD
             { 
                 case 1:
                     return "Missing or wrong arguments!";
+                case 2:
+                    return "Wrong type!";
+                case 3:
+                    return "Some arguments are null!";
+                case 30:
+                    return "Job do not exist!";
                 default:
                     return "Errorcode: " + statusCode;
             }
@@ -151,6 +166,9 @@ namespace MAD
                     break;
                 case "cursor":
                     command = new CursorCommand(this);
+                    break;
+                case "jobstatus":
+                    command = new JobSystemListCommand(js);
                     break;
             }
         }

@@ -31,14 +31,23 @@ namespace MAD
             }
         }
 
-        public void RemoveJob(int JobID)
+        public Job GetJob(int jobID)
+        {
+            foreach (Job job in jobs)
+                if (jobID == job.jobID)
+                    return job;
+
+            return null;
+        }
+
+        public void RemoveJob(int jobID)
         {
             foreach (Job temp in jobs)
             {
-                if (temp.jobID == JobID)
+                if (temp.jobID == jobID)
                 {
                     if(!temp.IsRunning())
-                        jobs.RemoveAt((int)JobID);
+                        jobs.RemoveAt((int)jobID);
 
                     break;
                 }
@@ -54,11 +63,11 @@ namespace MAD
             }
         }
 
-        public void StartJob(int JobID)
+        public void StartJob(int jobID)
         {
             foreach(Job temp in jobs)
             {
-                if (temp.jobID == JobID)
+                if (temp.jobID == jobID)
                 {
                     temp.Start();
                     break;

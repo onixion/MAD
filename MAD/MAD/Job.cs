@@ -64,10 +64,14 @@ namespace MAD
 
         public virtual void JobStatus()
         {
-            Console.WriteLine("Job-ID:           " + jobID);
-            Console.WriteLine("Job-Name:         " + jobOptions.jobName);
-            Console.WriteLine("Target-Address:   " + jobOptions.targetAddress);
-            Console.WriteLine("Delaytime:        " + jobOptions.delay);
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("JOB-ID:           " + jobID);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("JOB-NAME:         " + jobOptions.jobName);
+            Console.WriteLine("JOB-TYPE:         " + jobOptions.jobType.ToString());
+            Console.WriteLine("TARGET-ADDRESS:   " + jobOptions.targetAddress);
+            Console.WriteLine("DELAYTIME:        " + jobOptions.delay);
         }
     }
 }
