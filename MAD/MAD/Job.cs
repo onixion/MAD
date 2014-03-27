@@ -54,21 +54,25 @@ namespace MAD
             Thread.Sleep(jobOptions.delay);
         }
 
-        public bool IsRunning()
+        public bool IsActive()
         {
-            if (jobThread != null)
+            if (jobThread == null)
+                return false;
+            else
                 return true;
-
-            return false;
         }
 
         public virtual void JobStatus()
         {
             Console.WriteLine();
+            Console.BackgroundColor = ConsoleColor.Blue;
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("JOB-ID:           " + jobID);
+            Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("JOB-NAME:         " + jobOptions.jobName);
+            Console.WriteLine("JOB-OUTPUT:       " + jobOutput);
+            Console.WriteLine("JOB-ACITIVE:      " + IsActive().ToString());
             Console.WriteLine("JOB-TYPE:         " + jobOptions.jobType.ToString());
             Console.WriteLine("TARGET-ADDRESS:   " + jobOptions.targetAddress);
             Console.WriteLine("DELAYTIME:        " + jobOptions.delay);

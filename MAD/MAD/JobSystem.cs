@@ -46,7 +46,7 @@ namespace MAD
             {
                 if (temp.jobID == jobID)
                 {
-                    if(!temp.IsRunning())
+                    if(!temp.IsActive())
                         jobs.RemoveAt((int)jobID);
 
                     break;
@@ -58,7 +58,7 @@ namespace MAD
         {
             for(int i = 0; i < jobs.Count; i++)
             {
-                if (!jobs[i].IsRunning())
+                if (!jobs[i].IsActive())
                     jobs.RemoveAt(i);
             }
         }

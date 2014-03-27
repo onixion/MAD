@@ -9,27 +9,21 @@ namespace MAD
     {
         public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
 
-        public string cliVersion = "0.0.0.2";
+        public string cliVersion = "0.0.3.4";
         public string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor textColor = ConsoleColor.White;
         public string windowTitle = "MAD - Network Monitoring";
 
         private string cliInput;
-        public string mainCommand;
-        public List<string[]> args;
+        public string inputCommand;
+        public List<string[]> inputArgs;
 
-        // AVAILABLE COMMANDS TO EXECUTE
-        public List<CommandOptions> commandOptions = new List<CommandOptions> 
-        { 
-
-        };
-        public List<object[]> commandObjects = new List<object[]>();
+        public List<CommandOptions> commandOptions = new List<CommandOptions> {};
 
         public Command command;
         public Type inputCommandType;
         public int executeStatusCode;
-
 
         //
         JobSystem js = new JobSystem();
@@ -37,16 +31,12 @@ namespace MAD
 
         public MadCLI()
         {
-            LoadCommands();
             UpdateWindowTitle();
+            InitCommands();
             Console.ForegroundColor = textColor;
-
-            //
-            js.AddJob(new JobHttpOptions("lol", JobOptions.JobType.HttpRequest, 2000, IPAddress.Parse("127.0.0.1"), 8080));
-            js.AddJob(new JobPingOptions("lol", JobOptions.JobType.PingRequest, 2000, IPAddress.Parse("127.0.0.1"), 200));
         }
 
-        public void LoadCommands()
+        private void InitCommands()
         {
             // GENERAL COMMANDS
             commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[0], new object[0]));
@@ -59,6 +49,9 @@ namespace MAD
             // JOBSYSTEM COMMANDS
             commandOptions.Add(new CommandOptions("jobstatus", typeof(JobSystemListCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
             commandOptions.Add(new CommandOptions("jobadd", typeof(JobSystemAddCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("jobremove", typeof(JobSystemRemoveCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("jobstart", typeof(JobSystemStartCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("jobstop", typeof(JobSystemStopCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
         }
 
         public void UpdateWindowTitle()
@@ -68,6 +61,7 @@ namespace MAD
 
         public void Start()
         {
+            PrintWelcome();
             PrintLogo();
 
             while (true)
@@ -75,74 +69,67 @@ namespace MAD
                 PrintCursor();
                 cliInput = Console.ReadLine();
 
-                if (cliInput != "")
+                inputCommand = GetCommand(cliInput);
+
+                if (inputCommand != null)
                 {
-                    mainCommand = GetCommand(cliInput);
-
-                    if (mainCommand != null)
+                    if (CommandExists(inputCommand))
                     {
-                        if (CommandExists(mainCommand))
+                        inputArgs = GetArgs(cliInput);
+                        inputCommandType = GetTypeCommand(inputCommand);
+
+                        command = (Command)inputCommandType.GetConstructor(GetTypeArray(inputCommand)).Invoke(GetCommandObjects(inputCommand));
+
+                        if (command.ValidArguments(inputArgs))
                         {
-                            // get args
-                            args = GetArgs(cliInput);
+                            command.SetArguments(inputArgs);
 
-                            // get command type
-                            inputCommandType = GetTypeCommand(mainCommand);
-                            // create command object
-                            command = (Command)inputCommandType.GetConstructor(GetTypeArray(mainCommand)).Invoke(GetCommandObjects(mainCommand));
+                            executeStatusCode = command.Execute();
 
-                            if (command.ValidArguments(args))
-                            {
-                                command.SetArguments(args);
-
-                                // EXECUTE COMMAND
-                                executeStatusCode = command.Execute();
-
-                                if (executeStatusCode != 0)
-                                    ErrorMessage(GetErrorText(executeStatusCode));
-                            }
-                            else
-                                ErrorMessage("Wrong or missing arguments!");
+                            if (executeStatusCode != 0)
+                                ErrorMessage(GetErrorText(executeStatusCode));
                         }
                         else
-                            ErrorMessage("Command \"" + mainCommand + "\" not found!");
+                            ErrorMessage(GetErrorText(1));
                     }
+                    else
+                        ErrorMessage("Command \"" + inputCommand + "\" unknown!");
                 }
             }
             
         }
 
-        public bool CommandExists(string commandName)
+        public bool CommandExists(string command)
         {
             foreach (CommandOptions temp in commandOptions)
-                if (temp.command == commandName)
+                if (temp.command == command)
                     return true;
 
             return false;
         }
 
-        public Type GetTypeCommand(string commandName)
+        private Type GetTypeCommand(string command)
         {
             foreach (CommandOptions temp in commandOptions)
-                if (temp.command == commandName)
+                if (temp.command == command)
                     return temp.commandType;
 
             return null;
         }
 
-        public Type[] GetTypeArray(string commandName)
+        private Type[] GetTypeArray(string command)
         {
             foreach (CommandOptions temp in commandOptions)
-                if (temp.command == commandName)
+                if (temp.command == command)
                     return temp.commandTypes;
 
             return null;
         }
 
-        public object[] GetCommandObjects(string commandName)
+        private object[] GetCommandObjects(string command)
         {
             foreach (CommandOptions temp in commandOptions)
-                if (temp.command == commandName)
+                if (temp.command == command)
                     return temp.commandObjects;
 
             return null;
@@ -155,14 +142,14 @@ namespace MAD
             Console.ForegroundColor = textColor;
         }
 
-        public string GetErrorText(int statusCode)
+        private string GetErrorText(int statusCode)
         {
             switch (statusCode)
             { 
                 case 1:
                     return "Missing or wrong arguments!";
                 case 2:
-                    return "Wrong type!";
+                    return "Wrong argument type!";
                 case 3:
                     return "Some arguments are null!";
                 case 30:
@@ -184,10 +171,10 @@ namespace MAD
             return buffer[0];
         }
 
-        public List<string[]> GetArgs(string inputCLI)
+        public List<string[]> GetArgs(string input)
         {
             List<string[]> temp1 = new List<string[]>();
-            string[] temp2 = cliInput.Split(new char[] {'-'});
+            string[] temp2 = input.Split(new char[] {'-'});
 
             for (int i = 1; i < temp2.Length; i++)
                 temp2[i] = temp2[i].Trim();
@@ -199,37 +186,6 @@ namespace MAD
             }
 
             return temp1;
-        }
-
-        public void CreateCommand(string input)
-        {
-            switch (input)
-            {
-                case "help":
-                    command = new HelpCommand();
-                    break;
-                case "clear":
-                    command = new ClearCommand();
-                    break;
-                case "exit":
-                    command = new ExitCommand();
-                    break;
-                case "close":
-                    command = new ExitCommand();
-                    break;
-                case "logo":
-                    command = new LogoCommand(this);
-                    break;
-                case "info":
-                    command = new InfoCommand(this);
-                    break;
-                case "cursor":
-                    command = new CursorCommand(this);
-                    break;
-                case "jobstatus":
-                    command = new JobSystemListCommand(js);
-                    break;
-            }
         }
 
         public void ErrorMessage(string message)
@@ -249,6 +205,19 @@ namespace MAD
             Console.WriteLine(@"| |  | | | | | |_/ |    MadCLI-VERSION " + cliVersion);
             Console.WriteLine(@"|_|  |_\_| |_/____/ __________________________ ");
             Console.WriteLine();
+        }
+
+        public void PrintWelcome()
+        {
+            Console.WriteLine("Welcome to the MAD-CommandLineInterface!");
+            Console.WriteLine();
+            Console.Write("This CLI is still not finished yet. Many important parts of the CLI are missing or not implemented yet. ");
+            Console.Write("So please stay calm and relaxed if it should crash ...");
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.Write(" > Press any key to continue ... ");
+            Console.ReadKey();
+            Console.Clear();
         }
     }
 }
