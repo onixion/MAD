@@ -51,6 +51,14 @@ namespace MAD
         public JobSystemAddCommand(JobSystem system)
         {
             this.system = system;
+
+            requiredIndicators.Add("t");
+            requiredIndicators.Add("n");
+            requiredIndicators.Add("ip");
+            requiredIndicators.Add("d");
+
+            optionalIndicators.Add("p");
+
         }
 
         public override int Execute()
@@ -60,10 +68,7 @@ namespace MAD
                 case "http":
 
                     if (ArgumentSupported("p"))
-                    {
-                        
-                       //system.jobs.Add(new JobHttpOptions(GetArgument("n"),JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p"))));
-                    }
+                        system.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"),JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
                     else
                         return 1;
 

@@ -55,6 +55,10 @@ namespace MAD
             commandOptions.Add(new CommandOptions("exit", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
+
+            // JOBSYSTEM COMMANDS
+            commandOptions.Add(new CommandOptions("jobstatus", typeof(JobSystemListCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("jobadd", typeof(JobSystemAddCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
         }
 
         public void UpdateWindowTitle()

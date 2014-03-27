@@ -114,8 +114,13 @@ namespace MAD
 
         public override int Execute()
         {
-            cli.cursor = GetArgument("t") + " ";
-            return 0;
+            if (!ArgumentEmpty("t"))
+            {
+                cli.cursor = GetArgument("t") + " ";
+                return 0;
+            }
+            else
+                return 1;
         }
     
     }
