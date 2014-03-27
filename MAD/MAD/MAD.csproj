@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
+    <Compile Include="CommandOptions.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="JobHttp.cs" />
     <Compile Include="JobHttpOptions.cs" />

@@ -86,7 +86,7 @@ namespace MAD
 
         public override int Execute()
         {
-            Console.WriteLine(@" __  __   _   ____ ");
+            Console.WriteLine(@" __  __ 2 _   ____ ");
             Console.WriteLine(@"|  \/  |/ _ \|  _  \    MadCLI VERSION                  v " + cli.cliVersion);
             Console.WriteLine(@"| .  . / /_\ \ | | |    MadNotificationSystem           v " + "unknown");
             Console.WriteLine(@"| |\/| |  _  | | | |    MadJobSystem                    v " + "unknown");

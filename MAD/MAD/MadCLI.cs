@@ -16,12 +16,20 @@ namespace MAD
         public string windowTitle = "MAD - Network Monitoring";
 
         private string cliInput;
-        public List<string> commands = new List<string> { "help", "clear", "exit", "close", "logo", "info", "cursor", "jobstatus" };
+        public string mainCommand;
+        public List<string[]> args;
+
+        // AVAILABLE COMMANDS TO EXECUTE
+        public List<CommandOptions> commandOptions = new List<CommandOptions> 
+        { 
+
+        };
+        public List<object[]> commandObjects = new List<object[]>();
+
         public Command command;
+        public Type inputCommandType;
         public int executeStatusCode;
 
-        public string commandInput;
-        public List<string[]> args;
 
         //
         JobSystem js = new JobSystem();
@@ -29,12 +37,24 @@ namespace MAD
 
         public MadCLI()
         {
+            LoadCommands();
             UpdateWindowTitle();
             Console.ForegroundColor = textColor;
 
             //
             js.AddJob(new JobHttpOptions("lol", JobOptions.JobType.HttpRequest, 2000, IPAddress.Parse("127.0.0.1"), 8080));
             js.AddJob(new JobPingOptions("lol", JobOptions.JobType.PingRequest, 2000, IPAddress.Parse("127.0.0.1"), 200));
+        }
+
+        public void LoadCommands()
+        {
+            // GENERAL COMMANDS
+            commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
+            commandOptions.Add(new CommandOptions("exit", typeof(ExitCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
         }
 
         public void UpdateWindowTitle()
@@ -53,35 +73,75 @@ namespace MAD
 
                 if (cliInput != "")
                 {
-                    commandInput = GetCommand(cliInput);
+                    mainCommand = GetCommand(cliInput);
 
-                    if (commandInput != null)
+                    if (mainCommand != null)
                     {
-                        if (CommandExists(commandInput))
+                        if (CommandExists(mainCommand))
                         {
-                            CreateCommand(commandInput);
-
+                            // get args
                             args = GetArgs(cliInput);
 
-                                if (command.ValidArguments(args))
-                                {
-                                    command.SetArguments(args);
-                                    
-                                    // EXECUTE COMMAND
-                                    executeStatusCode = command.Execute();
+                            // get command type
+                            inputCommandType = GetTypeCommand(mainCommand);
+                            // create command object
+                            command = (Command)inputCommandType.GetConstructor(GetTypeArray(mainCommand)).Invoke(GetCommandObjects(mainCommand));
 
-                                    if (executeStatusCode != 0)
-                                        ErrorMessage(GetErrorText(executeStatusCode));
-                                }
-                                else
-                                    ErrorMessage("Wrong or missing arguments!");
+                            if (command.ValidArguments(args))
+                            {
+                                command.SetArguments(args);
+
+                                // EXECUTE COMMAND
+                                executeStatusCode = command.Execute();
+
+                                if (executeStatusCode != 0)
+                                    ErrorMessage(GetErrorText(executeStatusCode));
+                            }
+                            else
+                                ErrorMessage("Wrong or missing arguments!");
                         }
                         else
-                            ErrorMessage("Command \"" + commandInput + "\" not found!");
+                            ErrorMessage("Command \"" + mainCommand + "\" not found!");
                     }
                 }
             }
             
+        }
+
+        public bool CommandExists(string commandName)
+        {
+            foreach (CommandOptions temp in commandOptions)
+                if (temp.command == commandName)
+                    return true;
+
+            return false;
+        }
+
+        public Type GetTypeCommand(string commandName)
+        {
+            foreach (CommandOptions temp in commandOptions)
+                if (temp.command == commandName)
+                    return temp.commandType;
+
+            return null;
+        }
+
+        public Type[] GetTypeArray(string commandName)
+        {
+            foreach (CommandOptions temp in commandOptions)
+                if (temp.command == commandName)
+                    return temp.commandTypes;
+
+            return null;
+        }
+
+        public object[] GetCommandObjects(string commandName)
+        {
+            foreach (CommandOptions temp in commandOptions)
+                if (temp.command == commandName)
+                    return temp.commandObjects;
+
+            return null;
         }
 
         public void PrintCursor()
@@ -137,11 +197,6 @@ namespace MAD
             return temp1;
         }
 
-        public bool CommandExists(string input)
-        {
-            return commands.Contains(input);
-        }
-
         public void CreateCommand(string input)
         {
             switch (input)
@@ -183,7 +238,7 @@ namespace MAD
 
         public void PrintLogo()
         {
-            Console.WriteLine(@" __  __   _   ____ ");
+            Console.WriteLine(@" __  __ 2 _   ____ ");
             Console.WriteLine(@"|  \/  |/ _ \|  _  \");
             Console.WriteLine(@"| .  . / /_\ \ | | |    MONITORING LIKE A BOZZ!");
             Console.WriteLine(@"| |\/| |  _  | | | |");
