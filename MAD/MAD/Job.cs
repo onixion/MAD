@@ -65,17 +65,13 @@ namespace MAD
         public virtual void JobStatus()
         {
             Console.WriteLine();
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("JOB-ID:           " + jobID);
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("JOB-NAME:         " + jobOptions.jobName);
-            Console.WriteLine("JOB-OUTPUT:       " + jobOutput);
-            Console.WriteLine("JOB-ACITIVE:      " + IsActive().ToString());
-            Console.WriteLine("JOB-TYPE:         " + jobOptions.jobType.ToString());
-            Console.WriteLine("TARGET-ADDRESS:   " + jobOptions.targetAddress);
-            Console.WriteLine("DELAYTIME:        " + jobOptions.delay);
+            Console.WriteLine(string.Format("JOB-ID:\t\t\t{0}", jobID));
+            Console.WriteLine(string.Format("\tNAME:     \t{0}", jobOptions.jobName));
+            Console.WriteLine(string.Format("\tOUTPUT:   \t{0}", jobOutput));
+            Console.WriteLine(string.Format("\tACITIVE:  \t{0}", IsActive().ToString()));
+            Console.WriteLine(string.Format("\tTYPE:     \t{0}", jobOptions.jobType.ToString()));
+            Console.WriteLine(string.Format("\tADDRESS:  \t{0}", jobOptions.targetAddress));
+            Console.WriteLine(string.Format("\tDELAYTIME:\t{0}", jobOptions.delay));
         }
     }
 }

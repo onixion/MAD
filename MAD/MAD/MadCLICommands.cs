@@ -114,7 +114,7 @@ namespace MAD
         {
             this.cli = cli;
 
-            requiredIndicators.Add("t"); // TEXT
+            requiredIndicators.Add(new object[] {"t", typeof(string)}); // TEXT
             //optionalIndicators.Add("c"); // COLOR
         }
 
@@ -128,6 +128,5 @@ namespace MAD
             else
                 return 1;
         }
-    
     }
 }

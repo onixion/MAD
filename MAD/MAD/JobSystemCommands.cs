@@ -11,12 +11,12 @@ namespace MAD
         public JobSystemListCommand(JobSystem system)
         {
             this.system = system;
-            optionalIndicators.Add("id");
+            optionalIndicators.Add(new object[]{"id", typeof(Int32)});
         }
 
         public override int Execute()
         {
-            if (OptionalArgumentExists("id"))
+            if (OptionalArgumentUsed("id"))
             {
                 if (!ArgumentEmpty("id"))
                 {
@@ -52,13 +52,13 @@ namespace MAD
         {
             this.system = system;
 
-            requiredIndicators.Add("t");
-            requiredIndicators.Add("n");
-            requiredIndicators.Add("ip");
-            requiredIndicators.Add("d");
+            requiredIndicators.Add(new object[]{"t",typeof(string)});
+            requiredIndicators.Add(new object[] { "n", typeof(string) });
+            requiredIndicators.Add(new object[] { "ip", typeof(string) });
+            requiredIndicators.Add(new object[] { "d", typeof(Int32) });
 
-            optionalIndicators.Add("p");
-            optionalIndicators.Add("ttl");
+            optionalIndicators.Add(new object[] { "p", typeof(Int32) });
+            optionalIndicators.Add(new object[] { "ttl", typeof(Int32) });
         }
 
         public override int Execute()
@@ -66,19 +66,19 @@ namespace MAD
             switch(GetArgument("t"))
             {
                 case "http":
-                    if (ArgumentSupported("p"))
+                    if (ArgumentExists("p"))
                         system.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"),JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
                     else
                         return 1;
                     break;
                 case "ping":
-                    if (ArgumentSupported("ttl"))
+                    if (ArgumentExists("ttl"))
                         system.jobs.Add(new JobPing(new JobPingOptions(GetArgument("n"),JobOptions.JobType.PingRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("ttl")))));
                     else
                         return 1;
                     break;
                 case "port":
-                    if (ArgumentSupported("p"))
+                    if (ArgumentExists("p"))
                         system.jobs.Add(new JobPort(new JobPortOptions(GetArgument("n"),JobOptions.JobType.PortRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
                     else
                         return 1;
@@ -98,7 +98,7 @@ namespace MAD
         {
             this.system = system;
 
-            requiredIndicators.Add("id");
+            requiredIndicators.Add(new object[] { "id", typeof(Int32) });
         }
 
         public override int Execute()
@@ -121,12 +121,12 @@ namespace MAD
         {
             this.system = system;
 
-            requiredIndicators.Add("id");
+            requiredIndicators.Add(new object[]{"id", typeof(Int32)});
         }
 
         public override int Execute()
         {
-            if (!ArgumentEmpty("id"))
+            if (OptionalArgumentUsed("id"))
             {
                 system.StartJob(Int32.Parse(GetArgument("id")));
                 return 0;
@@ -144,7 +144,7 @@ namespace MAD
         {
             this.system = system;
 
-            requiredIndicators.Add("id");
+            requiredIndicators.Add(new object[] {"id",typeof(Int32)});
         }
 
         public override int Execute()

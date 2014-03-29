@@ -9,7 +9,7 @@ namespace MAD
     {
         public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
 
-        public string cliVersion = "0.0.3.4";
+        public string cliVersion = "0.0.4.0";
         public string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor textColor = ConsoleColor.White;
@@ -19,11 +19,11 @@ namespace MAD
         public string inputCommand;
         public List<string[]> inputArgs;
 
-        public List<CommandOptions> commandOptions = new List<CommandOptions> {};
-
+        public List<CommandOptions> commandOptions = new List<CommandOptions>{};
         public Command command;
         public Type inputCommandType;
-        public int executeStatusCode;
+
+        public int statusCode;
 
         //
         JobSystem js = new JobSystem();
@@ -75,19 +75,26 @@ namespace MAD
                 {
                     if (CommandExists(inputCommand))
                     {
+                        // get arguments from input
                         inputArgs = GetArgs(cliInput);
-                        inputCommandType = GetTypeCommand(inputCommand);
+                        // get command type
+                        inputCommandType = GetCommandType(inputCommand);
 
-                        command = (Command)inputCommandType.GetConstructor(GetTypeArray(inputCommand)).Invoke(GetCommandObjects(inputCommand));
+                        // create command object
+                        command = (Command)inputCommandType.GetConstructor(GetObjectsTypeArray(inputCommand)).Invoke(GetCommandObjects(inputCommand));
 
+                        // check if the arguments are valid
                         if (command.ValidArguments(inputArgs))
                         {
+                            // set arguments
                             command.SetArguments(inputArgs);
 
-                            executeStatusCode = command.Execute();
+                            // EXECUTE COMMAND AND GET STATUSCODE AFTER EXECUTION
+                            statusCode = command.Execute();
 
-                            if (executeStatusCode != 0)
-                                ErrorMessage(GetErrorText(executeStatusCode));
+                            // check statuscode
+                            if (statusCode != 0)
+                                ErrorMessage(GetErrorText(statusCode));
                         }
                         else
                             ErrorMessage(GetErrorText(1));
@@ -95,8 +102,7 @@ namespace MAD
                     else
                         ErrorMessage("Command \"" + inputCommand + "\" unknown!");
                 }
-            }
-            
+            }   
         }
 
         public bool CommandExists(string command)
@@ -104,25 +110,22 @@ namespace MAD
             foreach (CommandOptions temp in commandOptions)
                 if (temp.command == command)
                     return true;
-
             return false;
         }
 
-        private Type GetTypeCommand(string command)
+        private Type GetCommandType(string command)
         {
             foreach (CommandOptions temp in commandOptions)
                 if (temp.command == command)
                     return temp.commandType;
-
             return null;
         }
 
-        private Type[] GetTypeArray(string command)
+        private Type[] GetObjectsTypeArray(string command)
         {
             foreach (CommandOptions temp in commandOptions)
                 if (temp.command == command)
-                    return temp.commandTypes;
-
+                    return temp.commandObjectsTypes;
             return null;
         }
 
@@ -163,18 +166,23 @@ namespace MAD
         {
             string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.RemoveEmptyEntries);
 
-            if (buffer[0] == "")
+            if (buffer.Length != 0)
+            {
+                if (buffer[0] == "")
+                    return null;
+
+                buffer[0] = buffer[0].Trim();
+
+                return buffer[0];
+            }
+            else
                 return null;
-
-            buffer[0] = buffer[0].Trim();
-
-            return buffer[0];
         }
 
         public List<string[]> GetArgs(string input)
         {
             List<string[]> temp1 = new List<string[]>();
-            string[] temp2 = input.Split(new char[] {'-'});
+            string[] temp2 = input.Split(new char[] {'-'}, StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 1; i < temp2.Length; i++)
                 temp2[i] = temp2[i].Trim();
