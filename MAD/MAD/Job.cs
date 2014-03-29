@@ -8,7 +8,7 @@ namespace MAD
     {
         public JobOptions jobOptions;
         private Thread jobThread;
-        public static int jobsCount = 0;
+        private static int jobsCount = 0;
         public int jobID;
         public string jobOutput;
 
@@ -65,13 +65,18 @@ namespace MAD
         public virtual void JobStatus()
         {
             Console.WriteLine();
-            Console.WriteLine(string.Format("JOB-ID:\t\t\t{0}", jobID));
+
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.WriteLine(string.Format("JOB\t\t\t\t\t"));
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine(string.Format("\tID:       \t{0}", jobID));
             Console.WriteLine(string.Format("\tNAME:     \t{0}", jobOptions.jobName));
-            Console.WriteLine(string.Format("\tOUTPUT:   \t{0}", jobOutput));
-            Console.WriteLine(string.Format("\tACITIVE:  \t{0}", IsActive().ToString()));
             Console.WriteLine(string.Format("\tTYPE:     \t{0}", jobOptions.jobType.ToString()));
             Console.WriteLine(string.Format("\tADDRESS:  \t{0}", jobOptions.targetAddress));
             Console.WriteLine(string.Format("\tDELAYTIME:\t{0}", jobOptions.delay));
+            Console.WriteLine(string.Format("\tACITIVE:  \t{0}", IsActive().ToString()));
+            Console.WriteLine(string.Format("\tOUTPUT:   \t{0}", jobOutput));
+
         }
     }
 }

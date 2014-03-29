@@ -47,11 +47,11 @@ namespace MAD
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
 
             // JOBSYSTEM COMMANDS
-            commandOptions.Add(new CommandOptions("jobstatus", typeof(JobSystemListCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("jobadd", typeof(JobSystemAddCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("jobremove", typeof(JobSystemRemoveCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("jobstart", typeof(JobSystemStartCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("jobstop", typeof(JobSystemStopCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
         }
 
         public void UpdateWindowTitle()

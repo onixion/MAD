@@ -49,10 +49,8 @@
     <Compile Include="JobPortOptions.cs" />
     <Compile Include="JobSystem.cs" />
     <Compile Include="JobSystemCommands.cs" />
-    <Compile Include="Mad.cs" />
     <Compile Include="MadCLI.cs" />
     <Compile Include="MadCLICommands.cs" />
-    <Compile Include="MadComponents.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
