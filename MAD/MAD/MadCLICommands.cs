@@ -7,39 +7,49 @@ namespace MAD
 {
     class HelpCommand : Command
     {
-        public HelpCommand() { }
+        MadCLI cli;
+
+        public HelpCommand(MadCLI cli) 
+        {
+            this.cli = cli;
+        }
 
         public override int Execute()
         {
             Console.WriteLine();
-            Console.WriteLine(" ______________________________________________________");
+            Console.WriteLine(" <---- H E L P ---- P A G E ---->");
             Console.WriteLine();
-            Console.WriteLine(" < HELP PAGE >");
-            Console.WriteLine();
-            Console.WriteLine(" < General commands >");
+            Headline(" <-- General commands -->");
             Console.WriteLine();
             Console.WriteLine(" > help                      print this help page            (WORKS)");
+            Console.WriteLine(" > version                   show all versions               (WORKS)");
             Console.WriteLine(" > clear                     clear console                   (WORKS)");
             Console.WriteLine(" > logo                      print the MAD logo              (WORKS)");
             Console.WriteLine(" > exit/close                exit program                    (WORKS)");
             Console.WriteLine(" > info                      informations about the program  (WORKS)");
-            Console.WriteLine(" > cursor -t <NEW CURSOR>");      
-            Console.WriteLine("                             change the CLI cursor           (WORKS)");
+            Console.WriteLine(" > cursor -t <NEW CURSOR>    change the CLI cursor           (WORKS)");
             Console.WriteLine(" > gui                       start the GUI                   (NIY)");                
             Console.WriteLine();
-            Console.WriteLine(" < JobSystem commands >");
+            Headline(" <-- MadJobSystem commands -->");
             Console.WriteLine();
             Console.WriteLine(" > jobstatus [-id <ID>]      status of the jobs              (WORKS)");
             Console.WriteLine(" > jobadd -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY>  (WORKS)");
             Console.WriteLine("     > -t <TYPE=PING> -ttl <TTL>");
             Console.WriteLine("     > -t <TYPE=HTTP> -p <PORT>");
             Console.WriteLine("     > -t <TYPE=PORT> -p <PORT>");
-            Console.WriteLine("                             add a job                       (WORKS)");
+            Console.WriteLine("                             add a job to the jobsystem      (WORKS)");
             Console.WriteLine();
-            Console.WriteLine(" < NotificationSystem commands >");
+            Headline(" <-- MadNotificationSystem commands -->");
             Console.WriteLine(" ______________________________________________________");
             Console.WriteLine();
             return 0;
+        }
+
+        public void Headline(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(text);
+            Console.ForegroundColor = cli.textColor;
         }
     }
 
@@ -81,11 +91,11 @@ namespace MAD
         }
     }
 
-    class InfoCommand : Command
+    class VersionCommand : Command
     {
         MadCLI cli;
 
-        public InfoCommand(MadCLI cli) 
+        public VersionCommand(MadCLI cli) 
         {
             this.cli = cli;
         }
@@ -99,9 +109,6 @@ namespace MAD
             Console.WriteLine(@"| |  | | | | | |_/ |    MadMemoryManagmentSysystem      v " + "unknown");
             Console.WriteLine(@"|_|  |_\_| |_/____/ ________________________________________________");
             Console.WriteLine();
-            Console.WriteLine(@"                             THE AMAZING TEAM");
-            Console.WriteLine();
-            Console.WriteLine(@"    PORCIC Alin  &  RANALTER Daniel  &  SINGH Manpreet  &  STOJANOVIC Marko");
             return 0;
         }
     }
@@ -113,20 +120,14 @@ namespace MAD
         public CursorCommand(MadCLI cli)
         {
             this.cli = cli;
-
             requiredIndicators.Add(new object[] {"t", typeof(string)}); // TEXT
             //optionalIndicators.Add("c"); // COLOR
         }
 
         public override int Execute()
         {
-            if (!ArgumentEmpty("t"))
-            {
-                cli.cursor = GetArgument("t") + " ";
-                return 0;
-            }
-            else
-                return 1;
+            cli.cursor = GetArgument("t") + " ";
+            return 0;
         }
     }
 }

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 
 namespace MAD
 {
-    public class JobSystem
+    public class MadJobSystem
     {
+        public string version = "0.0.1.0";
         public List<Job> jobs;
 
-        public JobSystem()
+        public MadJobSystem()
         { 
             jobs = new List<Job>();
         }
@@ -29,6 +30,14 @@ namespace MAD
                     jobs.Add(new JobHttp((JobHttpOptions)jobOptions));
                     break;
             }
+        }
+
+        public bool JobExist(int jobID)
+        {
+            foreach (Job temp in jobs)
+                if (temp.jobID == jobID)
+                    return true;
+            return false;
         }
 
         public Job GetJob(int jobID)

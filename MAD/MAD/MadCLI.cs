@@ -26,7 +26,7 @@ namespace MAD
         public int statusCode;
 
         //
-        JobSystem js = new JobSystem();
+        MadJobSystem js = new MadJobSystem();
         //
 
         public MadCLI()
@@ -39,19 +39,21 @@ namespace MAD
         private void InitCommands()
         {
             // GENERAL COMMANDS
-            commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
+            commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[] { typeof(MadCLI) }, new object[] {this}));
+            commandOptions.Add(new CommandOptions("version", typeof(VersionCommand), new Type[] { typeof(MadCLI) }, new object[] { this }));
             commandOptions.Add(new CommandOptions("exit", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
+
+            commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
 
             // JOBSYSTEM COMMANDS
-            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[] { typeof(JobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
         }
 
         public void UpdateWindowTitle()
@@ -96,8 +98,6 @@ namespace MAD
                             if (statusCode != 0)
                                 ErrorMessage(GetErrorText(statusCode));
                         }
-                        else
-                            ErrorMessage(GetErrorText(1));
                     }
                     else
                         ErrorMessage("Command \"" + inputCommand + "\" unknown!");
