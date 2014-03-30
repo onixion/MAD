@@ -23,14 +23,20 @@ namespace MAD
             try
             {
                 socket.Connect(new IPEndPoint(jobOptions.targetAddress, portJobOptions.port));
-                jobOutput = "TRUE";
+                jobOutput = "True";
             }
             catch (Exception e)
             {
-                jobOutput = "FALSE";
+                jobOutput = "False";
             }
 
             socket.Close();
+        }
+
+        public override void JobStatus()
+        {
+            base.JobStatus();
+            Console.WriteLine(string.Format("\tPORT:     \t{0}", portJobOptions.port));
         }
     }
 }

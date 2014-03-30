@@ -23,13 +23,13 @@ namespace MAD
             try
             {
                 response = request.GetResponse();
-                jobOutput = "HTTP WEBSERVER FOUND!";
+                jobOutput = "True";
 
                 response.Close();
             }
             catch (Exception e)
             {
-                jobOutput = "NO HTTP WEBSERVER FOUND!";
+                jobOutput = "False";
             }
 
             request.Abort();
@@ -38,7 +38,7 @@ namespace MAD
         public override void JobStatus()
         {
             base.JobStatus();
-            Console.WriteLine("PORT:             " + httpJobOptions.port);
+            Console.WriteLine(string.Format("\tPORT:     \t{0}", httpJobOptions.port));
         }
     }
 }

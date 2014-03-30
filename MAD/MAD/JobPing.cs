@@ -26,15 +26,15 @@ namespace MAD
             reply = ping.Send(jobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
             if (reply.Status == IPStatus.Success)
-                jobOutput = "TRUE";
+                jobOutput = "True";
             else
-                jobOutput = "FALSE";
+                jobOutput = "False";
         }
 
         public override void JobStatus()
         {
             base.JobStatus();
-            Console.WriteLine("TTL:              " + pingJobOptions.ttl);
+            Console.WriteLine(string.Format("\tTTL:      \t{0}", pingJobOptions.ttl));
         }
         
         

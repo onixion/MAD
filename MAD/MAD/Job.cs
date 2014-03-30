@@ -67,16 +67,14 @@ namespace MAD
             Console.WriteLine();
 
             Console.BackgroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine(string.Format("JOB\t\t\t\t\t"));
+            Console.WriteLine(string.Format("JOB-ID: " + jobID));
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.WriteLine(string.Format("\tID:       \t{0}", jobID));
             Console.WriteLine(string.Format("\tNAME:     \t{0}", jobOptions.jobName));
             Console.WriteLine(string.Format("\tTYPE:     \t{0}", jobOptions.jobType.ToString()));
             Console.WriteLine(string.Format("\tADDRESS:  \t{0}", jobOptions.targetAddress));
             Console.WriteLine(string.Format("\tDELAYTIME:\t{0}", jobOptions.delay));
             Console.WriteLine(string.Format("\tACITIVE:  \t{0}", IsActive().ToString()));
             Console.WriteLine(string.Format("\tOUTPUT:   \t{0}", jobOutput));
-
         }
     }
 }

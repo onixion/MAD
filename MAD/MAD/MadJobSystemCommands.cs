@@ -6,9 +6,9 @@ namespace MAD
 {
     public class JobSystemListCommand : Command
     {
-        private JobSystem system;
+        private MadJobSystem system;
 
-        public JobSystemListCommand(JobSystem system)
+        public JobSystemListCommand(MadJobSystem system)
         {
             this.system = system;
             optionalIndicators.Add(new object[]{"id", typeof(Int32)});
@@ -40,15 +40,14 @@ namespace MAD
             }
 
             return 0;
-
         }
     }
 
     public class JobSystemAddCommand : Command
     {
-        private JobSystem system;
+        private MadJobSystem system;
 
-        public JobSystemAddCommand(JobSystem system)
+        public JobSystemAddCommand(MadJobSystem system)
         {
             this.system = system;
 
@@ -92,65 +91,81 @@ namespace MAD
 
     public class JobSystemRemoveCommand : Command
     { 
-        private JobSystem system;
+        private MadJobSystem system;
+        private int id;
 
-        public JobSystemRemoveCommand(JobSystem system)
+        public JobSystemRemoveCommand(MadJobSystem system)
         {
             this.system = system;
-
             requiredIndicators.Add(new object[] { "id", typeof(Int32) });
         }
 
         public override int Execute()
         {
-            if (!ArgumentEmpty("id"))
+            id = Int32.Parse(GetArgument("id"));
+
+            if (system.JobExist(id))
             {
                 system.RemoveJob(Int32.Parse(GetArgument("id")));
                 return 0;
             }
             else
-                return 1;
+                return 30;
         }
     }
 
     public class JobSystemStartCommand : Command
     {
-        private JobSystem system;
+        private MadJobSystem system;
+        private int id;
 
-        public JobSystemStartCommand(JobSystem system)
+        public JobSystemStartCommand(MadJobSystem system)
         {
             this.system = system;
-
             requiredIndicators.Add(new object[]{"id", typeof(Int32)});
         }
 
         public override int Execute()
         {
+<<<<<<< HEAD:MAD/MAD/JobSystemCommands.cs
                 system.StartJob(Int32.Parse(GetArgument("id")));
                 return 0;
+=======
+            id = Int32.Parse(GetArgument("id"));
+
+            if (system.JobExist(id))
+            {
+                system.StartJob(Int32.Parse(GetArgument("id")));
+                return 0;
+            }
+            else
+                return 30;
+>>>>>>> onixion:MAD/MAD/MadJobSystemCommands.cs
         }
     }
 
     public class JobSystemStopCommand : Command
     {
-        private JobSystem system;
+        private MadJobSystem system;
+        private int id;
 
-        public JobSystemStopCommand(JobSystem system)
+        public JobSystemStopCommand(MadJobSystem system)
         {
             this.system = system;
-
             requiredIndicators.Add(new object[] {"id",typeof(Int32)});
         }
 
         public override int Execute()
         {
-            if (!ArgumentEmpty("id"))
+            id = Int32.Parse(GetArgument("id"));
+
+            if (system.JobExist(id))
             {
                 system.StopJob(Int32.Parse(GetArgument("id")));
                 return 0;
             }
             else
-                return 1;
+                return 30;
         }
     }
 }

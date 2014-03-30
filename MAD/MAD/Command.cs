@@ -17,7 +17,10 @@ namespace MAD
             // check if all arguments are known by the command
             foreach (string[] temp in args)
                 if (!ArgumentExists(temp[0]))
-                    return false; 
+                {
+                    ErrorMessage("Argument \"" + temp[0] + "\" do not exist!");
+                    return false;
+                }
 
             // check if all needed arguments are known
             int i = 0;
@@ -25,7 +28,10 @@ namespace MAD
                 if (RequiredArgumentExists(temp[0]))
                     i++;
             if (requiredIndicators.Count != i)
+            {
+                ErrorMessage("Missing required arguments!");
                 return false;
+            }
            
             // check the if the types are valid
             for (int i2 = 0; i2 < args.Count; i2++)
@@ -37,16 +43,30 @@ namespace MAD
                     int i3 = Int32.Parse(temp[1]);
                     Type type = GetType(temp[0]);
                     if (GetType(temp[0]) != typeof(Int32))
+                    {
+                        ErrorMessage("Argument \"" + temp[0] + "\" must be a string!");
                         return false;
+                    }
                 }
                 catch (Exception e)
                 {
                     if (GetType(temp[0]) != typeof(string))
+                    {
+                        ErrorMessage("Argument \"" + temp[0] + "\" must be a number!");
                         return false;
+                    }
                 }
             }
 
             return true;
+        }
+
+        public void ErrorMessage(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("[ERROR] ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(message);
         }
 
         public bool RequiredArgumentExists(string indicator)
