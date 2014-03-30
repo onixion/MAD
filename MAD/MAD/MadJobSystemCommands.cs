@@ -127,10 +127,6 @@ namespace MAD
 
         public override int Execute()
         {
-<<<<<<< HEAD:MAD/MAD/JobSystemCommands.cs
-                system.StartJob(Int32.Parse(GetArgument("id")));
-                return 0;
-=======
             id = Int32.Parse(GetArgument("id"));
 
             if (system.JobExist(id))
@@ -140,7 +136,6 @@ namespace MAD
             }
             else
                 return 30;
->>>>>>> onixion:MAD/MAD/MadJobSystemCommands.cs
         }
     }
 
