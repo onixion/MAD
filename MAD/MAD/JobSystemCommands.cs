@@ -126,13 +126,8 @@ namespace MAD
 
         public override int Execute()
         {
-            if (OptionalArgumentUsed("id"))
-            {
                 system.StartJob(Int32.Parse(GetArgument("id")));
                 return 0;
-            }
-            else
-                return 1;
         }
     }
 
