@@ -18,7 +18,7 @@ namespace MAD
             foreach (string[] temp in args)
                 if (!ArgumentExists(temp[0]))
                 {
-                    ErrorMessage("Argument \"" + temp[0] + "\" do not exist!");
+                    ErrorMessage("Argument \"" + temp[0] + "\" does not exist!");
                     return false;
                 }
 
@@ -44,7 +44,7 @@ namespace MAD
                     Type type = GetType(temp[0]);
                     if (GetType(temp[0]) != typeof(Int32))
                     {
-                        ErrorMessage("Argument \"" + temp[0] + "\" must be a string!");
+                        ErrorMessage("Argument \"-" + temp[0] + "\" must be a string!");
                         return false;
                     }
                 }
@@ -52,7 +52,7 @@ namespace MAD
                 {
                     if (GetType(temp[0]) != typeof(string))
                     {
-                        ErrorMessage("Argument \"" + temp[0] + "\" must be a number!");
+                        ErrorMessage("Argument \"-" + temp[0] + "\" must be a number!");
                         return false;
                     }
                 }
