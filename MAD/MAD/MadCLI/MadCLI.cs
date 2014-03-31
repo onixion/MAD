@@ -200,12 +200,21 @@ namespace MAD
 
         public void PrintLogo()
         {
+            int consoleWidth = Console.BufferWidth;
+
+            Console.CursorLeft = consoleWidth / 2 -20;
             Console.WriteLine(@" __  __ 2 _   ____ ");
-            Console.WriteLine(@"|  \/  |/ _ \|  _  \");
-            Console.WriteLine(@"| .  . / /_\ \ | | |    MONITORING LIKE A BOZZ!");
+            Console.CursorLeft = consoleWidth / 2 - 20;
+            Console.WriteLine(@"|  \/  |/ _ \|  _ \ ");
+            Console.CursorLeft = consoleWidth / 2 - 20;
+            Console.WriteLine(@"| .  . / /_\ \ | | |");
+            Console.CursorLeft = consoleWidth / 2 - 20;
             Console.WriteLine(@"| |\/| |  _  | | | |");
-            Console.WriteLine(@"| |  | | | | | |_/ |    MadCLI-VERSION " + version);
-            Console.WriteLine(@"|_|  |_\_| |_/____/ __________________________ ");
+            Console.CursorLeft = consoleWidth / 2- 20;
+            Console.WriteLine(@"| |  | | | | | |_/ |");
+            Console.CursorLeft = consoleWidth / 2 - 20;
+            Console.WriteLine(@"|_|  |_\_| |_/____/ ");
+            Console.WriteLine();
             Console.WriteLine();
         }
 

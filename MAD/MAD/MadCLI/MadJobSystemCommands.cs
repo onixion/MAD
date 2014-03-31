@@ -55,30 +55,35 @@ namespace MAD
 
         public override int Execute()
         {
-            switch(GetArgument("t"))
+            if (!ArgumentEmpty("t") && !ArgumentEmpty("n") && !ArgumentEmpty("ip") && !ArgumentEmpty("d"))
             {
-                case "http":
-                    if (ArgumentExists("p"))
-                        MadComponents.components.jobSystem.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"), JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
-                    else
+                switch (GetArgument("t"))
+                {
+                    case "http":
+                        if (ArgumentExists("p"))
+                            MadComponents.components.jobSystem.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"), JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
+                        else
+                            return 1;
+                        break;
+                    case "ping":
+                        if (ArgumentExists("ttl"))
+                            MadComponents.components.jobSystem.jobs.Add(new JobPing(new JobPingOptions(GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("ttl")))));
+                        else
+                            return 1;
+                        break;
+                    case "port":
+                        if (ArgumentExists("p"))
+                            MadComponents.components.jobSystem.jobs.Add(new JobPort(new JobPortOptions(GetArgument("n"), JobOptions.JobType.PortRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
+                        else
+                            return 1;
+                        break;
+                    default:
                         return 1;
-                    break;
-                case "ping":
-                    if (ArgumentExists("ttl"))
-                        MadComponents.components.jobSystem.jobs.Add(new JobPing(new JobPingOptions(GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("ttl")))));
-                    else
-                        return 1;
-                    break;
-                case "port":
-                    if (ArgumentExists("p"))
-                        MadComponents.components.jobSystem.jobs.Add(new JobPort(new JobPortOptions(GetArgument("n"), JobOptions.JobType.PortRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
-                    else
-                        return 1;
-                    break;
-                default:
-                    return 1;
+                }
+                return 0;
             }
-            return 0;
+            else
+                return 1;
         }
     }
 
