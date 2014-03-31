@@ -7,12 +7,7 @@ namespace MAD
 {
     class HelpCommand : Command
     {
-        MadCLI cli;
-
-        public HelpCommand(MadCLI cli) 
-        {
-            this.cli = cli;
-        }
+        public HelpCommand() {}
 
         public override int Execute()
         {
@@ -22,7 +17,7 @@ namespace MAD
             Headline(" <-- General commands -->");
             Console.WriteLine();
             Console.WriteLine(" > help                      print this help page            (WORKS)");
-            Console.WriteLine(" > version                   show all versions               (WORKS)");
+            Console.WriteLine(" > versions                  show versions                   (WORKS)");
             Console.WriteLine(" > clear                     clear console                   (WORKS)");
             Console.WriteLine(" > logo                      print the MAD logo              (WORKS)");
             Console.WriteLine(" > exit/close                exit program                    (WORKS)");
@@ -32,12 +27,15 @@ namespace MAD
             Console.WriteLine();
             Headline(" <-- MadJobSystem commands -->");
             Console.WriteLine();
-            Console.WriteLine(" > jobstatus [-id <ID>]      status of the jobs              (WORKS)");
-            Console.WriteLine(" > jobadd -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY>  (WORKS)");
+            Console.WriteLine(" > job status [-id <ID>]     status of the jobs              (WORKS)");
+            Console.WriteLine(" > job add -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY>  (WORKS)");
             Console.WriteLine("     > -t <TYPE=PING> -ttl <TTL>");
             Console.WriteLine("     > -t <TYPE=HTTP> -p <PORT>");
             Console.WriteLine("     > -t <TYPE=PORT> -p <PORT>");
             Console.WriteLine("                             add a job to the jobsystem      (WORKS)");
+            Console.WriteLine(" > job remove -id <JOBID>    remove a job from the jobsystem (WORKS)");
+            Console.WriteLine(" > job start -id <JOBID>     start a job from the jobsystem (WORKS)");
+            Console.WriteLine(" > job stop -id <JOBID>      stop a job from the jobsystem (WORKS)");
             Console.WriteLine();
             Headline(" <-- MadNotificationSystem commands -->");
             Console.WriteLine(" ______________________________________________________");
@@ -49,7 +47,7 @@ namespace MAD
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(text);
-            Console.ForegroundColor = cli.textColor;
+            Console.ForegroundColor = MadComponents.components.cli.textColor;
         }
     }
 
@@ -66,23 +64,18 @@ namespace MAD
 
     class LogoCommand : Command
     {
-        MadCLI cli;
-
-        public LogoCommand(MadCLI cli)
-        {
-            this.cli = cli;
-        }
+        public LogoCommand() {}
 
         public override int Execute()
         {
-            cli.PrintLogo();
+            MadComponents.components.cli.PrintLogo();
             return 0;
         }
     }
 
     class ExitCommand : Command
     {
-        public ExitCommand() { }
+        public ExitCommand() {}
 
         public override int Execute()
         {
@@ -91,42 +84,31 @@ namespace MAD
         }
     }
 
-    class VersionCommand : Command
+    class VersionsCommand : Command
     {
-        MadCLI cli;
-
-        public VersionCommand(MadCLI cli) 
-        {
-            this.cli = cli;
-        }
+        public VersionsCommand() {}
 
         public override int Execute()
         {
-            Console.WriteLine(@" __  __ 2 _   ____ ");
-            Console.WriteLine(@"|  \/  |/ _ \|  _  \    MadCLI VERSION                  v " + cli.cliVersion);
-            Console.WriteLine(@"| .  . / /_\ \ | | |    MadNotificationSystem           v " + "unknown");
-            Console.WriteLine(@"| |\/| |  _  | | | |    MadJobSystem                    v " + "unknown");
-            Console.WriteLine(@"| |  | | | | | |_/ |    MadMemoryManagmentSysystem      v " + "unknown");
-            Console.WriteLine(@"|_|  |_\_| |_/____/ ________________________________________________");
-            Console.WriteLine();
+            Console.WriteLine("Mad-Project VERSION " + MadComponents.components.version);
+            Console.WriteLine("MadCLI VERSION VERSION " + MadComponents.components.cli.version);
+            Console.WriteLine("MadNotificationSystem VERSION " + "unknown");
+            Console.WriteLine("MadJobSystem VERSION " + MadComponents.components.jobSystem.version);
+            Console.WriteLine("MadMemoryManagmentSysystem VERSION " + "unknown");
             return 0;
         }
     }
 
     class CursorCommand : Command
     {
-        private MadCLI cli;
-
-        public CursorCommand(MadCLI cli)
+        public CursorCommand()
         {
-            this.cli = cli;
-            requiredIndicators.Add(new object[] {"t", typeof(string)}); // TEXT
-            //optionalIndicators.Add("c"); // COLOR
+            requiredIndicators.Add(new object[] {"t", typeof(string)});
         }
 
         public override int Execute()
         {
-            cli.cursor = GetArgument("t") + " ";
+            MadComponents.components.cli.cursor = GetArgument("t") + " ";
             return 0;
         }
     }

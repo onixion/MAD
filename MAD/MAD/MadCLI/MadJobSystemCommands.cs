@@ -6,11 +6,8 @@ namespace MAD
 {
     public class JobSystemListCommand : Command
     {
-        private MadJobSystem system;
-
-        public JobSystemListCommand(MadJobSystem system)
+        public JobSystemListCommand()
         {
-            this.system = system;
             optionalIndicators.Add(new object[]{"id", typeof(Int32)});
         }
 
@@ -20,7 +17,7 @@ namespace MAD
             {
                 if (!ArgumentEmpty("id"))
                 {
-                    Job job = system.GetJob(Int32.Parse(GetArgument("id")));
+                    Job job = MadComponents.components.jobSystem.GetJob(Int32.Parse(GetArgument("id")));
 
                     if (job != null)
                         job.JobStatus();
@@ -32,10 +29,10 @@ namespace MAD
             }
             else
             {
-                foreach(Job job in system.jobs)
+                foreach (Job job in MadComponents.components.jobSystem.jobs)
                     job.JobStatus();
 
-                if (system.jobs.Count == 0)
+                if (MadComponents.components.jobSystem.jobs.Count == 0)
                     Console.WriteLine("(no jobs)");
             }
 
@@ -45,12 +42,8 @@ namespace MAD
 
     public class JobSystemAddCommand : Command
     {
-        private MadJobSystem system;
-
-        public JobSystemAddCommand(MadJobSystem system)
+        public JobSystemAddCommand()
         {
-            this.system = system;
-
             requiredIndicators.Add(new object[]{"t",typeof(string)});
             requiredIndicators.Add(new object[] { "n", typeof(string) });
             requiredIndicators.Add(new object[] { "ip", typeof(string) });
@@ -66,19 +59,19 @@ namespace MAD
             {
                 case "http":
                     if (ArgumentExists("p"))
-                        system.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"),JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
+                        MadComponents.components.jobSystem.jobs.Add(new JobHttp(new JobHttpOptions(GetArgument("n"), JobOptions.JobType.HttpRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
                     else
                         return 1;
                     break;
                 case "ping":
                     if (ArgumentExists("ttl"))
-                        system.jobs.Add(new JobPing(new JobPingOptions(GetArgument("n"),JobOptions.JobType.PingRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("ttl")))));
+                        MadComponents.components.jobSystem.jobs.Add(new JobPing(new JobPingOptions(GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("ttl")))));
                     else
                         return 1;
                     break;
                 case "port":
                     if (ArgumentExists("p"))
-                        system.jobs.Add(new JobPort(new JobPortOptions(GetArgument("n"),JobOptions.JobType.PortRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
+                        MadComponents.components.jobSystem.jobs.Add(new JobPort(new JobPortOptions(GetArgument("n"), JobOptions.JobType.PortRequest, Int32.Parse(GetArgument("d")), IPAddress.Parse(GetArgument("ip")), Int32.Parse(GetArgument("p")))));
                     else
                         return 1;
                     break;
@@ -90,23 +83,19 @@ namespace MAD
     }
 
     public class JobSystemRemoveCommand : Command
-    { 
-        private MadJobSystem system;
-        private int id;
-
+    {
         public JobSystemRemoveCommand(MadJobSystem system)
         {
-            this.system = system;
             requiredIndicators.Add(new object[] { "id", typeof(Int32) });
         }
 
         public override int Execute()
         {
-            id = Int32.Parse(GetArgument("id"));
+            int id = Int32.Parse(GetArgument("id"));
 
-            if (system.JobExist(id))
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                system.RemoveJob(Int32.Parse(GetArgument("id")));
+                MadComponents.components.jobSystem.RemoveJob(id);
                 return 0;
             }
             else
@@ -116,22 +105,18 @@ namespace MAD
 
     public class JobSystemStartCommand : Command
     {
-        private MadJobSystem system;
-        private int id;
-
-        public JobSystemStartCommand(MadJobSystem system)
+        public JobSystemStartCommand()
         {
-            this.system = system;
             requiredIndicators.Add(new object[]{"id", typeof(Int32)});
         }
 
         public override int Execute()
         {
-            id = Int32.Parse(GetArgument("id"));
+            int id = Int32.Parse(GetArgument("id"));
 
-            if (system.JobExist(id))
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                system.StartJob(Int32.Parse(GetArgument("id")));
+                MadComponents.components.jobSystem.StartJob(id);
                 return 0;
             }
             else
@@ -141,22 +126,18 @@ namespace MAD
 
     public class JobSystemStopCommand : Command
     {
-        private MadJobSystem system;
-        private int id;
-
-        public JobSystemStopCommand(MadJobSystem system)
+        public JobSystemStopCommand()
         {
-            this.system = system;
             requiredIndicators.Add(new object[] {"id",typeof(Int32)});
         }
 
         public override int Execute()
         {
-            id = Int32.Parse(GetArgument("id"));
+            int id = Int32.Parse(GetArgument("id"));
 
-            if (system.JobExist(id))
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                system.StopJob(Int32.Parse(GetArgument("id")));
+                MadComponents.components.jobSystem.StopJob(id);
                 return 0;
             }
             else

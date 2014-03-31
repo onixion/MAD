@@ -17,8 +17,7 @@ namespace MAD
             // MyProgram p = new MyProgram();
             // p.Run();
 
-            MadCLI s = new MadCLI();
-            s.Start();
+            MadComponents.components.cli.Start();
         }
     }
 }

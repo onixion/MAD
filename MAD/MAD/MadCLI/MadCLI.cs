@@ -7,9 +7,7 @@ namespace MAD
 {
     public class MadCLI
     {
-        public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
-
-        public string cliVersion = "0.0.4.0";
+        public string version = "0.0.4.0";
         public string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor textColor = ConsoleColor.White;
@@ -25,10 +23,6 @@ namespace MAD
 
         public int statusCode;
 
-        //
-        MadJobSystem js = new MadJobSystem();
-        //
-
         public MadCLI()
         {
             UpdateWindowTitle();
@@ -39,21 +33,21 @@ namespace MAD
         private void InitCommands()
         {
             // GENERAL COMMANDS
-            commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[] { typeof(MadCLI) }, new object[] {this}));
-            commandOptions.Add(new CommandOptions("version", typeof(VersionCommand), new Type[] { typeof(MadCLI) }, new object[] { this }));
+            commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("versions", typeof(VersionsCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("exit", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
 
             commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
-            commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[]{typeof(MadCLI)}, new object[]{this}));
+            commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[0], new object[0]));
 
             // JOBSYSTEM COMMANDS
-            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
-            commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[] { typeof(MadJobSystem) }, new object[] { js }));
+            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[0], new object[0]));
         }
 
         public void UpdateWindowTitle()
@@ -210,7 +204,7 @@ namespace MAD
             Console.WriteLine(@"|  \/  |/ _ \|  _  \");
             Console.WriteLine(@"| .  . / /_\ \ | | |    MONITORING LIKE A BOZZ!");
             Console.WriteLine(@"| |\/| |  _  | | | |");
-            Console.WriteLine(@"| |  | | | | | |_/ |    MadCLI-VERSION " + cliVersion);
+            Console.WriteLine(@"| |  | | | | | |_/ |    MadCLI-VERSION " + version);
             Console.WriteLine(@"|_|  |_\_| |_/____/ __________________________ ");
             Console.WriteLine();
         }
