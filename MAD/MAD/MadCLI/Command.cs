@@ -33,25 +33,16 @@ namespace MAD
                 return false;
             }
            
-            // check the if the types are valid
+            // check if they have values if neede
             for (int i2 = 0; i2 < args.Count; i2++)
             {
                 string[] temp = args[i2];
 
-                string identifier = temp[0];
-                string argument = temp[1];
-
-                Type requiredArgumentType = GetArgumentType(identifier);
-
-                if(requiredArgumentType != typeof(string))
+                if (!GetArgumentConfig(temp[0]))
                 {
-                    try
+                    if (temp[1] == null)
                     {
-                        
-                    }
-                    catch (Exception e)
-                    {
-                        ErrorMessage("Wrong argument type! The argument \"-" + identifier + "\" expects a number!"); 
+                        ErrorMessage("Argument \"-" + temp[0] + "\" is null!");
                         return false;
                     }
                 }
@@ -100,19 +91,17 @@ namespace MAD
             this.args = args;
         }
 
-        public Type GetArgumentType(string identifier)
+        public bool GetArgumentConfig(string identifier)
         { 
             foreach(object[] temp in requiredIndicators)
-            {
                 if((string)temp[0] == identifier)
-                    return (Type)temp[1];
-            }
+                    return (bool)temp[1];
 
             foreach (object[] temp in optionalIndicators)
                 if ((string)temp[0] == identifier)
-                    return (Type)temp[1];
+                    return (bool)temp[1];
 
-            return null;
+            return false;
         }
 
         public string GetArgument(string identifier)

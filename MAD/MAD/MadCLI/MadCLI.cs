@@ -2,12 +2,16 @@
 using System.Reflection;
 using System.Collections.Generic;
 
+//
+using System.Net;
+//
+
 namespace MAD
 {
     public class MadCLI
     {
         // cli variables
-        public string version = "0.0.5.0";
+        public string version = "0.0.5.5";
         public string cursor = "=> ";
         public string windowTitle = "MAD - Network Monitoring";
 
@@ -46,15 +50,17 @@ namespace MAD
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("versions", typeof(VersionsCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("info", typeof(InfoCommand), new Type[0], new object[0]));
-
             commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[0], new object[0]));
 
             // JOBSYSTEM COMMANDS
             commandOptions.Add(new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("jobsystem list", typeof(JobSystemTableCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add http", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add port", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[0], new object[0]));
@@ -62,6 +68,9 @@ namespace MAD
 
         public void Start()
         {
+            //
+            MadComponents.components.jobSystem.AddJob(new JobHttpOptions("HttpRequest01", JobOptions.JobType.HttpRequest, 4000, IPAddress.Parse("127.0.0.1"), 80));
+
             PrintLogo();
 
             while (true)
@@ -69,10 +78,12 @@ namespace MAD
                 PrintCursor();
                 cliInput = Console.ReadLine();
 
+                // get command
                 inputCommand = GetCommand(cliInput);
 
                 if (inputCommand != null)
                 {
+                    // check if command are known
                     if (CommandExists(inputCommand))
                     {
                         // get arguments from input
@@ -91,10 +102,6 @@ namespace MAD
 
                             // EXECUTE COMMAND AND GET STATUSCODE AFTER EXECUTION
                             statusCode = command.Execute();
-
-                            // check statuscode
-                            if (statusCode != 0)
-                                ErrorMessage(GetErrorText(statusCode));
                         }
                     }
                     else
@@ -156,23 +163,6 @@ namespace MAD
             return null;
         }
 
-        private string GetErrorText(int statusCode)
-        {
-            switch (statusCode)
-            { 
-                case 1:
-                    return "Missing or wrong arguments!";
-                case 2:
-                    return "Wrong argument type!";
-                case 3:
-                    return "Some arguments are null!";
-                case 30:
-                    return "Job do not exist!";
-                default:
-                    return "Errorcode: " + statusCode;
-            }
-        }
-
         private string GetCommand(string input)
         {
             string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.RemoveEmptyEntries);
@@ -203,7 +193,6 @@ namespace MAD
             {
                 string[] temp2 = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-                // if argument is null
                 if (temp2.Length == 1)
                     tempArgs.Add(new string[]{temp2[0], null});
                 else

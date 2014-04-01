@@ -16,7 +16,6 @@ namespace MAD
 
         public void InitJob()
         {
-            // set/get JobID
             jobID = jobsCount;
             jobsCount++;
         }
@@ -65,7 +64,6 @@ namespace MAD
         public virtual void JobStatus()
         {
             Console.WriteLine();
-
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(string.Format("\tJOB-ID: " + jobID));
             Console.ForegroundColor = MadComponents.components.cli.textColor;

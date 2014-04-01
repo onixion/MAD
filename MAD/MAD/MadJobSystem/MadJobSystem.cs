@@ -45,7 +45,6 @@ namespace MAD
             foreach (Job job in jobs)
                 if (jobID == job.jobID)
                     return job;
-
             return null;
         }
 

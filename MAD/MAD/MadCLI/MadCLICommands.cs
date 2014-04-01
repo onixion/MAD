@@ -16,27 +16,28 @@ namespace MAD
             Console.WriteLine();
             Headline(" <-- General commands -->");
             Console.WriteLine();
-            Console.WriteLine(" > help                      print this help page            (WORKS)");
-            Console.WriteLine(" > versions                  show versions                   (WORKS)");
-            Console.WriteLine(" > clear                     clear console                   (WORKS)");
-            Console.WriteLine(" > logo                      print the MAD logo              (WORKS)");
-            Console.WriteLine(" > exit/close                exit program                    (WORKS)");
-            Console.WriteLine(" > info                      informations about the program  (WORKS)");
-            Console.WriteLine(" > cursor -t <NEW CURSOR>    change the CLI cursor           (WORKS)");
-            Console.WriteLine(" > gui                       start the GUI                   (NIY)");                
+            Console.WriteLine(" > help                      print this help page");
+            Console.WriteLine(" > versions                  show versions");
+            Console.WriteLine(" > clear                     clear console");
+            Console.WriteLine(" > logo                      print the MAD logo");
+            Console.WriteLine(" > exit/close                exit program");
+            Console.WriteLine(" > info                      informations about the program");
+            Console.WriteLine(" > cursor -t <NEW CURSOR>    change the CLI cursor");
+            Console.WriteLine(" > gui                       start the GUI (NIY)");                
             Console.WriteLine();
             Headline(" <-- MadJobSystem commands -->");
             Console.WriteLine();
-            Console.WriteLine(" > jobsystem status          status of the job-system        (WORKS)");
-            Console.WriteLine(" > job status [-id <ID>]     status of the jobs              (WORKS)");
-            Console.WriteLine(" > job add -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY> (WORKS)");
-            Console.WriteLine("     > -t <TYPE=PING> -ttl <TTL>");
-            Console.WriteLine("     > -t <TYPE=HTTP> -p <PORT>");
-            Console.WriteLine("     > -t <TYPE=PORT> -p <PORT>");
-            Console.WriteLine("                             add a job to the jobsystem      (WORKS)");
-            Console.WriteLine(" > job remove -id <JOB ID>   remove a job from the jobsystem (WORKS)");
-            Console.WriteLine(" > job start -id <JOB ID>    start a job from the jobsystem  (WORKS)");
-            Console.WriteLine(" > job stop -id <JOB ID>     stop a job from the jobsystem   (WORKS)");
+            Console.WriteLine(" > jobsystem status          status of the job-system");
+            Console.WriteLine(" > job status [-id <ID>]     status of the jobs");
+            Console.WriteLine(" > job add ping -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -ttl <TTL>");
+            Console.WriteLine("                             add a ping-job");
+            Console.WriteLine(" > job add http -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -p <PORT>");
+            Console.WriteLine("                             add a http-job");
+            Console.WriteLine(" > job add port -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -p <PORT>");
+            Console.WriteLine("                             add a port-job");
+            Console.WriteLine(" > job remove -id <JOB ID>   remove a job");
+            Console.WriteLine(" > job start -id <JOB ID>    start a job");
+            Console.WriteLine(" > job stop -id <JOB ID>     stop a job");
             Console.WriteLine();
             Headline(" <-- MadMemoryManagmentSystem commands -->");
             Console.WriteLine();
@@ -116,23 +117,16 @@ namespace MAD
 
         public override int Execute()
         {
-            int consoleWidth = Console.BufferWidth;
             Console.WriteLine();
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("███╗   ███2 █████╗ ██████╗ ");
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("████╗ ████║██╔══██╗██╔══██╗");
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("██╔████╔██║███████║██║  ██║");
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("██║╚██╔╝██║██╔══██║██║  ██║");
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("██║ ╚═╝ ██║██║  ██║██████╔╝");
-            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
             Console.WriteLine("╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝ ");
             Console.WriteLine();
-            Console.CursorLeft = consoleWidth / 2 - 24;
             Console.WriteLine("Network Monitoring Program written fully in C#.");
+            Console.WriteLine();
             return 0;
         }
     }
@@ -141,7 +135,7 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredIndicators.Add(new object[] {"t", typeof(string)});
+            requiredIndicators.Add(new object[] {"t", false});
         }
 
         public override int Execute()
