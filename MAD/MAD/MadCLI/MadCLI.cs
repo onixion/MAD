@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -7,42 +6,53 @@ namespace MAD
 {
     public class MadCLI
     {
-        public string version = "0.0.4.0";
+        // cli variables
+        public string version = "0.0.5.0";
         public string cursor = "=> ";
-        public ConsoleColor cursorColor = ConsoleColor.Cyan;
-        public ConsoleColor textColor = ConsoleColor.White;
         public string windowTitle = "MAD - Network Monitoring";
 
+        public ConsoleColor cursorColor = ConsoleColor.Cyan;
+        public ConsoleColor textColor = ConsoleColor.White;
+        public ConsoleColor logoColor = ConsoleColor.Cyan;
+
+        // input variables
         private string cliInput;
-        public string inputCommand;
-        public List<string[]> inputArgs;
+        private string inputCommand;
+        private List<string[]> inputArgs;
 
-        public List<CommandOptions> commandOptions = new List<CommandOptions>{};
-        public Command command;
-        public Type inputCommandType;
-
-        public int statusCode;
+        // command variables
+        private List<CommandOptions> commandOptions = new List<CommandOptions>{};
+        private Command command;
+        private Type inputCommandType;
+        private int statusCode;
 
         public MadCLI()
         {
-            UpdateWindowTitle();
+            SetWindowTitle();
             InitCommands();
             Console.ForegroundColor = textColor;
+        }
+
+        public void SetWindowTitle()
+        {
+            Console.Title = windowTitle;
         }
 
         private void InitCommands()
         {
             // GENERAL COMMANDS
             commandOptions.Add(new CommandOptions("help", typeof(HelpCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("versions", typeof(VersionsCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("exit", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("versions", typeof(VersionsCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("info", typeof(InfoCommand), new Type[0], new object[0]));
 
             commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[0], new object[0]));
 
             // JOBSYSTEM COMMANDS
+            commandOptions.Add(new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job add", typeof(JobSystemAddCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[0], new object[0]));
@@ -50,14 +60,8 @@ namespace MAD
             commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[0], new object[0]));
         }
 
-        public void UpdateWindowTitle()
-        {
-            Console.Title = windowTitle;
-        }
-
         public void Start()
         {
-            PrintWelcome();
             PrintLogo();
 
             while (true)
@@ -99,6 +103,27 @@ namespace MAD
             }   
         }
 
+        public void PrintLogo()
+        {
+            Console.ForegroundColor = logoColor;
+            Console.WriteLine();
+            Console.WriteLine(@" ███╗   ███2 █████╗ ██████╗");
+            Console.WriteLine(@" ████╗ ████║██╔══██╗██╔══██╗");
+            Console.WriteLine(@" ██╔████╔██║███████║██║  ██║");
+            Console.WriteLine(@" ██║╚██╔╝██║██╔══██║██║  ██╠═════════════════════╗");
+            Console.WriteLine(@" ██║ ╚═╝ ██║██║  ██║██████╔╝ CLI VERSION " + version + " ║");
+            Console.WriteLine(@" ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╩══════════════════════╝");
+            Console.WriteLine();
+            Console.ForegroundColor = textColor;
+        }
+
+        private void PrintCursor()
+        {
+            Console.ForegroundColor = cursorColor;
+            Console.Write(cursor);
+            Console.ForegroundColor = textColor;
+        }
+
         public bool CommandExists(string command)
         {
             foreach (CommandOptions temp in commandOptions)
@@ -128,15 +153,7 @@ namespace MAD
             foreach (CommandOptions temp in commandOptions)
                 if (temp.command == command)
                     return temp.commandObjects;
-
             return null;
-        }
-
-        public void PrintCursor()
-        {
-            Console.ForegroundColor = cursorColor;
-            Console.Write(cursor);
-            Console.ForegroundColor = textColor;
         }
 
         private string GetErrorText(int statusCode)
@@ -156,7 +173,7 @@ namespace MAD
             }
         }
 
-        public string GetCommand(string input)
+        private string GetCommand(string input)
         {
             string[] buffer = input.Split(new string[]{"-"},StringSplitOptions.RemoveEmptyEntries);
 
@@ -173,62 +190,35 @@ namespace MAD
                 return null;
         }
 
-        public List<string[]> GetArgs(string input)
+        private List<string[]> GetArgs(string input)
         {
-            List<string[]> temp1 = new List<string[]>();
-            string[] temp2 = input.Split(new char[] {'-'}, StringSplitOptions.RemoveEmptyEntries);
+            List<string[]> tempArgs = new List<string[]>();
 
-            for (int i = 1; i < temp2.Length; i++)
-                temp2[i] = temp2[i].Trim();
+            string[] temp = input.Split(new char[] {'-'}, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 1; i < temp2.Length; i++)
+            for (int i = 1; i < temp.Length; i++)
+                temp[i] = temp[i].Trim();
+
+            for (int i = 1; i < temp.Length; i++)
             {
-                string[] temp3 = temp2[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-                temp1.Add(temp3);
+                string[] temp2 = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+                // if argument is null
+                if (temp2.Length == 1)
+                    tempArgs.Add(new string[]{temp2[0], null});
+                else
+                    tempArgs.Add(new string[] { temp2[0], temp2[1] }); // more arguments than 1 do not get recordnized
             }
 
-            return temp1;
+            return tempArgs;
         }
 
-        public void ErrorMessage(string message)
+        private void ErrorMessage(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("[ERROR] ");
             Console.ForegroundColor = textColor;
             Console.WriteLine(message);
-        }
-
-        public void PrintLogo()
-        {
-            int consoleWidth = Console.BufferWidth;
-
-            Console.CursorLeft = consoleWidth / 2 -20;
-            Console.WriteLine(@" __  __ 2 _   ____ ");
-            Console.CursorLeft = consoleWidth / 2 - 20;
-            Console.WriteLine(@"|  \/  |/ _ \|  _ \ ");
-            Console.CursorLeft = consoleWidth / 2 - 20;
-            Console.WriteLine(@"| .  . / /_\ \ | | |");
-            Console.CursorLeft = consoleWidth / 2 - 20;
-            Console.WriteLine(@"| |\/| |  _  | | | |");
-            Console.CursorLeft = consoleWidth / 2- 20;
-            Console.WriteLine(@"| |  | | | | | |_/ |");
-            Console.CursorLeft = consoleWidth / 2 - 20;
-            Console.WriteLine(@"|_|  |_\_| |_/____/ ");
-            Console.WriteLine();
-            Console.WriteLine();
-        }
-
-        public void PrintWelcome()
-        {
-            Console.WriteLine("Welcome to the MAD-CommandLineInterface!");
-            Console.WriteLine();
-            Console.Write("This CLI is still not finished yet. Many important parts of the CLI are missing or not implemented yet. ");
-            Console.Write("So please stay calm and relaxed if it should crash ...");
-            Console.WriteLine();
-            Console.WriteLine();
-            Console.Write(" > Press any key to continue ... ");
-            Console.ReadKey();
-            Console.Clear();
         }
     }
 }

@@ -95,5 +95,23 @@ namespace MAD
                 }
             }
         }
+
+        public int JobsCountActive()
+        {
+            int count = 0;
+            for (int i = 0; i < jobs.Count; i++)
+                if (jobs[0].IsActive() == true)
+                    count++;
+            return count;
+        }
+
+        public int JobsCountInactive()
+        {
+            int count = 0;
+            for (int i = 0; i < jobs.Count; i++)
+                if (jobs[0].IsActive() != true)
+                    count++;
+            return count;
+        }
     }
 }

@@ -4,6 +4,22 @@ using System.Collections.Generic;
 
 namespace MAD
 {
+    public class JobSystemStatusCommand : Command
+    {
+        public JobSystemStatusCommand() { }
+
+        public override int Execute()
+        {
+            Console.WriteLine();
+            Console.WriteLine("Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count);
+            Console.WriteLine("Jobs active:      " + MadComponents.components.jobSystem.JobsCountActive());
+            Console.WriteLine("Jobs inactive:    " + MadComponents.components.jobSystem.JobsCountInactive());
+            Console.WriteLine();
+
+            return 0;
+        }
+    }
+
     public class JobSystemListCommand : Command
     {
         public JobSystemListCommand()
@@ -30,10 +46,10 @@ namespace MAD
             else
             {
                 foreach (Job job in MadComponents.components.jobSystem.jobs)
+                {
                     job.JobStatus();
-
-                if (MadComponents.components.jobSystem.jobs.Count == 0)
-                    Console.WriteLine("(no jobs)");
+                    Console.WriteLine();
+                }
             }
 
             return 0;

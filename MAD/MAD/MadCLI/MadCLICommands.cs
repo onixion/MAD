@@ -12,7 +12,7 @@ namespace MAD
         public override int Execute()
         {
             Console.WriteLine();
-            Console.WriteLine(" <---- H E L P ---- P A G E ---->");
+            StartEndHeadline(" <---- H E L P ---- P A G E ---->");
             Console.WriteLine();
             Headline(" <-- General commands -->");
             Console.WriteLine();
@@ -27,20 +27,31 @@ namespace MAD
             Console.WriteLine();
             Headline(" <-- MadJobSystem commands -->");
             Console.WriteLine();
+            Console.WriteLine(" > jobsystem status          status of the job-system        (WORKS)");
             Console.WriteLine(" > job status [-id <ID>]     status of the jobs              (WORKS)");
-            Console.WriteLine(" > job add -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY>  (WORKS)");
+            Console.WriteLine(" > job add -t <TYPE> -n <JOBNAME> -ip <IPADDRESS> -d <DELAY> (WORKS)");
             Console.WriteLine("     > -t <TYPE=PING> -ttl <TTL>");
             Console.WriteLine("     > -t <TYPE=HTTP> -p <PORT>");
             Console.WriteLine("     > -t <TYPE=PORT> -p <PORT>");
             Console.WriteLine("                             add a job to the jobsystem      (WORKS)");
-            Console.WriteLine(" > job remove -id <JOBID>    remove a job from the jobsystem (WORKS)");
-            Console.WriteLine(" > job start -id <JOBID>     start a job from the jobsystem (WORKS)");
-            Console.WriteLine(" > job stop -id <JOBID>      stop a job from the jobsystem (WORKS)");
+            Console.WriteLine(" > job remove -id <JOB ID>   remove a job from the jobsystem (WORKS)");
+            Console.WriteLine(" > job start -id <JOB ID>    start a job from the jobsystem  (WORKS)");
+            Console.WriteLine(" > job stop -id <JOB ID>     stop a job from the jobsystem   (WORKS)");
+            Console.WriteLine();
+            Headline(" <-- MadMemoryManagmentSystem commands -->");
             Console.WriteLine();
             Headline(" <-- MadNotificationSystem commands -->");
-            Console.WriteLine(" ______________________________________________________");
+            Console.WriteLine();
+            StartEndHeadline(" <---- E N D ---->");
             Console.WriteLine();
             return 0;
+        }
+
+        public void StartEndHeadline(string text)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(text);
+            Console.ForegroundColor = MadComponents.components.cli.textColor;
         }
 
         public void Headline(string text)
@@ -95,6 +106,33 @@ namespace MAD
             Console.WriteLine("MadNotificationSystem VERSION " + "unknown");
             Console.WriteLine("MadJobSystem VERSION " + MadComponents.components.jobSystem.version);
             Console.WriteLine("MadMemoryManagmentSysystem VERSION " + "unknown");
+            return 0;
+        }
+    }
+
+    class InfoCommand : Command
+    {
+        public InfoCommand() { }
+
+        public override int Execute()
+        {
+            int consoleWidth = Console.BufferWidth;
+            Console.WriteLine();
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("███╗   ███2 █████╗ ██████╗ ");
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("████╗ ████║██╔══██╗██╔══██╗");
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("██╔████╔██║███████║██║  ██║");
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("██║╚██╔╝██║██╔══██║██║  ██║");
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("██║ ╚═╝ ██║██║  ██║██████╔╝");
+            Console.CursorLeft = consoleWidth / 2 - 28 / 2;
+            Console.WriteLine("╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝ ");
+            Console.WriteLine();
+            Console.CursorLeft = consoleWidth / 2 - 24;
+            Console.WriteLine("Network Monitoring Program written fully in C#.");
             return 0;
         }
     }

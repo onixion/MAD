@@ -66,9 +66,9 @@ namespace MAD
         {
             Console.WriteLine();
 
-            Console.BackgroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine(string.Format("JOB-ID: " + jobID));
-            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(string.Format("\tJOB-ID: " + jobID));
+            Console.ForegroundColor = MadComponents.components.cli.textColor;
             Console.WriteLine(string.Format("\tNAME:     \t{0}", jobOptions.jobName));
             Console.WriteLine(string.Format("\tTYPE:     \t{0}", jobOptions.jobType.ToString()));
             Console.WriteLine(string.Format("\tADDRESS:  \t{0}", jobOptions.targetAddress));

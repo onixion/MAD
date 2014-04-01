@@ -25,11 +25,11 @@ namespace MAD
             // check if all needed arguments are known
             int i = 0;
             foreach (string[] temp in args)
-                if (RequiredArgumentExists(temp[0]))
+                if (RequiredArgumentExist(temp[0]))
                     i++;
             if (requiredIndicators.Count != i)
             {
-                ErrorMessage("Missing required arguments!");
+                ErrorMessage("Some arguments are missing!");
                 return false;
             }
            
@@ -38,21 +38,20 @@ namespace MAD
             {
                 string[] temp = args[i2];
 
-                try
+                string identifier = temp[0];
+                string argument = temp[1];
+
+                Type requiredArgumentType = GetArgumentType(identifier);
+
+                if(requiredArgumentType != typeof(string))
                 {
-                    int i3 = Int32.Parse(temp[1]);
-                    Type type = GetType(temp[0]);
-                    if (GetType(temp[0]) != typeof(Int32))
+                    try
                     {
-                        ErrorMessage("Argument \"-" + temp[0] + "\" must be a string!");
-                        return false;
+                        
                     }
-                }
-                catch (Exception e)
-                {
-                    if (GetType(temp[0]) != typeof(string))
+                    catch (Exception e)
                     {
-                        ErrorMessage("Argument \"-" + temp[0] + "\" must be a number!");
+                        ErrorMessage("Wrong argument type! The argument \"-" + identifier + "\" expects a number!"); 
                         return false;
                     }
                 }
@@ -69,7 +68,7 @@ namespace MAD
             Console.WriteLine(message);
         }
 
-        public bool RequiredArgumentExists(string indicator)
+        public bool RequiredArgumentExist(string indicator)
         {
             foreach (object[] temp in requiredIndicators)
                 if ((string)temp[0] == indicator)
@@ -77,7 +76,7 @@ namespace MAD
             return false;
         }
 
-        public bool OptionalArgumentExists(string indicator)
+        public bool OptionalArgumentExist(string indicator)
         {
             foreach (object[] temp in optionalIndicators)
                 if ((string)temp[0] == indicator)
@@ -101,7 +100,7 @@ namespace MAD
             this.args = args;
         }
 
-        public Type GetType(string identifier)
+        public Type GetArgumentType(string identifier)
         { 
             foreach(object[] temp in requiredIndicators)
             {
@@ -137,11 +136,9 @@ namespace MAD
             foreach (object[] temp in requiredIndicators)
                 if ((string)temp[0] == indicator)
                     return true;
-
             foreach (object[] temp in optionalIndicators)
                 if ((string)temp[0] == indicator)
                     return true;
-
             return false;
         }
 
