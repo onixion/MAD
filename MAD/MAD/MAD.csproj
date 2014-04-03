@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="MadCLI\Command.cs" />
     <Compile Include="MadCLI\CommandOptions.cs" />
+    <Compile Include="MadCLI\Table.cs" />
     <Compile Include="MadJobSystem\Job.cs" />
     <Compile Include="MadJobSystem\JobHttp.cs" />
     <Compile Include="MadJobSystem\JobHttpOptions.cs" />

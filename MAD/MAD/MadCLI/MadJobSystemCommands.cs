@@ -169,25 +169,20 @@ namespace MAD
 
         public override int Execute()
         {
-            while (true)
-            {
-                WriteTable();
-                Thread.Sleep(10);
-            }
+            Table table = new Table(new string[] { "ID", "Namefsdfsdfdsfdsfds", "Type", "IpAddressfdsfdsfdsfs", "Active" });
+            table.WriteColumnes();
 
             return 0;
         }
 
-        private void WriteTable()
+        private void WriteJobs()
         {
-            Console.Clear();
-            Console.SetCursorPosition(0, 0);
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("ID\t\tName\t\tType\t\tOutput");
-            Console.ForegroundColor = ConsoleColor.Black;
+            Console.WriteLine("ID\tName\t\tType\t\tOutput");
+            Console.ForegroundColor = MadComponents.components.cli.textColor;
 
             foreach (Job temp in MadComponents.components.jobSystem.jobs)
-                Console.WriteLine(temp.jobID + "\t\t" + temp.jobOptions.jobName + "\t\t" + temp.jobOptions.jobType.ToString() + "\t\t" + temp.jobOutput);
+                Console.WriteLine(temp.jobID + "\t" + temp.jobOptions.jobName + "\t\t" + temp.jobOptions.jobType.ToString() + "\t\t" + temp.jobOutput);
         }
     }
 }
