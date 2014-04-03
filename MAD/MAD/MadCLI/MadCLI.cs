@@ -50,19 +50,21 @@ namespace MAD
             commandOptions.Add(new CommandOptions("close", typeof(ExitCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("versions", typeof(VersionsCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("info", typeof(InfoCommand), new Type[0], new object[0]));
+
             commandOptions.Add(new CommandOptions("clear", typeof(ClearCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("logo", typeof(LogoCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("cursor", typeof(CursorCommand), new Type[0], new object[0]));
 
             // JOBSYSTEM COMMANDS
             commandOptions.Add(new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("job add http", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("job add port", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job status", typeof(JobListCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job remove", typeof(JobSystemRemoveCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job start", typeof(JobSystemStartCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job stop", typeof(JobSystemStopCommand), new Type[0], new object[0]));
+
+            commandOptions.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add http", typeof(JobSystemAddHttpCommand), new Type[0], new object[0]));
+            commandOptions.Add(new CommandOptions("job add port", typeof(JobSystemAddPortCommand), new Type[0], new object[0]));
         }
 
         public void Start()

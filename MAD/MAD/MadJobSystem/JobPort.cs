@@ -36,7 +36,7 @@ namespace MAD
         public override void JobStatus()
         {
             base.JobStatus();
-            Console.WriteLine(string.Format("\tPORT:     \t{0}", portJobOptions.port));
+            Console.WriteLine(string.Format("PORT:     \t{0}", portJobOptions.port));
         }
     }
 }

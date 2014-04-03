@@ -6,7 +6,7 @@ namespace MAD
 {
     public class MadJobSystem
     {
-        public string version = "0.0.1.0";
+        public string version = "0.0.1.8";
         public List<Job> jobs;
 
         public MadJobSystem()
@@ -50,12 +50,17 @@ namespace MAD
 
         public void RemoveJob(int jobID)
         {
-            foreach (Job temp in jobs)
+            for(int i = 0; i < jobs.Count; i++)
             {
-                if (temp.jobID == jobID)
+                if (jobs[i].jobID == jobID)
                 {
-                    if(!temp.IsActive())
-                        jobs.RemoveAt((int)jobID);
+                    if (jobs[i].IsActive())
+                    {
+                        jobs[i].Stop();
+                        jobs.RemoveAt(i);
+                    }
+                    else
+                        jobs.RemoveAt(i);
 
                     break;
                 }

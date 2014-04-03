@@ -34,7 +34,7 @@ namespace MAD
         public override void JobStatus()
         {
             base.JobStatus();
-            Console.WriteLine(string.Format("\tTTL:      \t{0}", pingJobOptions.ttl));
+            Console.WriteLine(string.Format("TTL:      \t{0}", pingJobOptions.ttl));
         }
         
         
