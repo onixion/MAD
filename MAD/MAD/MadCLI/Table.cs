@@ -11,26 +11,32 @@ namespace MAD
         {
             this.columnes = columnes;
             columneWidth = Console.BufferWidth/columnes.Length-1;
-            // NOT WORKING YET THIS SHIT
-            for(int i = 0; i < columnes.Length; i++)
+        }
+
+        public string[] FormatStringArray(string[] data)
+        {
+            for (int i = 0; i < columnes.Length; i++)
             {
-                if (columnes[i].Length > columnes.Length)
+                // if string length is longer than columne width
+                if (data[i].Length > columneWidth)
                 {
-                    columnes[i] = columnes[i].Remove(columneWidth);
+                    data[i] = data[i].Remove(columneWidth);
                 }
                 else
                 {
-                    columnes[i] = columnes[i].PadRight(columneWidth - columnes[i].Length + 2, ' ');
+                    data[i] = data[i].PadRight(columneWidth);
                 }
             }
+
+            return data;
         }
 
-        public void WriteColumnes()
+        public void WriteColumnes(string[] data)
         {
-            foreach (string temp in columnes)
+            foreach (string temp in data)
             {
                 Console.Write(temp);
-                Console.Write("|");
+                Console.Write(" ");
             }
         }
 

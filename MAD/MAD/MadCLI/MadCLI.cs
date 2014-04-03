@@ -56,7 +56,6 @@ namespace MAD
 
             // JOBSYSTEM COMMANDS
             commandOptions.Add(new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand), new Type[0], new object[0]));
-            commandOptions.Add(new CommandOptions("jobsystem list", typeof(JobSystemTableCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job status", typeof(JobSystemListCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
             commandOptions.Add(new CommandOptions("job add http", typeof(JobSystemAddPingCommand), new Type[0], new object[0]));
@@ -70,6 +69,8 @@ namespace MAD
         {
             //
             MadComponents.components.jobSystem.AddJob(new JobHttpOptions("HttpRequest01", JobOptions.JobType.HttpRequest, 4000, IPAddress.Parse("127.0.0.1"), 80));
+            MadComponents.components.jobSystem.AddJob(new JobPingOptions("PingRequest01", JobOptions.JobType.PingRequest, 4000, IPAddress.Parse("127.0.0.1"), 300));
+            MadComponents.components.jobSystem.AddJob(new JobPortOptions("PortRequest01", JobOptions.JobType.PortRequest, 4000, IPAddress.Parse("127.0.0.1"), 80));
             //
 
             PrintLogo();

@@ -10,7 +10,7 @@ namespace MAD
         private Thread jobThread;
         private static int jobsCount = 0;
         public int jobID;
-        public string jobOutput;
+        public string jobOutput = "";
 
         public abstract void DoJob();
 
