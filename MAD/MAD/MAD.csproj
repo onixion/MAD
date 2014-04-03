@@ -37,22 +37,22 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MadCLI\Command.cs" />
-    <Compile Include="MadCLI\CommandOptions.cs" />
-    <Compile Include="MadCLI\Table.cs" />
-    <Compile Include="MadJobSystem\Job.cs" />
-    <Compile Include="MadJobSystem\JobHttp.cs" />
-    <Compile Include="MadJobSystem\JobHttpOptions.cs" />
-    <Compile Include="MadJobSystem\JobOptions.cs" />
-    <Compile Include="MadJobSystem\JobPing.cs" />
-    <Compile Include="MadJobSystem\JobPingOptions.cs" />
-    <Compile Include="MadJobSystem\JobPort.cs" />
-    <Compile Include="MadJobSystem\JobPortOptions.cs" />
+    <Compile Include="CLI\Command.cs" />
+    <Compile Include="CLI\CommandOptions.cs" />
+    <Compile Include="CLI\Table.cs" />
+    <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobHttp.cs" />
+    <Compile Include="JobSystem\JobHttpOptions.cs" />
+    <Compile Include="JobSystem\JobOptions.cs" />
+    <Compile Include="JobSystem\JobPing.cs" />
+    <Compile Include="JobSystem\JobPingOptions.cs" />
+    <Compile Include="JobSystem\JobPort.cs" />
+    <Compile Include="JobSystem\JobPortOptions.cs" />
     <Compile Include="MadComponents.cs" />
-    <Compile Include="MadJobSystem\MadJobSystem.cs" />
-    <Compile Include="MadCLI\MadJobSystemCommands.cs" />
-    <Compile Include="MadCLI\MadCLI.cs" />
-    <Compile Include="MadCLI\MadCLICommands.cs" />
+    <Compile Include="JobSystem\MadJobSystem.cs" />
+    <Compile Include="CLI\JobSystemCommands.cs" />
+    <Compile Include="CLI\CLI.cs" />
+    <Compile Include="CLI\CLICommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
