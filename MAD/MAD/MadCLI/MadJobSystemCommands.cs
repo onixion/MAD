@@ -10,13 +10,16 @@ namespace MAD
         string jobSystemHeader = "MadJobSystem v" + MadComponents.components.jobSystem.version;
         int consoleWidth = Console.BufferWidth;
 
-        string line = "".PadRight(Console.BufferWidth, '_');
-
+        string[] tableTitle = new string[] { "ID", "Name", "Type", "IP-Address", "Active", "Output" };
+        Table jobTable;
 
         public JobSystemStatusCommand() { }
 
         public override int Execute()
         {
+            jobTable = new Table(tableTitle);
+            tableTitle = jobTable.FormatStringArray(tableTitle);
+
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(jobSystemHeader);
@@ -26,19 +29,14 @@ namespace MAD
             Console.WriteLine("Jobs active:      " + MadComponents.components.jobSystem.JobsCountActive());
             Console.WriteLine("Jobs inactive:    " + MadComponents.components.jobSystem.JobsCountInactive());
             Console.WriteLine();
-            Console.WriteLine(line);
-
-            string[] title = new string[] { "ID", "Name", "Type", "IpAddress", "Active", "Output" };
-            Table jobTable = new Table(title);
-            title = jobTable.FormatStringArray(title);
-
             Console.ForegroundColor = ConsoleColor.Yellow;
-            jobTable.WriteColumnes(title);
+            jobTable.WriteColumnes(tableTitle);
+            Console.WriteLine("\n"+ jobTable.line);
             Console.ForegroundColor = MadComponents.components.cli.textColor;
 
             foreach (Job job in MadComponents.components.jobSystem.jobs)
             {
-                string[] array = new string[title.Length];
+                string[] array = new string[tableTitle.Length];
                 array[0] = job.jobID.ToString();
                 array[1] = job.jobOptions.jobName;
                 array[2] = job.jobOptions.jobType.ToString();
@@ -49,12 +47,11 @@ namespace MAD
                     array[4] = "False";
                 array[5] = job.jobOutput;
                 array = jobTable.FormatStringArray(array);
-                Console.WriteLine();
                 jobTable.WriteColumnes(array);
+                Console.WriteLine();
             }
 
             Console.WriteLine();
-            Console.WriteLine(line);
 
             return 0;
         }

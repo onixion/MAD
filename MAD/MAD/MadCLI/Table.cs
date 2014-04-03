@@ -7,6 +7,8 @@ namespace MAD
         private string[] columnes;
         private int columneWidth;
 
+        public string line = "".PadRight(Console.BufferWidth, '═');
+
         public Table(string[] columnes)
         {
             this.columnes = columnes;
@@ -39,6 +41,5 @@ namespace MAD
                 Console.Write(" ");
             }
         }
-
     }
 }
