@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 
 namespace MAD
@@ -39,7 +40,8 @@ namespace MAD
 
                 try
                 {
-                    // HERE
+                    //var converter = TypeDescriptor.GetConverter("LOL");
+                    //var result = converter.ConvertFrom("AWS");
                 }
                 catch (Exception e)
                 {

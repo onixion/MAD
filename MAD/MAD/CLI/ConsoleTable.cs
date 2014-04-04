@@ -7,7 +7,7 @@ namespace MAD
         private string[] columnesTitles;
         private int columneWidth;
 
-        public string line = "".PadRight(Console.BufferWidth, '═');
+        public string splitline = "".PadRight(Console.BufferWidth, '═');
 
         public ConsoleTable(string[] columnes)
         {

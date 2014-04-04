@@ -23,7 +23,6 @@ namespace MAD
         }
 
         public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
-
         public MadCLI cli;
         public MadJobSystem jobSystem;
     }

@@ -10,7 +10,7 @@ namespace MAD
         string jobSystemHeader = "MadJobSystem v" + MadComponents.components.jobSystem.version;
         int consoleWidth = Console.BufferWidth;
 
-        string[] tableTitle = new string[] { "ID", "Name", "Type", "IP-Address", "Active", "Output" };
+        string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
         ConsoleTable jobTable;
 
         public JobSystemStatusCommand() { }
@@ -31,7 +31,7 @@ namespace MAD
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Yellow;
             jobTable.WriteColumnes(tableTitle);
-            Console.WriteLine("\n"+ jobTable.line);
+            Console.WriteLine("\n"+ jobTable.splitline);
             Console.ForegroundColor = MadComponents.components.cli.textColor;
 
             foreach (Job job in MadComponents.components.jobSystem.jobs)
@@ -40,12 +40,13 @@ namespace MAD
                 array[0] = job.jobID.ToString();
                 array[1] = job.jobOptions.jobName;
                 array[2] = job.jobOptions.jobType.ToString();
-                array[3] = job.jobOptions.targetAddress.ToString();
                 if (job.IsActive())
-                    array[4] = "True";
+                    array[3] = "True";
                 else
-                    array[4] = "False";
-                array[5] = job.jobOutput;
+                    array[3] = "False";
+                array[4] = job.jobOptions.targetAddress.ToString();
+                array[5] = job.jobOptions.delay.ToString();
+                array[6] = job.jobOutput;
                 array = jobTable.FormatStringArray(array);
                 jobTable.WriteColumnes(array);
                 Console.WriteLine();
