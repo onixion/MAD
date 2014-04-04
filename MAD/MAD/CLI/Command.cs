@@ -5,50 +5,68 @@ namespace MAD
 {
     public abstract class Command
     {
-        //public List<object[]> mustIndicators = new List<object[]>();
+        public List<object[]> args = new List<object[]>();
 
         public List<object[]> requiredIndicators = new List<object[]>();
         public List<object[]> optionalIndicators = new List<object[]>();
 
-        public List<string[]> args = new List<string[]>();
-
-        public bool ValidArguments(List<string[]> args)
+        public bool ValidArguments(List<object[]> args)
         {
-            // check if all arguments are known by the command
+            int requiredArgsFound = 0;
+
             foreach (string[] temp in args)
+            {
+                // check if all arguments are known by the command
                 if (!ArgumentExists(temp[0]))
                 {
-                    ErrorMessage("Argument \"" + temp[0] + "\" does not exist!");
+                    ErrorMessage("Argument \"" + temp[0] + "\" does not exist for this command!");
                     return false;
                 }
 
-            // check if all needed arguments are known
-            int i = 0;
-            foreach (string[] temp in args)
+                // if the given arg is a required arg increase requiredArgsFound
                 if (RequiredArgumentExist(temp[0]))
-                    i++;
-            if (requiredIndicators.Count != i)
-            {
-                ErrorMessage("Some arguments are missing!");
-                return false;
-            }
-           
-            // check if they have values if neede
-            for (int i2 = 0; i2 < args.Count; i2++)
-            {
-                string[] temp = args[i2];
+                    requiredArgsFound++;
 
+                // check if the given args can have a value or not
                 if (!GetArgumentConfig(temp[0]))
                 {
                     if (temp[1] == null)
                     {
-                        ErrorMessage("Argument \"-" + temp[0] + "\" is null!");
+                        ErrorMessage("Argument \"-" + temp[0] + "\" can not be null!");
                         return false;
                     }
                 }
+
+                try
+                {
+                    // HERE
+                }
+                catch (Exception e)
+                {
+                    Console.Write(e.Message);
+                }
+
+            }
+
+            // check if all required args are known
+            if (requiredIndicators.Count != requiredArgsFound)
+            {
+                ErrorMessage("Some required arguments are missing!");
+                return false;
             }
 
             return true;
+        }
+
+        public Type GetType(string indicator)
+        {
+            foreach (object[] temp in requiredIndicators)
+                if (temp[0].ToString() == indicator)
+                    return Type.GetType(temp[2].ToString());
+            foreach (object[] temp in optionalIndicators)
+                if (temp[0].ToString() == indicator)
+                    return Type.GetType(temp[2].ToString());
+            return null;
         }
 
         public void ErrorMessage(string message)
@@ -86,7 +104,7 @@ namespace MAD
             return false;
         }
 
-        public void SetArguments(List<string[]> args)
+        public void SetArguments(List<object[]> args)
         {
             this.args = args;
         }

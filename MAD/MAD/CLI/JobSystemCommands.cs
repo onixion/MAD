@@ -11,13 +11,13 @@ namespace MAD
         int consoleWidth = Console.BufferWidth;
 
         string[] tableTitle = new string[] { "ID", "Name", "Type", "IP-Address", "Active", "Output" };
-        Table jobTable;
+        ConsoleTable jobTable;
 
         public JobSystemStatusCommand() { }
 
         public override int Execute()
         {
-            jobTable = new Table(tableTitle);
+            jobTable = new ConsoleTable(tableTitle);
             tableTitle = jobTable.FormatStringArray(tableTitle);
 
             Console.Clear();

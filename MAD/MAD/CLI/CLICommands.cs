@@ -132,7 +132,7 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredIndicators.Add(new object[] {"t", false});
+            requiredIndicators.Add(new object[] {"t", false, typeof(String)});
         }
 
         public override int Execute()

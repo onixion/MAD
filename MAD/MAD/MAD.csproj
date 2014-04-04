@@ -39,7 +39,7 @@
   <ItemGroup>
     <Compile Include="CLI\Command.cs" />
     <Compile Include="CLI\CommandOptions.cs" />
-    <Compile Include="CLI\Table.cs" />
+    <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobHttp.cs" />
     <Compile Include="JobSystem\JobHttpOptions.cs" />

@@ -2,34 +2,28 @@
 
 namespace MAD
 {
-    public class Table
+    public class ConsoleTable
     {
-        private string[] columnes;
+        private string[] columnesTitles;
         private int columneWidth;
 
         public string line = "".PadRight(Console.BufferWidth, '═');
 
-        public Table(string[] columnes)
+        public ConsoleTable(string[] columnes)
         {
-            this.columnes = columnes;
-            columneWidth = Console.BufferWidth/columnes.Length-1;
+            this.columnesTitles = columnes;
+            columneWidth = Console.BufferWidth / columnesTitles.Length - 1;
         }
 
         public string[] FormatStringArray(string[] data)
         {
-            for (int i = 0; i < columnes.Length; i++)
+            for (int i = 0; i < columnesTitles.Length; i++)
             {
-                // if string length is longer than columne width
                 if (data[i].Length > columneWidth)
-                {
                     data[i] = data[i].Remove(columneWidth);
-                }
                 else
-                {
                     data[i] = data[i].PadRight(columneWidth);
-                }
             }
-
             return data;
         }
 
