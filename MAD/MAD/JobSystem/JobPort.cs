@@ -25,7 +25,7 @@ namespace MAD
                 socket.Connect(new IPEndPoint(jobOptions.targetAddress, portJobOptions.port));
                 jobOutput = "True";
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 jobOutput = "False";
             }

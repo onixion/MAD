@@ -14,8 +14,10 @@ namespace MAD
         {
             int requiredArgsFound = 0;
 
-            foreach (string[] temp in args)
+            for (int i = 0; i < args.Count; i++)
             {
+                object[] temp = args[i];
+
                 // check if all arguments are known by the command
                 if (!ArgumentExists(temp[0]))
                 {
@@ -39,14 +41,26 @@ namespace MAD
 
                 try
                 {
-                    //var converter = TypeDescriptor.GetConverter("LOL");
-                    //var result = converter.ConvertFrom("AWS");
+                    /*  TODO: check what type the command wants -> GetType(temp[0])
+                     *  get argument type and try to parse it into the type
+                     *  
+                     *  if not working -> Error: Could not parse argument ...
+                     *  if working     -> continue 
+                     * 
+                     *  now it is not needed to check (inside a command) if the argument value
+                     *  have the right type, this saves time and lines of codes
+                     */
+
+                    // check if the argument value can be parsed to the needed type
+                    //temp[1] = Convert.ChangeType(2, GetType(temp[0]));
+                    //temp[1] = Convert.ChangeType(temp[1], Type.GetType(typeof(Int32).ToString()));
                 }
                 catch (Exception e)
                 {
-                    Console.Write(e.Message);
+                    Console.WriteLine(e);
+                    ErrorMessage("Could not parse argument \"" + temp[1].ToString() + "\" to " + GetType(temp[0]));
+                    return false;
                 }
-
             }
 
             // check if all required args are known
@@ -59,18 +73,18 @@ namespace MAD
             return true;
         }
 
-        public Type GetType(string indicator)
+        public Type GetType(object indicator)
         {
             foreach (object[] temp in requiredIndicators)
-                if (temp[0].ToString() == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return Type.GetType(temp[2].ToString());
             foreach (object[] temp in optionalIndicators)
-                if (temp[0].ToString() == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return Type.GetType(temp[2].ToString());
             return null;
         }
 
-        public void ErrorMessage(string message)
+        public void ErrorMessage(object message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("[ERROR] ");
@@ -78,23 +92,23 @@ namespace MAD
             Console.WriteLine(message);
         }
 
-        public bool RequiredArgumentExist(string indicator)
+        public bool RequiredArgumentExist(object indicator)
         {
             foreach (object[] temp in requiredIndicators)
-                if ((string)temp[0] == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return true;
             return false;
         }
 
-        public bool OptionalArgumentExist(string indicator)
+        public bool OptionalArgumentExist(object indicator)
         {
             foreach (object[] temp in optionalIndicators)
-                if ((string)temp[0] == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return true;
             return false;
         }
 
-        public bool OptionalArgumentUsed(string indicator)
+        public bool OptionalArgumentUsed(object indicator)
         { 
             foreach(object[] temp in optionalIndicators)
             foreach(string[] temp2 in args)
@@ -110,26 +124,26 @@ namespace MAD
             this.args = args;
         }
 
-        public bool GetArgumentConfig(string identifier)
+        public bool GetArgumentConfig(object identifier)
         { 
             foreach(object[] temp in requiredIndicators)
-                if((string)temp[0] == identifier)
+                if (temp[0].ToString() == identifier.ToString())
                     return (bool)temp[1];
 
             foreach (object[] temp in optionalIndicators)
-                if ((string)temp[0] == identifier)
+                if (temp[0].ToString() == identifier.ToString())
                     return (bool)temp[1];
 
             return false;
         }
 
-        public string GetArgument(string identifier)
+        public object GetArgument(object identifier)
         {
-            foreach (string[] temp in args)
+            foreach (object[] temp in args)
             {
                 if (temp.Length == 2)
                 {
-                    if (identifier == temp[0])
+                    if (identifier.ToString() == temp[0].ToString())
                         return temp[1];
                 }
                 else
@@ -139,13 +153,13 @@ namespace MAD
             return null;
         }
 
-        public bool ArgumentExists(string indicator)
+        public bool ArgumentExists(object indicator)
         {
             foreach (object[] temp in requiredIndicators)
-                if ((string)temp[0] == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return true;
             foreach (object[] temp in optionalIndicators)
-                if ((string)temp[0] == indicator)
+                if (temp[0].ToString() == indicator.ToString())
                     return true;
             return false;
         }
@@ -159,9 +173,6 @@ namespace MAD
             return false;
         }
 
-        /// <summary>
-        /// Execute command
-        /// </summary>
         public abstract int Execute();
     }
 }

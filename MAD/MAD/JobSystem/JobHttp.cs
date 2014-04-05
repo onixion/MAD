@@ -27,7 +27,7 @@ namespace MAD
 
                 response.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 jobOutput = "False";
             }

@@ -91,7 +91,7 @@ namespace MAD
                         // get command type
                         inputCommandType = GetCommandType(inputCommand);
 
-                        // create command object
+                        // create command object (pass the command none objects)
                         command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
 
                         // check if the arguments are valid
@@ -151,7 +151,7 @@ namespace MAD
                 string[] temp2 = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (temp2.Length == 1)
-                    tempArgs.Add(new string[] { temp2[0], null });
+                    tempArgs.Add(new string[] { temp2[0], null }); // argument value is empty
                 else
                     tempArgs.Add(new string[] { temp2[0], temp2[1] }); // more arguments than 1 do not get recordnized
             }

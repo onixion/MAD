@@ -62,28 +62,20 @@ namespace MAD
     {
         public JobListCommand()
         {
-            optionalIndicators.Add(new object[] { "id", false });
+            optionalIndicators.Add(new object[] { "id", false, typeof(Int32)});
         }
 
         public override int Execute()
         {
-            if(OptionalArgumentUsed("id"))
+            if (OptionalArgumentUsed("id"))
             {
-                try
-                {
-                    int id = Int32.Parse(GetArgument("id"));
-                    Job job = MadComponents.components.jobSystem.GetJob(id);
-                }
-                catch (Exception e)
-                {
-                    ErrorMessage("Could not parse argument!");
-                    return 0;
-                }
+                int id = (int)GetArgument("id");
+                Job job = MadComponents.components.jobSystem.GetJob(id);
             }
             else
             {
-            foreach (Job job in MadComponents.components.jobSystem.jobs)
-                job.JobStatus();
+                foreach (Job job in MadComponents.components.jobSystem.jobs)
+                    job.JobStatus();
             }
             return 0;
         }
@@ -93,24 +85,24 @@ namespace MAD
     {
         public JobSystemAddPingCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false });
-            requiredIndicators.Add(new object[] { "ip", false });
+            requiredIndicators.Add(new object[] { "n", false, typeof(String)});
+            requiredIndicators.Add(new object[] { "ip", false, typeof(String)});
 
-            optionalIndicators.Add(new object[] { "d", false });
-            optionalIndicators.Add(new object[] { "ttl", false });
+            optionalIndicators.Add(new object[] { "d", false, typeof(Int32)});
+            optionalIndicators.Add(new object[] { "ttl", false, typeof(Int32)});
         }
 
         public override int Execute()
         {
             try
             {
-                IPAddress address = IPAddress.Parse(GetArgument("ip"));
-                int delay = Int32.Parse(GetArgument("d"));
-                int ttl = Int32.Parse(GetArgument("ttl"));
+                IPAddress address = IPAddress.Parse((string)GetArgument("id"));
+                int delay = Int32.Parse((string)GetArgument("d"));
+                int ttl = Int32.Parse((string)GetArgument("ttl"));
 
-                MadComponents.components.jobSystem.AddJob(new JobPingOptions(GetArgument("n"),JobOptions.JobType.PingRequest, delay, address, ttl));
+                MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"),JobOptions.JobType.PingRequest, delay, address, ttl));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 ErrorMessage("Could not parse arguments.");
                 return 0;
@@ -124,24 +116,24 @@ namespace MAD
     {
         public JobSystemAddHttpCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false });
-            requiredIndicators.Add(new object[] { "ip", false });
+            requiredIndicators.Add(new object[] { "n", false, typeof(String) });
+            requiredIndicators.Add(new object[] { "ip", false, typeof(String) });
 
-            optionalIndicators.Add(new object[] { "d", false });
-            optionalIndicators.Add(new object[] { "p", false });
+            optionalIndicators.Add(new object[] { "d", false, typeof(Int32) });
+            optionalIndicators.Add(new object[] { "p", false, typeof(Int32) });
         }
 
         public override int Execute()
         {
             try
             {
-                IPAddress address = IPAddress.Parse(GetArgument("ip"));
-                int delay = Int32.Parse(GetArgument("d"));
-                int port = Int32.Parse(GetArgument("p"));
+                IPAddress address = (IPAddress)GetArgument("ip");
+                int delay = (Int32)GetArgument("d");
+                int port = (Int32)GetArgument("p");
 
-                MadComponents.components.jobSystem.AddJob(new JobHttpOptions(GetArgument("n"), JobOptions.JobType.HttpRequest, delay, address, port));
+                MadComponents.components.jobSystem.AddJob(new JobHttpOptions((string)GetArgument("n"), JobOptions.JobType.HttpRequest, delay, address, port));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 ErrorMessage("Could not parse arguments.");
                 return 0;
@@ -156,26 +148,26 @@ namespace MAD
     {
         public JobSystemAddPortCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false });
-            requiredIndicators.Add(new object[] { "ip", false });
+            requiredIndicators.Add(new object[] { "n", false, typeof(String) });
+            requiredIndicators.Add(new object[] { "ip", false, typeof(String) });
 
-            optionalIndicators.Add(new object[] { "d", false });
-            optionalIndicators.Add(new object[] { "p", false });
+            optionalIndicators.Add(new object[] { "d", false, typeof(Int32) });
+            optionalIndicators.Add(new object[] { "p", false, typeof(Int32) });
         }
 
         public override int Execute()
         {
             try
             {
-                IPAddress address = IPAddress.Parse(GetArgument("ip"));
-                int delay = Int32.Parse(GetArgument("d"));
-                int port = Int32.Parse(GetArgument("p"));
+                IPAddress address = IPAddress.Parse((string)GetArgument("ip"));
+                int delay = (int)GetArgument("d");
+                int port = (int)GetArgument("p");
 
-                MadComponents.components.jobSystem.AddJob(new JobPortOptions(GetArgument("n"), JobOptions.JobType.PortRequest, delay, address, port));
+                MadComponents.components.jobSystem.AddJob(new JobPortOptions((string)GetArgument("n"), JobOptions.JobType.PortRequest, delay, address, port));
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                ErrorMessage("Could not parse arguments.");
+                ErrorMessage("Could not parse ip");
                 return 0;
             }
 
@@ -187,29 +179,21 @@ namespace MAD
     {
         public JobSystemRemoveCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false });
+            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
         }
 
         public override int Execute()
         {
-            try
-            {
-                int id = Int32.Parse(GetArgument("id"));
+            int id = (Int32)GetArgument("id");
 
-                if (MadComponents.components.jobSystem.JobExist(id))
-                {
-                    MadComponents.components.jobSystem.RemoveJob(id);
-                    return 0;
-                }
-                else
-                {
-                    ErrorMessage("Job does not exist!");
-                    return 0;
-                }
-            }
-            catch (Exception e)
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                ErrorMessage("Argument \"-id\" must be a number!");
+                MadComponents.components.jobSystem.RemoveJob(id);
+                return 0;
+            }
+            else
+            {
+                ErrorMessage("Job does not exist!");
                 return 0;
             }
         }
@@ -219,29 +203,22 @@ namespace MAD
     {
         public JobSystemStartCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false });
+            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
         }
 
         public override int Execute()
         {
-            try
-            {
-                int id = Int32.Parse(GetArgument("id"));
 
-                if (MadComponents.components.jobSystem.JobExist(id))
-                {
-                    MadComponents.components.jobSystem.StartJob(id);
-                    return 0;
-                }
-                else
-                {
-                    ErrorMessage("Job does not exist!");
-                    return 0;
-                }
-            }
-            catch (Exception e)
+            int id = (int)GetArgument("id");
+
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                ErrorMessage("Argument \"-id\" must be a number!");
+                MadComponents.components.jobSystem.StartJob(id);
+                return 0;
+            }
+            else
+            {
+                ErrorMessage("Job does not exist!");
                 return 0;
             }
         }
@@ -251,29 +228,21 @@ namespace MAD
     {
         public JobSystemStopCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false });
+            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
         }
 
         public override int Execute()
         {
-            try
-            {
-                int id = Int32.Parse(GetArgument("id"));
+            int id = (Int32)GetArgument("id");
 
-                if (MadComponents.components.jobSystem.JobExist(id))
-                {
-                    MadComponents.components.jobSystem.StopJob(id);
-                    return 0;
-                }
-                else
-                {
-                    ErrorMessage("Job does not exist!");
-                    return 0;
-                }
-            }
-            catch (Exception e)
+            if (MadComponents.components.jobSystem.JobExist(id))
             {
-                ErrorMessage("Argument \"-id\" must be a number!");
+                MadComponents.components.jobSystem.StopJob(id);
+                return 0;
+            }
+            else
+            {
+                ErrorMessage("Job does not exist!");
                 return 0;
             }
         }
