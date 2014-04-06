@@ -6,7 +6,6 @@ namespace MAD
     public abstract class Command
     {
         public List<object[]> args = new List<object[]>();
-
         public List<object[]> requiredIndicators = new List<object[]>();
         public List<object[]> optionalIndicators = new List<object[]>();
 
@@ -21,7 +20,7 @@ namespace MAD
                 // check if all arguments are known by the command
                 if (!ArgumentExists(temp[0]))
                 {
-                    ErrorMessage("Argument \"" + temp[0] + "\" does not exist for this command!");
+                    ErrorMessage("Parameter '-" + temp[0] + "' does not exist for this command!");
                     return false;
                 }
 
@@ -34,13 +33,11 @@ namespace MAD
                 {
                     if (temp[1] == null)
                     {
-                        ErrorMessage("Argument \"-" + temp[0] + "\" can not be null!");
+                        ErrorMessage("Value of argument '-" + temp[0] + "' can't be null!");
                         return false;
                     }
                 }
 
-                try
-                {
                     /*  TODO: check what type the command wants -> GetType(temp[0])
                      *  get argument type and try to parse it into the type
                      *  
@@ -50,23 +47,12 @@ namespace MAD
                      *  now it is not needed to check (inside a command) if the argument value
                      *  have the right type, this saves time and lines of codes
                      */
-
-                    // check if the argument value can be parsed to the needed type
-                    //temp[1] = Convert.ChangeType(2, GetType(temp[0]));
-                    //temp[1] = Convert.ChangeType(temp[1], Type.GetType(typeof(Int32).ToString()));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    ErrorMessage("Could not parse argument \"" + temp[1].ToString() + "\" to " + GetType(temp[0]));
-                    return false;
-                }
             }
 
             // check if all required args are known
             if (requiredIndicators.Count != requiredArgsFound)
             {
-                ErrorMessage("Some required arguments are missing!");
+                ErrorMessage("Some required parameters are missing! Type 'help' to see commands.");
                 return false;
             }
 
@@ -137,19 +123,13 @@ namespace MAD
             return false;
         }
 
-        public object GetArgument(object identifier)
+        // this must be object
+        public string GetArgument(object identifier)
         {
-            foreach (object[] temp in args)
-            {
+            foreach(object[] temp in args)
                 if (temp.Length == 2)
-                {
                     if (identifier.ToString() == temp[0].ToString())
-                        return temp[1];
-                }
-                else
-                    return null;
-            }
-
+                        return (string)temp[1];
             return null;
         }
 

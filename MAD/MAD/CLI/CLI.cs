@@ -30,6 +30,8 @@ namespace MAD
         private Command command;
         private Type inputCommandType;
 
+        //
+
         public MadCLI()
         {
             InitCommands();
@@ -105,7 +107,7 @@ namespace MAD
                         }
                     }
                     else
-                        ErrorMessage("Command \"" + inputCommand + "\" unknown!");
+                        ErrorMessage("Command '" + inputCommand + "' unknown! Type 'help' for more information.");
                 }
             }   
         }
