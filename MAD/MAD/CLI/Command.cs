@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 
 namespace MAD
 {
@@ -19,18 +20,18 @@ namespace MAD
                 object[] temp = args[i];
 
                 // check if all arguments are known by the command
-                if (!ArgumentExists(temp[0]))
+                if (!ParameterExists(temp[0]))
                 {
                     ErrorMessage("Parameter '-" + temp[0] + "' does not exist for this command!");
                     return false;
                 }
 
                 // if the given arg is a required arg increase requiredArgsFound
-                if (RequiredArgumentExist(temp[0]))
+                if (RequiredParameterExist(temp[0]))
                     requiredArgsFound++;
 
                 // check if the given args can have a value or not
-                if (!GetArgumentConfig(temp[0]))
+                if (!ParameterConfigEmpty(temp[0]))
                 {
                     if (temp[1] == null)
                     {
@@ -55,15 +56,13 @@ namespace MAD
 
                 try
                 {
-                    typeChanger.ConvertFromInvariantString((string)temp[1]);
+                    typeChanger.ConvertFromString((string)temp[0]);
                 }
                 catch (Exception)
                 {
-                    ErrorMessage("Could not parse argument '" + temp[1] + "' to " + neededType.ToString() + "!");
+                    ErrorMessage("Could not parse parameter '" + temp[1] + "' to " + neededType.ToString() + "!");
                     return false;
                 }
-
-
             }
 
             // check if all required args are known
@@ -80,10 +79,10 @@ namespace MAD
         {
             foreach (object[] temp in requiredIndicators)
                 if (temp[0].ToString() == indicator.ToString())
-                    return Type.GetType(temp[2].ToString());
+                    return (Type)temp[2];
             foreach (object[] temp in optionalIndicators)
                 if (temp[0].ToString() == indicator.ToString())
-                    return Type.GetType(temp[2].ToString());
+                    return (Type)temp[2];
             return null;
         }
 
@@ -95,7 +94,7 @@ namespace MAD
             Console.WriteLine(message);
         }
 
-        public bool RequiredArgumentExist(object indicator)
+        public bool RequiredParameterExist(object indicator)
         {
             foreach (object[] temp in requiredIndicators)
                 if (temp[0].ToString() == indicator.ToString())
@@ -103,7 +102,7 @@ namespace MAD
             return false;
         }
 
-        public bool OptionalArgumentExist(object indicator)
+        public bool OptionalParameterExist(object indicator)
         {
             foreach (object[] temp in optionalIndicators)
                 if (temp[0].ToString() == indicator.ToString())
@@ -111,7 +110,7 @@ namespace MAD
             return false;
         }
 
-        public bool OptionalArgumentUsed(object indicator)
+        public bool OptionalParameterUsed(object indicator)
         { 
             foreach(object[] temp in optionalIndicators)
             foreach(string[] temp2 in args)
@@ -122,12 +121,12 @@ namespace MAD
             return false;
         }
 
-        public void SetArguments(List<object[]> args)
+        public void SetParameters(List<object[]> args)
         {
             this.args = args;
         }
 
-        public bool GetArgumentConfig(object identifier)
+        public bool ParameterConfigEmpty(object identifier)
         { 
             foreach(object[] temp in requiredIndicators)
                 if (temp[0].ToString() == identifier.ToString())
@@ -150,7 +149,7 @@ namespace MAD
             return null;
         }
 
-        public bool ArgumentExists(object indicator)
+        public bool ParameterExists(object indicator)
         {
             foreach (object[] temp in requiredIndicators)
                 if (temp[0].ToString() == indicator.ToString())

@@ -100,7 +100,7 @@ namespace MAD
                         if (command.ValidArguments(inputArgs))
                         {
                             // set arguments
-                            command.SetArguments(inputArgs);
+                            command.SetParameters(inputArgs);
 
                             // EXECUTE COMMAND
                             command.Execute();

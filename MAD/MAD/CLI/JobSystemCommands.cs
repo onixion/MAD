@@ -67,7 +67,7 @@ namespace MAD
 
         public override int Execute()
         {
-            if (OptionalArgumentUsed("id"))
+            if (OptionalParameterUsed("id"))
             {
                 int id = Int32.Parse(GetArgument("id"));
                 Job job = MadComponents.components.jobSystem.GetJob(id);
@@ -94,8 +94,35 @@ namespace MAD
 
         public override int Execute()
         {
-            MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse((string)GetArgument("d")), IPAddress.Parse((string)GetArgument("ip")), Int32.Parse((string)GetArgument("ttl"))));
-            return 0;
+            try
+            {
+
+                if (OptionalParameterUsed("d") && OptionalParameterUsed("ttl"))
+                {
+                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse((string)GetArgument("d")), IPAddress.Parse((string)GetArgument("ip")), Int32.Parse((string)GetArgument("ttl"))));
+                    return 0;
+                }
+                else if (OptionalParameterUsed("d"))
+                {
+                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse((string)GetArgument("d")), IPAddress.Parse((string)GetArgument("ip")), 300));
+                    return 0;
+                }
+                else if (OptionalParameterUsed("ttl"))
+                {
+                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, 10000, IPAddress.Parse((string)GetArgument("ip")), Int32.Parse((string)GetArgument("ttl"))));
+                    return 0;
+                }
+                else
+                {
+                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, 10000, IPAddress.Parse((string)GetArgument("ip")), 300));
+                    return 0;
+                }
+            }
+            catch (Exception)
+            {
+                ErrorMessage("Could not parse argument 'ip' to IPAddress!");
+                return 0;
+            }
         }
     }
 
