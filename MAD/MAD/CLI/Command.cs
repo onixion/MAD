@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace MAD
 {
@@ -38,15 +39,31 @@ namespace MAD
                     }
                 }
 
-                    /*  TODO: check what type the command wants -> GetType(temp[0])
-                     *  get argument type and try to parse it into the type
-                     *  
-                     *  if not working -> Error: Could not parse argument ...
-                     *  if working     -> continue 
-                     * 
-                     *  now it is not needed to check (inside a command) if the argument value
-                     *  have the right type, this saves time and lines of codes
-                     */
+                /*  TODO: check what type the command wants -> GetType(temp[0])
+                 *  get argument type and try to parse it into the type neede 
+                 *  for the command
+                 *  
+                 *  if not working -> Error: Could not parse argument ...
+                 *  if working     -> continue 
+                 * 
+                 *  now it is not needed to check (inside a command) if the argument value
+                 *  have the right type, this saves time and lines of codes
+                 */
+
+                Type neededType = GetType(temp[0]);
+                var typeChanger = TypeDescriptor.GetConverter(neededType);
+
+                try
+                {
+                    typeChanger.ConvertFromInvariantString((string)temp[1]);
+                }
+                catch (Exception)
+                {
+                    ErrorMessage("Could not parse argument '" + temp[1] + "' to " + neededType.ToString() + "!");
+                    return false;
+                }
+
+
             }
 
             // check if all required args are known

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace MAD
 {
@@ -132,7 +133,7 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredIndicators.Add(new object[] {"t", false, typeof(Int32)});
+            requiredIndicators.Add(new object[] {"t", false, typeof(IPAddress)});
         }
 
         public override int Execute()
