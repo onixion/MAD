@@ -51,16 +51,19 @@ namespace MAD
                  *  have the right type, this saves time and lines of codes
                  */
 
+                /*
                 Type neededType = GetType(temp[0]);
                 var typeChanger = TypeDescriptor.GetConverter(neededType);
+                */
 
                 try
                 {
-                    typeChanger.ConvertFromString((string)temp[0]);
+                    //temp[1] = Convert.ChangeType(temp[1], GetType(temp[0]));
+                    //typeChanger.ConvertFrom(temp[0]);
                 }
                 catch (Exception)
                 {
-                    ErrorMessage("Could not parse parameter '" + temp[1] + "' to " + neededType.ToString() + "!");
+                    ErrorMessage("Could not parse argument '" + temp[1] + "' to " /*+ neededType.ToString() + "!"*/);
                     return false;
                 }
             }
@@ -68,7 +71,7 @@ namespace MAD
             // check if all required args are known
             if (requiredIndicators.Count != requiredArgsFound)
             {
-                ErrorMessage("Some required parameters are missing! Type 'help' to see commands.");
+                ErrorMessage("Some required parameters are missing! Type 'help' to see full commands.");
                 return false;
             }
 

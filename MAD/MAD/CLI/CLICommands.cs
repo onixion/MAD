@@ -133,7 +133,7 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredIndicators.Add(new object[] {"t", false, typeof(IPAddress)});
+            requiredIndicators.Add(new object[] {"t", false, typeof(Int32)});
         }
 
         public override int Execute()
