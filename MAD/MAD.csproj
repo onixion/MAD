@@ -37,6 +37,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\CLIServer.cs" />
     <Compile Include="CLI\Command.cs" />
     <Compile Include="CLI\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />

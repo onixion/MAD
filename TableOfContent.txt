@@ -1,6 +1,6 @@
 FOLDERS
 
  > Docs -> Documentation of the code
- > Logs -> log for every developer (how many hours your spent working on it,...)
+ > Logs -> log for every developer (how many hours your spent working on it...)
  > MAD -> main program files
  > Tests -> folder to test some code
