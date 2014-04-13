@@ -38,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\CLIServer.cs" />
+    <Compile Include="CLI\Parameter.cs" />
+    <Compile Include="CLI\ParameterInput.cs" />
+    <Compile Include="CLI\ParameterOption.cs" />
     <Compile Include="CLI\TCPServer.cs" />
     <Compile Include="CLI\Command.cs" />
     <Compile Include="CLI\CommandOptions.cs" />

@@ -7,37 +7,35 @@ namespace MAD
 {
     public abstract class Command
     {
-        public List<object[]> args = new List<object[]>();
-        public List<object[]> requiredIndicators = new List<object[]>();
-        public List<object[]> optionalIndicators = new List<object[]>();
+        public List<ParameterOption> requiredParameter = new List<ParameterOption>();
+        public List<ParameterOption> optionalParameter = new List<ParameterOption>();
 
-        public bool ValidArguments(List<object[]> args)
+        public ParameterInput parameters;
+
+        public bool ValidArguments(ParameterInput parameters)
         {
             int requiredArgsFound = 0;
 
-            for (int i = 0; i < args.Count; i++)
+            for (int i = 0; i < parameters.parameters.Count; i++)
             {
-                object[] temp = args[i];
+                Parameter temp = parameters.parameters[i];
 
                 // check if all arguments are known by the command
-                if (!ParameterExists(temp[0]))
+                if (!ParameterExists(temp))
                 {
-                    ErrorMessage("Parameter '-" + temp[0] + "' does not exist for this command!");
+                    ErrorMessage("Parameter '-" + temp.indicator + "' does not exist for this command!");
                     return false;
                 }
 
                 // if the given arg is a required arg increase requiredArgsFound
-                if (RequiredParameterExist(temp[0]))
+                if (RequiredParameterExist(temp))
                     requiredArgsFound++;
 
                 // check if the given args can have a value or not
-                if (!ParameterConfigEmpty(temp[0]))
+                if (GetParameterOptions(temp.indicator).argumentEmpty)
                 {
-                    if (temp[1] == null)
-                    {
-                        ErrorMessage("Value of argument '-" + temp[0] + "' can't be null!");
-                        return false;
-                    }
+                        ErrorMessage("Value of parameter '-" + temp.indicator + "' can't be null!");
+                        return false;   
                 }
 
                 /*  TODO: check what type the command wants -> GetType(temp[0])
@@ -50,21 +48,10 @@ namespace MAD
                  *  now it is not needed to check (inside a command) if the argument value
                  *  have the right type, this saves time and lines of codes
                  */
-
-                try
-                {
-                    Type parseType = GetType(temp[0]);
-                    //temp[1].ParseTo<parseType>();
-                }
-                catch (Exception)
-                {
-                    ErrorMessage("Could not parse argument '" + temp[1] + "' to " /*+ neededType.ToString() + "!"*/);
-                    return false;
-                }
             }
 
             // check if all required args are known
-            if (requiredIndicators.Count != requiredArgsFound)
+            if (requiredParameter.Count != requiredArgsFound)
             {
                 ErrorMessage("Some required parameters are missing! Type 'help' to see full commands.");
                 return false;
@@ -73,14 +60,14 @@ namespace MAD
             return true;
         }
 
-        public Type GetType(object indicator)
+        public Type GetType(string indicator)
         {
-            foreach (object[] temp in requiredIndicators)
-                if (temp[0].ToString() == indicator.ToString())
-                    return (Type)temp[2];
-            foreach (object[] temp in optionalIndicators)
-                if (temp[0].ToString() == indicator.ToString())
-                    return (Type)temp[2];
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == indicator)
+                    return temp.argumentType;
+            foreach (ParameterOption temp in optionalParameter)
+                if (temp.indicator == indicator)
+                    return temp.argumentType;
             return null;
         }
 
@@ -92,89 +79,65 @@ namespace MAD
             Console.WriteLine(message);
         }
 
-        public bool RequiredParameterExist(object indicator)
+        public bool RequiredParameterExist(Parameter parameter)
         {
-            foreach (object[] temp in requiredIndicators)
-                if (temp[0].ToString() == indicator.ToString())
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == parameter.indicator)
                     return true;
             return false;
         }
 
-        public bool OptionalParameterExist(object indicator)
+        public bool OptionalParameterExist(Parameter parameter)
         {
-            foreach (object[] temp in optionalIndicators)
-                if (temp[0].ToString() == indicator.ToString())
+            foreach (ParameterOption temp in optionalParameter)
+                if (temp.indicator == parameter.indicator)
                     return true;
+
             return false;
         }
 
-        public bool OptionalParameterUsed(object indicator)
-        { 
-            foreach(object[] temp in optionalIndicators)
-            foreach(string[] temp2 in args)
-            {
-                if ((string)temp[0] == temp2[0])
-                    return true;
-            }
-            return false;
-        }
-
-        public void SetParameters(List<object[]> args)
+        public ParameterOption GetParameterOptions(string indicator)
         {
-            this.args = args;
-        }
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == indicator)
+                    return temp;
 
-        public bool ParameterConfigEmpty(object identifier)
-        { 
-            foreach(object[] temp in requiredIndicators)
-                if (temp[0].ToString() == identifier.ToString())
-                    return (bool)temp[1];
+            foreach (ParameterOption temp in optionalParameter)
+                if (temp.indicator == indicator)
+                    return temp;
 
-            foreach (object[] temp in optionalIndicators)
-                if (temp[0].ToString() == identifier.ToString())
-                    return (bool)temp[1];
-
-            return false;
-        }
-
-        // this must be object
-        public string GetArgument(object identifier)
-        {
-            foreach(object[] temp in args)
-                if (temp.Length == 2)
-                    if (identifier.ToString() == temp[0].ToString())
-                        return (string)temp[1];
             return null;
         }
 
-        public bool ParameterExists(object indicator)
+        public void SetParameters(ParameterInput parameters)
         {
-            foreach (object[] temp in requiredIndicators)
-                if (temp[0].ToString() == indicator.ToString())
-                    return true;
-            foreach (object[] temp in optionalIndicators)
-                if (temp[0].ToString() == indicator.ToString())
-                    return true;
+            this.parameters = parameters;
+        }
+
+        public bool ParameterExpectsEmptyArgument(Parameter parameter)
+        {
+            if (ParameterExists(parameter))
+                return GetParameterOptions(parameter.indicator).argumentEmpty;
+
             return false;
         }
 
-        public bool ArgumentEmpty(string indicator)
+        public bool ParameterExists(Parameter parameter)
         {
-            foreach (string[] temp in args)
-                if (temp[0] == indicator)
-                    if (temp.Length == 1)
-                        return true;
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == parameter.indicator)
+                    return true;
+
+            foreach (ParameterOption temp in optionalParameter)
+                if (temp.indicator == parameter.indicator)
+                    return true;
+
             return false;
         }
 
-        public abstract int Execute();
-    }
-
-    public static class ArgumentParser
-    {
-        public static T ParseTo<T>(this string text)
-        {
-            return (T)Convert.ChangeType(text, typeof(T));
-        }
+        /// <summary>
+        /// This abstract method will be executed every cycletime (delay).
+        /// </summary>
+        public abstract void Execute();
     }
 }

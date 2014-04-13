@@ -7,7 +7,7 @@ namespace MAD
     {
         public HelpCommand() {}
 
-        public override int Execute()
+        public override void Execute()
         {
             Console.WriteLine();
             StartEndHeadline(" <---- H E L P ---- P A G E ---->");
@@ -43,7 +43,6 @@ namespace MAD
             Console.WriteLine();
             StartEndHeadline(" <---- E N D ---->");
             Console.WriteLine();
-            return 0;
         }
 
         public void StartEndHeadline(string text)
@@ -65,10 +64,9 @@ namespace MAD
     {
         public ClearCommand() { }
 
-        public override int Execute()
+        public override void Execute()
         {
             Console.Clear();
-            return 0;
         }
     }
 
@@ -76,10 +74,9 @@ namespace MAD
     {
         public LogoCommand() {}
 
-        public override int Execute()
+        public override void Execute()
         {
-            MadComponents.components.cli.PrintLogo();
-            return 0;
+
         }
     }
 
@@ -87,10 +84,9 @@ namespace MAD
     {
         public ExitCommand() {}
 
-        public override int Execute()
+        public override void Execute()
         {
             Environment.Exit(0);
-            return 0;
         }
     }
 
@@ -98,14 +94,13 @@ namespace MAD
     {
         public VersionsCommand() {}
 
-        public override int Execute()
+        public override void Execute()
         {
             Console.WriteLine("Mad-Project VERSION " + MadComponents.components.version);
             Console.WriteLine("MadCLI VERSION VERSION " + MadComponents.components.cli.version);
             Console.WriteLine("MadNotificationSystem VERSION " + "unknown");
             Console.WriteLine("MadJobSystem VERSION " + MadComponents.components.jobSystem.version);
             Console.WriteLine("MadMemoryManagmentSysystem VERSION " + "unknown");
-            return 0;
         }
     }
 
@@ -113,19 +108,9 @@ namespace MAD
     {
         public InfoCommand() { }
 
-        public override int Execute()
+        public override void Execute()
         {
-            Console.WriteLine();
-            Console.WriteLine("███╗   ███2 █████╗ ██████╗ ");
-            Console.WriteLine("████╗ ████║██╔══██╗██╔══██╗");
-            Console.WriteLine("██╔████╔██║███████║██║  ██║");
-            Console.WriteLine("██║╚██╔╝██║██╔══██║██║  ██║");
-            Console.WriteLine("██║ ╚═╝ ██║██║  ██║██████╔╝");
-            Console.WriteLine("╚═╝     ╚═╝╚═╝  ╚═╝╚═════╝ ");
-            Console.WriteLine();
-            Console.WriteLine("Network Monitoring Program written fully in C#.");
-            Console.WriteLine();
-            return 0;
+
         }
     }
 
@@ -133,13 +118,12 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredIndicators.Add(new object[] {"t", false, typeof(Int32)});
+            requiredParameter.Add(new ParameterOption("t", false, typeof(string)));
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            MadComponents.components.cli.cursor = GetArgument("t") + " ";
-            return 0;
+            MadComponents.components.cli.cursor = parameters.GetParameter("t").value;
         }
     }
 }

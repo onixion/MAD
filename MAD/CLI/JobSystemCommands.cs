@@ -1,28 +1,23 @@
 ﻿using System;
-using System.Threading;
 using System.Net;
-using System.Collections.Generic;
 
 namespace MAD
 {
     public class JobSystemStatusCommand : Command
     {
-        string jobSystemHeader = "MadJobSystem v" + MadComponents.components.jobSystem.version;
-        int consoleWidth = Console.BufferWidth;
-
-        string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
         ConsoleTable jobTable;
+        string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
 
         public JobSystemStatusCommand() { }
 
-        public override int Execute()
+        public override void Execute()
         {
             jobTable = new ConsoleTable(tableTitle);
             tableTitle = jobTable.FormatStringArray(tableTitle);
 
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(jobSystemHeader);
+            Console.WriteLine("MadJobSystem v" + MadComponents.components.jobSystem.version);
             Console.ForegroundColor = MadComponents.components.cli.textColor;
             Console.WriteLine();
             Console.WriteLine("Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count);
@@ -31,7 +26,8 @@ namespace MAD
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Yellow;
             jobTable.WriteColumnes(tableTitle);
-            Console.WriteLine("\n"+ jobTable.splitline);
+            Console.WriteLine();
+            Console.WriteLine(jobTable.splitline);
             Console.ForegroundColor = MadComponents.components.cli.textColor;
 
             foreach (Job job in MadComponents.components.jobSystem.jobs)
@@ -40,21 +36,17 @@ namespace MAD
                 array[0] = job.jobID.ToString();
                 array[1] = job.jobOptions.jobName;
                 array[2] = job.jobOptions.jobType.ToString();
-                if (job.IsActive())
-                    array[3] = "True";
-                else
-                    array[3] = "False";
+                array[3] = job.IsActive().ToString();
                 array[4] = job.jobOptions.targetAddress.ToString();
                 array[5] = job.jobOptions.delay.ToString();
                 array[6] = job.jobOutput;
                 array = jobTable.FormatStringArray(array);
+
                 jobTable.WriteColumnes(array);
                 Console.WriteLine();
             }
 
             Console.WriteLine();
-
-            return 0;
         }
     }
 
@@ -62,22 +54,12 @@ namespace MAD
     {
         public JobListCommand()
         {
-            optionalIndicators.Add(new object[] { "id", false, typeof(Int32)});
+
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            if (OptionalParameterUsed("id"))
-            {
-                int id = Int32.Parse(GetArgument("id"));
-                Job job = MadComponents.components.jobSystem.GetJob(id);
-            }
-            else
-            {
-                foreach (Job job in MadComponents.components.jobSystem.jobs)
-                    job.JobStatus();
-            }
-            return 0;
+
         }
     }
 
@@ -85,44 +67,12 @@ namespace MAD
     {
         public JobSystemAddPingCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false, typeof(String)});
-            requiredIndicators.Add(new object[] { "ip", false, typeof(String)});
 
-            optionalIndicators.Add(new object[] { "d", false, typeof(Int32)});
-            optionalIndicators.Add(new object[] { "ttl", false, typeof(Int32)});
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            try
-            {
 
-                if (OptionalParameterUsed("d") && OptionalParameterUsed("ttl"))
-                {
-                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse((string)GetArgument("d")), IPAddress.Parse((string)GetArgument("ip")), Int32.Parse((string)GetArgument("ttl"))));
-                    return 0;
-                }
-                else if (OptionalParameterUsed("d"))
-                {
-                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, Int32.Parse((string)GetArgument("d")), IPAddress.Parse((string)GetArgument("ip")), 300));
-                    return 0;
-                }
-                else if (OptionalParameterUsed("ttl"))
-                {
-                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, 10000, IPAddress.Parse((string)GetArgument("ip")), Int32.Parse((string)GetArgument("ttl"))));
-                    return 0;
-                }
-                else
-                {
-                    MadComponents.components.jobSystem.AddJob(new JobPingOptions((string)GetArgument("n"), JobOptions.JobType.PingRequest, 10000, IPAddress.Parse((string)GetArgument("ip")), 300));
-                    return 0;
-                }
-            }
-            catch (Exception)
-            {
-                ErrorMessage("Could not parse argument 'ip' to IPAddress!");
-                return 0;
-            }
         }
     }
 
@@ -130,22 +80,12 @@ namespace MAD
     {
         public JobSystemAddHttpCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false, typeof(String) });
-            requiredIndicators.Add(new object[] { "ip", false, typeof(String) });
 
-            optionalIndicators.Add(new object[] { "d", false, typeof(Int32) });
-            optionalIndicators.Add(new object[] { "p", false, typeof(Int32) });
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            IPAddress address = IPAddress.Parse(GetArgument("ip"));
-            int delay = Int32.Parse(GetArgument("d"));
-            int port = Int32.Parse(GetArgument("p"));
 
-            MadComponents.components.jobSystem.AddJob(new JobHttpOptions((string)GetArgument("n"), JobOptions.JobType.HttpRequest, delay, address, port));
-
-            return 0;
         }
     }
 
@@ -154,95 +94,51 @@ namespace MAD
     {
         public JobSystemAddPortCommand()
         {
-            requiredIndicators.Add(new object[] { "n", false, typeof(String) });
-            requiredIndicators.Add(new object[] { "ip", false, typeof(String) });
 
-            optionalIndicators.Add(new object[] { "d", false, typeof(Int32) });
-            optionalIndicators.Add(new object[] { "p", false, typeof(Int32) });
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            IPAddress address = IPAddress.Parse((string)GetArgument("ip"));
-            int delay = Int32.Parse(GetArgument("d"));
-            int port = Int32.Parse(GetArgument("p"));
-
-            MadComponents.components.jobSystem.AddJob(new JobPortOptions((string)GetArgument("n"), JobOptions.JobType.PortRequest, delay, address, port));
-
-            return 0;
+ 
         }
     }
 
-    public class JobSystemRemoveCommand : Command // WORKING
+    public class JobSystemRemoveCommand : Command
     {
         public JobSystemRemoveCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
+
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            int id = Int32.Parse(GetArgument("id"));
 
-            if (MadComponents.components.jobSystem.JobExist(id))
-            {
-                MadComponents.components.jobSystem.RemoveJob(id);
-                return 0;
-            }
-            else
-            {
-                ErrorMessage("Job does not exist!");
-                return 0;
-            }
         }
     }
 
-    public class JobSystemStartCommand : Command // WORKING
+    public class JobSystemStartCommand : Command
     {
         public JobSystemStartCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
+            
         }
 
-        public override int Execute()
+        public override void Execute()
         {
 
-            int id = Int32.Parse(GetArgument("id"));
-
-            if (MadComponents.components.jobSystem.JobExist(id))
-            {
-                MadComponents.components.jobSystem.StartJob(id);
-                return 0;
-            }
-            else
-            {
-                ErrorMessage("Job does not exist!");
-                return 0;
-            }
         }
     }
 
-    public class JobSystemStopCommand : Command // WORKING
+    public class JobSystemStopCommand : Command
     {
         public JobSystemStopCommand()
         {
-            requiredIndicators.Add(new object[] { "id", false, typeof(Int32) });
+            
         }
 
-        public override int Execute()
+        public override void Execute()
         {
-            int id = Int32.Parse(GetArgument("id"));
 
-            if (MadComponents.components.jobSystem.JobExist(id))
-            {
-                MadComponents.components.jobSystem.StopJob(id);
-                return 0;
-            }
-            else
-            {
-                ErrorMessage("Job does not exist!");
-                return 0;
-            }
         }
     }
 }

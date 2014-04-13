@@ -2,18 +2,13 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-//
-using System.Net;
-//
-
 namespace MAD
 {
     public class MadCLI
     {
         // cli vars
-        public string version = "0.0.6.5";
+        public string version = "0.0.7.0";
         public string cursor = "=> ";
-        public string windowTitle = "MAD - Network Monitoring";
 
         // cli color vars
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
@@ -22,29 +17,28 @@ namespace MAD
 
         // cli input vars
         private string cliInput;
-        private string inputCommand;
-        private List<object[]> inputArgs;
+        private string commandInput;
+        private ParameterInput parameterInput;
 
         // cli command vars
         private List<CommandOptions> commandOptions;
         private Command command;
         private Type inputCommandType;
 
-        //
+        // --------------------------------------------------------
+        //          CLI Framework
+        // --------------------------------------------------------
 
         public MadCLI()
         {
             InitCommands();
         }
 
-        public void SetWindowTitle()
-        {
-            Console.Title = windowTitle;
-        }
-
+        /// <summary>
+        /// Initilize commands.
+        /// </summary>
         private void InitCommands()
         {
-
             commandOptions = new List<CommandOptions>()
             {
                 // GENERAL COMMANDS
@@ -69,51 +63,83 @@ namespace MAD
             };
         }
 
+        /// <summary>
+        /// Start the cli.
+        /// </summary>
+
         public void Start()
         {
-            SetWindowTitle();
-            Console.ForegroundColor = textColor;
-
             PrintLogo();
+
             while (true)
             {
                 PrintCursor();
+
+                // cli waiting for input
                 cliInput = Console.ReadLine();
 
                 // get command
-                inputCommand = GetCommand(cliInput);
+                commandInput = GetCommand(cliInput);
 
-                if (inputCommand != null)
+                if (commandInput != null)
                 {
                     // check if command are known
-                    if (CommandExists(inputCommand))
+                    if (CommandExists(commandInput))
                     {
                         // get arguments from input
-                        inputArgs = GetArgs(cliInput);
+                        parameterInput = GetParamtersFromInput(cliInput);
                         // get command type
-                        inputCommandType = GetCommandType(inputCommand);
+                        inputCommandType = GetCommandType(commandInput);
 
                         // create command object (pass the command none objects)
                         command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
 
                         // check if the arguments are valid
-                        if (command.ValidArguments(inputArgs))
+                        if (command.ValidArguments(parameterInput))
                         {
-                            // set arguments
-                            command.SetParameters(inputArgs);
+                            // set command parameters 
+                            command.SetParameters(parameterInput);
 
                             // EXECUTE COMMAND
                             command.Execute();
                         }
                     }
                     else
-                        ErrorMessage("Command '" + inputCommand + "' unknown! Type 'help' for more information.");
+                        ErrorMessage("Command '" + commandInput + "' unknown! Type 'help' for more information.");
                 }
             }   
         }
 
-        //
+        /// <summary>
+        /// Print logo for the cli.
+        /// </summary>
+        private void PrintLogo()
+        {
+            Console.ForegroundColor = logoColor;
+            Console.WriteLine();
+            Console.WriteLine(@" ███╗   ███2 █████╗ ██████╗");
+            Console.WriteLine(@" ████╗ ████║██╔══██╗██╔══██╗");
+            Console.WriteLine(@" ██╔████╔██║███████║██║  ██║");
+            Console.WriteLine(@" ██║╚██╔╝██║██╔══██║██║  ██╠═════════════════════╗");
+            Console.WriteLine(@" ██║ ╚═╝ ██║██║  ██║██████╔╝ CLI VERSION " + version + " ║");
+            Console.WriteLine(@" ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╩══════════════════════╝");
+            Console.WriteLine();
+            Console.ForegroundColor = textColor;
+        }
 
+        /// <summary>
+        /// Print cursor for the cli.
+        /// </summary>
+        private void PrintCursor()
+        {
+            Console.ForegroundColor = cursorColor;
+            Console.Write(cursor);
+            Console.ForegroundColor = textColor;
+        }
+
+        /// <summary>
+        /// Get command from input.
+        /// </summary>
         private string GetCommand(string input)
         {
             string[] buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
@@ -131,17 +157,24 @@ namespace MAD
                 return null;
         }
 
-        public bool CommandExists(string command)
+        /// <summary>
+        /// Check if command is known by the cli.
+        /// </summary>
+        private bool CommandExists(string command)
         {
             foreach (CommandOptions temp in commandOptions)
                 if (temp.command == command)
                     return true;
+
             return false;
         }
 
-        private List<object[]> GetArgs(string input)
+        /// <summary>
+        /// Get Parameters from input (e.g. -a MyArgument)
+        /// </summary>
+        private ParameterInput GetParamtersFromInput(string input)
         {
-            List<object[]> tempArgs = new List<object[]>();
+            ParameterInput parameterTemp = new ParameterInput();
 
             string[] temp = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -153,14 +186,22 @@ namespace MAD
                 string[] temp2 = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
                 if (temp2.Length == 1)
-                    tempArgs.Add(new string[] { temp2[0], null }); // argument value is empty
+                {
+                    parameterTemp.parameters.Add(new Parameter(temp2[0], null)); // parameter argument is null
+                }
                 else
-                    tempArgs.Add(new string[] { temp2[0], temp2[1] }); // more arguments than 1 do not get recordnized
+                {
+                    parameterTemp.parameters.Add(new Parameter(temp2[0], temp2[1])); // more than one argument do NOT get recordnized by the CLI!!!
+                }
             }
 
-            return tempArgs;
+            return parameterTemp;
         }
 
+        /// <summary>
+        /// Get command type.
+        /// </summary>
+        /// <param name="command"></param>
         private Type GetCommandType(string command)
         {
             foreach (CommandOptions temp in commandOptions)
@@ -169,51 +210,15 @@ namespace MAD
             return null;
         }
 
-        /*
-        private Type[] GetObjectsTypeArray(string command)
-        {
-            foreach (CommandOptions temp in commandOptions)
-                if (temp.command == command)
-                    return temp.commandObjectsTypes;
-            return null;
-        }
-
-        private object[] GetCommandObjects(string command)
-        {
-            foreach (CommandOptions temp in commandOptions)
-                if (temp.command == command)
-                    return temp.commandObjects;
-            return null;
-        }
-         * */
-
-        public void PrintLogo()
-        {
-            Console.ForegroundColor = logoColor;
-            Console.WriteLine();
-            Console.WriteLine(@" ███╗   ███2 █████╗ ██████╗");
-            Console.WriteLine(@" ████╗ ████║██╔══██╗██╔══██╗");
-            Console.WriteLine(@" ██╔████╔██║███████║██║  ██║");
-            Console.WriteLine(@" ██║╚██╔╝██║██╔══██║██║  ██╠═════════════════════╗");
-            Console.WriteLine(@" ██║ ╚═╝ ██║██║  ██║██████╔╝ CLI VERSION " + version + " ║");
-            Console.WriteLine(@" ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╩══════════════════════╝");
-            Console.WriteLine();
-            Console.ForegroundColor = textColor;
-        }
-
-        private void PrintCursor()
-        {
-            Console.ForegroundColor = cursorColor;
-            Console.Write(cursor);
-            Console.ForegroundColor = textColor;
-        }
-
+        /// <summary>
+        /// Print error message to cli.
+        /// </summary>
         private void ErrorMessage(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("[ERROR] ");
-            Console.ForegroundColor = textColor;
             Console.WriteLine(message);
+            Console.ForegroundColor = textColor;
         }
     }
 }
