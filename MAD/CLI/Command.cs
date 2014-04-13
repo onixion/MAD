@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Reflection;
 using System.Net;
 
 namespace MAD
@@ -51,15 +51,10 @@ namespace MAD
                  *  have the right type, this saves time and lines of codes
                  */
 
-                /*
-                Type neededType = GetType(temp[0]);
-                var typeChanger = TypeDescriptor.GetConverter(neededType);
-                */
-
                 try
                 {
-                    //temp[1] = Convert.ChangeType(temp[1], GetType(temp[0]));
-                    //typeChanger.ConvertFrom(temp[0]);
+                    Type parseType = GetType(temp[0]);
+                    //temp[1].ParseTo<parseType>();
                 }
                 catch (Exception)
                 {
@@ -173,5 +168,13 @@ namespace MAD
         }
 
         public abstract int Execute();
+    }
+
+    public static class ArgumentParser
+    {
+        public static T ParseTo<T>(this string text)
+        {
+            return (T)Convert.ChangeType(text, typeof(T));
+        }
     }
 }
