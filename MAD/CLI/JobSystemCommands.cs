@@ -54,7 +54,7 @@ namespace MAD
     {
         public JobListCommand()
         {
-
+            optionalParameter.Add(new ParameterOption("id", false, typeof(Int32)));
         }
 
         public override void Execute()

@@ -61,6 +61,30 @@ namespace MAD
         }
 
         /// <summary>
+        /// Check if a optional parameter is used.
+        /// </summary>
+        public bool OptionalParameterUsed(string indicator)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Get the argument type.
+        /// </summary>
+        public Type GetArgumentType(Parameter parameter)
+        {
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == parameter.indicator)
+                    return temp.argumentType;
+
+            foreach (ParameterOption temp in requiredParameter)
+                if (temp.indicator == parameter.indicator)
+                    return temp.argumentType;
+
+            return null;
+        }
+
+        /// <summary>
         /// Check if the given parameters are valid for the command.
         /// </summary>
         /// <param name="parameters"></param>
@@ -91,19 +115,22 @@ namespace MAD
                     return false;
                 }
 
-                /*  TODO: check what type the command wants -> GetType(temp[0])
-                 *  get argument type and try to parse it into the type neede 
-                 *  for the command
-                 *  
-                 *  if not working -> Error: Could not parse argument ...
-                 *  if working     -> continue 
-                 * 
-                 *  now it is not needed to check (inside a command) if the argument value
-                 *  have the right type, this saves time and lines of codes
-                 */
+                // try to parse the argument to the specific type
+                object argument = Convert((string)temp.value,GetArgumentType(temp));
+
+                if (argument == null)
+                {
+                    MadComponents.components.cli.ErrorMessage("Could not parse argument '" + temp.value + ". Type help for view full commands.");
+                    return false;
+                }
+                else
+                {
+                    // set value to the parsed object
+                    temp.value = argument;
+                }
             }
 
-            // check if all required args are known
+            // check if all required parameters are known
             if (requiredParameter.Count != requiredArgsFound)
             {
                 MadComponents.components.cli.ErrorMessage("Some required parameters are missing! Type 'help' to see full commands.");
@@ -111,6 +138,32 @@ namespace MAD
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Convert argument (string) to the needed type and return it.
+        /// (this method can only parse Int32, String and IPAddress)
+        /// </summary>
+        private object Convert(string value, Type convertType)
+        {
+            try
+            {
+                switch (convertType.ToString())
+                {
+                    case "System.Int32":
+                        return Int32.Parse(value);
+                    case "System.String":
+                        return value;
+                    case "System.Net.IPAddress":
+                        return IPAddress.Parse(value);
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         /// <summary>

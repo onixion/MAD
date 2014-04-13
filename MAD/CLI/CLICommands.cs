@@ -70,16 +70,6 @@ namespace MAD
         }
     }
 
-    class LogoCommand : Command
-    {
-        public LogoCommand() {}
-
-        public override void Execute()
-        {
-
-        }
-    }
-
     class ExitCommand : Command
     {
         public ExitCommand() {}
@@ -96,11 +86,11 @@ namespace MAD
 
         public override void Execute()
         {
-            Console.WriteLine("Mad-Project VERSION " + MadComponents.components.version);
-            Console.WriteLine("MadCLI VERSION VERSION " + MadComponents.components.cli.version);
-            Console.WriteLine("MadNotificationSystem VERSION " + "unknown");
-            Console.WriteLine("MadJobSystem VERSION " + MadComponents.components.jobSystem.version);
-            Console.WriteLine("MadMemoryManagmentSysystem VERSION " + "unknown");
+            Console.WriteLine("Mad-Project                  VERSION " + MadComponents.components.version);
+            Console.WriteLine("MadCLI VERSION               VERSION " + MadComponents.components.cli.version);
+            Console.WriteLine("MadNotificationSystem        VERSION " + "unknown");
+            Console.WriteLine("MadJobSystem                 VERSION " + MadComponents.components.jobSystem.version);
+            Console.WriteLine("MadMemoryManagmentSysystem   VERSION " + "unknown");
         }
     }
 
@@ -118,12 +108,12 @@ namespace MAD
     {
         public CursorCommand()
         {
-            requiredParameter.Add(new ParameterOption("t", false, typeof(string)));
+            requiredParameter.Add(new ParameterOption("t", false, typeof(String)));
         }
 
         public override void Execute()
         {
-            MadComponents.components.cli.cursor = parameters.GetParameter("t").value;
+            MadComponents.components.cli.cursor = (String)parameters.GetParameter("t").value;
         }
     }
 }

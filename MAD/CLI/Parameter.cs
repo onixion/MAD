@@ -5,7 +5,7 @@ namespace MAD
     public class Parameter
     {
         public string indicator;
-        public string value;
+        public object value;
 
         public Parameter(string indicator, string value)
         {

@@ -48,7 +48,6 @@ namespace MAD
                 new CommandOptions("versions", typeof(VersionsCommand)),
                 new CommandOptions("info", typeof(InfoCommand)),
                 new CommandOptions("clear", typeof(ClearCommand)),
-                new CommandOptions("logo", typeof(LogoCommand)),
                 new CommandOptions("cursor", typeof(CursorCommand)),
 
                 // JOBSYSTEM COMMANDS
