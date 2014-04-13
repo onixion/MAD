@@ -9,6 +9,7 @@ namespace MAD
         // cli vars
         public string version = "0.0.7.0";
         public string cursor = "=> ";
+        public int consoleWidth;
 
         // cli color vars
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
@@ -115,16 +116,7 @@ namespace MAD
         /// </summary>
         private void PrintLogo()
         {
-            Console.ForegroundColor = logoColor;
-            Console.WriteLine();
-            Console.WriteLine(@" ███╗   ███2 █████╗ ██████╗");
-            Console.WriteLine(@" ████╗ ████║██╔══██╗██╔══██╗");
-            Console.WriteLine(@" ██╔████╔██║███████║██║  ██║");
-            Console.WriteLine(@" ██║╚██╔╝██║██╔══██║██║  ██╠═════════════════════╗");
-            Console.WriteLine(@" ██║ ╚═╝ ██║██║  ██║██████╔╝ CLI VERSION " + version + " ║");
-            Console.WriteLine(@" ╚═╝     ╚═╝╚═╝  ╚═╝╚═════╩══════════════════════╝");
-            Console.WriteLine();
-            Console.ForegroundColor = textColor;
+
         }
 
         /// <summary>

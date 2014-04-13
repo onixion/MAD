@@ -21,8 +21,8 @@ namespace MAD
             Console.ForegroundColor = MadComponents.components.cli.textColor;
             Console.WriteLine();
             Console.WriteLine("Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count);
-            Console.WriteLine("Jobs active:      " + MadComponents.components.jobSystem.JobsCountActive());
-            Console.WriteLine("Jobs inactive:    " + MadComponents.components.jobSystem.JobsCountInactive());
+            Console.WriteLine("Jobs active:      " + MadComponents.components.jobSystem.JobsActive());
+            Console.WriteLine("Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive());
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Yellow;
             jobTable.WriteColumnes(tableTitle);
