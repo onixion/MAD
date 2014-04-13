@@ -9,17 +9,10 @@ namespace MAD
         public string command;
         public Type commandType;
 
-        /*
-        public Type[] commandObjectsTypes;
-        public object[] commandObjects;
-        */
-
-        public CommandOptions(string command, Type commandType/*, Type[] commandObjectsTypes, object[] commandObjects*/)
+        public CommandOptions(string command, Type commandType)
         {
             this.command = command;
             this.commandType = commandType;
-            //this.commandObjectsTypes = commandObjectsTypes;
-            //this.commandObjects = commandObjects;
         }
     }
 }

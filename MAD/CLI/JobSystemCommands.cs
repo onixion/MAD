@@ -89,7 +89,6 @@ namespace MAD
         }
     }
 
-
     public class JobSystemAddPortCommand : Command
     {
         public JobSystemAddPortCommand()
@@ -99,7 +98,7 @@ namespace MAD
 
         public override void Execute()
         {
- 
+
         }
     }
 

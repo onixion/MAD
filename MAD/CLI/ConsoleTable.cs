@@ -14,6 +14,9 @@ namespace MAD
             columneWidth = Console.BufferWidth / columnesTitles.Length - 1;
         }
 
+        /// <summary>
+        /// Format a string array to get ready be written into the table.
+        /// </summary>
         public string[] FormatStringArray(string[] data)
         {
             for (int i = 0; i < columnesTitles.Length; i++)
@@ -26,6 +29,9 @@ namespace MAD
             return data;
         }
 
+        /// <summary>
+        /// Write one line into the table.
+        /// </summary>
         public void WriteColumnes(string[] data)
         {
             foreach (string temp in data)

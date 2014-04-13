@@ -9,7 +9,6 @@ namespace MAD
         // cli vars
         public string version = "0.0.7.0";
         public string cursor = "=> ";
-        public int consoleWidth;
 
         // cli color vars
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
@@ -67,7 +66,6 @@ namespace MAD
         /// <summary>
         /// Start the cli.
         /// </summary>
-
         public void Start()
         {
             PrintLogo();
@@ -96,7 +94,7 @@ namespace MAD
                         command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
 
                         // check if the arguments are valid
-                        if (command.ValidArguments(parameterInput))
+                        if (command.ValidParameters(parameterInput))
                         {
                             // set command parameters 
                             command.SetParameters(parameterInput);
@@ -205,7 +203,7 @@ namespace MAD
         /// <summary>
         /// Print error message to cli.
         /// </summary>
-        private void ErrorMessage(string message)
+        public void ErrorMessage(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Write("[ERROR] ");
