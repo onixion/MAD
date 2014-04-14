@@ -5,13 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{79A69B70-83D7-45D6-88F5-F99C85B6A3EC}</ProjectGuid>
+    <ProjectGuid>{0A1F0057-E91E-41C6-A224-9850C5D17B5B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CLIClient</RootNamespace>
-    <AssemblyName>CLIClient</AssemblyName>
+    <RootNamespace>MAD</RootNamespace>
+    <AssemblyName>MAD</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -37,10 +38,37 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLIClient\CLIClient.cs" />
+    <Compile Include="CLI\Server\CLIClient.cs" />
+    <Compile Include="CLI\Server\CLIServer.cs" />
+    <Compile Include="CLI\Parameter.cs" />
+    <Compile Include="CLI\ParameterInput.cs" />
+    <Compile Include="CLI\ParameterOption.cs" />
+    <Compile Include="CLI\Server\CLIUser.cs" />
+    <Compile Include="CLI\Server\TCPServer.cs" />
+    <Compile Include="CLI\Commands\Command.cs" />
+    <Compile Include="CLI\Commands\CommandOptions.cs" />
+    <Compile Include="CLI\ConsoleTable.cs" />
+    <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobHttp.cs" />
+    <Compile Include="JobSystem\JobHttpOptions.cs" />
+    <Compile Include="JobSystem\JobOptions.cs" />
+    <Compile Include="JobSystem\JobPing.cs" />
+    <Compile Include="JobSystem\JobPingOptions.cs" />
+    <Compile Include="JobSystem\JobPort.cs" />
+    <Compile Include="JobSystem\JobPortOptions.cs" />
+    <Compile Include="MadComponents.cs" />
+    <Compile Include="JobSystem\JobSystem.cs" />
+    <Compile Include="CLI\Commands\JobSystemCommands.cs" />
+    <Compile Include="CLI\CLI.cs" />
+    <Compile Include="CLI\Commands\CLICommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CLIClient\TCPClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
+      <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>
+      <Name>SmartThreadPool</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

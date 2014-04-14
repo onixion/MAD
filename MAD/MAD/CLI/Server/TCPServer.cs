@@ -2,22 +2,28 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-//using Amib.Threading; GEHT NICHT?!
+using Amib.Threading;
 
 namespace MAD
 {
     public abstract class TcpServer
     {
-        public string version = "0.0.0.1";
+        public string version = "0.0.0.4";
 
         private Thread listenerThread;
+        public SmartThreadPool clientPool;
 
         private TcpListener tcpListener;
         private TcpClient tcpClient;
 
-        public void Init(int port)
+        /// <summary>
+        /// Initial server.
+        /// </summary>
+        public virtual void Init(int port)
         {
             tcpListener = new TcpListener(IPAddress.Loopback, port);
+            clientPool = new SmartThreadPool();
+            clientPool.MaxThreads = 3;
         }
 
         /// <summary>
@@ -27,8 +33,17 @@ namespace MAD
         {
             if (listenerThread == null)
             {
-                listenerThread = new Thread(WaitForClients);
-                listenerThread.Start();
+                try
+                {
+                    tcpListener.Start();
+
+                    listenerThread = new Thread(WaitForClients);
+                    listenerThread.Start();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
 
@@ -39,8 +54,15 @@ namespace MAD
         {
             if (listenerThread.IsAlive)
             {
+                // stop TCP-listener
+                tcpListener.Stop();
+
+                // dispose listenerThread
                 listenerThread.Abort();
                 listenerThread = null;
+
+                // cancel all threads in pool
+                clientPool.Cancel();
             }
         }
 
@@ -52,15 +74,16 @@ namespace MAD
             while (true)
             {
                 tcpClient = tcpListener.AcceptTcpClient();
-
-                // THREADPOOL
-                ThreadPool.QueueUserWorkItem(new WaitCallback(BuildConnection), tcpClient);
+                clientPool.QueueWorkItem(BuildConnection, tcpClient);
             }
         }
 
+        /// <summary>
+        /// Build everything up to ensure that the connection is astablished.
+        /// </summary>
         private void BuildConnection(object client)
         {
-            // CHECK FOR SECURE KEY
+            //
 
             HandleClient((TcpClient)client);
         }

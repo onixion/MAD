@@ -6,3 +6,4 @@
 [13.04.2014][10:00-14:00][4h][11h] CLI Framework
 [14.04.2014][09:00-11:00][2h][13h] CLI Framework (finished)
 [14.04.2014][11:00-13:00][2h][15h] CLI Server/Client
+[14.04.2014][18:00-22:00][4h][19h] CLI Server/Client

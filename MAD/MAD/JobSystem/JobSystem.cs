@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Net;
 namespace MAD
 {
-    public class MadJobSystem
+    public class JobSystem
     {
         public string version = "0.0.1.8";
         public List<Job> jobs;
 
-        public MadJobSystem()
+        public JobSystem()
         { 
             jobs = new List<Job>();
         }

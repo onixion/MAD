@@ -7,8 +7,8 @@ namespace MAD
     {
         private MadComponents()
         {
-            cli = new MadCLI();
-            jobSystem = new MadJobSystem();
+            jobSystem = new JobSystem();
+            cliServer = new CLIServer(292);
         }
 
         private static MadComponents _components;
@@ -29,7 +29,9 @@ namespace MAD
         //     GLOBAL OBJECTS
         // ----------------------------------
 
-        public MadCLI cli;
-        public MadJobSystem jobSystem;
+        public CLIServer cliServer;
+        public JobSystem jobSystem;
+
+        public CLI cli;
     }
 }

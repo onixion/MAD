@@ -5,7 +5,7 @@ using System.Net;
 
 namespace MAD
 {
-    public class MadCLI
+    public class CLI
     {
         // cli vars
         public string version = "0.0.7.0";
@@ -30,7 +30,7 @@ namespace MAD
         //          CLI Framework
         // --------------------------------------------------------
 
-        public MadCLI()
+        public CLI()
         {
             InitCommands();
         }
