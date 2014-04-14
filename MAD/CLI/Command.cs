@@ -65,20 +65,24 @@ namespace MAD
         /// </summary>
         public bool OptionalParameterUsed(string indicator)
         {
+            foreach (Parameter temp in parameters.parameters)
+                if ((string)temp.indicator == indicator)
+                    return true;
+
             return false;
         }
 
         /// <summary>
         /// Get the argument type.
         /// </summary>
-        public Type GetArgumentType(Parameter parameter)
+        public Type GetArgumentType(string indicator)
         {
             foreach (ParameterOption temp in requiredParameter)
-                if (temp.indicator == parameter.indicator)
+                if (temp.indicator == indicator)
                     return temp.argumentType;
 
-            foreach (ParameterOption temp in requiredParameter)
-                if (temp.indicator == parameter.indicator)
+            foreach (ParameterOption temp in optionalParameter)
+                if (temp.indicator == indicator)
                     return temp.argumentType;
 
             return null;
@@ -111,16 +115,29 @@ namespace MAD
                 // check if the given args can have a value or not
                 if (GetParameterOptions(temp.indicator).argumentEmpty)
                 {
-                    MadComponents.components.cli.ErrorMessage("Value of parameter '-" + temp.indicator + "' can't be null!");
-                    return false;
+                    // check if argument is not null
+                    if(temp.value != null)
+                    {
+                        MadComponents.components.cli.ErrorMessage("Value of parameter '-" + temp.indicator + "' must be null!");
+                        return false;
+                    }
+                }
+                else
+                { 
+                    // check if argument is null
+                    if (temp.value == null)
+                    {
+                        MadComponents.components.cli.ErrorMessage("Value of parameter '-" + temp.indicator + "' can't be null!");
+                        return false;
+                    }
                 }
 
                 // try to parse the argument to the specific type
-                object argument = Convert((string)temp.value,GetArgumentType(temp));
+                object argument = Convert((string)temp.value, GetArgumentType(temp.indicator));
 
                 if (argument == null)
                 {
-                    MadComponents.components.cli.ErrorMessage("Could not parse argument '" + temp.value + ". Type help for view full commands.");
+                    MadComponents.components.cli.ErrorMessage("Could not parse argument '" + temp.value + "'. Type help for view full commands.");
                     return false;
                 }
                 else
