@@ -23,7 +23,6 @@ namespace CLIClient
             try
             {
                 client.Connect(serverEndPoint);
-
             }
             catch (Exception)
             { 

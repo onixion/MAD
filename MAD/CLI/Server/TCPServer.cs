@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+//using Amib.Threading; GEHT NICHT?!
 
 namespace MAD
 {
@@ -9,18 +10,19 @@ namespace MAD
     {
         public string version = "0.0.0.1";
 
+        private Thread listenerThread;
+
         private TcpListener tcpListener;
         private TcpClient tcpClient;
-
-        private Thread listenerThread;
-        // Threadpool for clients
-
 
         public void Init(int port)
         {
             tcpListener = new TcpListener(IPAddress.Loopback, port);
         }
 
+        /// <summary>
+        /// Start server.
+        /// </summary>
         public void Start()
         {
             if (listenerThread == null)
@@ -30,6 +32,9 @@ namespace MAD
             }
         }
 
+        /// <summary>
+        /// Stop server.
+        /// </summary>
         public void Stop()
         {
             if (listenerThread.IsAlive)
@@ -39,15 +44,25 @@ namespace MAD
             }
         }
 
+        /// <summary>
+        /// Wait for clients to connect.
+        /// </summary>
         private void WaitForClients()
         {
             while (true)
             {
                 tcpClient = tcpListener.AcceptTcpClient();
 
-
-                // THREAD POOL
+                // THREADPOOL
+                ThreadPool.QueueUserWorkItem(new WaitCallback(BuildConnection), tcpClient);
             }
+        }
+
+        private void BuildConnection(object client)
+        {
+            // CHECK FOR SECURE KEY
+
+            HandleClient((TcpClient)client);
         }
 
         public abstract void HandleClient(TcpClient client);

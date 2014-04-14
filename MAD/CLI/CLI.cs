@@ -114,7 +114,16 @@ namespace MAD
         /// </summary>
         private void PrintLogo()
         {
-
+            Console.ForegroundColor = logoColor;
+            Console.WriteLine(@" ___  ___  ___ ______ ");
+            Console.WriteLine(@" |  \/  | / _ \|  _  \");
+            Console.WriteLine(@" | .  . |/ /_\ \ | | |  Network Monitoring,");
+            Console.WriteLine(@" | |\/| ||  _  | | | |  like a boss ...");
+            Console.WriteLine(@" | |  | || | | | |/ / ");
+            Console.WriteLine(@" \_|  |_/\_| |_/___/    CLI VERSION " + version);
+            Console.WriteLine(@" _____________________________________________");
+            Console.WriteLine();
+            Console.ForegroundColor = textColor;
         }
 
         /// <summary>
@@ -177,11 +186,13 @@ namespace MAD
 
                 if (temp2.Length == 1)
                 {
-                    parameterTemp.parameters.Add(new Parameter(temp2[0], null)); // parameter argument is null
+                    // parameter argument is null
+                    parameterTemp.parameters.Add(new Parameter(temp2[0], null)); 
                 }
                 else
                 {
-                    parameterTemp.parameters.Add(new Parameter(temp2[0], temp2[1])); // more than one argument do NOT get recordnized by the CLI!!!
+                    // more than one argument do NOT get recordnized by the CLI!!!
+                    parameterTemp.parameters.Add(new Parameter(temp2[0], temp2[1])); 
                 }
             }
 
