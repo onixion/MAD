@@ -17,12 +17,15 @@ namespace MAD
         /// <summary>
         /// Check if given password equals the password from the user.
         /// </summary>
-        public bool CheckPassword(string pass)
+        public bool CheckPassword(byte[] password)
         {
-            byte[] temp = GetMD5Hash(pass);
-
-            if (password == temp)
+            if (this.password.Length == password.Length)
+            {
+                for (int i = 0; i < this.password.Length; i++)
+                    if (password[i] != this.password[i])
+                        return false;
                 return true;
+            }
             else
                 return false;
         }

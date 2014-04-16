@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 
 namespace CLIClient
 {
@@ -7,9 +8,21 @@ namespace CLIClient
     {
         static void Main(string[] args)
         {
-            CLIConnect connect = new CLIConnect(IPAddress.Parse("127.0.0.1"), 9999, "admin", "bestpasswordeva", "123456");
-            connect.Connect();
+            CLIClient client = new CLIClient(IPAddress.Parse("127.0.0.1"), 999, "admin", "bestpasswordeva", "123456");
+            client.Connect();
 
+            client.Send(client.socket, "123456");
+
+            if (client.Receive(client.socket) == "OK")
+            {
+                client.Send(client.socket, "admin");
+
+                if (client.Receive(client.socket) == "OK")
+                {
+                    client.Send(client.socket, "yolo");
+                }
+            }
+            client.socket.Close();
             Console.ReadKey();
         }
     }

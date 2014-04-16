@@ -1,42 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using SocketFramework;
 
 namespace MAD
 {
-    public class CLIServer : TcpServer
+    public class CLIServer : SocketServer
     {
         // cli server vars
         private List<CLIUser> users = new List<CLIUser>();
-        private byte[] securePass = new byte[2048];
+        private string securePass = "123456";
 
         public CLIServer(int port)
         {
-            Init(port);
+            InitServer(new IPEndPoint(IPAddress.Loopback, port));
+
+            InitCLIServer();
         }
 
-        /// <summary>
-        /// Init all users for the CLI.
-        /// </summary>
-        public override void Init(int port)
+        public void InitCLIServer()
         {
-            base.Init(port);
-
-            securePass = Encoding.ASCII.GetBytes("123456");
-            users.Add(new CLIUser("admin", "yolobestpasseva"));
+            users.Add(new CLIUser("admin", "yolo"));
         }
 
-        public override void HandleClient(TcpClient client)
+        public override void HandleClient(Socket socket)
         {
-            CLIClient cliClient = new CLIClient(client);
+            Console.WriteLine("Client connected: " + socket.RemoteEndPoint.AddressFamily.ToString());
 
-            if (Login(cliClient))
-            { 
-                // START CLI
+            string receivedSecurePass = Receive(socket);
+            Send(socket, "OK");
+            string username = Receive(socket);
+            Send(socket, "OK");
+            byte[] password = GetMD5Hash(Encoding.ASCII.GetBytes(Receive(socket)));
+            Send(socket, "OK");
+
+            Console.WriteLine("SecurePass: " + receivedSecurePass);
+            Console.WriteLine("Username: " + username);
             
+            if(CheckSecurePass(receivedSecurePass))
+            {
+                if (CheckUsernameAndPassword(username, password))
+                {
+                    Console.WriteLine("YES");
+                }
             }
         }
+
+        #region Usermanagment
 
         public bool UserExist(string username)
         {
@@ -56,41 +68,34 @@ namespace MAD
             return null;
         }
 
-        private bool Login(CLIClient cliClient)
+        #endregion
+
+        #region Security
+
+        private bool CheckSecurePass(string securePass)
         {
-            if (CheckSecurePass(cliClient))
-            {
-                Console.WriteLine("AUTH");
-            }
-
-            return false;
-        }
-
-        private bool CheckSecurePass(CLIClient cliClient)
-        {
-            byte[] temp = new byte[2048];
-            temp = cliClient.BeginReadData(2048);
-
-            if (temp == securePass)
+            if (this.securePass == securePass)
                 return true;
             else
                 return false;
         }
 
-        private bool CheckUsernameAndPassword(CLIClient cliClient)
+        private bool CheckUsernameAndPassword(string username, byte[] password)
         {
-            byte[] temp = new byte[2048];
-            temp = cliClient.BeginReadData(2048);
-            string temp2 = Encoding.ASCII.GetString(temp);
+            // get user (if user does not exist: client = null)
+            CLIUser client = GetUser(username);
 
-            CLIUser client = GetUser(temp2);
-
+            // check if user exist
             if (client != null)
             {
-                
+                // check password
+                if (client.CheckPassword(password))
+                    return true;
             }
-
             return false;
         }
+
+        #endregion 
+
     }
 }
