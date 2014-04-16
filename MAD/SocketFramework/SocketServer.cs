@@ -14,7 +14,7 @@ namespace SocketFramework
 
         public Thread listenThread;
 
-        public void InitServer(IPEndPoint serverEndPoint)
+        public void InitSocketServer(IPEndPoint serverEndPoint)
         {
             this.serverEndPoint = serverEndPoint;
         }

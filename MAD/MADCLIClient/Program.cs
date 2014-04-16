@@ -6,24 +6,125 @@ namespace CLIClient
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            CLIClient client = new CLIClient(IPAddress.Parse("127.0.0.1"), 999, "admin", "bestpasswordeva", "123456");
+            #region vars
+
+            string input;
+
+            IPAddress serverAddress;
+            int serverPort;
+
+            string username;
+            string password;
+            string securePass;
+
+            #endregion
+
+            #region setup
+
+            Console.WriteLine("CLI-Client [MINIMAL VERSION]");
+
+            Console.Write("IP: ");
+            input = Console.ReadLine();
+
+            try
+            {
+                serverAddress = IPAddress.Parse(input);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("INVALID INPUT!");
+                return 0;
+            }
+
+            Console.Write("PORT: ");
+            input = Console.ReadLine();
+
+            try
+            {
+                serverPort = Int32.Parse(input);
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("INVALID INPUT!");
+                return 0;
+            }
+
+            Console.Write("USERNAME: ");
+            username = Console.ReadLine();
+
+            Console.Write("PASSWORD: ");
+            password = Console.ReadLine();
+
+            Console.Write("SECUREPASS: ");
+            securePass = Console.ReadLine();
+
+            #endregion
+
+            CLIClient client = new CLIClient(serverAddress,serverPort, username, password, securePass);
             client.Connect();
 
-            client.Send(client.socket, "123456");
+            client.Send(client.socket, securePass);
 
             if (client.Receive(client.socket) == "OK")
             {
-                client.Send(client.socket, "admin");
+                client.Send(client.socket, username);
 
                 if (client.Receive(client.socket) == "OK")
                 {
-                    client.Send(client.socket, "yolo");
+                    client.Send(client.socket, password);
+
+                    if (client.Receive(client.socket) == "ACCEPTED")
+                    {
+                        Console.WriteLine("LOGIN WAS SUCCESSFUL!");
+                        Console.WriteLine("Waiting for server ...");
+
+                        client.Send(client.socket, "GET_CLI");
+
+                        input = client.Receive(client.socket);
+
+                        if (input != "MODE_UNKNOWN")
+                        {
+                            Console.Write(input);
+
+                            while (true)
+                            {
+                                input = Console.ReadLine();
+                                client.Send(client.socket, input);
+                                Console.WriteLine(client.Receive(client.socket));
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("MODE UNKNOWN!");
+                            return 0;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("NO AUTHORISATION!");
+                        return 0;
+                    }
+
+
+                }
+                else
+                {
+                    Console.WriteLine("SERVER NOT RESPONDING!");
+                    return 0;
                 }
             }
+            else
+            {
+                Console.WriteLine("SERVER NOT RESPONDING!");
+                return 0;
+            }
+
             client.socket.Close();
             Console.ReadKey();
+
+            return 0;
         }
     }
 }

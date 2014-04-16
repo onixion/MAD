@@ -2,12 +2,15 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
+using SocketFramework;
 
 namespace MAD
 {
-    public class CLI
+    public class CLI : SocketOperations
     {
         // cli vars
+        private Socket clientSocket;
         public string version = "0.0.7.0";
         public string cursor = "=> ";
 
@@ -30,9 +33,10 @@ namespace MAD
         //          CLI Framework
         // --------------------------------------------------------
 
-        public CLI()
+        public CLI(Socket clientSocket)
         {
             InitCommands();
+            this.clientSocket = clientSocket;
         }
 
         /// <summary>
@@ -72,10 +76,11 @@ namespace MAD
 
             while (true)
             {
-                PrintCursor();
-
+                //PrintCursor();
+                Send(clientSocket, cursor);
+                
                 // cli waiting for input
-                cliInput = Console.ReadLine();
+                cliInput = Receive(clientSocket);
 
                 // get command
                 commandInput = GetCommand(cliInput);
@@ -104,7 +109,7 @@ namespace MAD
                         }
                     }
                     else
-                        ErrorMessage("Command '" + commandInput + "' unknown! Type 'help' for more information.");
+                        Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information.");
                 }
             }   
         }

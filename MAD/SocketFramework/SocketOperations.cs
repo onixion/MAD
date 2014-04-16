@@ -107,10 +107,11 @@ namespace SocketFramework
 
         #region Other methods
 
-        public byte[] GetMD5Hash(byte[] data)
+        public string GetMD5Hash(string data)
         {
+            byte[] temp = Encoding.ASCII.GetBytes(data);
             MD5 alg = new MD5CryptoServiceProvider();
-            return alg.ComputeHash(data, 0, data.Length);
+            return Encoding.ASCII.GetString(alg.ComputeHash(temp, 0, temp.Length));
         }
 
         #endregion

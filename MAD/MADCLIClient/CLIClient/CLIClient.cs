@@ -12,14 +12,13 @@ namespace CLIClient
         private byte[] securePass = new byte[2048];
 
         private string username;
-        private byte[] password;
+        private string password;
 
         public CLIClient(IPAddress serverAddress, int serverPort, string username, string password, string securePass)
         {
             this.serverEndPoint = new IPEndPoint(serverAddress, serverPort);
-
             this.username = username;
-            this.password = GetMD5Hash(Encoding.ASCII.GetBytes(password));
+            this.password = GetMD5Hash(password);
             this.securePass = Encoding.ASCII.GetBytes(securePass);
         }
     }
