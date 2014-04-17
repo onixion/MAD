@@ -10,9 +10,6 @@ namespace MAD
             // WHEN YOU PUSH THIS TO GITHUB, MAKE SURE THE MAIN METHOD (THIS ON HERE) IS EMPTY.
             // IF THIS IS NOT EMPTY, THE MERGE PROCESS COULD CAUSE AN ERROR. TO AVOID THAT JUST
             // KEEP THIS METHOD HERE CLEAN. THANKS!
-
-            CLIServer server = new CLIServer(999);
-            server.Start();
         }
     }
 }

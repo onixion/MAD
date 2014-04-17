@@ -10,8 +10,9 @@ namespace MAD
 
         public JobSystemStatusCommand() { }
 
-        public override void Execute()
+        public override string Execute()
         {
+            /*
             jobTable = new ConsoleTable(tableTitle);
             tableTitle = jobTable.FormatStringArray(tableTitle);
 
@@ -46,7 +47,9 @@ namespace MAD
                 Console.WriteLine();
             }
 
-            Console.WriteLine();
+            Console.WriteLine();*/
+
+            return output;
         }
     }
 
@@ -57,7 +60,7 @@ namespace MAD
             optionalParameter.Add(new ParameterOption("id",false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             if(OptionalParameterUsed("id"))
             {
@@ -68,11 +71,13 @@ namespace MAD
                     MadComponents.components.jobSystem.GetJob(id).JobStatus();
                 }
                 else
-                    MadComponents.components.cli.ErrorMessage("Job with ID '" + id + "' does not exist.");
+                    output = "Job with ID '" + id + "' does not exist.";
             }
             else
                 foreach (Job job in MadComponents.components.jobSystem.jobs)
                     job.JobStatus();
+
+            return output;
         }
     }
 
@@ -87,7 +92,7 @@ namespace MAD
             optionalParameter.Add(new ParameterOption("ttl", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").value;
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
@@ -112,6 +117,8 @@ namespace MAD
                 // optional parameter "ttl" used
                 MadComponents.components.jobSystem.CreateJob(new JobPingOptions(jobName, JobOptions.JobType.PingRequest, 10000, targetAddress, (int)parameters.GetParameter("ttl").value));
             }
+
+            return output;
         }
     }
 
@@ -126,7 +133,7 @@ namespace MAD
             optionalParameter.Add(new ParameterOption("p", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").value;
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
@@ -151,6 +158,8 @@ namespace MAD
                 // optional parameter "p" used
                 MadComponents.components.jobSystem.CreateJob(new JobHttpOptions(jobName, JobOptions.JobType.HttpRequest, 10000, targetAddress, (int)parameters.GetParameter("p").value));
             }
+
+            return output;
         }
     }
 
@@ -165,7 +174,7 @@ namespace MAD
             optionalParameter.Add(new ParameterOption("p", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").value;
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
@@ -190,6 +199,8 @@ namespace MAD
                 // optional parameter "p" used
                 MadComponents.components.jobSystem.CreateJob(new JobPortOptions(jobName, JobOptions.JobType.PortRequest, 10000, targetAddress, (int)parameters.GetParameter("p").value));
             }
+
+            return output;
         }
     }
 
@@ -200,7 +211,7 @@ namespace MAD
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").value;
 
@@ -210,7 +221,9 @@ namespace MAD
                 MadComponents.components.jobSystem.DestroyJob(id);
             }
             else
-                MadComponents.components.cli.ErrorMessage("Job does not exist.");
+                output = "[FAIL] Job does not exist.";
+
+            return output;
         }
     }
 
@@ -221,7 +234,7 @@ namespace MAD
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").value;
 
@@ -230,7 +243,9 @@ namespace MAD
                 MadComponents.components.jobSystem.StartJob(id);
             }
             else
-                MadComponents.components.cli.ErrorMessage("Job does not exist.");
+                output = "[FAIL] Job does not exist.";
+
+            return output;
         }
     }
 
@@ -241,7 +256,7 @@ namespace MAD
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
         }
 
-        public override void Execute()
+        public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").value;
 
@@ -250,7 +265,9 @@ namespace MAD
                 MadComponents.components.jobSystem.StopJob(id);
             }
             else
-                MadComponents.components.cli.ErrorMessage("Job does not exist.");
+                output = "[FAIL] Job does not exist.";
+
+            return output;
         }
     }
 }

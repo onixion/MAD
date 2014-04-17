@@ -12,6 +12,8 @@ namespace MAD
 
         public ParameterInput parameters;
 
+        public string output = "";
+
         /// <summary>
         /// Set parameters of the command.
         /// </summary>
@@ -93,7 +95,7 @@ namespace MAD
         /// </summary>
         /// <param name="parameters"></param>
         /// <returns></returns>
-        public bool ValidParameters(ParameterInput parameters)
+        public string ValidParameters(ParameterInput parameters)
         {
             int requiredArgsFound = 0;
 
@@ -104,8 +106,7 @@ namespace MAD
                 // check if all arguments are known by the command
                 if (!ParameterExists(temp))
                 {
-                    MadComponents.components.cli.ErrorMessage("Parameter '-" + temp.indicator + "' does not exist for this command!");
-                    return false;
+                    return "Parameter '-" + temp.indicator + "' does not exist for this command!";
                 }
 
                 // if the given arg is a required arg increase requiredArgsFound
@@ -118,8 +119,7 @@ namespace MAD
                     // check if argument is not null
                     if(temp.value != null)
                     {
-                        MadComponents.components.cli.ErrorMessage("Value of parameter '-" + temp.indicator + "' must be null!");
-                        return false;
+                        return "Value of parameter '-" + temp.indicator + "' must be null!";
                     }
                 }
                 else
@@ -127,8 +127,7 @@ namespace MAD
                     // check if argument is null
                     if (temp.value == null)
                     {
-                        MadComponents.components.cli.ErrorMessage("Value of parameter '-" + temp.indicator + "' can't be null!");
-                        return false;
+                        return "Value of parameter '-" + temp.indicator + "' can't be null!";
                     }
                 }
 
@@ -137,8 +136,7 @@ namespace MAD
 
                 if (argument == null)
                 {
-                    MadComponents.components.cli.ErrorMessage("Could not parse argument '" + temp.value + "'. Type help for view full commands.");
-                    return false;
+                    return "Could not parse argument '" + temp.value + "'. Type help for view full commands.";
                 }
                 else
                 {
@@ -150,11 +148,10 @@ namespace MAD
             // check if all required parameters are known
             if (requiredParameter.Count != requiredArgsFound)
             {
-                MadComponents.components.cli.ErrorMessage("Some required parameters are missing! Type 'help' to see full commands.");
-                return false;
+                return "Some required parameters are missing! Type 'help' to see full commands.";
             }
 
-            return true;
+            return "VALID_PARAMETER_YES";
         }
 
         /// <summary>
@@ -202,6 +199,6 @@ namespace MAD
         /// <summary>
         /// This abstract method will be executed every cycle (=delayTime).
         /// </summary>
-        public abstract void Execute();
+        public abstract string Execute();
     }
 }

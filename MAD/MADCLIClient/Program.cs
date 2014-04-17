@@ -92,18 +92,20 @@ namespace CLIClient
                             {
                                 input = Console.ReadLine();
                                 client.Send(client.socket, input);
-                                Console.WriteLine(client.Receive(client.socket));
+                                Console.Write(client.Receive(client.socket));
                             }
                         }
                         else
                         {
                             Console.WriteLine("MODE UNKNOWN!");
+                            Console.ReadKey();
                             return 0;
                         }
                     }
                     else
                     {
                         Console.WriteLine("NO AUTHORISATION!");
+                        Console.ReadKey();
                         return 0;
                     }
 
@@ -112,12 +114,14 @@ namespace CLIClient
                 else
                 {
                     Console.WriteLine("SERVER NOT RESPONDING!");
+                    Console.ReadKey();
                     return 0;
                 }
             }
             else
             {
                 Console.WriteLine("SERVER NOT RESPONDING!");
+                Console.ReadKey();
                 return 0;
             }
 

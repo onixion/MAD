@@ -23,6 +23,7 @@ namespace MAD
         private string cliInput;
         private string commandInput;
         private ParameterInput parameterInput;
+        private string parameterValid;
 
         // cli command vars
         private List<CommandOptions> commandOptions;
@@ -52,7 +53,6 @@ namespace MAD
                 new CommandOptions("close", typeof(ExitCommand)),
                 new CommandOptions("versions", typeof(VersionsCommand)),
                 new CommandOptions("info", typeof(InfoCommand)),
-                new CommandOptions("clear", typeof(ClearCommand)),
                 new CommandOptions("cursor", typeof(CursorCommand)),
 
                 // JOBSYSTEM COMMANDS
@@ -72,21 +72,26 @@ namespace MAD
         /// </summary>
         public void Start()
         {
-            PrintLogo();
+            //send cursor for the first time
+            Send(clientSocket, "\n" + cursor); 
 
             while (true)
             {
-                //PrintCursor();
-                Send(clientSocket, cursor);
-                
+
                 // cli waiting for input
                 cliInput = Receive(clientSocket);
 
-                // get command
-                commandInput = GetCommand(cliInput);
+                Console.WriteLine("SERVER RECEIVED: " + cliInput);
 
-                if (commandInput != null)
+                // check if client wants to disconnect
+                if (cliInput == "DISCONNECTED")
+                    break;
+
+                if (cliInput != "")
                 {
+                    // get command
+                    commandInput = GetCommand(cliInput);
+
                     // check if command are known
                     if (CommandExists(commandInput))
                     {
@@ -98,48 +103,31 @@ namespace MAD
                         // create command object (pass the command none objects)
                         command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
 
-                        // check if the arguments are valid
-                        if (command.ValidParameters(parameterInput))
+                        // check if the arguments are valid (string = VALID_PARAMETER_YES)
+                        parameterValid = command.ValidParameters(parameterInput);
+
+                        if (parameterValid == "VALID_PARAMETER_YES")
                         {
                             // set command parameters 
                             command.SetParameters(parameterInput);
 
-                            // EXECUTE COMMAND
-                            command.Execute();
+                            // EXECUTE COMMAND AND SEND OUTPUT
+                            Send(clientSocket, command.Execute() + "\n" + cursor);
                         }
+                        else
+                            Send(clientSocket, parameterValid + "\n" + cursor);
                     }
                     else
-                        Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information.");
+                        Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
                 }
-            }   
+                else
+                    Send(clientSocket, "\n" + cursor);
+            }
+
+            clientSocket.Close();
         }
 
-        /// <summary>
-        /// Print logo for the cli.
-        /// </summary>
-        private void PrintLogo()
-        {
-            Console.ForegroundColor = logoColor;
-            Console.WriteLine(@" ___  ___  ___ ______ ");
-            Console.WriteLine(@" |  \/  | / _ \|  _  \");
-            Console.WriteLine(@" | .  . |/ /_\ \ | | |  Network Monitoring,");
-            Console.WriteLine(@" | |\/| ||  _  | | | |  like a boss ...");
-            Console.WriteLine(@" | |  | || | | | |/ / ");
-            Console.WriteLine(@" \_|  |_/\_| |_/___/    CLI VERSION " + version);
-            Console.WriteLine(@" _____________________________________________");
-            Console.WriteLine();
-            Console.ForegroundColor = textColor;
-        }
-
-        /// <summary>
-        /// Print cursor for the cli.
-        /// </summary>
-        private void PrintCursor()
-        {
-            Console.ForegroundColor = cursorColor;
-            Console.Write(cursor);
-            Console.ForegroundColor = textColor;
-        }
+        #region CLI format methodes
 
         /// <summary>
         /// Get command from input.
@@ -161,17 +149,7 @@ namespace MAD
                 return null;
         }
 
-        /// <summary>
-        /// Check if command is known by the cli.
-        /// </summary>
-        private bool CommandExists(string command)
-        {
-            foreach (CommandOptions temp in commandOptions)
-                if (temp.command == command)
-                    return true;
 
-            return false;
-        }
 
         /// <summary>
         /// Get Parameters from input (e.g. -a MyArgument)
@@ -204,6 +182,20 @@ namespace MAD
             return parameterTemp;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Check if command is known by the cli.
+        /// </summary>
+        private bool CommandExists(string command)
+        {
+            foreach (CommandOptions temp in commandOptions)
+                if (temp.command == command)
+                    return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Get command type.
         /// </summary>
@@ -214,17 +206,6 @@ namespace MAD
                 if (temp.command == command)
                     return temp.commandType;
             return null;
-        }
-
-        /// <summary>
-        /// Print error message to cli.
-        /// </summary>
-        public void ErrorMessage(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("[ERROR] ");
-            Console.WriteLine(message);
-            Console.ForegroundColor = textColor;
         }
     }
 }
