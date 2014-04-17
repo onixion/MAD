@@ -38,7 +38,6 @@ namespace SocketFramework
             if (listenThread != null)
             {
                 socket.Shutdown(SocketShutdown.Both);
-
                 listenThread = null;
             }
         }
@@ -53,7 +52,7 @@ namespace SocketFramework
             }
         }
 
-        public void HandleClientInternal(IAsyncResult result)
+        private void HandleClientInternal(IAsyncResult result)
         {
             clieConn.Set();
             Socket temp = (Socket)result.AsyncState;

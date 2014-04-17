@@ -14,6 +14,7 @@ namespace CLIClient
 
             IPAddress serverAddress;
             int serverPort;
+            string serverReply;
 
             string username;
             string password;
@@ -65,6 +66,8 @@ namespace CLIClient
             CLIClient client = new CLIClient(serverAddress,serverPort, username, password, securePass);
             client.Connect();
 
+            string passwordMD5 = client.GetMD5Hash(password);
+
             client.Send(client.socket, securePass);
 
             if (client.Receive(client.socket) == "OK")
@@ -73,7 +76,7 @@ namespace CLIClient
 
                 if (client.Receive(client.socket) == "OK")
                 {
-                    client.Send(client.socket, password);
+                    client.Send(client.socket, passwordMD5);
 
                     if (client.Receive(client.socket) == "ACCEPTED")
                     {
@@ -92,8 +95,16 @@ namespace CLIClient
                             {
                                 input = Console.ReadLine();
                                 client.Send(client.socket, input);
-                                Console.Write(client.Receive(client.socket));
+
+                                serverReply = client.Receive(client.socket);
+
+                                if (serverReply == "DISCONNECTED")
+                                    break;
+
+                                Console.Write(serverReply);
                             }
+
+                            Console.WriteLine("DISCONNECTED FROM SERVER!");
                         }
                         else
                         {
@@ -125,7 +136,10 @@ namespace CLIClient
                 return 0;
             }
 
+            Console.WriteLine("Closing socket ...");
             client.socket.Close();
+
+            Console.WriteLine("Press any key to close ...");
             Console.ReadKey();
 
             return 0;

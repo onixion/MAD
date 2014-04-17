@@ -11,13 +11,9 @@ namespace MAD
     {
         // cli vars
         private Socket clientSocket;
-        public string version = "0.0.7.0";
+        private IPEndPoint clientEndPoint;
+        public string version = "0.0.7.5";
         public string cursor = "=> ";
-
-        // cli color vars
-        public ConsoleColor cursorColor = ConsoleColor.Cyan;
-        public ConsoleColor textColor = ConsoleColor.White;
-        public ConsoleColor logoColor = ConsoleColor.Cyan;
 
         // cli input vars
         private string cliInput;
@@ -38,11 +34,9 @@ namespace MAD
         {
             InitCommands();
             this.clientSocket = clientSocket;
+            this.clientEndPoint = (IPEndPoint) clientSocket.RemoteEndPoint;
         }
 
-        /// <summary>
-        /// Initilize commands.
-        /// </summary>
         private void InitCommands()
         {
             commandOptions = new List<CommandOptions>()
@@ -67,64 +61,72 @@ namespace MAD
             };
         }
 
-        /// <summary>
-        /// Start the cli.
-        /// </summary>
         public void Start()
         {
             //send cursor for the first time
-            Send(clientSocket, "\n" + cursor); 
+            Send(clientSocket, "\n" + cursor);
 
             while (true)
             {
-
-                // cli waiting for input
+                // cli waiting for input from socket
                 cliInput = Receive(clientSocket);
 
-                Console.WriteLine("SERVER RECEIVED: " + cliInput);
+                // LOGGER HERE
 
                 // check if client wants to disconnect
-                if (cliInput == "DISCONNECTED")
-                    break;
-
-                if (cliInput != "")
+                if (cliInput == "DISCONNECT")
                 {
-                    // get command
-                    commandInput = GetCommand(cliInput);
+                    // let the client know that he disconnected
+                    Send(clientSocket, "DISCONNECTED");
+                    break;
+                }
 
-                    // check if command are known
-                    if (CommandExists(commandInput))
+                // check if client lost connection
+                if (cliInput != null)
+                {
+                    if (cliInput != "")
                     {
-                        // get arguments from input
-                        parameterInput = GetParamtersFromInput(cliInput);
-                        // get command type
-                        inputCommandType = GetCommandType(commandInput);
+                        // get command
+                        commandInput = GetCommand(cliInput);
 
-                        // create command object (pass the command none objects)
-                        command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
-
-                        // check if the arguments are valid (string = VALID_PARAMETER_YES)
-                        parameterValid = command.ValidParameters(parameterInput);
-
-                        if (parameterValid == "VALID_PARAMETER_YES")
+                        // check if command are known
+                        if (CommandExists(commandInput))
                         {
-                            // set command parameters 
-                            command.SetParameters(parameterInput);
+                            // get arguments from input
+                            parameterInput = GetParamtersFromInput(cliInput);
+                            // get command type
+                            inputCommandType = GetCommandType(commandInput);
 
-                            // EXECUTE COMMAND AND SEND OUTPUT
-                            Send(clientSocket, command.Execute() + "\n" + cursor);
+                            // create command object (pass the command none objects)
+                            command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
+
+                            // check if the arguments are valid (string = VALID_PARAMETER_YES)
+                            parameterValid = command.ValidParameters(parameterInput);
+
+                            if (parameterValid == "VALID_PARAMETER_YES")
+                            {
+                                // set command parameters 
+                                command.SetParameters(parameterInput);
+
+                                // EXECUTE COMMAND AND SEND OUTPUT
+                                Send(clientSocket, command.Execute() + "\n" + cursor);
+                            }
+                            else
+                                Send(clientSocket, parameterValid + "\n" + cursor);
                         }
                         else
-                            Send(clientSocket, parameterValid + "\n" + cursor);
+                            Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
                     }
                     else
-                        Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
+                        Send(clientSocket, "\n" + cursor);
                 }
                 else
-                    Send(clientSocket, "\n" + cursor);
+                    break;
             }
 
             clientSocket.Close();
+
+            Console.WriteLine(GetTimeStamp() + " Client(" + clientEndPoint.Address + ") disconnected.");
         }
 
         #region CLI format methodes
@@ -148,8 +150,6 @@ namespace MAD
             else
                 return null;
         }
-
-
 
         /// <summary>
         /// Get Parameters from input (e.g. -a MyArgument)
@@ -184,6 +184,8 @@ namespace MAD
 
         #endregion
 
+        #region CLI logic-methodes
+
         /// <summary>
         /// Check if command is known by the cli.
         /// </summary>
@@ -207,5 +209,7 @@ namespace MAD
                     return temp.commandType;
             return null;
         }
+
+        #endregion
     }
 }

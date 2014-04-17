@@ -31,10 +31,13 @@ namespace MAD
                 jobOutput = "False";
         }
 
-        public override void JobStatus()
+        public override string JobStatus()
         {
-            base.JobStatus();
-            Console.WriteLine(string.Format("TTL:      \t{0}", pingJobOptions.ttl));
+            string temp = base.JobStatus();
+
+            temp += "TTL:       " + pingJobOptions.ttl + "\n";
+
+            return temp;
         }
         
         

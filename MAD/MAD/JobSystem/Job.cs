@@ -62,18 +62,19 @@ namespace MAD
                 return true;
         }
 
-        public virtual void JobStatus()
+        public virtual string JobStatus()
         {
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(string.Format("JOB-ID: " + jobID));
-            Console.ForegroundColor = MadComponents.components.cli.textColor;
-            Console.WriteLine(string.Format("NAME:     \t{0}", jobOptions.jobName));
-            Console.WriteLine(string.Format("TYPE:     \t{0}", jobOptions.jobType.ToString()));
-            Console.WriteLine(string.Format("ADDRESS:  \t{0}", jobOptions.targetAddress));
-            Console.WriteLine(string.Format("DELAYTIME:\t{0}", jobOptions.delay));
-            Console.WriteLine(string.Format("ACITIVE:  \t{0}", IsActive().ToString()));
-            Console.WriteLine(string.Format("OUTPUT:   \t{0}", jobOutput));
+            string temp = "";
+
+            temp += "JOB-ID:    " + jobID + "\n";
+            temp += "NAME:      " + jobOptions.jobName + "\n";
+            temp += "TYPE:      " + jobOptions.jobType.ToString() + "\n";
+            temp += "ADDRESS:   " + jobOptions.targetAddress + "\n";
+            temp += "DELAYTIME: " + jobOptions.delay + "\n";
+            temp += "ACITIVE:   " + IsActive().ToString() + "\n";
+            temp += "OUTPUT:    " + jobOutput + "\n";
+
+            return temp;
         }
     }
 }

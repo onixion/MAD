@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
+using System.Timers;
 
 namespace SocketFramework
 {
@@ -14,18 +15,22 @@ namespace SocketFramework
 
         #region Send methods
 
-        public void Send(Socket socket, string text)
+        public bool Send(Socket socket, string text)
         {
             try
             {
                 byte[] data = Encoding.ASCII.GetBytes(text + "<EOF>");
+
                 socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
                 sendDone.WaitOne();
+
                 sendDone.Reset();
+                return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                sendDone.Reset();
+                return false;
             }
         }
 
@@ -36,9 +41,9 @@ namespace SocketFramework
                 Socket temp = (Socket)result.AsyncState;
                 temp.EndSend(result);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("SEND-CALLBACK-ERROR!");
             }
 
             sendDone.Set();
@@ -56,20 +61,16 @@ namespace SocketFramework
             try
             {
                 socket.BeginReceive(recieveObject.readBytes, 0, recieveObject.readBytes.Length, 0, new AsyncCallback(ReceiveCallback), recieveObject);
-
                 receDone.WaitOne();
-                receDone.Reset();
 
+                receDone.Reset();
                 return recieveObject.recievedDataString;
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                receDone.Reset();
+                return null;
             }
-
-            receDone.Reset();
-
-            return null;
         }
 
         private void ReceiveCallback(IAsyncResult result)
@@ -90,14 +91,12 @@ namespace SocketFramework
                         receDone.WaitOne();
                     }
                     else
-                    {
                         recieveObject.recievedDataString = recieveObject.recievedDataString.Replace("<EOF>", "");
-                    }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("RECEIVE-CALLBACK-ERROR!");
             }
 
             receDone.Set();
@@ -112,6 +111,11 @@ namespace SocketFramework
             byte[] temp = Encoding.ASCII.GetBytes(data);
             MD5 alg = new MD5CryptoServiceProvider();
             return Encoding.ASCII.GetString(alg.ComputeHash(temp, 0, temp.Length));
+        }
+
+        public string GetTimeStamp()
+        {
+            return DateTime.Now.ToString("[dd.MM.yyyy]<HH:mm:ss>");
         }
 
         #endregion

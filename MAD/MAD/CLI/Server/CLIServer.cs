@@ -25,19 +25,22 @@ namespace MAD
 
         public override void HandleClient(Socket socket)
         {
-            Console.WriteLine("Client connected ...");
+            IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
+
+            Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") connected ...");
 
             string receivedSecurePass = Receive(socket);
             Send(socket, "OK");
             string username = Receive(socket);
             Send(socket, "OK");
-            string passwordMD5 = GetMD5Hash(Receive(socket));
+            string passwordMD5 = Receive(socket);
 
             if (CheckSecurePass(securePass))
             {
                 if (CheckUsernameAndPassword(username, passwordMD5))
                 {
                     Send(socket, "ACCEPTED");
+                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") login as '" + username + "'.");
 
                     /* After the client login to the cli server,
                      * he need to send the mode he want to enter.
@@ -46,7 +49,7 @@ namespace MAD
 
                     string mode = Receive(socket);
                     switch (mode)
-                    { 
+                    {
                         case "GET_CLI":
                             CLI cli = new CLI(socket);
                             cli.Start();
@@ -58,10 +61,16 @@ namespace MAD
                     }
                 }
                 else
+                {
                     Send(socket, "DENIED");
+                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. Username or password wrong.");
+                }
             }
             else
+            {
                 Send(socket, "DENIED");
+                Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
+            }
         }
 
         #region Usermanagment

@@ -33,10 +33,13 @@ namespace MAD
             socket.Close();
         }
 
-        public override void JobStatus()
+        public override string JobStatus()
         {
-            base.JobStatus();
-            Console.WriteLine(string.Format("PORT:     \t{0}", portJobOptions.port));
+            string temp = base.JobStatus();
+
+            temp += "PORT:      " + portJobOptions.port + "\n";
+
+            return temp;
         }
     }
 }

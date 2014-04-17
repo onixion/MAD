@@ -75,7 +75,7 @@ namespace MAD
             }
             else
                 foreach (Job job in MadComponents.components.jobSystem.jobs)
-                    job.JobStatus();
+                    output += job.JobStatus();
 
             return output;
         }

@@ -35,10 +35,13 @@ namespace MAD
             request.Abort();
         }
 
-        public override void JobStatus()
+        public override string JobStatus()
         {
-            base.JobStatus();
-            Console.WriteLine(string.Format("PORT:     \t{0}", httpJobOptions.port));
+            string temp = base.JobStatus();
+
+            temp += "PORT:      " + httpJobOptions.port + "\n";
+
+            return temp;
         }
     }
 }

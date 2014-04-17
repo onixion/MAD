@@ -8,7 +8,7 @@ namespace MAD
         private MadComponents()
         {
             jobSystem = new JobSystem();
-            cliServer = new CLIServer(292);
+            cliServer = new CLIServer(999);
         }
 
         private static MadComponents _components;
@@ -31,7 +31,5 @@ namespace MAD
 
         public CLIServer cliServer;
         public JobSystem jobSystem;
-
-        public CLI cli;
     }
 }
