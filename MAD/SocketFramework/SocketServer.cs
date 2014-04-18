@@ -13,10 +13,9 @@ namespace SocketFramework
 
         public ManualResetEvent clieConn = new ManualResetEvent(false);
         public Thread listenerThread;
+        public bool stopRequest = false;
 
         private SmartThreadPool threadPool = new SmartThreadPool();
-
-        public bool stopRequest = false;
 
         public void InitSocketServer(IPEndPoint serverEndPoint)
         {
@@ -45,6 +44,7 @@ namespace SocketFramework
                 stopRequest = true;
 
                 clieConn.Set();
+                clieConn.Reset();
 
                 // wait for thread to close
                 listenerThread.Join();
@@ -77,9 +77,8 @@ namespace SocketFramework
             clieConn.Set();
 
             Socket temp = (Socket)result.AsyncState;
-            Socket workSocket = temp.EndAccept(result);
 
-            threadPool.QueueWorkItem(HandleClient, workSocket);
+            threadPool.QueueWorkItem(HandleClient, temp.EndAccept(result));
         }
 
         public abstract void HandleClient(Socket socket);

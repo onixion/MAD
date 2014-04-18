@@ -18,7 +18,7 @@ namespace MAD
             {
                 if (_components == null)
                     _components = new MadComponents();
-
+  
                 return _components;
             }
         }

@@ -126,7 +126,7 @@ namespace MAD
 
             clientSocket.Close();
 
-            Console.WriteLine(GetTimeStamp() + " Client(" + clientEndPoint.Address + ") disconnected.");
+            Console.WriteLine(GetTimeStamp() + " Client (" + clientEndPoint.Address + ") disconnected.");
         }
 
         #region CLI format methodes

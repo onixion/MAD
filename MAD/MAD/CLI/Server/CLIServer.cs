@@ -14,13 +14,8 @@ namespace MAD
         
         public CLIServer(int port)
         {
-            InitSocketServer(new IPEndPoint(IPAddress.Loopback, port));
             InitCLIServer();
-        }
-
-        public void InitCLIServer()
-        {
-            users.Add(new CLIUser("admin", GetMD5Hash("yolo")));
+            InitSocketServer(new IPEndPoint(IPAddress.Loopback, 999));
         }
 
         public override void HandleClient(Socket socket)
@@ -71,6 +66,11 @@ namespace MAD
                 Send(socket, "DENIED");
                 Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
             }
+        }
+
+        public void InitCLIServer()
+        {
+            users.Add(new CLIUser("admin", GetMD5Hash("yolo")));
         }
 
         #region Usermanagment
