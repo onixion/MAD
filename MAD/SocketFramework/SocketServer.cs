@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Text;
+using Amib.Threading;
 
 namespace SocketFramework
 {
@@ -10,35 +10,48 @@ namespace SocketFramework
     {
         public Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public IPEndPoint serverEndPoint;
-        public ManualResetEvent clieConn = new ManualResetEvent(false);
 
-        public Thread listenThread;
+        public ManualResetEvent clieConn = new ManualResetEvent(false);
+        public Thread listenerThread;
+
+        private SmartThreadPool threadPool = new SmartThreadPool();
+
+        public bool stopRequest = false;
 
         public void InitSocketServer(IPEndPoint serverEndPoint)
         {
             this.serverEndPoint = serverEndPoint;
+
+            socket.Bind(serverEndPoint);
+            socket.Listen(5);
         }
 
         #region Server handling methodes
 
         public void Start()
         {
-            if (listenThread == null)
+            if (listenerThread == null)
             {
-                socket.Bind(serverEndPoint);
-                socket.Listen(5);
-
-                listenThread = new Thread(ListenOnSocket);
-                listenThread.Start();
+                listenerThread = new Thread(ListenOnSocket);
+                listenerThread.Start();
             }
         }
 
         public void Stop()
         {
-            if (listenThread != null)
+            if (listenerThread != null)
             {
-                socket.Shutdown(SocketShutdown.Both);
-                listenThread = null;
+                // give the thread a stop signal
+                stopRequest = true;
+
+                clieConn.Set();
+
+                // wait for thread to close
+                listenerThread.Join();
+                listenerThread = null;
+
+                // cancel all threads
+                threadPool.Shutdown(); // NOT THE BEST IDEA
             }
         }
 
@@ -49,16 +62,24 @@ namespace SocketFramework
                 socket.BeginAccept(new AsyncCallback(HandleClientInternal), socket);
                 clieConn.WaitOne();
                 clieConn.Reset();
+
+                // stop listening
+                if (stopRequest == true)
+                {
+                    stopRequest = false;
+                    break;
+                }
             }
         }
 
         private void HandleClientInternal(IAsyncResult result)
         {
             clieConn.Set();
+
             Socket temp = (Socket)result.AsyncState;
             Socket workSocket = temp.EndAccept(result);
 
-            HandleClient(workSocket);
+            threadPool.QueueWorkItem(HandleClient, workSocket);
         }
 
         public abstract void HandleClient(Socket socket);

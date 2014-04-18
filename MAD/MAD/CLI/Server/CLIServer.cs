@@ -11,7 +11,7 @@ namespace MAD
     {
         private List<CLIUser> users = new List<CLIUser>();
         private string securePass = "123456";
-
+        
         public CLIServer(int port)
         {
             InitSocketServer(new IPEndPoint(IPAddress.Loopback, port));

@@ -12,6 +12,17 @@ namespace MAD
             // KEEP THIS METHOD HERE CLEAN. THANKS!
 
             MadComponents.components.cliServer.Start();
+            Console.WriteLine("START");
+            Console.ReadKey();
+            MadComponents.components.cliServer.Stop();
+            Console.WriteLine("STOP");
+            Console.ReadKey();
+            MadComponents.components.cliServer.Start();
+            Console.WriteLine("START");
+            Console.ReadKey();
+            MadComponents.components.cliServer.Stop();
+            Console.WriteLine("STOP");
+            Console.ReadKey();
         }
     }
 }

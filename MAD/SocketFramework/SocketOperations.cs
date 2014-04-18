@@ -10,6 +10,8 @@ namespace SocketFramework
 {
     public abstract class SocketOperations
     {
+        public Version socketOPversion = new Version(1, 0);
+
         public ManualResetEvent sendDone = new ManualResetEvent(false);
         public ManualResetEvent receDone = new ManualResetEvent(false);
 
@@ -66,7 +68,7 @@ namespace SocketFramework
                 receDone.Reset();
                 return recieveObject.recievedDataString;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 receDone.Reset();
                 return null;
@@ -94,13 +96,25 @@ namespace SocketFramework
                         recieveObject.recievedDataString = recieveObject.recievedDataString.Replace("<EOF>", "");
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("RECEIVE-CALLBACK-ERROR!");
             }
 
             receDone.Set();
         }
+
+        #region revieveObject
+
+        public class RecieveObject
+        {
+            public Socket recieveSocket;
+
+            public byte[] readBytes = new byte[1048];
+            public string recievedDataString = "";
+        }
+
+        #endregion
 
         #endregion
 
@@ -121,11 +135,5 @@ namespace SocketFramework
         #endregion
     }
 
-    public class RecieveObject
-    {
-        public Socket recieveSocket;
 
-        public byte[] readBytes = new byte[1048];
-        public string recievedDataString = "";
-    }
 }
