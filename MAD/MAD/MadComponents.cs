@@ -7,6 +7,7 @@ namespace MAD
     {
         private MadComponents()
         {
+            // default constructors
             jobSystem = new JobSystem();
             cliServer = new CLIServer(999);
         }
@@ -23,11 +24,11 @@ namespace MAD
             }
         }
 
-        public string version { get { return Assembly.GetExecutingAssembly().GetName().Version.ToString(); } }
-
         // ----------------------------------
         //     GLOBAL OBJECTS
         // ----------------------------------
+
+        public Version version = new Version(0, 5, 1000);
 
         public CLIServer cliServer;
         public JobSystem jobSystem;

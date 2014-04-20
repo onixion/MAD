@@ -9,10 +9,12 @@ namespace MAD
 {
     public class CLI : SocketOperations
     {
-        // cli vars
+        // network vars
         private Socket clientSocket;
         private IPEndPoint clientEndPoint;
-        public string version = "0.0.7.5";
+
+        // cli vars
+        public Version version = new Version(1, 4, 0);
         public string cursor = "=> ";
 
         // cli input vars
@@ -131,9 +133,6 @@ namespace MAD
 
         #region CLI format methodes
 
-        /// <summary>
-        /// Get command from input.
-        /// </summary>
         private string GetCommand(string input)
         {
             string[] buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
@@ -151,9 +150,6 @@ namespace MAD
                 return null;
         }
 
-        /// <summary>
-        /// Get Parameters from input (e.g. -a MyArgument)
-        /// </summary>
         private ParameterInput GetParamtersFromInput(string input)
         {
             ParameterInput parameterTemp = new ParameterInput();
@@ -186,9 +182,6 @@ namespace MAD
 
         #region CLI logic-methodes
 
-        /// <summary>
-        /// Check if command is known by the cli.
-        /// </summary>
         private bool CommandExists(string command)
         {
             foreach (CommandOptions temp in commandOptions)
@@ -198,10 +191,6 @@ namespace MAD
             return false;
         }
 
-        /// <summary>
-        /// Get command type.
-        /// </summary>
-        /// <param name="command"></param>
         private Type GetCommandType(string command)
         {
             foreach (CommandOptions temp in commandOptions)

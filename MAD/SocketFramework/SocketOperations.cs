@@ -10,10 +10,80 @@ namespace SocketFramework
 {
     public abstract class SocketOperations
     {
-        public Version socketOPversion = new Version(1, 0);
+        public Version socketOPversion = new Version(1, 7);
 
-        public ManualResetEvent sendDone = new ManualResetEvent(false);
-        public ManualResetEvent receDone = new ManualResetEvent(false);
+        private ManualResetEvent clieConn = new ManualResetEvent(false);
+        private ManualResetEvent clieDisc = new ManualResetEvent(false);
+        private ManualResetEvent sendDone = new ManualResetEvent(false);
+        private ManualResetEvent receDone = new ManualResetEvent(false);
+
+        #region Connect methodes
+
+        public bool Connect(Socket socket, IPEndPoint serverEndPoint)
+        {
+            try
+            {
+                socket.BeginConnect(serverEndPoint, new AsyncCallback(ConnectCallback), socket);
+                clieConn.WaitOne();
+
+                clieConn.Reset();
+                return true;
+            }
+            catch (Exception)
+            {
+                clieConn.Reset();
+                return false;
+            }
+        }
+
+        private void ConnectCallback(IAsyncResult result)
+        {
+            Socket temp = (Socket)result.AsyncState;
+
+            try
+            {
+                temp.EndConnect(result);
+            }
+            catch (Exception)
+            {
+            }
+
+            clieConn.Set();
+        }
+
+        public bool Disconnect(Socket socket, IPEndPoint serverEndPoint)
+        {
+            try
+            {
+                socket.BeginDisconnect(true, new AsyncCallback(DisconnectCallback), socket);
+                clieDisc.WaitOne();
+
+                clieDisc.Reset();
+                return true;
+            }
+            catch (Exception)
+            {
+                clieDisc.Reset();
+                return false;
+            }
+        }
+
+        private void DisconnectCallback(IAsyncResult result)
+        {
+            Socket temp = (Socket)result.AsyncState;
+
+            try
+            {
+                temp.EndDisconnect(result);
+            }
+            catch (Exception)
+            {
+            }
+
+            clieDisc.Set();
+        }
+
+        #endregion
 
         #region Send methods
 
@@ -45,7 +115,6 @@ namespace SocketFramework
             }
             catch (Exception)
             {
-                Console.WriteLine("SEND-CALLBACK-ERROR!");
             }
 
             sendDone.Set();

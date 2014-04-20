@@ -11,7 +11,8 @@ namespace SocketFramework
         public Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public IPEndPoint serverEndPoint;
 
-        public ManualResetEvent clieConn = new ManualResetEvent(false);
+        private ManualResetEvent clientConnect = new ManualResetEvent(false);
+
         public Thread listenerThread;
         public bool stopRequest = false;
 
@@ -43,15 +44,15 @@ namespace SocketFramework
                 // give the thread a stop signal
                 stopRequest = true;
 
-                clieConn.Set();
-                clieConn.Reset();
+                clientConnect.Set();
+                clientConnect.Reset();
 
                 // wait for thread to close
                 listenerThread.Join();
                 listenerThread = null;
 
                 // cancel all threads
-                threadPool.Shutdown(); // NOT THE BEST IDEA
+                //threadPool.Shutdown(); // NOT THE BEST IDEA
             }
         }
 
@@ -60,10 +61,9 @@ namespace SocketFramework
             while (true)
             {
                 socket.BeginAccept(new AsyncCallback(HandleClientInternal), socket);
-                clieConn.WaitOne();
-                clieConn.Reset();
+                clientConnect.WaitOne();
+                clientConnect.Reset();
 
-                // stop listening
                 if (stopRequest == true)
                 {
                     stopRequest = false;
@@ -74,11 +74,9 @@ namespace SocketFramework
 
         private void HandleClientInternal(IAsyncResult result)
         {
-            clieConn.Set();
-
-            Socket temp = (Socket)result.AsyncState;
-
-            threadPool.QueueWorkItem(HandleClient, temp.EndAccept(result));
+            clientConnect.Set();
+            Socket clientSocket = (Socket)result.AsyncState;
+            threadPool.QueueWorkItem(HandleClient, clientSocket.EndAccept(result));
         }
 
         public abstract void HandleClient(Socket socket);
