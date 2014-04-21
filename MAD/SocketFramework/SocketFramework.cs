@@ -3,40 +3,38 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Text;
-using System.Security.Cryptography;
-using System.Timers;
 
 namespace SocketFramework
 {
-    public abstract class SocketOperations
+    public abstract class SocketFramework
     {
-        public Version socketOPversion = new Version(1, 7);
+        public Version version = new Version(1, 9);
 
-        private ManualResetEvent clieConn = new ManualResetEvent(false);
-        private ManualResetEvent clieDisc = new ManualResetEvent(false);
+        public ManualResetEvent clientConnect = new ManualResetEvent(false);
+        private ManualResetEvent clientDisconnect = new ManualResetEvent(false);
         private ManualResetEvent sendDone = new ManualResetEvent(false);
-        private ManualResetEvent receDone = new ManualResetEvent(false);
+        private ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         #region Connect methodes
 
-        public bool Connect(Socket socket, IPEndPoint serverEndPoint)
+        public bool sConnect(Socket socket, IPEndPoint serverEndPoint)
         {
             try
             {
-                socket.BeginConnect(serverEndPoint, new AsyncCallback(ConnectCallback), socket);
-                clieConn.WaitOne();
+                socket.BeginConnect(serverEndPoint, new AsyncCallback(sConnectCallback), socket);
+                clientConnect.WaitOne();
 
-                clieConn.Reset();
+                clientConnect.Reset();
                 return true;
             }
             catch (Exception)
             {
-                clieConn.Reset();
+                clientConnect.Reset();
                 return false;
             }
         }
 
-        private void ConnectCallback(IAsyncResult result)
+        private void sConnectCallback(IAsyncResult result)
         {
             Socket temp = (Socket)result.AsyncState;
 
@@ -48,27 +46,27 @@ namespace SocketFramework
             {
             }
 
-            clieConn.Set();
+            clientConnect.Set();
         }
 
-        public bool Disconnect(Socket socket, IPEndPoint serverEndPoint)
+        public bool sDisconnect(Socket socket, IPEndPoint serverEndPoint)
         {
             try
             {
-                socket.BeginDisconnect(true, new AsyncCallback(DisconnectCallback), socket);
-                clieDisc.WaitOne();
+                socket.BeginDisconnect(true, new AsyncCallback(sDisconnectCallback), socket);
+                clientDisconnect.WaitOne();
 
-                clieDisc.Reset();
+                clientDisconnect.Reset();
                 return true;
             }
             catch (Exception)
             {
-                clieDisc.Reset();
+                clientDisconnect.Reset();
                 return false;
             }
         }
 
-        private void DisconnectCallback(IAsyncResult result)
+        private void sDisconnectCallback(IAsyncResult result)
         {
             Socket temp = (Socket)result.AsyncState;
 
@@ -79,8 +77,8 @@ namespace SocketFramework
             catch (Exception)
             {
             }
-
-            clieDisc.Set();
+   
+            clientDisconnect.Set();
         }
 
         #endregion
@@ -116,7 +114,7 @@ namespace SocketFramework
             catch (Exception)
             {
             }
-
+                
             sendDone.Set();
         }
 
@@ -132,14 +130,14 @@ namespace SocketFramework
             try
             {
                 socket.BeginReceive(recieveObject.readBytes, 0, recieveObject.readBytes.Length, 0, new AsyncCallback(ReceiveCallback), recieveObject);
-                receDone.WaitOne();
+                receiveDone.WaitOne();
 
-                receDone.Reset();
+                receiveDone.Reset();
                 return recieveObject.recievedDataString;
             }
             catch (Exception)
             {
-                receDone.Reset();
+                receiveDone.Reset();
                 return null;
             }
         }
@@ -154,12 +152,12 @@ namespace SocketFramework
 
                 if (receiveLength > 0)
                 {
-                    recieveObject.recievedDataString += Encoding.ASCII.GetString(recieveObject.readBytes,0,receiveLength);
+                    recieveObject.recievedDataString += Encoding.ASCII.GetString(recieveObject.readBytes, 0, receiveLength);
 
                     if (!recieveObject.recievedDataString.Contains("<EOF>"))
                     {
                         recieveObject.recieveSocket.BeginReceive(recieveObject.readBytes, 0, recieveObject.readBytes.Length, 0, new AsyncCallback(ReceiveCallback), recieveObject);
-                        receDone.WaitOne();
+                        receiveDone.WaitOne();
                     }
                     else
                         recieveObject.recievedDataString = recieveObject.recievedDataString.Replace("<EOF>", "");
@@ -167,10 +165,10 @@ namespace SocketFramework
             }
             catch (Exception)
             {
-                Console.WriteLine("RECEIVE-CALLBACK-ERROR!");
+
             }
 
-            receDone.Set();
+                receiveDone.Set();
         }
 
         #region revieveObject
@@ -184,22 +182,6 @@ namespace SocketFramework
         }
 
         #endregion
-
-        #endregion
-
-        #region Other methods
-
-        public string GetMD5Hash(string data)
-        {
-            byte[] temp = Encoding.ASCII.GetBytes(data);
-            MD5 alg = new MD5CryptoServiceProvider();
-            return Encoding.ASCII.GetString(alg.ComputeHash(temp, 0, temp.Length));
-        }
-
-        public string GetTimeStamp()
-        {
-            return DateTime.Now.ToString("[dd.MM.yyyy]<HH:mm:ss>");
-        }
 
         #endregion
     }

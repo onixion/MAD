@@ -35,7 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SocketClient.cs" />
-    <Compile Include="SocketOperations.cs" />
+    <Compile Include="SocketFramework.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

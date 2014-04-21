@@ -1,25 +1,33 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Security.Cryptography;
 using SocketFramework;
 
 namespace CLIClient
 {
-    public class CLIClient : SocketClient 
+    public class CLIClient : SocketClient
     {
-        private byte[] securePass = new byte[2048];
+        public string securePass;
+        public string username;
+        public string passwordMD5;
 
-        private string username;
-        private string password;
-
-        public CLIClient(IPAddress serverAddress, int serverPort, string username, string password, string securePass)
+        public CLIClient(IPEndPoint serverEndPoint, string securePass, string username, string password)
         {
-            this.serverEndPoint = new IPEndPoint(serverAddress, serverPort);
+            // init socketClient
+            InitSocketClient(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), serverEndPoint);
+
             this.username = username;
-            this.password = GetMD5Hash(password);
-            this.securePass = Encoding.ASCII.GetBytes(securePass);
+            this.passwordMD5 = Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes(password)));
+            this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
+
+        private byte[] GetMD5Hash(byte[] data)
+        {
+            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5CryptoServiceProvider.Create();
+            return md5.ComputeHash(data);
+        } 
     }
 }

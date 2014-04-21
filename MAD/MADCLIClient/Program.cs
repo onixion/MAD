@@ -10,15 +10,17 @@ namespace CLIClient
         {
             #region vars
 
-            string input;
-
             IPAddress serverAddress;
             int serverPort;
-            string serverReply;
+
+            string input;
 
             string username;
             string password;
             string securePass;
+
+            string serverRequest;
+            string serverResponse;
 
             #endregion
 
@@ -63,64 +65,73 @@ namespace CLIClient
 
             #endregion
 
-            CLIClient client = new CLIClient(serverAddress,serverPort, username, password, securePass);
-            client.Connect();
+            CLIClient clientCLI = new CLIClient(new IPEndPoint(serverAddress, serverPort), securePass, username, password);
+            clientCLI.sConnect(clientCLI.serverSocket, clientCLI.serverEndPoint);
 
-            string passwordMD5 = client.GetMD5Hash(password);
-
-            client.Send(client.socket, securePass);
-
-            if (client.Receive(client.socket) == "OK")
+            if (clientCLI.serverSocket.Connected == true)
             {
-                client.Send(client.socket, username);
+                clientCLI.Send(clientCLI.serverSocket, clientCLI.securePass);
 
-                if (client.Receive(client.socket) == "OK")
+                //Console.WriteLine(clientCLI.Receive(clientCLI.serverSocket));
+
+                if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
                 {
-                    client.Send(client.socket, passwordMD5);
+                    clientCLI.Send(clientCLI.serverSocket, clientCLI.username);
 
-                    if (client.Receive(client.socket) == "ACCEPTED")
+                    if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
                     {
-                        Console.WriteLine("LOGIN WAS SUCCESSFUL!");
-                        Console.WriteLine("Waiting for server ...");
+                        clientCLI.Send(clientCLI.serverSocket, clientCLI.passwordMD5);
 
-                        client.Send(client.socket, "GET_CLI");
-
-                        input = client.Receive(client.socket);
-
-                        if (input != "MODE_UNKNOWN")
+                        if (clientCLI.Receive(clientCLI.serverSocket) == "ACCEPTED")
                         {
-                            Console.Write(input);
+                            Console.WriteLine("LOGIN WAS SUCCESSFUL!");
+                            Console.WriteLine("Waiting for server ...");
 
-                            while (true)
+                            clientCLI.Send(clientCLI.serverSocket, "GET_CLI");
+
+                            input = clientCLI.Receive(clientCLI.serverSocket);
+
+                            if (input != "MODE_UNKNOWN")
                             {
-                                input = Console.ReadLine();
-                                client.Send(client.socket, input);
+                                Console.Write(input);
 
-                                serverReply = client.Receive(client.socket);
+                                while (true)
+                                {
+                                    input = Console.ReadLine();
+                                    clientCLI.Send(clientCLI.serverSocket, input);
 
-                                if (serverReply == "DISCONNECTED")
-                                    break;
+                                    serverResponse = clientCLI.Receive(clientCLI.serverSocket);
 
-                                Console.Write(serverReply);
+                                    if (serverResponse == "DISCONNECTED")
+                                        break;
+
+                                    Console.Write(serverResponse);
+                                }
+
+                                Console.WriteLine("DISCONNECTED FROM SERVER!");
                             }
-
-                            Console.WriteLine("DISCONNECTED FROM SERVER!");
+                            else
+                            {
+                                Console.WriteLine("MODE NOT KNOW BY SERVER!");
+                                Console.ReadKey();
+                                return 0;
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("MODE UNKNOWN!");
+                            Console.WriteLine("NO AUTHORISATION!");
                             Console.ReadKey();
                             return 0;
                         }
+
+
                     }
                     else
                     {
-                        Console.WriteLine("NO AUTHORISATION!");
+                        Console.WriteLine("SERVER NOT RESPONDING!");
                         Console.ReadKey();
                         return 0;
                     }
-
-
                 }
                 else
                 {
@@ -128,16 +139,14 @@ namespace CLIClient
                     Console.ReadKey();
                     return 0;
                 }
+
+                Console.WriteLine("Closing socket ...");
+                clientCLI.serverSocket.Close();
             }
             else
             {
-                Console.WriteLine("SERVER NOT RESPONDING!");
-                Console.ReadKey();
-                return 0;
+                Console.WriteLine("Could not connect to server ...");
             }
-
-            Console.WriteLine("Closing socket ...");
-            client.socket.Close();
 
             Console.WriteLine("Press any key to close ...");
             Console.ReadKey();

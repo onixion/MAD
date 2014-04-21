@@ -9,40 +9,49 @@ namespace MAD
 {
     public class CLIServer : SocketServer
     {
-        private List<CLIUser> users = new List<CLIUser>();
-        private string securePass = "123456";
-        
+        private string secureKey = "123456";
+        private List<CLIUser> users;
+
         public CLIServer(int port)
         {
-            InitCLIServer();
-            InitSocketServer(new IPEndPoint(IPAddress.Loopback, 999));
+            InitSocketServer(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), new IPEndPoint(IPAddress.Loopback, 999));
+            InitCLIUsers();
         }
 
         public override void HandleClient(Socket socket)
         {
+            // get ip from client
             IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
 
+            // log request to console
             Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") connected ...");
 
+            // reveive sercurePass
             string receivedSecurePass = Receive(socket);
             Send(socket, "OK");
+
+            // reveive username
             string username = Receive(socket);
             Send(socket, "OK");
+
+            // reveive passwordMD5
             string passwordMD5 = Receive(socket);
 
-            if (CheckSecurePass(securePass))
+            if (CheckSecureKey(secureKey))
             {
                 if (CheckUsernameAndPassword(username, passwordMD5))
                 {
+                    // client accepted
                     Send(socket, "ACCEPTED");
                     Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") login as '" + username + "'.");
 
                     /* After the client login to the cli server,
                      * he need to send the mode he want to enter.
-                     * For the default cli, he need to send GET_CLI.
+                     * For the default cli, he needs to send GET_CLI.
                      * */
 
                     string mode = Receive(socket);
+
                     switch (mode)
                     {
                         case "GET_CLI":
@@ -68,9 +77,12 @@ namespace MAD
             }
         }
 
-        public void InitCLIServer()
+        public void InitCLIUsers()
         {
-            users.Add(new CLIUser("admin", GetMD5Hash("yolo")));
+            users = new List<CLIUser>()
+            {
+                new CLIUser("admin", Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes("yolo"))))
+            };
         }
 
         #region Usermanagment
@@ -97,9 +109,9 @@ namespace MAD
 
         #region Security
 
-        private bool CheckSecurePass(string securePass)
+        private bool CheckSecureKey(string secureKey)
         {
-            if (this.securePass == securePass)
+            if (this.secureKey == secureKey)
                 return true;
             else
                 return false;
@@ -118,6 +130,17 @@ namespace MAD
                     return true;
             }
             return false;
+        }
+
+        private string GetTimeStamp()
+        {
+            return DateTime.Now.ToString(" dd-MM-yyyy HH-mm-ss ");
+        }
+
+        private byte[] GetMD5Hash(byte[] data)
+        {
+            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5CryptoServiceProvider.Create();
+            return md5.ComputeHash(data);
         }
 
         #endregion 

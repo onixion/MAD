@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using SocketFramework;
-
+using System.Text;
 namespace MAD
 {
-    public class CLI : SocketOperations
+    public class CLI : SocketFramework.SocketFramework
     {
         // network vars
         private Socket clientSocket;
         private IPEndPoint clientEndPoint;
 
         // cli vars
-        public Version version = new Version(1, 4, 0);
         public string cursor = "=> ";
 
         // cli input vars
@@ -117,10 +116,10 @@ namespace MAD
                                 Send(clientSocket, parameterValid + "\n" + cursor);
                         }
                         else
-                            Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
+                            Send(clientSocket,"Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
                     }
                     else
-                        Send(clientSocket, "\n" + cursor);
+                        Send(clientSocket,"\n" + cursor);
                 }
                 else
                     break;
@@ -128,7 +127,7 @@ namespace MAD
 
             clientSocket.Close();
 
-            Console.WriteLine(GetTimeStamp() + " Client (" + clientEndPoint.Address + ") disconnected.");
+            Console.WriteLine(" Client (" + clientEndPoint.Address + ") disconnected.");
         }
 
         #region CLI format methodes

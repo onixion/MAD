@@ -28,7 +28,7 @@ namespace MAD
         //     GLOBAL OBJECTS
         // ----------------------------------
 
-        public Version version = new Version(0, 5, 1000);
+        public Version version = new Version(0, 5, 1500);
 
         public CLIServer cliServer;
         public JobSystem jobSystem;
