@@ -27,7 +27,7 @@ namespace SocketFramework
             this.serverSocket.Bind(serverEndPoint);
             this.serverSocket.Listen(5);
         }
-
+        
         #region Server handling methodes
 
         public void Start()
