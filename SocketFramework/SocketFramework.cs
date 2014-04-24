@@ -8,12 +8,12 @@ namespace SocketFramework
 {
     public abstract class SocketFramework
     {
-        public Version version = new Version(1, 9);
+        public Version version = new Version(2, 9);
 
         public ManualResetEvent clientConnect = new ManualResetEvent(false);
-        private ManualResetEvent clientDisconnect = new ManualResetEvent(false);
-        private ManualResetEvent sendDone = new ManualResetEvent(false);
-        private ManualResetEvent receiveDone = new ManualResetEvent(false);
+        public ManualResetEvent clientDisconnect = new ManualResetEvent(false);
+        public ManualResetEvent sendDone = new ManualResetEvent(false);
+        public ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         #region Connect methodes
 

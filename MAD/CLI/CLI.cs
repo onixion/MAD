@@ -123,6 +123,10 @@ namespace MAD
                 }
                 else
                     break;
+
+                // check if the server has stopped
+                if (MadComponents.components.cliServer.serverStopRequest == true)
+                    break;
             }
 
             clientSocket.Close();

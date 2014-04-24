@@ -32,13 +32,17 @@ namespace MAD
         /// <summary>
         /// Write one line into the table.
         /// </summary>
-        public void WriteColumnes(string[] data)
+        public string WriteColumnes(string[] data)
         {
+            string buffer = "";
+
             foreach (string temp in data)
             {
-                Console.Write(temp);
-                Console.Write(" ");
+                buffer += temp;
+                buffer += " ";
             }
+
+            return buffer;
         }
     }
 }

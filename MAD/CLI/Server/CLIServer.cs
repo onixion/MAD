@@ -9,12 +9,14 @@ namespace MAD
 {
     public class CLIServer : SocketServer
     {
+        private string cryptoKey = "123456";
         private string secureKey = "123456";
+
         private List<CLIUser> users;
 
         public CLIServer(int port)
         {
-            InitSocketServer(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), new IPEndPoint(IPAddress.Loopback, 999));
+            InitSocketServer(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), new IPEndPoint(IPAddress.Loopback, port));
             InitCLIUsers();
         }
 
@@ -77,6 +79,8 @@ namespace MAD
             }
         }
 
+        #region Usermanagment
+
         public void InitCLIUsers()
         {
             users = new List<CLIUser>()
@@ -84,8 +88,6 @@ namespace MAD
                 new CLIUser("admin", Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes("yolo"))))
             };
         }
-
-        #region Usermanagment
 
         public bool UserExist(string username)
         {

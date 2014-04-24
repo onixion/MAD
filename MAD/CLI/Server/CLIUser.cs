@@ -8,6 +8,8 @@ namespace MAD
         public string username;
         public string passwordMD5;
 
+        public bool online = false;
+
         public CLIUser(string username, string passwordMD5)
         {
             this.username = username;

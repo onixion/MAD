@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+
 using Amib.Threading;
 using SocketFramework;
 
@@ -9,15 +10,15 @@ namespace SocketFramework
 {
     public abstract class SocketServer : SocketFramework
     {
+        #region members
         public Socket serverSocket;
         public IPEndPoint serverEndPoint;
 
-        private ManualResetEvent clientConnect = new ManualResetEvent(false);
-
-        private SmartThreadPool threadPool = new SmartThreadPool();
-
         public Thread listenerThread;
         public bool serverStopRequest = false;
+
+        private SmartThreadPool threadPool = new SmartThreadPool();
+        #endregion
 
         public void InitSocketServer(Socket serverSocket, IPEndPoint serverEndPoint)
         {
@@ -25,7 +26,7 @@ namespace SocketFramework
             this.serverEndPoint = serverEndPoint;
 
             this.serverSocket.Bind(serverEndPoint);
-            this.serverSocket.Listen(5);
+            this.serverSocket.Listen(20);
         }
         
         #region Server handling methodes

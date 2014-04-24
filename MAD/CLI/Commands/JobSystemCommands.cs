@@ -8,28 +8,17 @@ namespace MAD
         ConsoleTable jobTable;
         string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
 
-        public JobSystemStatusCommand() { }
-
         public override string Execute()
         {
-            /*
             jobTable = new ConsoleTable(tableTitle);
             tableTitle = jobTable.FormatStringArray(tableTitle);
 
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("MadJobSystem v" + MadComponents.components.jobSystem.version);
-            Console.ForegroundColor = MadComponents.components.cli.textColor;
-            Console.WriteLine();
-            Console.WriteLine("Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count);
-            Console.WriteLine("Jobs active:      " + MadComponents.components.jobSystem.JobsActive());
-            Console.WriteLine("Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive());
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            jobTable.WriteColumnes(tableTitle);
-            Console.WriteLine();
-            Console.WriteLine(jobTable.splitline);
-            Console.ForegroundColor = MadComponents.components.cli.textColor;
+            output += "MadJobSystem v" + MadComponents.components.jobSystem.version + "\n\n";
+            output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
+            output += "Jobs active:      " + MadComponents.components.jobSystem.JobsActive() + "\n";
+            output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n";
+            output += jobTable.WriteColumnes(tableTitle) + "\n";
+            output += jobTable.splitline + "\n";
 
             foreach (Job job in MadComponents.components.jobSystem.jobs)
             {
@@ -41,13 +30,18 @@ namespace MAD
                 array[4] = job.jobOptions.targetAddress.ToString();
                 array[5] = job.jobOptions.delay.ToString();
                 array[6] = job.jobOutput;
+
+                // format the string array
                 array = jobTable.FormatStringArray(array);
 
-                jobTable.WriteColumnes(array);
-                Console.WriteLine();
-            }
+                // add the string array to output
 
-            Console.WriteLine();*/
+                foreach (string temp in array)
+                {
+                    output += temp;
+                    output += " ";
+                }
+            }
 
             return output;
         }

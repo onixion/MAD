@@ -5,13 +5,6 @@ namespace MAD
 {
     public class MadComponents
     {
-        private MadComponents()
-        {
-            // default constructors
-            jobSystem = new JobSystem();
-            cliServer = new CLIServer(999);
-        }
-
         private static MadComponents _components;
         public static MadComponents components
         {
@@ -28,9 +21,20 @@ namespace MAD
         //     GLOBAL OBJECTS
         // ----------------------------------
 
-        public Version version = new Version(0, 5, 1500);
+        public Version version = new Version(0, 5, 3500);
 
         public CLIServer cliServer;
         public JobSystem jobSystem;
+
+        // ----------------------------------
+        //     DEFAULT CONSTRUCTORS
+        // ----------------------------------
+
+        private MadComponents()
+        {
+            jobSystem = new JobSystem();
+            cliServer = new CLIServer(999);
+        }
+
     }
 }
