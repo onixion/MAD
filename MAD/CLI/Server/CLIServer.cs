@@ -9,7 +9,7 @@ namespace MAD
 {
     public class CLIServer : SocketServer
     {
-        private string cryptoKey = "123456";
+        // private string cryptoKey = "123456";
         private string secureKey = "123456";
 
         private List<CLIUser> users;

@@ -1,100 +1,109 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Net;
+using System.Collections.Generic;
 
 namespace MAD
 {
     public abstract class Command
     {
+        #region members
+
         public List<ParameterOption> requiredParameter = new List<ParameterOption>();
         public List<ParameterOption> optionalParameter = new List<ParameterOption>();
 
         public ParameterInput parameters;
-
         public string output = "";
 
-        /// <summary>
-        /// Set parameters of the command.
-        /// </summary>
+        #endregion
+
+        #region methodes
+
         public void SetParameters(ParameterInput parameters)
         {
             this.parameters = parameters;
         }
 
-        /// <summary>
-        /// Check if parameter exist for the command.
-        /// </summary>
         public bool ParameterExists(Parameter parameter)
         {
             foreach (ParameterOption temp in requiredParameter)
+            {
                 if (temp.indicator == parameter.indicator)
+                {
                     return true;
+                }
+            }
 
             foreach (ParameterOption temp in optionalParameter)
+            {
                 if (temp.indicator == parameter.indicator)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
 
-        /// <summary>
-        /// Check if a required parameter exist for the command.
-        /// </summary>
         public bool RequiredParameterExist(Parameter parameter)
         {
             foreach (ParameterOption temp in requiredParameter)
+            {
                 if (temp.indicator == parameter.indicator)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
 
-        /// <summary>
-        /// Check if an optioanl parameter exist for the command.
-        /// </summary>
         public bool OptionalParameterExist(Parameter parameter)
         {
             foreach (ParameterOption temp in optionalParameter)
+            {
                 if (temp.indicator == parameter.indicator)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
 
-        /// <summary>
-        /// Check if a optional parameter is used.
-        /// </summary>
         public bool OptionalParameterUsed(string indicator)
         {
             foreach (Parameter temp in parameters.parameters)
+            {
                 if ((string)temp.indicator == indicator)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
 
-        /// <summary>
-        /// Get the argument type.
-        /// </summary>
         public Type GetArgumentType(string indicator)
         {
             foreach (ParameterOption temp in requiredParameter)
+            {
                 if (temp.indicator == indicator)
+                {
                     return temp.argumentType;
+                }
+            }
 
             foreach (ParameterOption temp in optionalParameter)
+            {
                 if (temp.indicator == indicator)
+                {
                     return temp.argumentType;
+                }
+            }
 
             return null;
         }
 
-        /// <summary>
-        /// Check if the given parameters are valid for the command.
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <returns></returns>
         public string ValidParameters(ParameterInput parameters)
         {
             int requiredArgsFound = 0;
@@ -111,7 +120,9 @@ namespace MAD
 
                 // if the given arg is a required arg increase requiredArgsFound
                 if (RequiredParameterExist(temp))
+                {
                     requiredArgsFound++;
+                }
 
                 // check if the given args can have a value or not
                 if (GetParameterOptions(temp.indicator).argumentEmpty)
@@ -151,13 +162,15 @@ namespace MAD
                 return "Some required parameters are missing! Type 'help' to see full commands.";
             }
 
-            return "VALID_PARAMETER_YES";
+            return "VALID_PARAMETER";
         }
 
-        /// <summary>
-        /// Convert argument (string) to the needed type and return it.
-        /// (this method can only parse Int32, String and IPAddress)
-        /// </summary>
+        /* The method 'Convert' can only parse object to: 
+         * 
+         *  System.Int32
+         *  System.String
+         *  System.Net.IPAddress
+         */
         private object Convert(string value, Type convertType)
         {
             try
@@ -180,25 +193,30 @@ namespace MAD
             }
         }
 
-        /// <summary>
-        /// Get a ParameterOptions object from a specific parameter.
-        /// </summary>
         public ParameterOption GetParameterOptions(string indicator)
         {
             foreach (ParameterOption temp in requiredParameter)
+            {
                 if (temp.indicator == indicator)
+                {
                     return temp;
+                }
+            }
 
             foreach (ParameterOption temp in optionalParameter)
+            {
                 if (temp.indicator == indicator)
+                {
                     return temp;
+                }
+            }
 
             return null;
         }
 
-        /// <summary>
-        /// This abstract method will be executed every cycle (=delayTime).
-        /// </summary>
+        // This abstract method will be executed every cycle (=delayTime).
         public abstract string Execute();
+
+        #endregion
     }
 }

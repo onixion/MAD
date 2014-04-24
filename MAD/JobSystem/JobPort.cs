@@ -6,15 +6,22 @@ namespace MAD
 {
     class JobPort : Job
     {
+        #region members
+
         public JobPortOptions portJobOptions;
         private Socket socket;
+
+        #endregion
 
         public JobPort(JobPortOptions portJobOptions)
         {
             InitJob();
+
             this.portJobOptions = portJobOptions;
             this.jobOptions = (JobOptions) portJobOptions;
         }
+
+        #region methodes
 
         public override void DoJob()
         {
@@ -35,12 +42,14 @@ namespace MAD
 
         public override string JobStatus()
         {
-            string temp = base.JobStatus();
+            string buffer = base.JobStatus();
 
-            temp += "PORT:      " + portJobOptions.port + "\n";
+            buffer += "PORT:      " + portJobOptions.port + "\n";
 
-            return temp;
+            return buffer;
         }
+
+        #endregion
     }
 }
 

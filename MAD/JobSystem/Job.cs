@@ -1,24 +1,51 @@
 ﻿using System;
-using System.Threading;
 using System.Net;
+using System.Threading;
 
 namespace MAD
 {
     public abstract class Job
     {
+        #region members
+
         public JobOptions jobOptions;
-        private Thread jobThread;
 
         private static int jobsCount = 0;
         public int jobID;
         public string jobOutput = "";
 
-        public abstract void DoJob();
+        private Thread jobThread;
+        public bool threadRunning = false;
+
+        #endregion
+
+        #region methodes
 
         public void InitJob()
         {
+            // get job-ID
             jobID = jobsCount;
             jobsCount++;
+
+            // init workerthread
+            jobThread = new Thread(WorkerThread);
+        }
+
+        public void Start()
+        {
+            if (!threadRunning)
+            {
+                threadRunning = true;
+                jobThread.Start();
+            }
+        }
+
+        public void Stop()
+        {
+            if (threadRunning)
+            {
+                threadRunning = false;
+            }
         }
 
         public void WorkerThread()
@@ -27,54 +54,34 @@ namespace MAD
             {
                 DoJob();
                 Wait();
+
+                if (threadRunning)
+                    break;
             }
         }
 
-        public void Start()
-        {
-            if (jobThread == null)
-            {
-                jobThread = new Thread(new ThreadStart(WorkerThread));
-                jobThread.Start();
-            }
-        }
-
-        public void Stop()
-        {
-            if (jobThread != null)
-            {
-                jobThread.Abort();
-                jobThread.Join();
-                jobThread = null;
-            }
-        }
+        public abstract void DoJob();
 
         public void Wait()
         {
             Thread.Sleep(jobOptions.delay);
         }
 
-        public bool IsActive()
-        {
-            if (jobThread == null)
-                return false;
-            else
-                return true;
-        }
-
         public virtual string JobStatus()
         {
-            string temp = "";
+            string buffer = "";
 
-            temp += "JOB-ID:    " + jobID + "\n";
-            temp += "NAME:      " + jobOptions.jobName + "\n";
-            temp += "TYPE:      " + jobOptions.jobType.ToString() + "\n";
-            temp += "ADDRESS:   " + jobOptions.targetAddress + "\n";
-            temp += "DELAYTIME: " + jobOptions.delay + "\n";
-            temp += "ACITIVE:   " + IsActive().ToString() + "\n";
-            temp += "OUTPUT:    " + jobOutput + "\n";
+            buffer += "JOB-ID:    " + jobID + "\n";
+            buffer += "NAME:      " + jobOptions.jobName + "\n";
+            buffer += "TYPE:      " + jobOptions.jobType.ToString() + "\n";
+            buffer += "ADDRESS:   " + jobOptions.targetAddress + "\n";
+            buffer += "DELAYTIME: " + jobOptions.delay + "\n";
+            buffer += "ACITIVE:   " + threadRunning.ToString() + "\n";
+            buffer += "OUTPUT:    " + jobOutput + "\n";
 
-            return temp;
+            return buffer;
         }
+
+        #endregion
     }
 }

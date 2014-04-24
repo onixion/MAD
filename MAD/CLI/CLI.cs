@@ -44,9 +44,7 @@ namespace MAD
             {
                 // GENERAL COMMANDS
                 new CommandOptions("help", typeof(HelpCommand)),
-                new CommandOptions("exit", typeof(ExitCommand)),
-                new CommandOptions("close", typeof(ExitCommand)),
-                new CommandOptions("versions", typeof(VersionsCommand)),
+                new CommandOptions("versions", typeof(VersionCommand)),
                 new CommandOptions("info", typeof(InfoCommand)),
                 new CommandOptions("cursor", typeof(CursorCommand)),
 
@@ -104,7 +102,7 @@ namespace MAD
                             // check if the arguments are valid (string = VALID_PARAMETER_YES)
                             parameterValid = command.ValidParameters(parameterInput);
 
-                            if (parameterValid == "VALID_PARAMETER_YES")
+                            if (parameterValid == "VALID_PARAMETER")
                             {
                                 // set command parameters 
                                 command.SetParameters(parameterInput);

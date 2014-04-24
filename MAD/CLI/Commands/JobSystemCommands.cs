@@ -5,8 +5,8 @@ namespace MAD
 {
     public class JobSystemStatusCommand : Command
     {
-        ConsoleTable jobTable;
-        string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
+        private ConsoleTable jobTable;
+        private string[] tableTitle = new string[] { "ID", "Name", "Type", "Active", "IP-Address", "Delay", "Output" };
 
         public override string Execute()
         {
@@ -16,7 +16,7 @@ namespace MAD
             output += "MadJobSystem v" + MadComponents.components.jobSystem.version + "\n\n";
             output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
             output += "Jobs active:      " + MadComponents.components.jobSystem.JobsActive() + "\n";
-            output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n";
+            output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n\n";
             output += jobTable.WriteColumnes(tableTitle) + "\n";
             output += jobTable.splitline + "\n";
 
@@ -26,7 +26,7 @@ namespace MAD
                 array[0] = job.jobID.ToString();
                 array[1] = job.jobOptions.jobName;
                 array[2] = job.jobOptions.jobType.ToString();
-                array[3] = job.IsActive().ToString();
+                array[3] = job.threadRunning.ToString();
                 array[4] = job.jobOptions.targetAddress.ToString();
                 array[5] = job.jobOptions.delay.ToString();
                 array[6] = job.jobOutput;
@@ -35,7 +35,6 @@ namespace MAD
                 array = jobTable.FormatStringArray(array);
 
                 // add the string array to output
-
                 foreach (string temp in array)
                 {
                     output += temp;

@@ -1,88 +1,52 @@
 ﻿using System;
-using System.Net;
 
 namespace MAD
 {
     class HelpCommand : Command
     {
-        public HelpCommand() {}
-
         public override string Execute()
         {
-            output = " <---- H E L P ---- P A G E ---->\n";
-            
-            /*Console.WriteLine();
-            Headline(" <-- General commands -->");
-            Console.WriteLine();
-            Console.WriteLine(" > help                      print this help page");
-            Console.WriteLine(" > versions                  show versions");
-            Console.WriteLine(" > clear                     clear console");
-            Console.WriteLine(" > logo                      print the MAD logo");
-            Console.WriteLine(" > exit/close                exit program");
-            Console.WriteLine(" > info                      informations about the program");
-            Console.WriteLine(" > cursor -t <NEW CURSOR>    change the CLI cursor");
-            Console.WriteLine(" > gui                       start the GUI (NIY)");                
-            Console.WriteLine();
-            Headline(" <-- MadJobSystem commands -->");
-            Console.WriteLine();
-            Console.WriteLine(" > jobsystem status          status of the job-system");
-            Console.WriteLine(" > job status [-id <ID>]     status of the jobs");
-            Console.WriteLine(" > job add ping -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -ttl <TTL>");
-            Console.WriteLine("                             add a ping-job");
-            Console.WriteLine(" > job add http -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -p <PORT>");
-            Console.WriteLine("                             add a http-job");
-            Console.WriteLine(" > job add port -n <JOB NAME> -ip <IPADDRESS> -d <DELAY> -p <PORT>");
-            Console.WriteLine("                             add a port-job");
-            Console.WriteLine(" > job remove -id <JOB ID>   remove a job");
-            Console.WriteLine(" > job start -id <JOB ID>    start a job");
-            Console.WriteLine(" > job stop -id <JOB ID>     stop a job");
-            Console.WriteLine();
-            Headline(" <-- MadMemoryManagmentSystem commands -->");
-            Console.WriteLine();
-            Headline(" <-- MadNotificationSystem commands -->");
-            Console.WriteLine();
-            StartEndHeadline(" <---- E N D ---->");
-            Console.WriteLine();*/
-
-            return output;
-        }
-
-
-    }
-
-    class ExitCommand : Command
-    {
-        public ExitCommand() {}
-
-        public override string Execute()
-        {
-            Environment.Exit(0);
+            output += " <---- H E L P ---- P A G E ---->\n\n";
+            output += " <-- General commands -->\n\n";
+            output += " > help                      print this help page\n";
+            output += " > server-version            show server version\n";
+            output += " > info                      informations about the cli-server\n";
+            output += " > DISCONNECT                disconnect from server\n"; 
+            output += " > cursor -t <NEW CURSOR>    change the CLI cursor\n\n";
+            output += " <-- MadJobSystem commands -->\n";
+            output += " > jobsystem status          status of the job-system\n";
+            output += " > job status [-id <ID>]     status of the jobs\n";
+            output += " > job add ping -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-ttl <TTL>]\n";
+            output += "                             add a ping-job\n";
+            output += " > job add http -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
+            output += "                             add a http-job\n";
+            output += " > job add port -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
+            output += "                             add a port-job\n";
+            output += " > job remove -id <JOB ID>   remove a job\n";
+            output += " > job start -id <JOB ID>    start a job\n";
+            output += " > job stop -id <JOB ID>     stop a job\n";
+            output += " <-- MadMemoryManagmentSystem commands -->\n";
+            output += " <-- MadNotificationSystem commands -->\n";
+            output += " <---- E N D ---->\n";
 
             return output;
         }
     }
 
-    class VersionsCommand : Command
+    class VersionCommand : Command
     {
-        public VersionsCommand() {}
-
         public override string Execute()
         {
-            output += "Mad-Project                  VERSION " + MadComponents.components.version + "\n";
-            output += "MadNotificationSystem        VERSION " + "unknown\n";
-            output += "MadJobSystem                 VERSION " + MadComponents.components.jobSystem.version + "\n";
-            output += "MadMemoryManagmentSysystem   VERSION " + "unknown\n";
-
+            output += "CLI-SERVER VERSION " + MadComponents.components.cliServer.version;
             return output;
         }
     }
 
     class InfoCommand : Command
     {
-        public InfoCommand() { }
-
         public override string Execute()
         {
+            output += "INFO TEXT COMING SOON";
             return output;
         }
     }
