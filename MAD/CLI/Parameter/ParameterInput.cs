@@ -5,12 +5,7 @@ namespace MAD
 {
     public class ParameterInput
     {
-        public List<Parameter> parameters;
-
-        public ParameterInput()
-        {
-            parameters = new List<Parameter>();
-        }
+        public List<Parameter> parameters = new List<Parameter>();
 
         public Parameter GetParameter(string indicator)
         {

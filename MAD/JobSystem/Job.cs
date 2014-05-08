@@ -8,14 +8,14 @@ namespace MAD
     {
         #region members
 
-        public JobOptions jobOptions;
-
         private static int jobsCount = 0;
         public int jobID;
-        public string jobOutput = "";
 
+        public JobOptions jobOptions;
         private Thread jobThread;
-        public bool threadRunning = false;
+        public bool threadStopRequest = false;
+
+        public string jobOutput = "";
 
         #endregion
 
@@ -23,7 +23,7 @@ namespace MAD
 
         public void InitJob()
         {
-            // get job-ID
+            // set job-ID
             jobID = jobsCount;
             jobsCount++;
 
@@ -33,18 +33,18 @@ namespace MAD
 
         public void Start()
         {
-            if (!threadRunning)
+            if (!threadStopRequest)
             {
-                threadRunning = true;
+                threadStopRequest = true;
                 jobThread.Start();
             }
         }
 
         public void Stop()
         {
-            if (threadRunning)
+            if (threadStopRequest)
             {
-                threadRunning = false;
+                threadStopRequest = false;
             }
         }
 
@@ -55,7 +55,7 @@ namespace MAD
                 DoJob();
                 Wait();
 
-                if (threadRunning)
+                if (threadStopRequest)
                     break;
             }
         }
@@ -76,7 +76,7 @@ namespace MAD
             buffer += "TYPE:      " + jobOptions.jobType.ToString() + "\n";
             buffer += "ADDRESS:   " + jobOptions.targetAddress + "\n";
             buffer += "DELAYTIME: " + jobOptions.delay + "\n";
-            buffer += "ACITIVE:   " + threadRunning.ToString() + "\n";
+            buffer += "ACITIVE:   " + threadStopRequest.ToString() + "\n";
             buffer += "OUTPUT:    " + jobOutput + "\n";
 
             return buffer;

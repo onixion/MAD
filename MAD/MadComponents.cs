@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 namespace MAD
 {
@@ -30,7 +29,8 @@ namespace MAD
 
         private MadComponents()
         {
-            jobSystem = new JobSystem();
+            // init components
+            jobSystem = new JobSystem("data");
             cliServer = new CLIServer(999);
         }
 

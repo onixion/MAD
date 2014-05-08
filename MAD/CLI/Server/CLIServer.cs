@@ -9,8 +9,8 @@ namespace MAD
 {
     public class CLIServer : SocketServer
     {
-        // private string cryptoKey = "123456";
-        private string secureKey = "123456";
+        private string cryptoKey = "asdf";
+        private string secureKey = "1234";
 
         private List<CLIUser> users;
 

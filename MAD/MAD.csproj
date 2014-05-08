@@ -39,9 +39,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\Server\CLIServer.cs" />
-    <Compile Include="CLI\Parameter.cs" />
-    <Compile Include="CLI\ParameterInput.cs" />
-    <Compile Include="CLI\ParameterOption.cs" />
+    <Compile Include="CLI\Parameter\Parameter.cs" />
+    <Compile Include="CLI\Parameter\ParameterInput.cs" />
+    <Compile Include="CLI\Parameter\ParameterOption.cs" />
     <Compile Include="CLI\Server\CLIUser.cs" />
     <Compile Include="CLI\Commands\Command.cs" />
     <Compile Include="CLI\Commands\CommandOptions.cs" />

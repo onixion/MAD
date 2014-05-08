@@ -15,7 +15,7 @@ namespace MAD
             // KEEP THIS METHOD HERE CLEAN. THANKS!
             
             // start CLI-server on port 999
-            MadComponents.components.cliServer.Start();
+            //MadComponents.components.cliServer.Start();
         }
     }
 }

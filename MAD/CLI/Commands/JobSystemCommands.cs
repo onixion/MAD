@@ -26,7 +26,7 @@ namespace MAD
                 array[0] = job.jobID.ToString();
                 array[1] = job.jobOptions.jobName;
                 array[2] = job.jobOptions.jobType.ToString();
-                array[3] = job.threadRunning.ToString();
+                array[3] = job.threadStopRequest.ToString();
                 array[4] = job.jobOptions.targetAddress.ToString();
                 array[5] = job.jobOptions.delay.ToString();
                 array[6] = job.jobOutput;

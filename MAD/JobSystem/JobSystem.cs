@@ -9,13 +9,16 @@ namespace MAD
         #region members
 
         public Version version = new Version(1, 0);
-        public List<Job> jobs;
+        public List<Job> jobs = new List<Job>();
+
+        public readonly string dataPath;
 
         #endregion
 
-        public JobSystem()
-        { 
-            jobs = new List<Job>();
+        public JobSystem(string dataPath)
+        {
+            this.dataPath = dataPath;
+            // check dir exist and create ...
         }
 
         #region methodes
@@ -48,9 +51,7 @@ namespace MAD
 
         public void CreateJob(JobOptions jobOptions)
         {
-            int jobType = (int)jobOptions.jobType;
-
-            switch (jobType)
+            switch ((int)jobOptions.jobType)
             {
                 case 0: // PING REQUEST
                     jobs.Add(new JobPing((JobPingOptions)jobOptions));
@@ -70,7 +71,7 @@ namespace MAD
             {
                 if (jobs[i].jobID == jobID)
                 {
-                    if (jobs[i].threadRunning)
+                    if (jobs[i].threadStopRequest)
                     {
                         jobs[i].Stop();
                         jobs.RemoveAt(i);
@@ -89,7 +90,7 @@ namespace MAD
         {
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (!jobs[i].threadRunning)
+                if (!jobs[i].threadStopRequest)
                 {
                     jobs.RemoveAt(i);
                 }
@@ -131,7 +132,7 @@ namespace MAD
 
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (jobs[0].threadRunning)
+                if (jobs[0].threadStopRequest)
                 {
                     count++;
                 }
@@ -146,7 +147,7 @@ namespace MAD
 
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (!jobs[0].threadRunning)
+                if (!jobs[0].threadStopRequest)
                 {
                     count++;
                 }
