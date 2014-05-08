@@ -60,8 +60,11 @@ namespace SocketFramework
         {
             while (true)
             {
-                serverSocket.BeginAccept(new AsyncCallback(HandleClientInternal), serverSocket);
+                //serverSocket.BeginAccept(new AsyncCallback(HandleClientInternal), serverSocket);
 
+                Socket socket = serverSocket.Accept();
+
+                threadPool.QueueWorkItem(HandleClient, socket);
                 clientConnect.WaitOne();
                 clientConnect.Reset();
 
