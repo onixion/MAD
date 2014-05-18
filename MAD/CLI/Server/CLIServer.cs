@@ -12,21 +12,25 @@ namespace MAD
         private string cryptoKey = "asdf";
         private string secureKey = "1234";
 
+        public string dataPath;
+
         private List<CLIUser> users;
 
-        public CLIServer(int port)
+        public CLIServer(string dataPath, int port)
         {
+            this.dataPath = dataPath;
+
             InitSocketServer(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), new IPEndPoint(IPAddress.Loopback, port));
             InitCLIUsers();
         }
 
         public override void HandleClient(Socket socket)
         {
-            // get ip from client
+            // get ip-endpoint from client
             IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
 
             // log request to console
-            Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") connected ...");
+            Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") connected.");
 
             // reveive sercurePass
             string receivedSecurePass = Receive(socket);
@@ -39,7 +43,7 @@ namespace MAD
             // reveive passwordMD5
             string passwordMD5 = Receive(socket);
 
-            if (CheckSecureKey(secureKey))
+            if (this.secureKey == receivedSecurePass)
             {
                 if (CheckUsernameAndPassword(username, passwordMD5))
                 {
@@ -60,6 +64,7 @@ namespace MAD
                             CLI cli = new CLI(socket);
                             cli.Start();
                             break;
+                        // other modes ...
 
                         default:
                             Send(socket, "MODE_UNKNOWN");
@@ -92,8 +97,12 @@ namespace MAD
         public bool UserExist(string username)
         {
             foreach (CLIUser temp in users)
+            {
                 if (temp.username == username)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -101,8 +110,12 @@ namespace MAD
         public CLIUser GetUser(string username)
         {
             foreach (CLIUser temp in users)
+            {
                 if (temp.username == username)
+                {
                     return temp;
+                }
+            }
 
             return null;
         }
@@ -111,26 +124,21 @@ namespace MAD
 
         #region Security
 
-        private bool CheckSecureKey(string secureKey)
-        {
-            if (this.secureKey == secureKey)
-                return true;
-            else
-                return false;
-        }
-
         private bool CheckUsernameAndPassword(string username, string passwordMD5)
         {
             // get user (if user does not exist: client = null)
             CLIUser client = GetUser(username);
 
-            // check if user exist
+            // check username
             if (client != null)
             {
                 // check password
                 if (client.passwordMD5 == passwordMD5)
+                {
                     return true;
+                }
             }
+
             return false;
         }
 
