@@ -38,13 +38,15 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\CLI.cs" />
+    <Compile Include="CLI\CLIFramework.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Parameter\Parameter.cs" />
     <Compile Include="CLI\Parameter\ParameterInput.cs" />
     <Compile Include="CLI\Parameter\ParameterOption.cs" />
-    <Compile Include="CLI\Server\CLIUser.cs" />
-    <Compile Include="CLI\Commands\Command.cs" />
-    <Compile Include="CLI\Commands\CommandOptions.cs" />
+    <Compile Include="CLI\CLIUser.cs" />
+    <Compile Include="CLI\Command\Command.cs" />
+    <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobHttp.cs" />
@@ -57,7 +59,7 @@
     <Compile Include="MadComponents.cs" />
     <Compile Include="JobSystem\JobSystem.cs" />
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
-    <Compile Include="CLI\CLI.cs" />
+    <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

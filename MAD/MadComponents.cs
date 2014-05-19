@@ -1,4 +1,5 @@
 ﻿using System;
+using MAD.CLI;
 
 namespace MAD
 {
@@ -22,6 +23,7 @@ namespace MAD
 
         public const string dataPath = "data";
 
+        public CLI.CLI cli;
         public CLIServer cliServer;
         public JobSystem jobSystem;
 
@@ -33,13 +35,12 @@ namespace MAD
         {
             // create data-path
             if (System.IO.Directory.Exists(dataPath))
-            {
                 System.IO.Directory.CreateDirectory(dataPath);
-            }
 
             // init components
+            cli = new CLI.CLI(dataPath);
             jobSystem = new JobSystem(dataPath);
-            cliServer = new CLIServer(dataPath, 999);
+            //cliServer = new CLIServer(dataPath, 999);
         }
 
         // ----------------------------------

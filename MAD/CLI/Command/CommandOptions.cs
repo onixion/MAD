@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace MAD
+namespace MAD.CLI
 {
     public class CommandOptions
     {

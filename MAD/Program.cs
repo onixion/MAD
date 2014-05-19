@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using SocketFramework;
 
 namespace MAD
 {
@@ -16,6 +13,9 @@ namespace MAD
             
             // start CLI-server on port 999
             //MadComponents.components.cliServer.Start();
+
+            // start CLI
+            MadComponents.components.cli.Start();
         }
     }
 }

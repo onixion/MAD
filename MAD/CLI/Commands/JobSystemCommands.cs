@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace MAD
+namespace MAD.CLI
 {
     public class JobSystemStatusCommand : Command
     {

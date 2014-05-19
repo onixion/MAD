@@ -2,7 +2,7 @@
 using System.Net;
 using System.Collections.Generic;
 
-namespace MAD
+namespace MAD.CLI
 {
     public abstract class Command
     {

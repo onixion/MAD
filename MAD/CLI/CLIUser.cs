@@ -14,5 +14,7 @@ namespace MAD
             this.username = username;
             this.passwordMD5 = passwordMD5;
         }
+
+        // TODO: save/load users, groups (admin, ...)
     }
 }

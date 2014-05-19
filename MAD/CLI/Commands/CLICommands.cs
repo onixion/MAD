@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD
+namespace MAD.CLI
 {
     class HelpCommand : Command
     {
