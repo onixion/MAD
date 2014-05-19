@@ -66,12 +66,7 @@ namespace MAD.CLI
 
         protected string CLIInfo()
         { 
-            return "MAD-CLI (Version " + version + ") [" + GetTimeStamp() + "]\n";
-        }
-
-        protected string Cursor()
-        {
-            return "\n" + cursor;
+            return "MAD-CLI (Version " + version + ") \nSERVER-TIME: " + GetTimeStamp();
         }
 
         #endregion

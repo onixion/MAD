@@ -15,7 +15,7 @@ namespace MAD.CLI
             while (true)
             {
                 // print cursor
-                Console.Write(Cursor());
+                Console.Write(cursor);
 
                 // read input
                 cliInput = Console.ReadLine();

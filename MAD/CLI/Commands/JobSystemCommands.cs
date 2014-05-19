@@ -199,6 +199,8 @@ namespace MAD.CLI
 
     public class JobSystemRemoveCommand : Command
     {
+        Job job;
+
         public JobSystemRemoveCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -208,13 +210,19 @@ namespace MAD.CLI
         {
             int id = (int)parameters.GetParameter("id").value;
 
-            if (MadComponents.components.jobSystem.JobExist(id))
+            job = MadComponents.components.jobSystem.GetJob(id);
+
+            if (job != null)
             {
-                MadComponents.components.jobSystem.StopJob(id);
-                MadComponents.components.jobSystem.DestroyJob(id);
+                if (job.Active())
+                {
+                    MadComponents.components.jobSystem.StopJob(job);
+                }
+
+                MadComponents.components.jobSystem.DestroyJob(job.jobID);
             }
             else
-                output = "[FAIL] Job does not exist.";
+                output = "Job does not exist!";
 
             return output;
         }
@@ -222,6 +230,8 @@ namespace MAD.CLI
 
     public class JobSystemStartCommand : Command
     {
+        Job job;
+
         public JobSystemStartCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -230,13 +240,20 @@ namespace MAD.CLI
         public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").value;
+           
+            job = MadComponents.components.jobSystem.GetJob(id);
 
-            if (MadComponents.components.jobSystem.JobExist(id))
+            if (job != null)
             {
-                MadComponents.components.jobSystem.StartJob(id);
+                if (MadComponents.components.jobSystem.StartJob(job))
+                {
+                    output = "Job started.";
+                }
+                else
+                    output = "Job already running!";
             }
             else
-                output = "[FAIL] Job does not exist.";
+                output = "Job does not exist!";
 
             return output;
         }
@@ -244,6 +261,8 @@ namespace MAD.CLI
 
     public class JobSystemStopCommand : Command
     {
+        Job job;
+
         public JobSystemStopCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -253,12 +272,19 @@ namespace MAD.CLI
         {
             int id = (int)parameters.GetParameter("id").value;
 
-            if (MadComponents.components.jobSystem.JobExist(id))
+            job = MadComponents.components.jobSystem.GetJob(id);
+
+            if (job != null)
             {
-                MadComponents.components.jobSystem.StopJob(id);
+                if (MadComponents.components.jobSystem.StopJob(job))
+                {
+                    output = "Job started.";
+                }
+                else
+                    output = "Job already running!";
             }
             else
-                output = "[FAIL] Job does not exist.";
+                output = "Job does not exist!";
 
             return output;
         }

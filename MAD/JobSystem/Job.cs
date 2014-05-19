@@ -31,21 +31,34 @@ namespace MAD
             jobThread = new Thread(WorkerThread);
         }
 
-        public void Start()
+        public bool Start()
         {
             if (!threadStopRequest)
             {
                 threadStopRequest = true;
                 jobThread.Start();
+
+                return true;
             }
+
+            return false;
         }
 
-        public void Stop()
+        public bool Stop()
         {
             if (threadStopRequest)
             {
                 threadStopRequest = false;
+
+                return true;
             }
+
+            return false;
+        }
+
+        public bool Active()
+        {
+            return jobThread.IsAlive;
         }
 
         public void WorkerThread()

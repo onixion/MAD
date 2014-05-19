@@ -102,28 +102,14 @@ namespace MAD
             }
         }
 
-        public void StartJob(int jobID)
+        public bool StartJob(Job job)
         {
-            foreach (Job temp in jobs)
-            {
-                if (temp.jobID == jobID)
-                {
-                    temp.Start();
-                    break;
-                }
-            }
+            return job.Start();
         }
 
-        public void StopJob(int JobID)
+        public bool StopJob(Job job)
         {
-            foreach (Job temp in jobs)
-            {
-                if (temp.jobID == JobID)
-                {
-                    temp.Stop();
-                    break;
-                }
-            }
+            return job.Stop();
         }
 
         public int JobsActive()
