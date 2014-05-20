@@ -41,17 +41,17 @@ namespace MAD.CLI
             while (true)
             {
                 // reveive sercurePass
-                string receivedSecurePass = ssReceive(socket);
+                string receivedSecurePass = Receive(socket);
                 if (receivedSecurePass == null) { break; }
-                if (!ssSend(socket, "OK")) { break; }
+                if (!Send(socket, "OK")) { break; }
 
                 // reveive username
-                string username = ssReceive(socket);
+                string username = Receive(socket);
                 if (username == null) { break; }
-                if (!ssSend(socket, "OK")) { break; }
+                if (!Send(socket, "OK")) { break; }
 
                 // reveive passwordMD5
-                string passwordMD5 = ssReceive(socket);
+                string passwordMD5 = Receive(socket);
                 if (passwordMD5 == null) { break; }
 
                 if (this.secureKey == receivedSecurePass)
@@ -59,7 +59,7 @@ namespace MAD.CLI
                     if (CheckUsernameAndPassword(username, passwordMD5))
                     {
                         // client accepted
-                        if (!ssSend(socket, "ACCEPTED")) { break; }
+                        if (!Send(socket, "ACCEPTED")) { break; }
                         Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") has login as '" + username + "'.");
 
                         /* After the client login to the cli server,
@@ -67,7 +67,7 @@ namespace MAD.CLI
                          * For the default cli, he needs to send GET_CLI.
                          */
 
-                        string mode = ssReceive(socket);
+                        string mode = Receive(socket);
                         if (mode == null) { break; }
 
                         switch (mode)
@@ -78,26 +78,26 @@ namespace MAD.CLI
                             // other modes ...
 
                             default:
-                                ssSend(socket, "MODE_UNKNOWN");
+                                Send(socket, "MODE_UNKNOWN");
                                 break;
                         }
                     }
                     else
                     {
-                        ssSend(socket, "DENIED");
+                        Send(socket, "DENIED");
                         Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. Username or password wrong.");
                     }
                 }
                 else
                 {
-                    ssSend(socket, "DENIED");
+                    Send(socket, "DENIED");
                     Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
                 }
             }
 
             Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") disconnected.");
 
-            ssDisconnect(socket);
+            sDisconnect(socket, serverEndPoint);
             socket.Close();
         }
 

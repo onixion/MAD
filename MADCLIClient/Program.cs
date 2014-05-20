@@ -105,28 +105,28 @@ namespace CLIClient
                 CLIClient clientCLI = new CLIClient(new IPEndPoint(serverAddress, serverPort), secureKey, username, password);
 
                 // try connect
-                if (!clientCLI.ssConnect(clientCLI.serverSocket, clientCLI.serverEndPoint)) { break; }
+                if (!clientCLI.sConnect(clientCLI.serverSocket, clientCLI.serverEndPoint)) { break; }
 
                 if (clientCLI.serverSocket.Connected)
                 {
-                    if (!clientCLI.ssSend(clientCLI.serverSocket, clientCLI.securePass)) { break; }
+                    if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.securePass)) { break; }
 
-                    if (clientCLI.ssReceive(clientCLI.serverSocket) == "OK")
+                    if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
                     {
-                        if (!clientCLI.ssSend(clientCLI.serverSocket, clientCLI.username)) { break; }
+                        if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.username)) { break; }
 
-                        if (clientCLI.ssReceive(clientCLI.serverSocket) == "OK")
+                        if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
                         {
-                            if (!clientCLI.ssSend(clientCLI.serverSocket, clientCLI.passwordMD5)) { break; }
+                            if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.passwordMD5)) { break; }
 
-                            if (clientCLI.ssReceive(clientCLI.serverSocket) == "ACCEPTED")
+                            if (clientCLI.Receive(clientCLI.serverSocket) == "ACCEPTED")
                             {
                                 Console.WriteLine("LOGIN WAS SUCCESSFUL!");
                                 Console.WriteLine("Waiting for server ...");
 
-                                if (!clientCLI.ssSend(clientCLI.serverSocket, "GET_CLI")) { break; }
+                                if (!clientCLI.Send(clientCLI.serverSocket, "GET_CLI")) { break; }
 
-                                cliInput = clientCLI.ssReceive(clientCLI.serverSocket);
+                                cliInput = clientCLI.Receive(clientCLI.serverSocket);
 
                                 if(cliInput != null)
                                 if (cliInput != "MODE_UNKNOWN")
@@ -136,9 +136,9 @@ namespace CLIClient
                                     while (true)
                                     {
                                         cliInput = Console.ReadLine();
-                                        if (!clientCLI.ssSend(clientCLI.serverSocket, cliInput)) { break; }
+                                        if (!clientCLI.Send(clientCLI.serverSocket, cliInput)) { break; }
 
-                                        serverResponse = clientCLI.ssReceive(clientCLI.serverSocket);
+                                        serverResponse = clientCLI.Receive(clientCLI.serverSocket);
 
                                         if (serverResponse == "DISCONNECTED" || serverResponse == null)
                                             break;
@@ -161,8 +161,6 @@ namespace CLIClient
                                 Console.ReadKey();
                                 return 0;
                             }
-
-
                         }
                         else
                         {
@@ -186,7 +184,7 @@ namespace CLIClient
 
 
                 Console.WriteLine("Disconnecting ...");
-                clientCLI.ssDisconnect(clientCLI.serverSocket);
+                clientCLI.sDisconnect(clientCLI.serverSocket, clientCLI.serverEndPoint);
 
                 Console.WriteLine("Closing socket ...");
                 clientCLI.serverSocket.Close();

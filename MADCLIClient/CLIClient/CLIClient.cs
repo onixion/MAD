@@ -19,15 +19,10 @@ namespace CLIClient
             // init socketClient
             InitSocketClient(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), serverEndPoint);
 
+            this.securePass = securePass;
             this.username = username;
             this.passwordMD5 = Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes(password)));
             this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
-
-        private byte[] GetMD5Hash(byte[] data)
-        {
-            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5CryptoServiceProvider.Create();
-            return md5.ComputeHash(data);
-        } 
     }
 }

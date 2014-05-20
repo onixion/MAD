@@ -55,7 +55,7 @@ namespace SocketFramework
             if (listenerThread != null)
             {
                 serverStopRequest = true;
-                clientConnect.Set();
+                done.Set();
                 listenerThread.Join();
                 listenerThread = null;
 
@@ -68,7 +68,7 @@ namespace SocketFramework
             while (true)
             {
                 serverSocket.BeginAccept(new AsyncCallback(HandleClientInternal), serverSocket);
-                clientConnect.WaitOne();
+                done.WaitOne();
 
                 if (serverStopRequest)
                 {
@@ -80,7 +80,7 @@ namespace SocketFramework
 
         private void HandleClientInternal(IAsyncResult result)
         {
-            clientConnect.Set();
+            done.Set();
             Socket client = (Socket)result.AsyncState;
 
             // add client to ThreadPool

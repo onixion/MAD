@@ -10,13 +10,39 @@ namespace SocketFramework
     {
         public Version version = new Version(3, 0);
 
+        /*
         public AutoResetEvent clientConnect = new AutoResetEvent(false);
         public AutoResetEvent clientDisconnect = new AutoResetEvent(false);
         public AutoResetEvent sendDone = new AutoResetEvent(false);
         public AutoResetEvent receiveDone = new AutoResetEvent(false);
+        */
 
-        public int sendTimeout = 5000;
-        public int receiveTimeout = 5000;
+        public AutoResetEvent done = new AutoResetEvent(false);
+
+        public Thread connectionCheck;
+        public bool checkConnectionStop = false;
+
+        private void CheckConnection(object socket)
+        {
+            Socket temp = (Socket)socket;
+
+            while (true)
+            {
+                if (checkConnectionStop == true)
+                {
+                    checkConnectionStop = false;
+                    break;
+                }
+
+                if (!temp.Connected)
+                {
+                    done.Set();
+                    break;
+                }
+
+                Thread.Sleep(200);
+            }
+        }
 
         #region Connect methodes
 
@@ -25,13 +51,12 @@ namespace SocketFramework
             try
             {
                 socket.BeginConnect(serverEndPoint, new AsyncCallback(sConnectCallback), socket);
-                clientConnect.WaitOne();
+                done.WaitOne();
 
                 return true;
             }
             catch (Exception)
             {
-                clientConnect.Reset();
                 return false;
             }
         }
@@ -48,7 +73,7 @@ namespace SocketFramework
             {
             }
 
-            clientConnect.Set();
+            done.Set();
         }
 
         public bool sDisconnect(Socket socket, IPEndPoint serverEndPoint)
@@ -56,13 +81,12 @@ namespace SocketFramework
             try
             {
                 socket.BeginDisconnect(true, new AsyncCallback(sDisconnectCallback), socket);
-                clientDisconnect.WaitOne();
+                done.WaitOne();
 
                 return true;
             }
             catch (Exception)
             {
-                clientDisconnect.Reset();
                 return false;
             }
         }
@@ -79,7 +103,7 @@ namespace SocketFramework
             {
             }
    
-            clientDisconnect.Set();
+            done.Set();
         }
 
         #endregion
@@ -88,35 +112,56 @@ namespace SocketFramework
 
         public bool Send(Socket socket, string text)
         {
+            connectionCheck = new Thread(new ParameterizedThreadStart(CheckConnection));
+            connectionCheck.Start(socket);
+
+            SendObject sendObject = new SendObject();
+            sendObject.sendSocket = socket;
+
             try
             {
-                byte[] data = Encoding.ASCII.GetBytes(text + "<EOF>");
+                byte[] data = Encoding.ASCII.GetBytes(text);
 
-                socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), socket);
-                sendDone.WaitOne();
+                socket.BeginSend(data, 0, data.Length, SocketFlags.None, new AsyncCallback(SendCallback), sendObject);
 
-                sendDone.Reset();
+                // wait for Callback or Client-Disconnect
+                done.WaitOne();
+
+                // stop checking connection of client
+                checkConnectionStop = true;
+
                 return true;
             }
             catch (Exception)
             {
-                sendDone.Reset();
                 return false;
             }
         }
 
         private void SendCallback(IAsyncResult result)
         {
+            SendObject sendObject = (SendObject)result.AsyncState;
+
             try
             {
-                Socket temp = (Socket)result.AsyncState;
-                temp.EndSend(result);
+                int sendLength = sendObject.sendSocket.EndSend(result);
+
+                if (sendLength > 0)
+                {
+                    sendObject.sendSocket.BeginSend(sendObject.data, 0, sendObject.sendLengthParts, SocketFlags.None, new AsyncCallback(SendCallback), sendObject);
+                    done.WaitOne();
+                }
+
+                // send <EOF>
+                byte[] endSymbol = Encoding.ASCII.GetBytes("<EOF>");
+
+                sendObject.sendSocket.BeginSend(endSymbol, 0, endSymbol.Length, SocketFlags.None, new AsyncCallback(SendCallback), sendObject);
+                done.WaitOne();
             }
             catch (Exception)
-            {
-            }
+            { }
                 
-            sendDone.Set();
+            done.Set();
         }
 
         #endregion
@@ -125,20 +170,26 @@ namespace SocketFramework
 
         public string Receive(Socket socket)
         {
+            connectionCheck = new Thread(new ParameterizedThreadStart(CheckConnection));
+            connectionCheck.Start(socket);
+
             RecieveObject recieveObject = new RecieveObject();
             recieveObject.recieveSocket = socket;
 
             try
             {
                 socket.BeginReceive(recieveObject.readBytes, 0, recieveObject.readBytes.Length, 0, new AsyncCallback(ReceiveCallback), recieveObject);
-                receiveDone.WaitOne();
 
-                receiveDone.Reset();
+                // wait for Callback or Client-Disconnect
+                done.WaitOne();
+
+                // stop checking connection of client
+                checkConnectionStop = true;
+
                 return recieveObject.recievedDataString;
             }
             catch (Exception)
             {
-                receiveDone.Reset();
                 return null;
             }
         }
@@ -158,19 +209,29 @@ namespace SocketFramework
                     if (!recieveObject.recievedDataString.Contains("<EOF>"))
                     {
                         recieveObject.recieveSocket.BeginReceive(recieveObject.readBytes, 0, recieveObject.readBytes.Length, 0, new AsyncCallback(ReceiveCallback), recieveObject);
-                        receiveDone.WaitOne();
+                        done.WaitOne();
                     }
                     else
                         recieveObject.recievedDataString = recieveObject.recievedDataString.Replace("<EOF>", "");
                 }
             }
             catch (Exception)
-            {
+            { }
 
-            }
-
-                receiveDone.Set();
+            done.Set();
         }
+
+        #region sendObject
+
+        public class SendObject
+        {
+            public Socket sendSocket;
+
+            public int sendLengthParts = 1048;
+            public byte[] data;
+        }
+
+        #endregion
 
         #region revieveObject
 
@@ -195,9 +256,8 @@ namespace SocketFramework
 
         #endregion
 
-
         #region testing
-
+        /*
         public bool ssConnect(Socket socket, IPEndPoint serverEndpoint)
         {
             try
@@ -276,7 +336,7 @@ namespace SocketFramework
 
             return null;
         }
-
+        */
         #endregion
     }
 

@@ -142,14 +142,12 @@ namespace MAD.CLI
 
         #endregion
 
-        #region CLI Securtiy/TimeStamp
+        #region CLI TimeStamp
 
         protected string GetTimeStamp()
         {
             return DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
         }
-
-
 
         #endregion
     }

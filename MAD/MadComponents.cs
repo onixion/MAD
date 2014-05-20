@@ -1,6 +1,7 @@
 ﻿using System;
-using SocketFramework;
 using MAD.CLI;
+
+using SocketFramework;
 
 namespace MAD
 {
