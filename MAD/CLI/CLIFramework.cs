@@ -29,9 +29,6 @@ namespace MAD.CLI
         protected Command command;
         protected Type inputCommandType;
 
-        // cli usermanagement
-        protected List<CLIUser> users;
-
         #endregion
 
         #region CLI main methodes
@@ -141,62 +138,6 @@ namespace MAD.CLI
                 if (temp.command == command)
                     return temp.commandType;
             return null;
-        }
-
-        #endregion
-
-        #region CLI Usermanagment
-
-        public void InitCLIUsers()
-        {
-            users = new List<CLIUser>()
-            {
-                new CLIUser("admin", Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes("yolo"))))
-            };
-        }
-
-        public bool UserExist(string username)
-        {
-            foreach (CLIUser temp in users)
-            {
-                if (temp.username == username)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public CLIUser GetUser(string username)
-        {
-            foreach (CLIUser temp in users)
-            {
-                if (temp.username == username)
-                {
-                    return temp;
-                }
-            }
-
-            return null;
-        }
-
-        protected bool CheckLogin(string username, string passwordMD5)
-        {
-            // get user (if user does not exist: client = null)
-            CLIUser client = GetUser(username);
-
-            // check username
-            if (client != null)
-            {
-                // check password
-                if (client.passwordMD5 == passwordMD5)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         #endregion

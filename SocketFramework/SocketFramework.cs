@@ -8,12 +8,12 @@ namespace SocketFramework
 {
     public abstract class SocketFramework
     {
-        public Version version = new Version(2, 9);
+        public Version version = new Version(3, 0);
 
-        public ManualResetEvent clientConnect = new ManualResetEvent(false);
-        public ManualResetEvent clientDisconnect = new ManualResetEvent(false);
-        public ManualResetEvent sendDone = new ManualResetEvent(false);
-        public ManualResetEvent receiveDone = new ManualResetEvent(false);
+        public AutoResetEvent clientConnect = new AutoResetEvent(false);
+        public AutoResetEvent clientDisconnect = new AutoResetEvent(false);
+        public AutoResetEvent sendDone = new AutoResetEvent(false);
+        public AutoResetEvent receiveDone = new AutoResetEvent(false);
 
         #region Connect methodes
 
@@ -24,7 +24,6 @@ namespace SocketFramework
                 socket.BeginConnect(serverEndPoint, new AsyncCallback(sConnectCallback), socket);
                 clientConnect.WaitOne();
 
-                clientConnect.Reset();
                 return true;
             }
             catch (Exception)
@@ -56,7 +55,6 @@ namespace SocketFramework
                 socket.BeginDisconnect(true, new AsyncCallback(sDisconnectCallback), socket);
                 clientDisconnect.WaitOne();
 
-                clientDisconnect.Reset();
                 return true;
             }
             catch (Exception)
@@ -195,5 +193,5 @@ namespace SocketFramework
         #endregion
     }
 
-
+    public class SocketFrameworkNode : SocketFramework { }
 }
