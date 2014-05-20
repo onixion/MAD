@@ -149,11 +149,7 @@ namespace MAD.CLI
             return DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
         }
 
-        protected byte[] GetMD5Hash(byte[] data)
-        {
-            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5CryptoServiceProvider.Create();
-            return md5.ComputeHash(data);
-        }
+
 
         #endregion
     }

@@ -11,7 +11,7 @@ namespace MAD.CLI
         private readonly string dataPath;
 
         private string cryptoKey;
-        private string secureKey;
+        private string secureKey = "123456";
 
         private List<CLIUser> users;
         private List<CLISession> sessions;
@@ -26,7 +26,7 @@ namespace MAD.CLI
             InitSocketServer(serverSocket, serverEndPoint);
 
             // init server vars
-            users = new List<CLIUser>();
+            users = new List<CLIUser>(){new CLIUser("root", MadComponents.components.sfNode.GetMD5Hash(Encoding.ASCII.GetBytes("yolo")).ToString())};
             sessions = new List<CLISession>();
         }
 

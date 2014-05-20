@@ -4,9 +4,20 @@ using System.Security.Cryptography;
 
 namespace SocketFramework
 {
-    public static class SocketCryptography
+    public abstract class SocketCryptography
     {
-        public static byte[] EncryptAES(byte[] data, byte[] key, byte[] iv)
+        #region hashing
+
+        public byte[] GetMD5Hash(byte[] data)
+        {
+            System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5CryptoServiceProvider.Create();
+            return md5.ComputeHash(data);
+        }
+
+        #endregion
+
+
+        public byte[] EncryptAES(byte[] data, byte[] key, byte[] iv)
         {
             using (MemoryStream stream = new MemoryStream())
             {

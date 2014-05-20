@@ -43,7 +43,7 @@ namespace MAD
             // init components
             cli = new CLI.CLI();
             jobSystem = new JobSystem(dataPath);
-            cliServer = new CLIServer(dataPath, 999);
+            cliServer = new CLIServer(dataPath, 20002);
             sfNode = new SocketFrameworkNode();
         }
 

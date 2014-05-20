@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SocketFramework
 {
-    public abstract class SocketFramework
+    public abstract class SocketFramework : SocketCryptography
     {
         public Version version = new Version(3, 0);
 
