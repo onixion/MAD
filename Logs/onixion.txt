@@ -16,4 +16,4 @@
 (NOTE: TCPClient and SERVER DO NOT WORK OVER NETWORK, JUST ON LOCALHOST, WORKING ON IT)
 
 [19.05.2014][18:00-20:00][2h][43h] Working on CLIFramework/CLI
-[20.05.2014][16:30-18:30][2h][45h] CLISessions / CLIServer / SocketFramework
+[20.05.2014][16:30-22:30][6h][49h] CLISessions / CLIServer / SocketFramework / SocketFramework

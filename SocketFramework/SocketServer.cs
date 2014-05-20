@@ -9,22 +9,34 @@ namespace SocketFramework
     public abstract class SocketServer : SocketFramework
     {
         #region members
+
         public Socket serverSocket;
         public IPEndPoint serverEndPoint;
 
+        private SmartThreadPool threadPool = new SmartThreadPool();
         public Thread listenerThread;
         public bool serverStopRequest = false;
 
-        private SmartThreadPool threadPool = new SmartThreadPool();
+        public const int clientsMax = 20;
+
         #endregion
 
         public void InitSocketServer(Socket serverSocket, IPEndPoint serverEndPoint)
         {
             this.serverSocket = serverSocket;
+            this.serverSocket.ExclusiveAddressUse = true;
+            this.serverSocket.NoDelay = false;
+            this.serverSocket.LingerState = new LingerOption(true, clientsMax);
+
             this.serverEndPoint = serverEndPoint;
 
+            InitSocket();
+        }
+
+        public void InitSocket()
+        {
             this.serverSocket.Bind(serverEndPoint);
-            this.serverSocket.Listen(20);
+            this.serverSocket.Listen(clientsMax);
         }
 
         #region Server handling methodes
@@ -43,10 +55,7 @@ namespace SocketFramework
             if (listenerThread != null)
             {
                 serverStopRequest = true;
-
                 clientConnect.Set();
-                clientConnect.Reset();
-
                 listenerThread.Join();
                 listenerThread = null;
 
@@ -58,13 +67,8 @@ namespace SocketFramework
         {
             while (true)
             {
-                //serverSocket.BeginAccept(new AsyncCallback(HandleClientInternal), serverSocket);
-
-                Socket socket = serverSocket.Accept();
-
-                threadPool.QueueWorkItem(HandleClient, socket);
+                serverSocket.BeginAccept(new AsyncCallback(HandleClientInternal), serverSocket);
                 clientConnect.WaitOne();
-                clientConnect.Reset();
 
                 if (serverStopRequest)
                 {

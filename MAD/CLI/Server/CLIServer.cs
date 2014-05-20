@@ -26,70 +26,79 @@ namespace MAD.CLI
             InitSocketServer(serverSocket, serverEndPoint);
 
             // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", MadComponents.components.sfNode.GetMD5Hash(Encoding.ASCII.GetBytes("yolo")).ToString())};
+            users = new List<CLIUser>(){new CLIUser("root", GetMD5Hash(Encoding.ASCII.GetBytes("lol")).ToString())};
             sessions = new List<CLISession>();
         }
 
         public override void HandleClient(Socket socket)
         {
-            // WORKING ON THIS!
-
             // get ip-endpoint from client
             IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
 
             // log request to console
-            Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") connected.");
+            Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") connected.");
 
-            // reveive sercurePass
-            string receivedSecurePass = Receive(socket);
-            Send(socket, "OK");
-
-            // reveive username
-            string username = Receive(socket);
-            Send(socket, "OK");
-
-            // reveive passwordMD5
-            string passwordMD5 = Receive(socket);
-
-            if (this.secureKey == receivedSecurePass)
+            while (true)
             {
-                if (CheckUsernameAndPassword(username, passwordMD5))
+                // reveive sercurePass
+                string receivedSecurePass = ssReceive(socket);
+                if (receivedSecurePass == null) { break; }
+                if (!ssSend(socket, "OK")) { break; }
+
+                // reveive username
+                string username = ssReceive(socket);
+                if (username == null) { break; }
+                if (!ssSend(socket, "OK")) { break; }
+
+                // reveive passwordMD5
+                string passwordMD5 = ssReceive(socket);
+                if (passwordMD5 == null) { break; }
+
+                if (this.secureKey == receivedSecurePass)
                 {
-                    // client accepted
-                    Send(socket, "ACCEPTED");
-                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") login as '" + username + "'.");
-
-                    /* After the client login to the cli server,
-                     * he need to send the mode he want to enter.
-                     * For the default cli, he needs to send GET_CLI.
-                     */
-
-                    string mode = Receive(socket);
-
-                    switch (mode)
+                    if (CheckUsernameAndPassword(username, passwordMD5))
                     {
-                        case "GET_CLI":
-                            sessions.Add(new CLISession(socket));
-                            
-                            break;
-                        // other modes ...
+                        // client accepted
+                        if (!ssSend(socket, "ACCEPTED")) { break; }
+                        Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") has login as '" + username + "'.");
 
-                        default:
-                            Send(socket, "MODE_UNKNOWN");
-                            break;
+                        /* After the client login to the cli server,
+                         * he need to send the mode he want to enter.
+                         * For the default cli, he needs to send GET_CLI.
+                         */
+
+                        string mode = ssReceive(socket);
+                        if (mode == null) { break; }
+
+                        switch (mode)
+                        {
+                            case "GET_CLI":
+                                sessions.Add(new CLISession(socket));
+                                break;
+                            // other modes ...
+
+                            default:
+                                ssSend(socket, "MODE_UNKNOWN");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        ssSend(socket, "DENIED");
+                        Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. Username or password wrong.");
                     }
                 }
                 else
                 {
-                    Send(socket, "DENIED");
-                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. Username or password wrong.");
+                    ssSend(socket, "DENIED");
+                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
                 }
             }
-            else
-            {
-                Send(socket, "DENIED");
-                Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
-            }
+
+            Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") disconnected.");
+
+            ssDisconnect(socket);
+            socket.Close();
         }
 
         #region Usermanagment

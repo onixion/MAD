@@ -15,6 +15,9 @@ namespace SocketFramework
         public AutoResetEvent sendDone = new AutoResetEvent(false);
         public AutoResetEvent receiveDone = new AutoResetEvent(false);
 
+        public int sendTimeout = 5000;
+        public int receiveTimeout = 5000;
+
         #region Connect methodes
 
         public bool sConnect(Socket socket, IPEndPoint serverEndPoint)
@@ -188,6 +191,90 @@ namespace SocketFramework
         public string GetTimeStamp()
         {
             return DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss");
+        }
+
+        #endregion
+
+
+        #region testing
+
+        public bool ssConnect(Socket socket, IPEndPoint serverEndpoint)
+        {
+            try
+            {
+                if (!socket.Connected)
+                {
+                    socket.Connect(serverEndpoint);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public bool ssDisconnect(Socket socket)
+        {
+            if (socket.Connected)
+            {
+                try
+                {
+                    socket.Disconnect(true);
+                    return true;
+                }
+                catch (Exception)
+                { }
+            }
+
+            return false;
+        }
+
+        public bool ssSend(Socket socket, string data)
+        {
+            try
+            {
+                if (socket.Connected)
+                {
+                        socket.Send(Encoding.ASCII.GetBytes(data), SocketFlags.None);
+                        return true;
+                }
+            }
+            catch (Exception)
+            { }
+
+            return false;
+        }
+
+        public string ssReceive(Socket socket)
+        {
+            if (socket.Connected)
+            {
+                try
+                {
+                    string buffer = "";
+                    while (true)
+                    {
+                        byte[] buffer2 = new byte[3];
+                        int reveivedData = socket.Receive(buffer2);
+
+                        buffer += Encoding.ASCII.GetString(buffer2);
+
+                        if (buffer.Contains("\0"))
+                        {
+                            break;
+                        }
+                    }
+
+                    return buffer;
+                }
+                catch (Exception)
+                { }
+            }
+
+            return null;
         }
 
         #endregion
