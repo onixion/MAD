@@ -184,6 +184,15 @@ namespace SocketFramework
         #endregion
 
         #endregion
+
+        #region timestamp method
+
+        public string GetTimeStamp()
+        {
+            return DateTime.Now.ToString("dd.MM.yyyy hh:mm:ss");
+        }
+
+        #endregion
     }
 
 

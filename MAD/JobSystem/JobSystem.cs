@@ -67,22 +67,15 @@ namespace MAD
 
         public void DestroyJob(int jobID)
         {
-            for(int i = 0; i < jobs.Count; i++)
-            {
-                if (jobs[i].jobID == jobID)
-                {
-                    if (jobs[i].threadStopRequest)
-                    {
-                        jobs[i].Stop();
-                        jobs.RemoveAt(i);
-                    }
-                    else
-                    {
-                        jobs.RemoveAt(i);
-                    }
+            Job job = GetJob(jobID);
 
-                    break;
-                }
+            if (job != null)
+            {
+                job.Stop();
+            }
+            else
+            {
+                throw new Exception("Job does not exist!");
             }
         }
 
@@ -102,14 +95,38 @@ namespace MAD
             }
         }
 
-        public bool StartJob(Job job)
+        public void StartJob(int jobID)
         {
-            return job.Start();
+            Job job = GetJob(jobID);
+
+            if (job != null)
+            {
+                if (!job.Start())
+                {
+                    throw new Exception("Job is already active!");
+                }
+            }
+            else
+            {
+                throw new Exception("Job does not exist!");
+            }
         }
 
-        public bool StopJob(Job job)
+        public void StopJob(int jobID)
         {
-            return job.Stop();
+            Job job = GetJob(jobID);
+
+            if (job != null)
+            {
+                if (!job.Stop())
+                {
+                    throw new Exception("Job is already inactive!");
+                }
+            }
+            else
+            {
+                throw new Exception("Job does not exist!");
+            }
         }
 
         public int JobsActive()
@@ -129,17 +146,7 @@ namespace MAD
 
         public int JobsInactive()
         {
-            int count = 0;
-
-            for (int i = 0; i < jobs.Count; i++)
-            {
-                if (!jobs[0].threadStopRequest)
-                {
-                    count++;
-                }
-            }
-
-            return count;
+            return jobs.Count - JobsActive(); 
         }
 
         #endregion

@@ -10,11 +10,7 @@ namespace MAD
             // WHEN YOU PUSH THIS TO GITHUB, MAKE SURE THE MAIN METHOD (THIS ON HERE) IS EMPTY.
             // IF THIS IS NOT EMPTY, THE MERGE PROCESS COULD CAUSE AN ERROR. TO AVOID THAT JUST
             // KEEP THIS METHOD HERE CLEAN. THANKS!
-            
-            // start CLI-server on port 999
-            //MadComponents.components.cliServer.Start();
 
-            // start CLI
             MadComponents.components.cli.Start();
         }
     }

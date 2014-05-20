@@ -3,24 +3,37 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using SocketFramework;
 
-namespace MAD
+namespace MAD.CLI
 {
-    public class CLIServer : SocketServer
+    public class CLIServer : SocketFramework.SocketServer
     {
-        private string cryptoKey = "asdf";
-        private string secureKey = "1234";
+        private readonly string dataPath;
 
-        public CLIServer(int port)
+        private string cryptoKey;
+        private string secureKey;
+
+        private List<CLIUser> users;
+        private List<CLISession> sessions;
+
+        public CLIServer(string dataPath, int port)
         {
+            this.dataPath = dataPath;
+
+            // init server
+            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            serverEndPoint = new IPEndPoint(IPAddress.Any, port);
+            InitSocketServer(serverSocket, serverEndPoint);
+
+            // init server vars
+            users = new List<CLIUser>();
+            sessions = new List<CLISession>();
         }
 
         public override void HandleClient(Socket socket)
         {
             // WORKING ON THIS!
 
-            /*
             // get ip-endpoint from client
             IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
 
@@ -49,15 +62,15 @@ namespace MAD
                     /* After the client login to the cli server,
                      * he need to send the mode he want to enter.
                      * For the default cli, he needs to send GET_CLI.
-                     * 
+                     */
 
                     string mode = Receive(socket);
 
                     switch (mode)
                     {
                         case "GET_CLI":
-                            CLIServerInternal cli = new CLIServerInternal(socket);
-                            cli.Start();
+                            sessions.Add(new CLISession(socket));
+                            
                             break;
                         // other modes ...
 
@@ -77,7 +90,46 @@ namespace MAD
                 Send(socket, "DENIED");
                 Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
             }
-             * */
         }
+
+        #region Usermanagment
+
+        private bool CheckUsernameAndPassword(string username, string passwordMD5)
+        {
+            CLIUser user = GetCLIUser(username);
+
+            if (user != null)
+            {
+                if (user.passwordMD5 == passwordMD5)
+                {
+                    return false;
+                }
+                else
+                {
+                    // password wrong.
+                    return false;
+                }
+            }
+            else
+            {
+                // username wrong.
+                return false;
+            }
+        }
+
+        private CLIUser GetCLIUser(string username)
+        {
+            foreach (CLIUser temp in users)
+            {
+                if (temp.username == username)
+                {
+                    return temp;
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
     }
 }

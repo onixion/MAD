@@ -3,40 +3,41 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using SocketFramework;
 using System.Text;
+
+using SocketFramework;
 
 namespace MAD.CLI
 {
-    public class CLIServerInternal : CLIFramework
+    public class CLISession : CLIFramework
     {
         // network vars
         private Socket clientSocket;
         private IPEndPoint clientEndPoint;
 
         // --------------------------------------------------------
-        //          CLI ServerINTERNAL
+        //          CLI Session
         // --------------------------------------------------------
 
-        public CLIServerInternal(Socket clientSocket)
+        public CLISession(Socket clientSocket)
         {
-            /*InitCommands();
+            InitCLI();
             this.clientSocket = clientSocket;
-            this.clientEndPoint = (IPEndPoint) clientSocket.RemoteEndPoint;*/
+            this.clientEndPoint = (IPEndPoint) clientSocket.RemoteEndPoint;
+
+            // start session
+            this.Start();
         }
 
         public override void Start()
         {
-            // WORKING ON THIS!
-
-            /*
             //send cursor for the first time
-            Send(clientSocket, "\n" + cursor);
+            MadComponents.components.sfNode.Send(clientSocket, "\n" + cursor);
 
             while (true)
             {
                 // cli waiting for input from socket
-                cliInput = Receive(clientSocket);
+                cliInput = MadComponents.components.sfNode.Receive(clientSocket);
 
                 // LOGGER HERE
 
@@ -44,7 +45,7 @@ namespace MAD.CLI
                 if (cliInput == "DISCONNECT")
                 {
                     // let the client know that he disconnected
-                    Send(clientSocket, "DISCONNECTED");
+                    MadComponents.components.sfNode.Send(clientSocket, "DISCONNECTED");
                     break;
                 }
 
@@ -76,29 +77,38 @@ namespace MAD.CLI
                                 command.SetParameters(parameterInput);
 
                                 // EXECUTE COMMAND AND SEND OUTPUT
-                                Send(clientSocket, command.Execute() + "\n" + cursor);
+                                MadComponents.components.sfNode.Send(clientSocket, command.Execute() + "\n" + cursor);
                             }
                             else
-                                Send(clientSocket, parameterValid + "\n" + cursor);
+                            {
+                                MadComponents.components.sfNode.Send(clientSocket, parameterValid + "\n" + cursor);
+                            }
                         }
                         else
-                            Send(clientSocket,"Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
+                        {
+                            MadComponents.components.sfNode.Send(clientSocket, "Command '" + commandInput + "' unknown! Type 'help' for more information." + "\n" + cursor);
+                        }
                     }
                     else
-                        Send(clientSocket,"\n" + cursor);
+                    {
+                        MadComponents.components.sfNode.Send(clientSocket, "\n" + cursor);
+                    }
                 }
                 else
+                {
                     break;
+                }
 
                 // check if the server has stopped
                 if (MadComponents.components.cliServer.serverStopRequest == true)
+                {
                     break;
+                }
             }
 
             clientSocket.Close();
 
             Console.WriteLine(" Client (" + clientEndPoint.Address + ") disconnected.");
-             * */
         }
     }
 }

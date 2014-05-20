@@ -37,6 +37,7 @@
     <Compile Include="SocketClient.cs" />
     <Compile Include="SocketCryptography.cs" />
     <Compile Include="SocketFramework.cs" />
+    <Compile Include="SocketFrameworkNode.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

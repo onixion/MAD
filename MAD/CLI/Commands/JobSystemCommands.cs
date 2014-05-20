@@ -199,8 +199,6 @@ namespace MAD.CLI
 
     public class JobSystemRemoveCommand : Command
     {
-        Job job;
-
         public JobSystemRemoveCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -210,19 +208,15 @@ namespace MAD.CLI
         {
             int id = (int)parameters.GetParameter("id").value;
 
-            job = MadComponents.components.jobSystem.GetJob(id);
-
-            if (job != null)
+            try
             {
-                if (job.Active())
-                {
-                    MadComponents.components.jobSystem.StopJob(job);
-                }
-
-                MadComponents.components.jobSystem.DestroyJob(job.jobID);
+                MadComponents.components.jobSystem.DestroyJob(id);
+                output += "Job destroyed.";
             }
-            else
-                output = "Job does not exist!";
+            catch (Exception e)
+            {
+                output += "FAIL: " + e.Message;
+            }
 
             return output;
         }
@@ -230,8 +224,6 @@ namespace MAD.CLI
 
     public class JobSystemStartCommand : Command
     {
-        Job job;
-
         public JobSystemStartCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -240,20 +232,16 @@ namespace MAD.CLI
         public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").value;
-           
-            job = MadComponents.components.jobSystem.GetJob(id);
 
-            if (job != null)
+            try
             {
-                if (MadComponents.components.jobSystem.StartJob(job))
-                {
-                    output = "Job started.";
-                }
-                else
-                    output = "Job already running!";
+                MadComponents.components.jobSystem.StartJob(id);
+                output = "Job started.";
             }
-            else
-                output = "Job does not exist!";
+            catch (Exception e)
+            {
+                output = "FAIL: " + e.Message;
+            }      
 
             return output;
         }
@@ -261,8 +249,6 @@ namespace MAD.CLI
 
     public class JobSystemStopCommand : Command
     {
-        Job job;
-
         public JobSystemStopCommand()
         {
             requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
@@ -272,19 +258,15 @@ namespace MAD.CLI
         {
             int id = (int)parameters.GetParameter("id").value;
 
-            job = MadComponents.components.jobSystem.GetJob(id);
-
-            if (job != null)
+            try
             {
-                if (MadComponents.components.jobSystem.StopJob(job))
-                {
-                    output = "Job started.";
-                }
-                else
-                    output = "Job already running!";
+                MadComponents.components.jobSystem.StopJob(id);
+                output = "Job stopped.";
             }
-            else
-                output = "Job does not exist!";
+            catch (Exception e)
+            {
+                output = "FAIL: " + e.Message;
+            }      
 
             return output;
         }

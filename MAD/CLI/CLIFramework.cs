@@ -55,7 +55,11 @@ namespace MAD.CLI
                 new CommandOptions("job stop", typeof(JobSystemStopCommand)),
                 new CommandOptions("job add ping", typeof(JobSystemAddPingCommand)),
                 new CommandOptions("job add http", typeof(JobSystemAddHttpCommand)),
-                new CommandOptions("job add port", typeof(JobSystemAddPortCommand))
+                new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
+
+                // CLI SERVER COMMANDS
+                new CommandOptions("cliserver start", typeof(CLIServerStart)),
+                new CommandOptions("cliserver stop", typeof(CLIServerStop))
             };
         }
 

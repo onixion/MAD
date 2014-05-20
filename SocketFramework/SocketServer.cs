@@ -2,9 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-
 using Amib.Threading;
-using SocketFramework;
 
 namespace SocketFramework
 {
@@ -28,7 +26,7 @@ namespace SocketFramework
             this.serverSocket.Bind(serverEndPoint);
             this.serverSocket.Listen(20);
         }
-        
+
         #region Server handling methodes
 
         public void Start()
