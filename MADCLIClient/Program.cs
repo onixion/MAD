@@ -17,178 +17,79 @@ namespace CLIClient
             string cliInput;
             string serverResponse;
 
-            string username;
-            string password;
             string secureKey;
-
-            string cryptoKey;
+            string username;
+            string passwordMD5;
 
             #endregion
 
 
             Console.WriteLine("CLI-Client [MINIMAL VERSION]");
-            Console.WriteLine("______SETUP_________________\n");
 
             #region setup
 
-            #region cryptoKey loading
-
-            if (!Directory.Exists("data"))
-                Directory.CreateDirectory("data");
-
-            Console.WriteLine("Loading crypto-key ...");
-
-            if(File.Exists(Path.Combine("data","cryptoKey.key")))
-            {
-                Console.WriteLine("Crypto-key found!");
-
-                using (FileStream file = new FileStream(Path.Combine("data", "cryptoKey.key"), FileMode.Open, FileAccess.Read, FileShare.Read))
-                using (StreamReader reader = new StreamReader(file))
-                    cryptoKey = reader.ReadToEnd();
-
-                Console.WriteLine("Crypto-key: " + cryptoKey);
-            }
-            else
-            {
-                Console.WriteLine("No crypto-key found. Please insert the crypto key here: ");
-                cryptoKey = Console.ReadLine();
-
-                using (FileStream file = new FileStream(Path.Combine("data", "cryptoKey.key"), FileMode.Create, FileAccess.Write, FileShare.Write))
-                using (StreamWriter writer = new StreamWriter(file))
-                    writer.WriteLine(cryptoKey);
-
-                Console.WriteLine("Crypto-file created.");
-            }
-
-            #endregion
-
-            Console.Write("\nIP: ");
-            cliInput = Console.ReadLine();
-
-            try
-            {
-                serverAddress = IPAddress.Parse(cliInput);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("INVALID INPUT!");
-                return 0;
-            }
-
-            Console.Write("PORT: ");
-            cliInput = Console.ReadLine();
-
-            try
-            {
-                serverPort = Int32.Parse(cliInput);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("INVALID INPUT!");
-                return 0;
-            }
-
-            Console.Write("USERNAME: ");
-            username = Console.ReadLine();
-
-            Console.Write("PASSWORD: ");
-            password = Console.ReadLine();
-
-            Console.Write("SECUREPASS: ");
-            secureKey = Console.ReadLine();
-
-            #endregion
-
             while (true)
             {
-                // init client
-                CLIClient clientCLI = new CLIClient(new IPEndPoint(serverAddress, serverPort), secureKey, username, password);
-
-                // try connect
-                if (!clientCLI.sConnect(clientCLI.serverSocket, clientCLI.serverEndPoint)) { break; }
-
-                if (clientCLI.serverSocket.Connected)
+                while (true)
                 {
-                    if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.securePass)) { break; }
+                    Console.Write("\nIP: ");
+                    cliInput = Console.ReadLine();
 
-                    if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
+                    try
                     {
-                        if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.username)) { break; }
-
-                        if (clientCLI.Receive(clientCLI.serverSocket) == "OK")
-                        {
-                            if (!clientCLI.Send(clientCLI.serverSocket, clientCLI.passwordMD5)) { break; }
-
-                            if (clientCLI.Receive(clientCLI.serverSocket) == "ACCEPTED")
-                            {
-                                Console.WriteLine("LOGIN WAS SUCCESSFUL!");
-                                Console.WriteLine("Waiting for server ...");
-
-                                if (!clientCLI.Send(clientCLI.serverSocket, "GET_CLI")) { break; }
-
-                                cliInput = clientCLI.Receive(clientCLI.serverSocket);
-
-                                if(cliInput != null)
-                                if (cliInput != "MODE_UNKNOWN")
-                                {
-                                    Console.Write(cliInput);
-
-                                    while (true)
-                                    {
-                                        cliInput = Console.ReadLine();
-                                        if (!clientCLI.Send(clientCLI.serverSocket, cliInput)) { break; }
-
-                                        serverResponse = clientCLI.Receive(clientCLI.serverSocket);
-
-                                        if (serverResponse == "DISCONNECTED" || serverResponse == null)
-                                            break;
-
-                                        Console.Write(serverResponse);
-                                    }
-
-                                    Console.WriteLine("DISCONNECTED FROM SERVER!");
-                                }
-                                else
-                                {
-                                    Console.WriteLine("MODE NOT KNOW BY SERVER!");
-                                    Console.ReadKey();
-                                    return 0;
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("NO AUTHORISATION!");
-                                Console.ReadKey();
-                                return 0;
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("SERVER NOT RESPONDING!");
-                            Console.ReadKey();
-                            return 0;
-                        }
+                        serverAddress = IPAddress.Parse(cliInput);
+                        break;
                     }
-                    else
+                    catch (Exception)
                     {
-                        Console.WriteLine("SERVER NOT RESPONDING!");
-                        Console.ReadKey();
-                        return 0;
+                        Console.WriteLine("INVALID INPUT!");
                     }
-
-                }
-                else
-                {
-                    Console.WriteLine("Could not connect to server ...");
                 }
 
+                while (true)
+                {
+                    Console.Write("PORT: ");
+                    cliInput = Console.ReadLine();
 
-                Console.WriteLine("Disconnecting ...");
-                clientCLI.sDisconnect(clientCLI.serverSocket, clientCLI.serverEndPoint);
+                    try
+                    {
+                        serverPort = Int32.Parse(cliInput);
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("INVALID INPUT!");
+                    }
+                }
 
-                Console.WriteLine("Closing socket ...");
-                clientCLI.serverSocket.Close();
+                Console.Write("USERNAME: ");
+                username = Console.ReadLine();
+
+                Console.Write("PASSWORD: ");
+                passwordMD5 = Console.ReadLine();
+
+                Console.Write("SECUREPASS: ");
+                secureKey = Console.ReadLine();
+
+                Console.WriteLine("ServerDestination: " + serverAddress + ":" + serverPort);
+                Console.WriteLine("Username: " + username);
+
+                Console.WriteLine("Everything right? Y/N");
+                ConsoleKeyInfo key = Console.ReadKey();
+                Console.WriteLine();
+
+                if (key.Key == ConsoleKey.Y)
+                {
+                    CLIClient client = new CLIClient(new IPEndPoint(serverAddress, serverPort), secureKey, username, passwordMD5);
+                    client.Start();
+
+                    break;
+                }
+
+                Console.Clear();
             }
+
+            #endregion
 
             Console.WriteLine("Press any key to exit program ...");
             Console.ReadKey();

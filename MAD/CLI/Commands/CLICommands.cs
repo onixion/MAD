@@ -36,7 +36,7 @@ namespace MAD.CLI
     {
         public override string Execute()
         {
-            output += "CLI-SERVER VERSION " + MadComponents.components.cliServer.version;
+            output += "CLI-SERVER VERSION " + MadComponents.components.cliServer.version + ".";
             return output;
         }
     }

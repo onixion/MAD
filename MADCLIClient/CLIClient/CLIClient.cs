@@ -2,27 +2,68 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
+using System.IO;
+
 using System.Security.Cryptography;
-using SocketFramework;
 
 namespace CLIClient
 {
-    public class CLIClient : SocketClient
+    public class CLIClient
     {
-        public string securePass;
-        public string username;
-        public string passwordMD5;
+        private IPEndPoint _serverEndPoint;
+        private string _securePass;
+        private string _username;
+        private string _passwordMD5;
 
-        public CLIClient(IPEndPoint serverEndPoint, string securePass, string username, string password)
+        public CLIClient(IPEndPoint serverEndPoint, string securePass, string username, string passwordMD5)
         {
-            // init socketClient
-            InitSocketClient(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), serverEndPoint);
+            _serverEndPoint = serverEndPoint;
+            _securePass = securePass;
+            _username = username;
+            _passwordMD5 = passwordMD5;
+        }
 
-            this.securePass = securePass;
-            this.username = username;
-            this.passwordMD5 = Encoding.ASCII.GetString(GetMD5Hash(Encoding.ASCII.GetBytes(password)));
-            this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public void Start()
+        {
+            TcpClient _client = new TcpClient();
+            NetworkStream _stream = null;
+
+            try
+            {
+                _client.Connect(_serverEndPoint);
+                _stream = _client.GetStream();
+
+                Send(_stream, "TESTTESTTEST");
+
+                Console.WriteLine();
+
+                _stream.Close();
+            }
+            catch (Exception e)
+            {
+                if (_stream != null)
+                    _stream.Close();
+
+                Console.WriteLine("Es konnte keine Verbindung zum Server hergestellt werden.");
+            }
+
+            _client.Close();
+        }
+
+        private void Send(NetworkStream _stream, string _data)
+        {
+            using (BinaryWriter _writer = new BinaryWriter(_stream))
+            {
+                _writer.Write(_data);
+            }
+        }
+
+        private string Receive(NetworkStream _stream)
+        {
+            using (BinaryReader _reader = new BinaryReader(_stream))
+            {
+                return _reader.ReadString();
+            }
         }
     }
 }

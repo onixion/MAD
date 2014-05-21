@@ -3,103 +3,105 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.IO;
 
 namespace MAD.CLI
 {
-    public class CLIServer : SocketFramework.SocketServer
+    public class CLIServer : CLIServerInternal
     {
-        private readonly string dataPath;
+        public Version version = new Version(0, 0, 1000);
 
-        private string cryptoKey;
-        private string secureKey = "123456";
+        private TcpListener serverListener;
+        private TcpClient client;
+
+        private readonly string dataPath;
 
         private List<CLIUser> users;
         private List<CLISession> sessions;
+
+        private string secKey = "123";
 
         public CLIServer(string dataPath, int port)
         {
             this.dataPath = dataPath;
 
             // init server
-            serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            serverEndPoint = new IPEndPoint(IPAddress.Any, port);
-            InitSocketServer(serverSocket, serverEndPoint);
+            serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
 
             // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", GetMD5Hash(Encoding.ASCII.GetBytes("lol")).ToString())};
+            users = new List<CLIUser>(){new CLIUser("root", "LOL")};
             sessions = new List<CLISession>();
         }
 
-        public override void HandleClient(Socket socket)
+        protected override bool StartListener()
         {
-            // get ip-endpoint from client
-            IPEndPoint client = (IPEndPoint)socket.RemoteEndPoint;
-
-            // log request to console
-            Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") connected.");
-
-            while (true)
+            try
             {
-                // reveive sercurePass
-                string receivedSecurePass = Receive(socket);
-                if (receivedSecurePass == null) { break; }
-                if (!Send(socket, "OK")) { break; }
+                serverListener.Start();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
-                // reveive username
-                string username = Receive(socket);
-                if (username == null) { break; }
-                if (!Send(socket, "OK")) { break; }
+        protected override void StopListener()
+        {
+            serverListener.Stop();
+        }
 
-                // reveive passwordMD5
-                string passwordMD5 = Receive(socket);
-                if (passwordMD5 == null) { break; }
+        protected override object GetClient()
+        {
+            return serverListener.AcceptTcpClient();
+        }
 
-                if (this.secureKey == receivedSecurePass)
+        protected override object HandleClient(object clientObject)
+        {
+            TcpClient _client = (TcpClient)clientObject;
+            NetworkStream _stream = _client.GetStream();
+
+            try
+            {
+                while (true)
                 {
-                    if (CheckUsernameAndPassword(username, passwordMD5))
-                    {
-                        // client accepted
-                        if (!Send(socket, "ACCEPTED")) { break; }
-                        Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") has login as '" + username + "'.");
+                    Console.WriteLine(Receive(_stream));
+                    Console.WriteLine();
 
-                        /* After the client login to the cli server,
-                         * he need to send the mode he want to enter.
-                         * For the default cli, he needs to send GET_CLI.
-                         */
 
-                        string mode = Receive(socket);
-                        if (mode == null) { break; }
 
-                        switch (mode)
-                        {
-                            case "GET_CLI":
-                                sessions.Add(new CLISession(socket));
-                                break;
-                            // other modes ...
 
-                            default:
-                                Send(socket, "MODE_UNKNOWN");
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        Send(socket, "DENIED");
-                        Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. Username or password wrong.");
-                    }
-                }
-                else
-                {
-                    Send(socket, "DENIED");
-                    Console.WriteLine(GetTimeStamp() + " Client (" + client.Address + ") failed to login. SecurePass wrong.");
                 }
             }
+            catch (Exception)
+            {
+                // client disconneted
+            }             
 
-            Console.WriteLine("<" + GetTimeStamp() + "> Client (" + client.Address + ") disconnected.");
-
-            sDisconnect(socket, serverEndPoint);
-            socket.Close();
+            _stream.Close();
+            _client.Close();
+            return null;
         }
+
+        #region Send/Recieve methodes
+
+        private void Send(NetworkStream _stream, string _data)
+        {
+            using (BinaryWriter _writer = new BinaryWriter(_stream))
+            {
+                _writer.Write(_data);
+            }
+        }
+
+        private string Receive(NetworkStream _stream)
+        {
+            using (BinaryReader _reader = new BinaryReader(_stream))
+            {
+                return _reader.ReadString();
+            }
+        }
+
+        #endregion
 
         #region Usermanagment
 

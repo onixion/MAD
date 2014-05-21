@@ -41,6 +41,7 @@
     <Compile Include="CLI\CLI.cs" />
     <Compile Include="CLI\CLIFramework.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
+    <Compile Include="CLI\Server\CLIPackage.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Parameter\Parameter.cs" />
     <Compile Include="CLI\Parameter\ParameterInput.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="CLI\Command\Command.cs" />
     <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
+    <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobHttp.cs" />
     <Compile Include="JobSystem\JobHttpOptions.cs" />
@@ -69,10 +71,6 @@
     <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
       <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>
       <Name>SmartThreadPool</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SocketFramework\SocketFramework.csproj">
-      <Project>{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}</Project>
-      <Name>SocketFramework</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

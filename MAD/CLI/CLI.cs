@@ -6,9 +6,14 @@ namespace MAD.CLI
 {
     public class CLI : CLIFramework
     {
-        public override void Start()
+        public CLI()
+        { 
+            // init CLI
+            _InitCLI();
+        }
+
+        public void Start()
         {
-            base.Start();
 
             Console.WriteLine(CLIInfo());
 

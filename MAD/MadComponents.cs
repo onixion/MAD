@@ -1,8 +1,6 @@
 ﻿using System;
 using MAD.CLI;
 
-using SocketFramework;
-
 namespace MAD
 {
     public class MadComponents
@@ -29,8 +27,6 @@ namespace MAD
         public CLIServer cliServer;
         public JobSystem jobSystem;
 
-        public SocketFrameworkNode sfNode;
-
         // ----------------------------------
         //     DEFAULT CONSTRUCTORS
         // ----------------------------------
@@ -45,7 +41,6 @@ namespace MAD
             cli = new CLI.CLI();
             jobSystem = new JobSystem(dataPath);
             cliServer = new CLIServer(dataPath, 999);
-            sfNode = new SocketFrameworkNode();
         }
 
         // ----------------------------------

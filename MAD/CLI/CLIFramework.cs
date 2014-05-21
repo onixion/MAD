@@ -33,7 +33,7 @@ namespace MAD.CLI
 
         #region CLI main methodes
 
-        public void InitCLI()
+        protected void _InitCLI()
         {
             // init available commands
             commandOptions = new List<CommandOptions>()
@@ -60,14 +60,9 @@ namespace MAD.CLI
             };
         }
 
-        public virtual void Start()
-        {
-            InitCLI();
-        }
-
         protected string CLIInfo()
-        { 
-            return "MAD-CLI (Version " + version + ") \nSERVER-TIME: " + GetTimeStamp();
+        {
+            return "MAD-CLI VERSION " + version;
         }
 
         #endregion

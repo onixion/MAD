@@ -17,3 +17,6 @@
 
 [19.05.2014][18:00-20:00][2h][43h] Working on CLIFramework/CLI
 [20.05.2014][16:30-22:30][6h][49h] CLISessions / CLIServer / SocketFramework / SocketFramework
+[21.05.2014][16:00-17:00][1h][50h] CLISessions / CLIServer / CLIClient
+
+(NOTE: SocketFramework was removed, because of complications. Now using the TcpListener and TcpClient)

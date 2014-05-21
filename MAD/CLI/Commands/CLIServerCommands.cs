@@ -12,7 +12,7 @@ namespace MAD.CLI
         public override string Execute()
         {
             MadComponents.components.cliServer.Start();
-            output += "CLI server started on port " +MadComponents.components.cliServer.serverEndPoint.Port + ".";
+            output += "CLI server started.";
             return output;
         }
     }
