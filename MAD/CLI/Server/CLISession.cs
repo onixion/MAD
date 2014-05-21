@@ -44,9 +44,9 @@ namespace MAD.CLI
             }
         }
 
-        public void Start()
+        private void Start()
         {
-            Console.WriteLine("SESSION STARTED");
+           
         }
     }
 }

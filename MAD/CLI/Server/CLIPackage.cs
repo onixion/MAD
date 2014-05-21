@@ -6,23 +6,22 @@ namespace MAD.CLI.Server
 {
     public class CLIPackage
     {
-        private byte[] _version = new byte[8];
-        private byte[] _packageID = new byte[8];
-        private byte[] _data;
+        public string version;
+        public int packageID;
+        public string data;
 
-        public CLIPackage(byte[] versionNumber, byte[] packageID, byte[] data)
+        public CLIPackage()
         {
-            _version = versionNumber;
-            _packageID = packageID;
-            _data = data;
+            version = "";
+            packageID = 0;
+            data = "";
         }
 
-        public byte[] GetPackageByte()
+        public CLIPackage(string version, int packageID, string data)
         {
-            byte[] _buffer = new byte[_version.Length + _data.Length];
-            
-
-            return _buffer;
+            this.version = version;
+            this.packageID = packageID;
+            this.data = data;
         }
     }
 }

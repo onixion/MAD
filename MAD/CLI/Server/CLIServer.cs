@@ -29,7 +29,7 @@ namespace MAD.CLI
             serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
 
             // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", "LOL")};
+            users = new List<CLIUser>(){new CLIUser("root", "123")};
             sessions = new List<CLISession>();
         }
 
@@ -63,27 +63,20 @@ namespace MAD.CLI
 
             try
             {
-                while (true)
-                {
-                    Console.WriteLine(Receive(_stream));
-                    Console.WriteLine();
-
-
-
-
-                }
+                // HERE HERE HERE
             }
             catch (Exception)
             {
-                // client disconneted
+                
             }             
 
             _stream.Close();
             _client.Close();
+
             return null;
         }
 
-        #region Send/Recieve methodes
+        #region Send/Recieve
 
         private void Send(NetworkStream _stream, string _data)
         {
@@ -103,7 +96,7 @@ namespace MAD.CLI
 
         #endregion
 
-        #region Usermanagment
+        #region Usermanagment / Security
 
         private bool CheckUsernameAndPassword(string username, string passwordMD5)
         {

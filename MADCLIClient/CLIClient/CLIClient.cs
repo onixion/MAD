@@ -11,14 +11,12 @@ namespace CLIClient
     public class CLIClient
     {
         private IPEndPoint _serverEndPoint;
-        private string _securePass;
         private string _username;
         private string _passwordMD5;
 
-        public CLIClient(IPEndPoint serverEndPoint, string securePass, string username, string passwordMD5)
+        public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
         {
             _serverEndPoint = serverEndPoint;
-            _securePass = securePass;
             _username = username;
             _passwordMD5 = passwordMD5;
         }
@@ -30,24 +28,35 @@ namespace CLIClient
 
             try
             {
+                Console.WriteLine("Connecting to server ...");
+
                 _client.Connect(_serverEndPoint);
                 _stream = _client.GetStream();
 
-                Send(_stream, "TESTTESTTEST");
+                Console.WriteLine("Connected to server.");
 
-                Console.WriteLine();
+                CLIConnection(_stream);
 
                 _stream.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 if (_stream != null)
                     _stream.Close();
 
-                Console.WriteLine("Es konnte keine Verbindung zum Server hergestellt werden.");
+                Console.WriteLine("Could not connect to server!");
             }
 
             _client.Close();
+        }
+
+        private void CLIConnection(NetworkStream _stream)
+        { 
+            /* From here the connection is astablished */
+        
+        
+        
+        
         }
 
         private void Send(NetworkStream _stream, string _data)

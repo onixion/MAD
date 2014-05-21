@@ -11,20 +11,19 @@ namespace CLIClient
         {
             #region vars
 
+            Version version = new Version(1, 0);
+
             IPAddress serverAddress;
             int serverPort;
 
             string cliInput;
-            string serverResponse;
 
-            string secureKey;
             string username;
-            string passwordMD5;
+            string passwordMD5 = "";
 
             #endregion
 
-
-            Console.WriteLine("CLI-Client [MINIMAL VERSION]");
+            Console.WriteLine("MAD-CLI-Client (Version " + version + ")");
 
             #region setup
 
@@ -66,21 +65,40 @@ namespace CLIClient
                 username = Console.ReadLine();
 
                 Console.Write("PASSWORD: ");
-                passwordMD5 = Console.ReadLine();
 
-                Console.Write("SECUREPASS: ");
-                secureKey = Console.ReadLine();
+                while (true)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey();
+                    Console.Write("\b");
 
-                Console.WriteLine("ServerDestination: " + serverAddress + ":" + serverPort);
-                Console.WriteLine("Username: " + username);
+                    if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
+                    {
+                        passwordMD5 += key.KeyChar;
+                    }
+                    else
+                    {
+                        if (key.Key == ConsoleKey.Backspace && passwordMD5.Length > 0)
+                        {
+                            passwordMD5 = passwordMD5.Substring(0, passwordMD5.Length - 1);
+                        }
+                        else
+                        {
+                            if (key.Key == ConsoleKey.Enter)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
 
-                Console.WriteLine("Everything right? Y/N");
-                ConsoleKeyInfo key = Console.ReadKey();
+                Console.WriteLine("\n\nConnect to '" + serverAddress + ":" + serverPort + "' with the username '" + username + "'?");
+                Console.WriteLine("Sure about that? Y/N");
+                ConsoleKeyInfo key2 = Console.ReadKey();
                 Console.WriteLine();
 
-                if (key.Key == ConsoleKey.Y)
+                if (key2.Key == ConsoleKey.Y)
                 {
-                    CLIClient client = new CLIClient(new IPEndPoint(serverAddress, serverPort), secureKey, username, passwordMD5);
+                    CLIClient client = new CLIClient(new IPEndPoint(serverAddress, serverPort), username, passwordMD5);
                     client.Start();
 
                     break;
@@ -91,7 +109,7 @@ namespace CLIClient
 
             #endregion
 
-            Console.WriteLine("Press any key to exit program ...");
+            Console.WriteLine("\nPress any key to exit program ...");
             Console.ReadKey();
 
             return 0;
