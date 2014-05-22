@@ -31,19 +31,15 @@ namespace CLIClient
                 Console.WriteLine("Connecting to server ...");
 
                 _client.Connect(_serverEndPoint);
-                _stream = _client.GetStream();
 
                 Console.WriteLine("Connected to server.");
 
-                CLIConnection(_stream);
+                CLIConnection(_client.GetStream());
 
                 _stream.Close();
             }
             catch (Exception)
             {
-                if (_stream != null)
-                    _stream.Close();
-
                 Console.WriteLine("Could not connect to server!");
             }
 
@@ -53,26 +49,21 @@ namespace CLIClient
         private void CLIConnection(NetworkStream _stream)
         { 
             /* From here the connection is astablished */
-        
-        
-        
-        
+
         }
+
+        #region Send/Recieve
 
         private void Send(NetworkStream _stream, string _data)
         {
-            using (BinaryWriter _writer = new BinaryWriter(_stream))
-            {
-                _writer.Write(_data);
-            }
+
         }
 
         private string Receive(NetworkStream _stream)
         {
-            using (BinaryReader _reader = new BinaryReader(_stream))
-            {
-                return _reader.ReadString();
-            }
+
         }
+
+        #endregion
     }
 }

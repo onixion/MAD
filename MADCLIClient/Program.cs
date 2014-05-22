@@ -93,8 +93,9 @@ namespace CLIClient
 
                 Console.WriteLine("\n\nConnect to '" + serverAddress + ":" + serverPort + "' with the username '" + username + "'?");
                 Console.WriteLine("Sure about that? Y/N");
+
                 ConsoleKeyInfo key2 = Console.ReadKey();
-                Console.WriteLine();
+                Console.WriteLine("\n\n");
 
                 if (key2.Key == ConsoleKey.Y)
                 {

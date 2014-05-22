@@ -59,18 +59,21 @@ namespace MAD.CLI
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
-            NetworkStream _stream = _client.GetStream();
+
+            // client connected
 
             try
             {
+                string data = Receive(_client.GetStream());
+                Send(_client.GetStream(), "LOL");
+
                 // HERE HERE HERE
             }
             catch (Exception)
             {
-                
+                // client disconnectedpl
             }             
 
-            _stream.Close();
             _client.Close();
 
             return null;
@@ -80,15 +83,19 @@ namespace MAD.CLI
 
         private void Send(NetworkStream _stream, string _data)
         {
-            using (BinaryWriter _writer = new BinaryWriter(_stream))
+            using (StreamWriter _writer = new StreamWriter(_stream))
             {
                 _writer.Write(_data);
+                _writer.Flush();
             }
+
+            _stream.Flush();
+            _stream.Close();
         }
 
         private string Receive(NetworkStream _stream)
         {
-            using (BinaryReader _reader = new BinaryReader(_stream))
+            using (StreamReader _reader = new StreamReader(_stream))
             {
                 return _reader.ReadString();
             }

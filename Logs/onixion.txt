@@ -20,3 +20,4 @@
 [21.05.2014][16:00-17:00][1h][50h] CLISessions / CLIServer / CLIClient
 
 (NOTE: SocketFramework was removed, because of complications. Now using the TcpListener and TcpClient)
+[22.05.2014][13:00-14:00][1h][51h] CliServer

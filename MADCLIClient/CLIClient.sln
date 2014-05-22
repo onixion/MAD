@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLIClient", "CLIClient.csproj", "{79A69B70-83D7-45D6-88F5-F99C85B6A3EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketFramework", "..\SocketFramework\SocketFramework.csproj", "{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartThreadPool", "..\SmartThreadPool\SmartThreadPool.csproj", "{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}"
 EndProject
 Global
@@ -35,21 +33,6 @@ Global
 		{79A69B70-83D7-45D6-88F5-F99C85B6A3EC}.Release|Mixed Platforms.Build.0 = Release|x86
 		{79A69B70-83D7-45D6-88F5-F99C85B6A3EC}.Release|x86.ActiveCfg = Release|x86
 		{79A69B70-83D7-45D6-88F5-F99C85B6A3EC}.Release|x86.Build.0 = Release|x86
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Publish|Any CPU.ActiveCfg = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Publish|Any CPU.Build.0 = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Publish|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Publish|Mixed Platforms.Build.0 = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Publish|x86.ActiveCfg = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3ECEE50A-F526-4F6C-AB00-96BD66A9F108}.Release|x86.ActiveCfg = Release|Any CPU
 		{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
