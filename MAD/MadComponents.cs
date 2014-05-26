@@ -34,17 +34,11 @@ namespace MAD
         private MadComponents()
         {
             // create data-path
-            if (System.IO.Directory.Exists(dataPath))
-                System.IO.Directory.CreateDirectory(dataPath);
 
             // init components
             cli = new CLI.CLI();
             jobSystem = new JobSystem(dataPath);
             cliServer = new CLIServer(dataPath, 999);
         }
-
-        // ----------------------------------
-        //     GLOBAL METHODES
-        // ----------------------------------
     }
 }
