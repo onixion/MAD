@@ -8,47 +8,36 @@ namespace MAD
         #region members
 
         public JobHttpOptions httpJobOptions;
-        private WebRequest request;
-        private WebResponse response;
+        private WebRequest _request;
+        private WebResponse _response;
 
         #endregion
 
-        public JobHttp(JobHttpOptions httpJobOptions)
+        public JobHttp(JobOptions jobOption, JobHttpOptions httpJobOptions)
         {
-            InitJob();
-
+            InitJob(jobOption);
             this.httpJobOptions = httpJobOptions;
-            this.jobOptions = (JobOptions)httpJobOptions;
         }
 
         #region methodes
 
         public override void DoJob()
         {
-            request = WebRequest.Create("http://" + jobOptions.targetAddress.ToString() + ":" + httpJobOptions.port);
+            _request = WebRequest.Create("http://" + httpJobOptions.targetAddress.ToString() + ":" + httpJobOptions.port);
 
             try
             {
-                response = request.GetResponse();
+                _response = _request.GetResponse();
                 jobOutput = "True";
 
-                response.Close();
+                _response.Close();
             }
             catch (Exception)
             {
                 jobOutput = "False";
             }
 
-            request.Abort();
-        }
-
-        public override string JobStatus()
-        {
-            string buffer = base.JobStatus();
-
-            buffer += "PORT:      " + httpJobOptions.port + "\n";
-
-            return buffer;
+            _request.Abort();
         }
 
         #endregion

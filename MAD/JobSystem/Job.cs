@@ -8,37 +8,41 @@ namespace MAD
     {
         #region members
 
-        private static int jobsCount = 0;
+        private static int _jobsCount = 0;
+        private Thread _jobThread;
+        private bool _threadStopRequest = false;
+        private AutoResetEvent _cycleLock = new AutoResetEvent(false);
+        private Thread _cycleThread;
+
         public int jobID;
-        public JobOptions jobOptions;
         public string jobOutput = "";
 
-        public Thread jobThread;
-        public bool threadStopRequest = false;
-        public AutoResetEvent cycleLock = new AutoResetEvent(false);
-        public Thread cycleThread;
+        public JobOptions jobOptions;
 
         #endregion
 
         #region methodes
 
-        public void InitJob()
+        protected void InitJob(JobOptions jobOptions)
         {
             // set job-ID
-            jobID = jobsCount;
-            jobsCount++;
+            jobID = _jobsCount;
+            _jobsCount++;
+
+            // set jobName, jobDelay and jobType
+            this.jobOptions = jobOptions;
 
             // init threads
-            jobThread = new Thread(WorkerThread);
-            cycleThread = new Thread(CycleLockSignal);
+            _jobThread = new Thread(WorkerThread);
+            _cycleThread = new Thread(CycleLockSignal);
         }
 
         public bool Start()
         {
-            if (!threadStopRequest)
+            if (!_threadStopRequest)
             {
-                threadStopRequest = true;
-                jobThread.Start();
+                _threadStopRequest = true;
+                _jobThread.Start();
 
                 return true;
             }
@@ -48,10 +52,10 @@ namespace MAD
 
         public bool Stop()
         {
-            if (threadStopRequest)
+            if (_threadStopRequest)
             {
-                threadStopRequest = false;
-                cycleLock.Set();
+                _threadStopRequest = false;
+                _cycleLock.Set();
 
                 return true;
             }
@@ -61,50 +65,35 @@ namespace MAD
 
         public bool Active()
         {
-            return jobThread.IsAlive;
+            return _jobThread.IsAlive;
         }
 
-        public void WorkerThread()
+        private void WorkerThread()
         {
             while (true)
             {
                 // execute cycleThread and start counting cycleTime
-                cycleThread.Start();
+                _cycleThread.Start();
 
                 // do job
                 DoJob();
 
-                // wait for cycletime
-                cycleLock.WaitOne();
+                // wait delay-time
+                _cycleLock.WaitOne();
 
                 // check for any stop-requests
-                if (threadStopRequest)
+                if (_threadStopRequest)
                     break;
             }
         }
 
+        private void CycleLockSignal()
+        {
+            Thread.Sleep(jobOptions.jobDelay);
+            _cycleLock.Set();
+        }
+
         public abstract void DoJob();
-
-        public void CycleLockSignal()
-        {
-            Thread.Sleep(jobOptions.delay);
-            cycleLock.Set();
-        }
-
-        public virtual string JobStatus()
-        {
-            string buffer = "";
-
-            buffer += "JOB-ID:    " + jobID + "\n";
-            buffer += "NAME:      " + jobOptions.jobName + "\n";
-            buffer += "TYPE:      " + jobOptions.jobType.ToString() + "\n";
-            buffer += "ADDRESS:   " + jobOptions.targetAddress + "\n";
-            buffer += "DELAYTIME: " + jobOptions.delay + "\n";
-            buffer += "ACITIVE:   " + threadStopRequest.ToString() + "\n";
-            buffer += "OUTPUT:    " + jobOutput + "\n";
-
-            return buffer;
-        }
 
         #endregion
     }

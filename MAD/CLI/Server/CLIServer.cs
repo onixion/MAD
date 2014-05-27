@@ -64,9 +64,6 @@ namespace MAD.CLI
 
             try
             {
-                string data = Receive(_client.GetStream());
-                Send(_client.GetStream(), "LOL");
-
                 // HERE HERE HERE
             }
             catch (Exception)
@@ -78,30 +75,6 @@ namespace MAD.CLI
 
             return null;
         }
-
-        #region Send/Recieve
-
-        private void Send(NetworkStream _stream, string _data)
-        {
-            using (StreamWriter _writer = new StreamWriter(_stream))
-            {
-                _writer.Write(_data);
-                _writer.Flush();
-            }
-
-            _stream.Flush();
-            _stream.Close();
-        }
-
-        private string Receive(NetworkStream _stream)
-        {
-            using (StreamReader _reader = new StreamReader(_stream))
-            {
-                return _reader.ReadString();
-            }
-        }
-
-        #endregion
 
         #region Usermanagment / Security
 

@@ -6,28 +6,20 @@ namespace MAD
 {
     public class JobSystem
     {
-        #region members
-
         public Version version = new Version(1, 0);
         public List<Job> jobs = new List<Job>();
 
-        public readonly string dataPath;
-
-        #endregion
-
         public JobSystem(string dataPath)
         {
-            this.dataPath = dataPath;
-            // check dir exist and create ...
         }
 
         #region methodes
 
         public bool JobExist(int jobID)
         {
-            foreach (Job temp in jobs)
+            foreach (Job _temp in jobs)
             {
-                if (temp.jobID == jobID)
+                if (_temp.jobID == jobID)
                 {
                     return true;
                 }
@@ -38,30 +30,32 @@ namespace MAD
 
         public Job GetJob(int jobID)
         {
-            foreach (Job job in jobs)
+            foreach (Job _job in jobs)
             {
-                if (jobID == job.jobID)
+                if (jobID == _job.jobID)
                 {
-                    return job;
+                    return _job;
                 }
             }
 
             return null;
         }
 
-        public void CreateJob(JobOptions jobOptions)
+        public void CreateJob(JobOptions jobOptions, object specifiedJobOptions)
         {
             switch ((int)jobOptions.jobType)
             {
                 case 0: // PING REQUEST
-                    jobs.Add(new JobPing((JobPingOptions)jobOptions));
+                    jobs.Add(new JobPing(jobOptions, (JobPingOptions)specifiedJobOptions));
                     break;
                 case 1: // PORT SCAN
-                    jobs.Add(new JobPort((JobPortOptions)jobOptions));
+                    jobs.Add(new JobPort(jobOptions, (JobPortOptions)specifiedJobOptions));
                     break;
                 case 2: // HTTP REQUEST
-                    jobs.Add(new JobHttp((JobHttpOptions)jobOptions));
+                    jobs.Add(new JobHttp(jobOptions, (JobHttpOptions)specifiedJobOptions));
                     break;
+
+                // new job-Types
             }
         }
 
@@ -83,13 +77,13 @@ namespace MAD
         {
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (!jobs[i].threadStopRequest)
+                if (!jobs[i].Active())
                 {
                     jobs.RemoveAt(i);
                 }
                 else
                 {
-                    jobs[0].Stop();
+                    jobs[i].Stop();
                     jobs.RemoveAt(i);
                 }
             }
@@ -97,11 +91,11 @@ namespace MAD
 
         public void StartJob(int jobID)
         {
-            Job job = GetJob(jobID);
+            Job _job = GetJob(jobID);
 
-            if (job != null)
+            if (_job != null)
             {
-                if (!job.Start())
+                if (!_job.Start())
                 {
                     throw new Exception("Job is already active!");
                 }
@@ -114,11 +108,11 @@ namespace MAD
 
         public void StopJob(int jobID)
         {
-            Job job = GetJob(jobID);
+            Job _job = GetJob(jobID);
 
-            if (job != null)
+            if (_job != null)
             {
-                if (!job.Stop())
+                if (!_job.Stop())
                 {
                     throw new Exception("Job is already inactive!");
                 }
@@ -131,17 +125,17 @@ namespace MAD
 
         public int JobsActive()
         {
-            int count = 0;
+            int _count = 0;
 
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (jobs[0].threadStopRequest)
+                if (jobs[i].Active())
                 {
-                    count++;
+                    _count++;
                 }
             }
 
-            return count;
+            return _count;
         }
 
         public int JobsInactive()

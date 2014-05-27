@@ -3,12 +3,20 @@ using System.Net;
 
 namespace MAD
 {
-    public abstract class JobOptions
+    public class JobOptions
     {
         public string jobName;
+        public int jobDelay;
+
+        // jobType is needed for the jobSystem to create the right job.
         public JobType jobType;
         public enum JobType { PingRequest, PortRequest, HttpRequest }
-        public int delay;
-        public IPAddress targetAddress;
+
+        public JobOptions(string jobName, int jobDelay, JobType jobType)
+        {
+            this.jobName = jobName;
+            this.jobDelay = jobDelay;
+            this.jobType = jobType; 
+        }
     }
 }

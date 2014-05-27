@@ -15,12 +15,10 @@ namespace MAD
 
         #endregion
 
-        public JobPing(JobPingOptions pingJobOptions)
+        public JobPing(JobOptions jobOptions, JobPingOptions pingJobOptions)
         {
-            InitJob();
-
+            InitJob(jobOptions);
             this.pingJobOptions = pingJobOptions;
-            this.jobOptions = (JobOptions)pingJobOptions;
 
             ping = new Ping();
             pingOptions = new PingOptions(pingJobOptions.ttl, true);
@@ -30,7 +28,7 @@ namespace MAD
 
         public override void DoJob()
         {
-            reply = ping.Send(jobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
+            reply = ping.Send(pingJobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
             if (reply.Status == IPStatus.Success)
             {
@@ -40,15 +38,6 @@ namespace MAD
             {
                 jobOutput = "False";
             }
-        }
-
-        public override string JobStatus()
-        {
-            string buffer = base.JobStatus();
-
-            buffer += "TTL:       " + pingJobOptions.ttl + "\n";
-
-            return buffer;
         }
 
         #endregion

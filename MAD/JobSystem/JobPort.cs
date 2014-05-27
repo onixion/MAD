@@ -13,12 +13,10 @@ namespace MAD
 
         #endregion
 
-        public JobPort(JobPortOptions portJobOptions)
+        public JobPort(JobOptions jobOptions, JobPortOptions portJobOptions)
         {
-            InitJob();
-
+            InitJob(jobOptions);
             this.portJobOptions = portJobOptions;
-            this.jobOptions = (JobOptions) portJobOptions;
         }
 
         #region methodes
@@ -29,7 +27,7 @@ namespace MAD
 
             try
             {
-                socket.Connect(new IPEndPoint(jobOptions.targetAddress, portJobOptions.port));
+                socket.Connect(new IPEndPoint(portJobOptions.targetAddress, portJobOptions.port));
                 jobOutput = "True";
             }
             catch (Exception)
@@ -38,15 +36,6 @@ namespace MAD
             }
 
             socket.Close();
-        }
-
-        public override string JobStatus()
-        {
-            string buffer = base.JobStatus();
-
-            buffer += "PORT:      " + portJobOptions.port + "\n";
-
-            return buffer;
         }
 
         #endregion
