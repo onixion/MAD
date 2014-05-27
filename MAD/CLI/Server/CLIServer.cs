@@ -9,15 +9,17 @@ namespace MAD.CLI
 {
     public class CLIServer : CLIServerInternal
     {
-        public Version version = new Version(0, 0, 1000);
+        public Version version = new Version(0, 8, 1000);
+        public Version versionFramework;
+
 
         private TcpListener serverListener;
         private TcpClient client;
 
         private readonly string dataPath;
 
-        private List<CLIUser> users;
-        private List<CLISession> sessions;
+        public List<CLIUser> users;
+        public List<CLISession> sessions;
 
         private string secKey = "123";
 
@@ -27,6 +29,11 @@ namespace MAD.CLI
 
             // init server
             serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
+
+            // get version of used CLI-Framework
+            CLISession temp = new CLISession(new TcpClient());
+            versionFramework = temp.versionFramework;
+            temp = null;
 
             // init server vars
             users = new List<CLIUser>(){new CLIUser("root", "123")};

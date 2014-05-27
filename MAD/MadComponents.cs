@@ -11,7 +11,9 @@ namespace MAD
             get
             {
                 if (_components == null)
+                {
                     _components = new MadComponents();
+                }
   
                 return _components;
             }
@@ -34,10 +36,14 @@ namespace MAD
         private MadComponents()
         {
             // create data-path
+            if (!System.IO.Directory.Exists(dataPath))
+            {
+                System.IO.Directory.CreateDirectory(dataPath);
+            }
 
             // init components
             cli = new CLI.CLI();
-            jobSystem = new JobSystem(dataPath);
+            jobSystem = new JobSystem();
             cliServer = new CLIServer(dataPath, 999);
         }
     }

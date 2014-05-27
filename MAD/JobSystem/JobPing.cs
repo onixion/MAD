@@ -28,15 +28,22 @@ namespace MAD
 
         public override void DoJob()
         {
-            reply = ping.Send(pingJobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
+            try
+            {
+                reply = ping.Send(pingJobOptions.targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), pingOptions);
 
-            if (reply.Status == IPStatus.Success)
-            {
-                jobOutput = "True";
+                if (reply.Status == IPStatus.Success)
+                {
+                    jobOutput = "True";
+                }
+                else
+                {
+                    jobOutput = "False";
+                }
             }
-            else
+            catch (Exception)
             {
-                jobOutput = "False";
+                jobOutput = "False (E)";
             }
         }
 

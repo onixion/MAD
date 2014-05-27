@@ -16,6 +16,8 @@ namespace MAD.CLI
         private bool _listenThreadRunning = false;
         private object _lock = new object();
 
+        public bool listening { get { return _listenThreadRunning; } }
+
         private SmartThreadPool _threadPool = new SmartThreadPool();
         private int _threadPoolThreadStopTime = 5000;
 

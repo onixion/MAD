@@ -6,6 +6,8 @@ namespace MAD.CLI
 {
     public class CLI : CLIFramework
     {
+        public Version version = new Version(1, 0, 7000);
+
         public CLI()
         { 
             // init CLI
@@ -14,8 +16,6 @@ namespace MAD.CLI
 
         public void Start()
         {
-
-            Console.WriteLine(CLIInfo());
 
             while (true)
             {
@@ -50,13 +50,21 @@ namespace MAD.CLI
                             command.SetParameters(parameterInput);
 
                             // EXECUTE COMMAND AND SEND OUTPUT
-                            Console.WriteLine(command.Execute());
+                            cliWriter.WriteToConsole(command.Execute() + "\n");
                         }
                         else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine(parameterValid);
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                        }
                     }
                     else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Command '" + commandInput + "' unknown! Type 'help' for more information.");
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
                 }
             }
         }

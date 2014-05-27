@@ -6,14 +6,13 @@ MAD is an opensource network monitoring software, which should become an alterna
 
 ###Things to implement:
 
-- CLI
 - GUI
-- JobSystem
-- JobPing (ping request)
-- JobHttp (http request)
-- JobPortScanner (scan a specific port; open/closed)
-- SNMP Protocol
-- NotificationSystem (E-Mail, Webpage, ...)
+- NotificationSystem (E-Mail ...)
+- Database
+- JobSystem (Ping, HttpRequest, Port Scan, Arp-Request, ...)
+- CLI
+- CLI-Server
+- CLI-Client
 
 ===
 

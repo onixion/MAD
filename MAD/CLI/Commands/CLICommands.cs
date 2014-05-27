@@ -6,37 +6,28 @@ namespace MAD.CLI
     {
         public override string Execute()
         {
-            output += " <---- H E L P ---- P A G E ---->\n\n";
-            output += " <-- General commands -->\n\n";
-            output += "  help                      print this help page\n\n";
-            output += "  server-version            show server version\n\n";
-            output += "  info                      informations about the cli-server\n\n";
-            output += "  cursor -t <NEW CURSOR>    change the CLI cursor\n\n";
-            output += " <-- MadJobSystem commands -->\n\n";
-            output += "  jobsystem status          status of the job-system\n\n";
-            output += "  job status [-id <ID>]     status of the jobs\n";
-            output += "  job add ping -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-ttl <TTL>]\n";
-            output += "                            add a ping-job\n\n";
-            output += "  job add http -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
-            output += "                            add a http-job\n\n";
-            output += "  job add port -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
-            output += "                            add a port-job\n\n";
-            output += "  job remove -id <JOB ID>   remove a job\n\n";
-            output += "  job start -id <JOB ID>    start a job\n\n";
-            output += "  job stop -id <JOB ID>     stop a job\n\n";
-            output += " <-- MadMemoryManagmentSystem commands -->\n\n";
-            output += " <-- MadNotificationSystem commands -->\n\n";
-            output += " <---- E N D ---->\n";
+            output += "<color><yellow><---- H E L P ---- P A G E ---->\n\n";
+            output += "<color><darkyellow><-- General commands -->\n\n";
+            output += "<color><white>  help                      <color><gray>print this help page\n\n";
+            output += "<color><white>  server-version            <color><gray>show server version\n\n";
+            output += "<color><white>  info                      <color><gray>informations about the cli-server\n\n";
+            output += "<color><white>  cursor -t <NEW CURSOR>    <color><gray>change the CLI cursor\n\n";
+            output += "<color><darkyellow><-- MadJobSystem commands -->\n\n";
+            output += "<color><white>  jobsystem status          <color><gray>status of the job-system\n\n";
+            output += "<color><white>  job status [-id <ID>]     <color><gray>status of the jobs\n";
+            output += "<color><white>  job add ping -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-ttl <TTL>]\n";
+            output += "                            <color><gray>add a ping-job\n\n";
+            output += "<color><white>  job add http -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
+            output += "                            <color><gray>add a http-job\n\n";
+            output += "<color><white>  job add port -n <JOB NAME> -ip <IPADDRESS> [-d <DELAY>] [-p <PORT>]\n";
+            output += "                            <color><gray>add a port-job\n\n";
+            output += "<color><white>  job remove -id <JOB ID>   <color><gray>remove a job\n\n";
+            output += "<color><white>  job start -id <JOB ID>    <color><gray>start a job\n\n";
+            output += "<color><white>  job stop -id <JOB ID>     <color><gray>stop a job\n\n";
+            output += "<color><darkyellow><-- MadMemoryManagmentSystem commands -->\n\n";
+            output += "<color><darkyellow><-- MadNotificationSystem commands -->\n\n";
+            output += "<color><yellow><---- E N D ---->\n";
 
-            return output;
-        }
-    }
-
-    class VersionCommand : Command
-    {
-        public override string Execute()
-        {
-            output += "CLI-SERVER VERSION " + MadComponents.components.cliServer.version + ".";
             return output;
         }
     }
@@ -45,21 +36,25 @@ namespace MAD.CLI
     {
         public override string Execute()
         {
-            output += "INFO TEXT COMING SOON";
+            output += "<color><red>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n";
+            output += "Components:<color><yellow>\n";
+            output += "CLI         v" + MadComponents.components.cli.version.ToString() + " (CLI-Framework v" + MadComponents.components.cli.versionFramework + ")\n";
+            output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + " (CLI-Framework v" + MadComponents.components.cliServer.versionFramework + ")\n";
+            output += "JobSystem   v" + MadComponents.components.jobSystem.version.ToString() + "\n";
             return output;
         }
     }
 
-    class CursorCommand : Command
+    class ColorTest : Command
     {
-        public CursorCommand()
-        {
-            requiredParameter.Add(new ParameterOption("t", false, typeof(String)));
-        }
-
         public override string Execute()
         {
-            //MadComponents.components.cli.cursor = (String)parameters.GetParameter("t").value;
+            output += "<color><gray>" + MadComponents.components.cli.cliWriter.colors.Count + " colors supported.\n";
+
+            foreach(object[] temp in MadComponents.components.cli.cliWriter.colors)
+            {
+                output += "<color>" + (string) temp[0] + (string) temp[0] + "\n";
+            }
 
             return output;
         }

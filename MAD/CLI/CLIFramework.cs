@@ -13,7 +13,10 @@ namespace MAD.CLI
         #region member
 
         // cli framework version
-        public Version version = new Version(1, 0);
+        public Version versionFramework = new Version(1,3);
+
+        // cli writer (for color)
+        public ConsoleWriter cliWriter = new ConsoleWriter();
 
         // cli vars
         protected string cursor = "=> ";
@@ -40,13 +43,11 @@ namespace MAD.CLI
             {
                 // GENERAL COMMANDS
                 new CommandOptions("help", typeof(HelpCommand)),
-                new CommandOptions("versions", typeof(VersionCommand)),
                 new CommandOptions("info", typeof(InfoCommand)),
-                new CommandOptions("cursor", typeof(CursorCommand)),
+                new CommandOptions("colortest", typeof(ColorTest)),
 
                 // JOBSYSTEM COMMANDS
                 new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand)),
-                new CommandOptions("job status", typeof(JobListCommand)),
                 new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
                 new CommandOptions("job start", typeof(JobSystemStartCommand)),
                 new CommandOptions("job stop", typeof(JobSystemStopCommand)),
@@ -55,14 +56,10 @@ namespace MAD.CLI
                 new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
 
                 // CLI SERVER COMMANDS
+                new CommandOptions("cliserver info", typeof(CLIServerInfo)),
                 new CommandOptions("cliserver start", typeof(CLIServerStart)),
                 new CommandOptions("cliserver stop", typeof(CLIServerStop))
             };
-        }
-
-        protected string CLIInfo()
-        {
-            return "MAD-CLI VERSION " + version;
         }
 
         #endregion

@@ -6,12 +6,8 @@ namespace MAD
 {
     public class JobSystem
     {
-        public Version version = new Version(1, 0);
+        public Version version = new Version(1, 2, 6000);
         public List<Job> jobs = new List<Job>();
-
-        public JobSystem(string dataPath)
-        {
-        }
 
         #region methodes
 
@@ -141,6 +137,16 @@ namespace MAD
         public int JobsInactive()
         {
             return jobs.Count - JobsActive(); 
+        }
+
+        public void SaveTable(string path)
+        { 
+            // TODO
+        }
+
+        public void LoadTable(string path)
+        { 
+            // TODO
         }
 
         #endregion
