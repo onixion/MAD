@@ -38,6 +38,8 @@ namespace MAD.CLI
             // init server vars
             users = new List<CLIUser>(){new CLIUser("root", "123")};
             sessions = new List<CLISession>();
+
+            TestAES();
         }
 
         protected override bool StartListener()

@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Threading;
+using System.IO;
+using System.Text;
+using System.Net.Sockets;
+using System.Security.Cryptography;
 
 // ThreadPool
 using Amib.Threading;
@@ -97,5 +101,82 @@ namespace MAD.CLI
             }
         }
 
+        public void SendAES(NetworkStream stream, string cryptPass, string data)
+        { 
+            
+        }
+
+        public void TestAES()
+        { 
+            byte[] pass = System.Text.Encoding.ASCII.GetBytes("lol123");
+
+            string data = "LOLOLOLO";
+            byte[] encrpyted;
+
+            using (Aes aes = Aes.Create())
+            {
+                encrpyted = AESDecrypt(aes.Key, aes.IV, data); 
+            }
+        }
+
+        public byte[] AESEncrypt(byte[] key, byte[] iv, string data)
+        {
+            if (key.Length != 0 | iv.Length != 0 | data.Length != 0)
+            {
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = iv;
+
+                    ICryptoTransform encryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                        {
+                            using (StreamWriter writer = new StreamWriter(cs))
+                            {
+                                writer.Write(data);
+                            }
+
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public byte[] AESDecrypt(byte[] key, byte[] iv, string data)
+        {
+            if (key.Length != 0 | iv.Length != 0 | data.Length != 0)
+            {
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = iv;
+
+                    ICryptoTransform encryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+
+                    using (MemoryStream ms = new MemoryStream(Encoding.ASCII.GetBytes(data)))
+                    {
+                        using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Read))
+                        {
+                            using (StreamReader reader = new StreamReader(cs))
+                            {
+                                 return Encoding.ASCII.GetBytes(reader.ReadToEnd());
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
