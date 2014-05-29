@@ -39,7 +39,7 @@ namespace MAD.CLI
             output += "<color><red>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n";
             output += "Components:<color><yellow>\n";
             output += "CLI         v" + MadComponents.components.cli.version.ToString() + " (CLI-Framework v" + MadComponents.components.cli.versionFramework + ")\n";
-            output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + " (CLI-Framework v" + MadComponents.components.cliServer.versionFramework + ")\n";
+            output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + "\n";
             output += "JobSystem   v" + MadComponents.components.jobSystem.version.ToString() + "\n";
             return output;
         }
@@ -49,13 +49,13 @@ namespace MAD.CLI
     {
         public override string Execute()
         {
-            output += "<color><gray>" + MadComponents.components.cli.cliWriter.colors.Count + " colors supported.\n";
-
+            //output += "<color><gray>" + MadComponents.components.cli.cliWriter.colors.Count + " colors supported.\n";
+            /*
             foreach(object[] temp in MadComponents.components.cli.cliWriter.colors)
             {
                 output += "<color>" + (string) temp[0] + (string) temp[0] + "\n";
             }
-
+            */
             return output;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.CLI
+namespace CLIClient
 {
     public static class ConsoleWriter
     {

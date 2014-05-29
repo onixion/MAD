@@ -6,17 +6,10 @@ namespace MAD.CLI
 {
     public abstract class CLIFramework
     {
-        // --------------------------------------------------------
-        //          CLI Framework
-        // --------------------------------------------------------
-
         #region member
 
         // cli framework version
         public Version versionFramework = new Version(1,3);
-
-        // cli writer (for color)
-        public ConsoleWriter cliWriter = new ConsoleWriter();
 
         // cli vars
         protected string cursor = "=> ";

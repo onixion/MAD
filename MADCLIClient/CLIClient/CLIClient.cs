@@ -10,9 +10,15 @@ namespace CLIClient
 {
     public class CLIClient
     {
+        #region member
+
         private IPEndPoint _serverEndPoint;
         private string _username;
         private string _passwordMD5;
+
+        private string cliInput;
+
+        #endregion
 
         public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
         {
@@ -21,47 +27,64 @@ namespace CLIClient
             _passwordMD5 = passwordMD5;
         }
 
+        #region methodes
+
         public void Start()
         {
             TcpClient _client = new TcpClient();
-            NetworkStream _stream = null;
+            NetworkStream _stream;
 
             try
             {
-                Console.WriteLine("Connecting to server ...");
-
+                Console.WriteLine("Connecting ...");
                 _client.Connect(_serverEndPoint);
 
-                Console.WriteLine("Connected to server.");
+                _stream = _client.GetStream();
 
-                CLIConnection(_client.GetStream());
-
+                CLIConnection(_stream);
                 _stream.Close();
+
+                Console.WriteLine("Disconnected.");
             }
             catch (Exception)
             {
-                Console.WriteLine("Could not connect to server!");
+                Console.WriteLine("Lost connection to server.");
             }
 
             _client.Close();
         }
 
         private void CLIConnection(NetworkStream _stream)
-        { 
-            /* From here the connection is astablished */
+        {
+            Console.WriteLine("SERVER-INFO: " + NetCommunication.ReceiveString(_stream));
+            NetCommunication.SendString(_stream, _username + "<seperator>" + _passwordMD5, true);
 
+            switch (NetCommunication.ReceiveString(_stream))
+            { 
+                case "ACCESS GRANTED":
+                    RemoteConsole(_stream);
+                    break;
+                case "ACCESS DENIED":
+                    Console.WriteLine("Server denied access!");
+                    break;
+                default:
+                    Console.WriteLine("Server-Response-Error!");
+                    break;
+            }
         }
 
-        #region Send/Recieve
-
-        private void Send(NetworkStream _stream, string _data)
+        private void RemoteConsole(NetworkStream stream)
         {
+            Console.Write(NetCommunication.ReceiveString(stream));
 
-        }
+            while (true)
+            {
+                cliInput = Console.ReadLine();
 
-        private string Receive(NetworkStream _stream)
-        {
+                NetCommunication.SendString(stream, cliInput, true);
 
+                ConsoleWriter.WriteToConsole(NetCommunication.ReceiveString(stream));
+            }
         }
 
         #endregion

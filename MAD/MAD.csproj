@@ -52,6 +52,7 @@
     <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
+    <Compile Include="CLI\Server\NetCommunication.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobHttp.cs" />
     <Compile Include="JobSystem\JobHttpOptions.cs" />

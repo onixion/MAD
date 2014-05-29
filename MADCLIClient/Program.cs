@@ -91,6 +91,8 @@ namespace CLIClient
                     }
                 }
 
+                passwordMD5 = NetCommunication.GetHash(passwordMD5);
+
                 Console.WriteLine("\n\nConnect to '" + serverAddress + ":" + serverPort + "' with the username '" + username + "'?");
                 Console.WriteLine("Sure about that? Y/N");
 

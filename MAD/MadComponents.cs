@@ -1,5 +1,6 @@
 ﻿using System;
 using MAD.CLI;
+using MAD.CLI.Server;
 
 namespace MAD
 {

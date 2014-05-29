@@ -9,8 +9,6 @@ namespace MAD
             if (args.Length == 0)
             { 
                 // start gui
-
-
                 MadComponents.components.cli.Start();
             }
             else if (args.Length >= 1)

@@ -16,7 +16,6 @@ namespace MAD.CLI
 
         public void Start()
         {
-
             while (true)
             {
                 // print cursor
@@ -50,7 +49,7 @@ namespace MAD.CLI
                             command.SetParameters(parameterInput);
 
                             // EXECUTE COMMAND AND SEND OUTPUT
-                            cliWriter.WriteToConsole(command.Execute() + "\n");
+                            ConsoleWriter.WriteToConsole(command.Execute() + "\n");
                         }
                         else
                         {

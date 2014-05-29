@@ -6,8 +6,12 @@ namespace MAD
 {
     public class JobSystem
     {
+        #region member
+
         public Version version = new Version(1, 2, 6000);
         public List<Job> jobs = new List<Job>();
+
+        #endregion
 
         #region methodes
 

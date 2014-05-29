@@ -5,42 +5,37 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
-namespace MAD.CLI
+namespace MAD.CLI.Server
 {
     public class CLIServer : CLIServerInternal
     {
+        #region members
+
         public Version version = new Version(0, 8, 1000);
-        public Version versionFramework;
-
-
-        private TcpListener serverListener;
-        private TcpClient client;
 
         private readonly string dataPath;
+        private const string logDirName = "log";
+
+        private TcpListener serverListener;
 
         public List<CLIUser> users;
         public List<CLISession> sessions;
 
-        private string secKey = "123";
+        #endregion
 
         public CLIServer(string dataPath, int port)
         {
             this.dataPath = dataPath;
 
-            // init server
+            // init tcp-server
             serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
 
-            // get version of used CLI-Framework
-            CLISession temp = new CLISession(new TcpClient());
-            versionFramework = temp.versionFramework;
-            temp = null;
-
             // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", "123")};
+            users = new List<CLIUser>(){new CLIUser("root", NetCommunication.GetHash("123"))};
             sessions = new List<CLISession>();
-
-            TestAES();
         }
+
+        #region methodes
 
         protected override bool StartListener()
         {
@@ -68,16 +63,32 @@ namespace MAD.CLI
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
+            IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+            NetworkStream _clientStream = _client.GetStream();
 
-            // client connected
+            Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") connected.");
 
             try
             {
-                // HERE HERE HERE
+                // send server info
+                NetCommunication.SendString(_clientStream, "Mad CLI-Server v" + version, true);
+
+                // receive login data
+                string loginData = NetCommunication.ReceiveString(_clientStream);
+
+                if (Login(loginData))
+                {
+                    NetCommunication.SendString(_clientStream, "ACCESS GRANTED", true);
+                    sessions.Add(new CLISession(_client, null)); // TODO: CLIUser Managment
+                }
+                else
+                {
+                    NetCommunication.SendString(_clientStream, "ACCESS DENIED", true);
+                }
             }
             catch (Exception)
             {
-                // client disconnectedpl
+
             }             
 
             _client.Close();
@@ -85,7 +96,41 @@ namespace MAD.CLI
             return null;
         }
 
-        #region Usermanagment / Security
+        private bool Login(string loginData)
+        {
+            string[] buffer = loginData.Split(new string[] { "<seperator>" },StringSplitOptions.None);
+
+            if (buffer.Length == 2)
+            {
+                if (CheckUsernameAndPassword(buffer[0], buffer[1]))
+                {
+                    CLIUser user = GetCLIUser(buffer[0]);
+
+                    if (!user.online)
+                    {
+                        user.online = true;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void Logout(string username)
+        {
+        
+        }
 
         private bool CheckUsernameAndPassword(string username, string passwordMD5)
         {
@@ -95,7 +140,7 @@ namespace MAD.CLI
             {
                 if (user.passwordMD5 == passwordMD5)
                 {
-                    return false;
+                    return true;
                 }
                 else
                 {
@@ -121,6 +166,29 @@ namespace MAD.CLI
             }
 
             return null;
+        }
+
+        #endregion
+
+        #region Logger
+
+        private void CreateLogDir()
+        {
+            if (!Directory.Exists(Path.Combine(dataPath, logDirName)))
+            {
+                Directory.CreateDirectory(Path.Combine(dataPath, logDirName));
+            }
+        }
+
+        private void Log(string data)
+        {
+            CreateLogDir();
+
+            using(FileStream stream = new FileStream(Path.Combine(dataPath, logDirName, "logCLISERVER.txt"), FileMode.Append, FileAccess.Write, FileShare.Read))
+            using (StreamWriter writer = new StreamWriter(stream))
+            {
+                writer.WriteLine("[ " + NetCommunication.DateStamp() + " | " + NetCommunication.TimeStamp() + " ] " + data);
+            }
         }
 
         #endregion

@@ -11,7 +11,7 @@ namespace MAD.CLI
 
         public override string Execute()
         {
-            output += "<color><red>CLI-Server v" + MadComponents.components.cliServer.version + " (CLI-Framework v" + MadComponents.components.cliServer.versionFramework + ") \n";
+            output += "<color><red>CLI-Server v" + MadComponents.components.cliServer.version + "\n";
             output += "<color><yellow>";
             output += "Server listening: " + MadComponents.components.cliServer.listening + "\n";
             output += "Active Sessions:  " + MadComponents.components.cliServer.sessions.Count + "\n";
