@@ -31,7 +31,7 @@ namespace MAD.CLI.Server
             serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
 
             // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", NetCommunication.GetHash("123"))};
+            users = new List<CLIUser>(){new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root)};
             sessions = new List<CLISession>();
         }
 

@@ -11,12 +11,13 @@ namespace MAD
         private static int _jobsCount = 0;
         private Thread _jobThread;
         private bool _threadStopRequest = false;
+        
         private AutoResetEvent _cycleLock = new AutoResetEvent(false);
         private Thread _cycleThread;
+        private static int _cycleTime = 100;
 
         public int jobID;
         public string jobOutput = "";
-
         public JobOptions jobOptions;
 
         #endregion
@@ -57,6 +58,9 @@ namespace MAD
                 _threadStopRequest = false;
                 _cycleLock.Set();
 
+                // wait for thread to close
+                _jobThread.Join();
+
                 return true;
             }
 
@@ -77,8 +81,6 @@ namespace MAD
 
                 // do job
                 DoJob();
-
-                // wait delay-time
                 _cycleLock.WaitOne();
 
                 // check for any stop-requests
@@ -89,7 +91,12 @@ namespace MAD
 
         private void CycleLockSignal()
         {
-            Thread.Sleep(jobOptions.jobDelay);
+            // check every _cycleTime for 
+            while (!_threadStopRequest)
+            {
+                Thread.Sleep(_cycleTime);
+            }
+
             _cycleLock.Set();
         }
 

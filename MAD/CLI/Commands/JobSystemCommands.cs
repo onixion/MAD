@@ -276,4 +276,30 @@ namespace MAD.CLI
             return output;
         }
     }
+
+    public class JobSystemOutputCommand : Command
+    {
+        public JobSystemOutputCommand()
+        {
+            requiredParameter.Add(new ParameterOption("id", false, typeof(int)));
+        }
+
+        public override string Execute()
+        {
+            int id = (int)parameters.GetParameter("id").value;
+
+            Job job = MadComponents.components.jobSystem.GetJob(id);
+
+            if (job != null)
+            {
+                output += "<color><yellow>" + job.jobOutput;
+                return output;
+            }
+            else
+            {
+                output += "<color><red>Job does not exist!";
+                return output;
+            }
+        }
+    }
 }

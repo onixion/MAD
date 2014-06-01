@@ -14,12 +14,6 @@ namespace MAD.CLI
         // cli vars
         protected string cursor = "=> ";
 
-        // cli input vars
-        protected string cliInput;
-        protected string commandInput;
-        protected ParameterInput parameterInput;
-        protected string parameterValid;
-
         // cli command vars
         protected List<CommandOptions> commandOptions;
         protected Command command;
@@ -31,7 +25,7 @@ namespace MAD.CLI
 
         protected void _InitCLI()
         {
-            // init available commands
+            // available commands for all users
             commandOptions = new List<CommandOptions>()
             {
                 // GENERAL COMMANDS
@@ -39,6 +33,7 @@ namespace MAD.CLI
                 new CommandOptions("info", typeof(InfoCommand)),
                 new CommandOptions("colortest", typeof(ColorTest)),
 
+                
                 // JOBSYSTEM COMMANDS
                 new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand)),
                 new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
@@ -53,6 +48,54 @@ namespace MAD.CLI
                 new CommandOptions("cliserver start", typeof(CLIServerStart)),
                 new CommandOptions("cliserver stop", typeof(CLIServerStop))
             };
+        }
+
+        /*
+         * This function checks if the parms are valid and sets the command
+         * object.
+         * 
+         * It returns the string "VALID_PARAMETER" when the parameter are valid.
+         * If the parameter are not valid it returns a error text. */
+        public string AnalyseInput(string cliInput, ref Command command)
+        {
+            string commandInput;
+
+            if (cliInput != "")
+            {
+                // get command
+                commandInput = GetCommand(cliInput);
+
+                // check if command is known
+                if (CommandExists(commandInput))
+                {
+                    // get command type
+                    Type inputCommandType = GetCommandType(commandInput);
+                    // get parameter and arguments from input
+                    ParameterInput parameterInput = GetParamtersFromInput(cliInput);
+
+                    // create command object (pass the command none objects)
+                    command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
+
+                    // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
+                    string parameterValid = command.ValidParameters(parameterInput);
+
+                    // set parameters if the parameter are valid
+                    if (parameterValid == "VALID_PARAMETER")
+                    {
+                        command.SetParameters(parameterInput);
+                    }
+
+                    return parameterValid;
+                }
+                else
+                {
+                    return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.";
+                }
+            }
+            else
+            {
+                return "";
+            }
         }
 
         #endregion

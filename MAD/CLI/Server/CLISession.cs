@@ -57,56 +57,22 @@ namespace MAD.CLI.Server
             // first time send cursor
             NetCommunication.SendString(stream, cursor, true);
 
+            string cliInput;
+            string response;
+
             while (true)
             {
                 cliInput = NetCommunication.ReceiveString(stream);
-                Console.WriteLine(cliInput);
 
-                if (cliInput != "")
+                response = AnalyseInput(cliInput, ref command);
+
+                if (response == "VALID_PARAMETER")
                 {
-                    if (cliInput == "exit" || cliInput == "close")
-                    {
-                        break;
-                    }
-
-                    // get command
-                    commandInput = GetCommand(cliInput);
-
-                    // check if command are known
-                    if (CommandExists(commandInput))
-                    {
-                        // get arguments from input
-                        parameterInput = GetParamtersFromInput(cliInput);
-                        // get command type
-                        inputCommandType = GetCommandType(commandInput);
-
-                        // create command object (pass the command none objects)
-                        command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
-
-                        // check if the arguments are valid (string = VALID_PARAMETER)
-                        parameterValid = command.ValidParameters(parameterInput);
-
-                        if (parameterValid == "VALID_PARAMETER")
-                        {
-                            // set command parameters 
-                            command.SetParameters(parameterInput);
-
-                            // EXECUTE COMMAND AND SEND OUTPUT
-                            NetCommunication.SendString(stream, command.Execute() + "\n<color><gray>" + cursor, true);
-                        }
-                        else
-                        {
-                            NetCommunication.SendString(stream, "<color><red>" + parameterValid + "\n<color><gray>" + cursor, true);
-                        }
-                    }
-                    else
-                    {
-                        NetCommunication.SendString(stream, "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.\n<color><gray>" + cursor, true);
-                    }
+                    NetCommunication.SendString(stream, command.Execute() + "\n<color><gray>" + cursor, true);
                 }
                 else
                 {
-                    NetCommunication.SendString(stream, "<color><gray>" + cursor, true);
+                    NetCommunication.SendString(stream, response + "\n<color><gray>" + cursor, true);
                 }
             }
         }

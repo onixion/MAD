@@ -7,7 +7,7 @@ namespace MAD.CLI
     {
         private const string colorTag = "<color>";
 
-        // supported colors (for now)
+        // supported colors
         public static List<object[]> colors = new List<object[]>()
         {
             new object[] { "<blue>" , ConsoleColor.Blue },
@@ -46,7 +46,7 @@ namespace MAD.CLI
                     }
                 }
             }
-
+            Console.Write("\n");
             Console.ForegroundColor = ConsoleColor.Gray;
         }
     }
