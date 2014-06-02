@@ -42,7 +42,6 @@
     <Compile Include="CLI\CLIFramework.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
     <Compile Include="CLI\ConsoleWriter.cs" />
-    <Compile Include="CLI\Server\CLIPackage.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Parameter\Parameter.cs" />
     <Compile Include="CLI\Parameter\ParameterInput.cs" />
@@ -54,13 +53,11 @@
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="CLI\Server\NetCommunication.cs" />
     <Compile Include="JobSystem\Job.cs" />
-    <Compile Include="JobSystem\JobHttp.cs" />
-    <Compile Include="JobSystem\JobHttpOptions.cs" />
+    <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\JobOptions.cs" />
-    <Compile Include="JobSystem\JobPing.cs" />
-    <Compile Include="JobSystem\JobPingOptions.cs" />
-    <Compile Include="JobSystem\JobPort.cs" />
-    <Compile Include="JobSystem\JobPortOptions.cs" />
+    <Compile Include="JobSystem\JobOutput.cs" />
+    <Compile Include="JobSystem\Jobs\JobPing.cs" />
+    <Compile Include="JobSystem\Jobs\JobPort.cs" />
     <Compile Include="MadComponents.cs" />
     <Compile Include="JobSystem\JobSystem.cs" />
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />

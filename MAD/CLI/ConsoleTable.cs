@@ -8,10 +8,10 @@ namespace MAD
         private int columneWidth;
         public string splitline = "".PadRight(Console.BufferWidth, '_');
 
-        public ConsoleTable(string[] columnesTitles)
+        public ConsoleTable(string[] columnesTitles, int consoleWidth)
         {
             this.columnesTitles = columnesTitles;
-            columneWidth = Console.BufferWidth / columnesTitles.Length - 1;
+            columneWidth = consoleWidth / columnesTitles.Length - 1;
         }
 
         #region methodes

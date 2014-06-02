@@ -7,7 +7,6 @@ namespace MAD.CLI
     {
         private const string colorTag = "<color>";
 
-        // supported colors
         public static List<object[]> colors = new List<object[]>()
         {
             new object[] { "<blue>" , ConsoleColor.Blue },
@@ -27,27 +26,33 @@ namespace MAD.CLI
             new object[] { "<yellow>" , ConsoleColor.Yellow }
         };
 
-        public static void WriteToConsole(string text)
+        /// <summary>
+        /// Writes data to the console in colors
+        /// </summary>
+        public static void WriteToConsole(string data)
         {
-            string[] temp = text.Split(new string[] { colorTag }, StringSplitOptions.None);
-
-            for (int i = 0; i < temp.Length; i++)
+            if (data != "")
             {
-                foreach (object[] buffer in colors)
-                { 
-                    string color = (string)buffer[0];
+                string[] temp = data.Split(new string[] { colorTag }, StringSplitOptions.None);
 
-                    if (temp[i].StartsWith(color))
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    foreach (object[] buffer in colors)
                     {
-                        temp[i] = temp[i].Remove(0, color.Length);
-                        Console.ForegroundColor = (ConsoleColor)buffer[1];
-                        Console.Write(temp[i]);
-                        break;
+                        string color = (string)buffer[0];
+
+                        if (temp[i].StartsWith(color))
+                        {
+                            temp[i] = temp[i].Remove(0, color.Length);
+                            Console.ForegroundColor = (ConsoleColor)buffer[1];
+                            Console.Write(temp[i]);
+                            break;
+                        }
                     }
                 }
+
+                Console.ForegroundColor = ConsoleColor.Gray;
             }
-            Console.Write("\n");
-            Console.ForegroundColor = ConsoleColor.Gray;
         }
     }
 }

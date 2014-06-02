@@ -25,7 +25,6 @@ namespace MAD.CLI
 
         protected void _InitCLI()
         {
-            // available commands for all users
             commandOptions = new List<CommandOptions>()
             {
                 // GENERAL COMMANDS
@@ -36,6 +35,7 @@ namespace MAD.CLI
                 
                 // JOBSYSTEM COMMANDS
                 new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand)),
+                new CommandOptions("job status", typeof(JobStatusCommand)),
                 new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
                 new CommandOptions("job start", typeof(JobSystemStartCommand)),
                 new CommandOptions("job stop", typeof(JobSystemStopCommand)),
@@ -44,7 +44,7 @@ namespace MAD.CLI
                 new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
 
                 // CLI SERVER COMMANDS
-                new CommandOptions("cliserver info", typeof(CLIServerInfo)),
+                new CommandOptions("cliserver", typeof(CLIServerInfo)),
                 new CommandOptions("cliserver start", typeof(CLIServerStart)),
                 new CommandOptions("cliserver stop", typeof(CLIServerStop))
             };

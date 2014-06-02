@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading;
 
-namespace MAD
+namespace MAD.JobSystem
 {
     public abstract class Job
     {
@@ -17,8 +17,8 @@ namespace MAD
         private static int _cycleTime = 100;
 
         public int jobID;
-        public string jobOutput = "";
         public JobOptions jobOptions;
+        public JobOutput jobOutput = new JobOutput();
 
         #endregion
 
@@ -101,6 +101,26 @@ namespace MAD
         }
 
         public abstract void DoJob();
+
+        public abstract void Update();
+
+        #region for CLI only
+
+        public string Status()
+        {
+            string _temp = "";
+
+            _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
+            _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
+            _temp += "<color><yellow>TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
+            _temp += "<color><yellow>DELAY(ms): <color><white>" + jobOptions.jobDelay + "\n";
+            _temp += "<color><yellow>ACTIVE: <color><white>" + Active().ToString() + "\n";
+            _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
+
+            return _temp;
+        }
+
+        #endregion
 
         #endregion
     }

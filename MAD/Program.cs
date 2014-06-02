@@ -8,8 +8,10 @@ namespace MAD
         {
             if (args.Length == 0)
             { 
-                // start gui
+                //---------------------------------------------
+                // TEST YOUR SHIT IN HERE
                 MadComponents.components.cli.Start();
+                //---------------------------------------------
             }
             else if (args.Length >= 1)
             {

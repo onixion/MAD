@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace MAD
+namespace MAD.JobSystem
 {
     public class JobSystem
     {
@@ -41,22 +41,9 @@ namespace MAD
             return null;
         }
 
-        public void CreateJob(JobOptions jobOptions, object specifiedJobOptions)
+        public void CreateJob(Job job)
         {
-            switch ((int)jobOptions.jobType)
-            {
-                case 0: // PING REQUEST
-                    jobs.Add(new JobPing(jobOptions, (JobPingOptions)specifiedJobOptions));
-                    break;
-                case 1: // PORT SCAN
-                    jobs.Add(new JobPort(jobOptions, (JobPortOptions)specifiedJobOptions));
-                    break;
-                case 2: // HTTP REQUEST
-                    jobs.Add(new JobHttp(jobOptions, (JobHttpOptions)specifiedJobOptions));
-                    break;
-
-                // new job-Types
-            }
+            jobs.Add(job);
         }
 
         public void DestroyJob(int jobID)

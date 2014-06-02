@@ -115,7 +115,7 @@ namespace MAD.CLI
                 // check if all arguments are known by the command
                 if (!ParameterExists(temp))
                 {
-                    return "Parameter '-" + temp.indicator + "' does not exist for this command!";
+                    return "<color><red>Parameter '-" + temp.indicator + "' does not exist for this command!";
                 }
 
                 // if the given arg is a required arg increase requiredArgsFound
@@ -130,7 +130,7 @@ namespace MAD.CLI
                     // check if argument is not null
                     if(temp.value != null)
                     {
-                        return "Value of parameter '-" + temp.indicator + "' must be null!";
+                        return "<color><red>Value of parameter '-" + temp.indicator + "' must be null!";
                     }
                 }
                 else
@@ -138,7 +138,7 @@ namespace MAD.CLI
                     // check if argument is null
                     if (temp.value == null)
                     {
-                        return "Value of parameter '-" + temp.indicator + "' can't be null!";
+                        return "<color><red>Value of parameter '-" + temp.indicator + "' can't be null!";
                     }
                 }
 
@@ -147,7 +147,7 @@ namespace MAD.CLI
 
                 if (argument == null)
                 {
-                    return "Could not parse argument '" + temp.value + "'. Type help for view full commands.";
+                    return "<color><red>Could not parse argument '" + temp.value + "'. Type help for view full commands.";
                 }
                 else
                 {
@@ -159,7 +159,7 @@ namespace MAD.CLI
             // check if all required parameters are known
             if (requiredParameter.Count != requiredArgsFound)
             {
-                return "Some required parameters are missing! Type 'help' to see full commands.";
+                return "<color><red>Some required parameters are missing! Type 'help' to see full commands.";
             }
 
             return "VALID_PARAMETER";

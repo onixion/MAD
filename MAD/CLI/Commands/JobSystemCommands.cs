@@ -1,91 +1,79 @@
 ﻿using System;
 using System.Net;
+using MAD.JobSystem;
 
 namespace MAD.CLI
 {
     public class JobSystemStatusCommand : Command
     {
-        public JobSystemStatusCommand()
+        ConsoleTable jobTable;
+
+        public override string Execute()
+        {
+            string[] tableRow = new string[] { "ID", "Name", "Type", "Delay", "Active", "Output-State" };
+            jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
+            tableRow = jobTable.FormatStringArray(tableRow);
+
+            output += "<color><yellow>\n";
+            output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
+            output += "Jobs active:      " + MadComponents.components.jobSystem.JobsActive() + "\n";
+            output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n\n";
+
+            output += jobTable.WriteColumnes(tableRow) + "\n";
+            output += jobTable.splitline + "\n";
+            output += "<color><white>";
+
+            /* It improves the performance when you can work with jobs directly! */
+            foreach (Job _temp in MadComponents.components.jobSystem.jobs)
+            {
+                tableRow[0] = _temp.jobID.ToString();
+                tableRow[1] = _temp.jobOptions.jobName;
+                tableRow[2] = _temp.jobOptions.jobType.ToString();
+                tableRow[3] = _temp.jobOptions.jobDelay.ToString();
+                tableRow[4] = _temp.Active().ToString();
+                tableRow[5] = _temp.jobOutput.jobState.ToString();
+
+                tableRow = jobTable.FormatStringArray(tableRow);
+                output += jobTable.WriteColumnes(tableRow) + "\n";
+            }
+
+            return output;
+        }
+    }
+
+    public class JobStatusCommand : Command
+    {
+        public JobStatusCommand()
         {
             optionalParameter.Add(new ParameterOption("id", false, typeof(int)));
         }
 
         public override string Execute()
         {
-            if (!OptionalParameterUsed("id"))
+            if (OptionalParameterUsed("id"))
             {
-                ConsoleTable jobTable;
-                string[] tableTitle = new string[] { "ID", "Name", "Type", "Delay", "Active", "Output" };
-                jobTable = new ConsoleTable(tableTitle);
-                tableTitle = jobTable.FormatStringArray(tableTitle);
+                Job _job = MadComponents.components.jobSystem.GetJob((int)parameters.GetParameter("id").value);
 
-                output += "<color><yellow>\n";
-                output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
-                output += "Jobs active:      " + MadComponents.components.jobSystem.JobsActive() + "\n";
-                output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n\n";
-                output += "<color><red>";
-
-                output += jobTable.WriteColumnes(tableTitle) + "\n";
-                output += jobTable.splitline + "\n";
-
-                output += "<color><white>";
-                foreach (Job job in MadComponents.components.jobSystem.jobs)
+                if (_job != null)
                 {
-                    string[] array = new string[tableTitle.Length];
-                    array[0] = job.jobID.ToString();
-                    array[1] = job.jobOptions.jobName;
-                    array[2] = job.jobOptions.jobType.ToString();
-                    array[3] = job.jobOptions.jobDelay.ToString();
-                    array[4] = job.Active().ToString();
-                    array[5] = job.jobOutput;
-
-                    // format the string array
-                    array = jobTable.FormatStringArray(array);
-
-                    // add the string array to output
-                    output += jobTable.WriteColumnes(array);
-                }
-
-                output += "\n";
-            }
-            else
-            { 
-                int id = (int)parameters.GetParameter("id").value;
-
-                if (!MadComponents.components.jobSystem.JobExist(id))
-                {
-                    Job job = MadComponents.components.jobSystem.GetJob(id);
-                    ConsoleTable table;
-                    string[] columes;
-
-                    switch (job.jobOptions.jobType.ToString())
-                    { 
-                        case "PingRequest":
-                            columes = new string[] {"ID", "Name", "Type", "Delay", "IP", "TTL", "Avtive", "Output" };
-                            table = new ConsoleTable(columes);
-                            columes = table.FormatStringArray(columes);
-                            output += "<color><red>" + table.WriteColumnes(columes) + "\n";
-                            output += table.splitline + "\n";
-
-                            string[] array = new string[7];
-                            array[0] = job.jobID.ToString();
-                            array[1] = job.jobOptions.jobName;
-                            array[2] = job.jobOptions.jobType.ToString();
-                            array[3] = job.jobOptions.jobDelay.ToString();
-
-                            // TODO
-
-                            break;
-                    }
+                    output = _job.Status();
                 }
                 else
                 {
-                    output += "<color><red>Job does not exist!";
+                    output = "<color><red>Job does not exist!";
                 }
+
+                return output;
+            }
+
+            else
+            {
+
             }
 
             return output;
         }
+    
     }
 
     public class JobSystemAddPingCommand : Command
@@ -107,22 +95,21 @@ namespace MAD.CLI
             if (OptionalParameterUsed("t") && OptionalParameterUsed("ttl"))
             {
                 // both optional parameter are used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), new JobPingOptions(targetAddress, (int)parameters.GetParameter("ttl").value));
+
             }
             else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("ttl"))
             {
                 // no optional parameter are used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, 20000, JobOptions.JobType.PingRequest), new JobPingOptions(targetAddress, 250));
+
             }
             else if (OptionalParameterUsed("t"))
             {
                 // optional parameter "t" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), new JobPingOptions(targetAddress, 250));
             }
             else
             {
                 // optional parameter "ttl" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, 20000, JobOptions.JobType.PingRequest), new JobPingOptions(targetAddress, (int)parameters.GetParameter("ttl").value));
+
             }
 
             return output;
@@ -148,22 +135,22 @@ namespace MAD.CLI
             if (OptionalParameterUsed("t") && OptionalParameterUsed("p"))
             {
                 // both optional parameter are used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), new JobHttpOptions(targetAddress, (int)parameters.GetParameter("p").value));
+
             }
             else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("p"))
             {
                 // no optional parameter are used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, 20000, JobOptions.JobType.HttpRequest), new JobHttpOptions(targetAddress, 80));
+ 
             }
             else if (OptionalParameterUsed("t"))
             {
                 // optional parameter "t" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), new JobHttpOptions(targetAddress, 80));
+ 
             }
             else
             {
                 // optional parameter "p" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, 20000, JobOptions.JobType.HttpRequest), new JobHttpOptions(targetAddress, (int)parameters.GetParameter("p").value));
+               
             }
 
             return output;
@@ -187,16 +174,21 @@ namespace MAD.CLI
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
             int port = (int)parameters.GetParameter("p").value;
 
+            JobPort _job; 
+
             if (OptionalParameterUsed("t"))
             {
                 // optional parameter "t" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PortRequest), new JobPortOptions(targetAddress, port));
+                _job = new JobPort(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PortRequest), targetAddress, port);
             }
             else
             {
-                // optional parameter "p" used
-                MadComponents.components.jobSystem.CreateJob(new JobOptions(jobName, 20000, JobOptions.JobType.PortRequest), new JobPortOptions(targetAddress, port));
+                // optional parameter "t"  not used
+                _job = new JobPort(new JobOptions(jobName, 20000, JobOptions.JobType.PortRequest), targetAddress, port);
             }
+
+            // add job to jobsystem
+            MadComponents.components.jobSystem.CreateJob(_job);
 
             return output;
         }

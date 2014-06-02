@@ -1,6 +1,8 @@
 ﻿using System;
+
 using MAD.CLI;
 using MAD.CLI.Server;
+using MAD.JobSystem;
 
 namespace MAD
 {
@@ -28,7 +30,7 @@ namespace MAD
 
         public CLI.CLI cli;
         public CLIServer cliServer;
-        public JobSystem jobSystem;
+        public JobSystem.JobSystem jobSystem;
 
         // ----------------------------------
         //     DEFAULT CONSTRUCTORS
@@ -44,7 +46,7 @@ namespace MAD
 
             // init components
             cli = new CLI.CLI();
-            jobSystem = new JobSystem();
+            jobSystem = new JobSystem.JobSystem();
             cliServer = new CLIServer(dataPath, 999);
         }
     }
