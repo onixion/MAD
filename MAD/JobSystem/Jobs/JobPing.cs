@@ -26,15 +26,9 @@ namespace MAD.JobSystem
             this.ttl = ttl;
 
             _ping = new Ping();
-            Update();
         }
 
         #region methodes
-
-        public override void Update()
-        {
-            _pingOptions = new PingOptions(ttl, true);
-        }
 
         public override void DoJob()
         {
@@ -55,6 +49,16 @@ namespace MAD.JobSystem
             {
                 jobOutput.jobState = JobOutput.State.Exception;
             }
+        }
+
+        public override string Status()
+        {
+            string _temp = base.Status();
+
+            _temp += "<color><yellow>TARGET-IP: <color><white>" + targetAddress.ToString() + "\n";
+            _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
+
+            return _temp;
         }
 
         #endregion

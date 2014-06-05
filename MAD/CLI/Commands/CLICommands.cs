@@ -2,7 +2,7 @@
 
 namespace MAD.CLI
 {
-    class HelpCommand : Command
+    public class HelpCommand : Command
     {
         public override string Execute()
         {
@@ -32,7 +32,7 @@ namespace MAD.CLI
         }
     }
 
-    class InfoCommand : Command
+    public class InfoCommand : Command
     {
         public override string Execute()
         {
@@ -45,7 +45,7 @@ namespace MAD.CLI
         }
     }
 
-    class ColorTest : Command
+    public class ColorTest : Command
     {
         public override string Execute()
         {

@@ -102,11 +102,9 @@ namespace MAD.JobSystem
 
         public abstract void DoJob();
 
-        public abstract void Update();
-
         #region for CLI only
 
-        public string Status()
+        public virtual string Status()
         {
             string _temp = "";
 

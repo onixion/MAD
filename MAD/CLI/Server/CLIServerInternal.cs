@@ -68,9 +68,7 @@ namespace MAD.CLI.Server
                     // wait for listen-thread to finish
                     _listenThread.Join();
 
-                    // wait for threads to finish
-                    _threadPool.WaitForIdle(_threadPoolThreadStopTime);
-                    // after time, abort all threads
+                    // abort all threads
                     _threadPool.Cancel();
                 }
                 else

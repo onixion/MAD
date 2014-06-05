@@ -29,18 +29,13 @@ namespace MAD.CLI
                 {
                     // input is valid -> execute command and write command output to console
                     ConsoleWriter.WriteToConsole(command.Execute());
-                    Console.Write("\n" + cursor);
-                }
-                else if (response == "")
-                {
-                    // input is empty
                     Console.Write(cursor);
                 }
                 else
                 { 
                     // something is wrong with the input (false arguments, missing arguments, and so on)
                     ConsoleWriter.WriteToConsole(response);
-                    Console.Write("\n" + cursor);
+                    Console.Write(cursor);
                 }
             }
         }

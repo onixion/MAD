@@ -2,12 +2,11 @@
 
 namespace MAD.CLI
 {
-    class CLIServerInfo : Command
+    public class CLIServerInfo : Command
     {
         public override string Execute()
         {
-            output += "<color><darkyellow>CLI-Server v" + MadComponents.components.cliServer.version + "\n";
-            output += "<color><yellow>";
+            output += "<color><yellow>CLI-Server v" + MadComponents.components.cliServer.version + "\n";
             output += "Server listening: " + MadComponents.components.cliServer.listening + "\n";
             output += "Active Sessions:  " + MadComponents.components.cliServer.sessions.Count + "\n";
             output += "Available Users:  " + MadComponents.components.cliServer.users.Count;
@@ -16,13 +15,8 @@ namespace MAD.CLI
         }
     }
 
-    class CLIServerStart : Command
+    public class CLIServerStart : Command
     {
-        public CLIServerStart()
-        {
-
-        }
-
         public override string Execute()
         {
             try
@@ -39,7 +33,7 @@ namespace MAD.CLI
         }
     }
 
-    class CLIServerStop : Command
+    public class CLIServerStop : Command
     {
         public override string Execute()
         {

@@ -8,11 +8,11 @@ namespace MAD.CLI
     {
         #region members
 
-        public List<ParameterOption> requiredParameter = new List<ParameterOption>();
-        public List<ParameterOption> optionalParameter = new List<ParameterOption>();
+        protected List<ParameterOption> requiredParameter = new List<ParameterOption>();
+        protected List<ParameterOption> optionalParameter = new List<ParameterOption>();
 
-        public ParameterInput parameters;
-        public string output = "";
+        protected ParameterInput parameters;
+        protected string output = "";
 
         #endregion
 
@@ -25,6 +25,7 @@ namespace MAD.CLI
 
         public bool ParameterExists(Parameter parameter)
         {
+            // required parameter
             foreach (ParameterOption temp in requiredParameter)
             {
                 if (temp.indicator == parameter.indicator)
@@ -33,6 +34,7 @@ namespace MAD.CLI
                 }
             }
 
+            // optional parameter
             foreach (ParameterOption temp in optionalParameter)
             {
                 if (temp.indicator == parameter.indicator)
@@ -115,7 +117,7 @@ namespace MAD.CLI
                 // check if all arguments are known by the command
                 if (!ParameterExists(temp))
                 {
-                    return "<color><red>Parameter '-" + temp.indicator + "' does not exist for this command!";
+                    return "<color><red>Parameter '-" + temp.indicator + "' does not exist for this command!\n";
                 }
 
                 // if the given arg is a required arg increase requiredArgsFound
@@ -130,7 +132,7 @@ namespace MAD.CLI
                     // check if argument is not null
                     if(temp.value != null)
                     {
-                        return "<color><red>Value of parameter '-" + temp.indicator + "' must be null!";
+                        return "<color><red>Value of parameter '-" + temp.indicator + "' must be null!\n";
                     }
                 }
                 else
@@ -138,7 +140,7 @@ namespace MAD.CLI
                     // check if argument is null
                     if (temp.value == null)
                     {
-                        return "<color><red>Value of parameter '-" + temp.indicator + "' can't be null!";
+                        return "<color><red>Value of parameter '-" + temp.indicator + "' can't be null!\n";
                     }
                 }
 
@@ -147,7 +149,7 @@ namespace MAD.CLI
 
                 if (argument == null)
                 {
-                    return "<color><red>Could not parse argument '" + temp.value + "'. Type help for view full commands.";
+                    return "<color><red>Could not parse argument '" + temp.value + "'. Type help for view full commands.\n";
                 }
                 else
                 {
@@ -159,7 +161,7 @@ namespace MAD.CLI
             // check if all required parameters are known
             if (requiredParameter.Count != requiredArgsFound)
             {
-                return "<color><red>Some required parameters are missing! Type 'help' to see full commands.";
+                return "<color><red>Some required parameters are missing! Type 'help' to see full commands.\n";
             }
 
             return "VALID_PARAMETER";

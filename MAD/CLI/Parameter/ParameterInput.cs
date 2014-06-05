@@ -5,6 +5,7 @@ namespace MAD.CLI
 {
     public class ParameterInput
     {
+        // All parameter from input.
         public List<Parameter> parameters = new List<Parameter>();
 
         public Parameter GetParameter(string indicator)

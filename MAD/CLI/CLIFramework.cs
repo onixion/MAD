@@ -31,10 +31,9 @@ namespace MAD.CLI
                 new CommandOptions("help", typeof(HelpCommand)),
                 new CommandOptions("info", typeof(InfoCommand)),
                 new CommandOptions("colortest", typeof(ColorTest)),
-
                 
                 // JOBSYSTEM COMMANDS
-                new CommandOptions("jobsystem status", typeof(JobSystemStatusCommand)),
+                new CommandOptions("jobsystem", typeof(JobSystemStatusCommand)),
                 new CommandOptions("job status", typeof(JobStatusCommand)),
                 new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
                 new CommandOptions("job start", typeof(JobSystemStartCommand)),
@@ -55,7 +54,7 @@ namespace MAD.CLI
          * object.
          * 
          * It returns the string "VALID_PARAMETER" when the parameter are valid.
-         * If the parameter are not valid it returns a error text. */
+         * If the parameter are not valid it returns the error text. */
         public string AnalyseInput(string cliInput, ref Command command)
         {
             string commandInput;
@@ -89,7 +88,7 @@ namespace MAD.CLI
                 }
                 else
                 {
-                    return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.";
+                    return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.\n";
                 }
             }
             else
@@ -154,8 +153,12 @@ namespace MAD.CLI
         protected bool CommandExists(string command)
         {
             foreach (CommandOptions temp in commandOptions)
+            {
                 if (temp.command == command)
+                {
                     return true;
+                }
+            }
 
             return false;
         }
@@ -163,8 +166,13 @@ namespace MAD.CLI
         protected Type GetCommandType(string command)
         {
             foreach (CommandOptions temp in commandOptions)
+            {
                 if (temp.command == command)
+                {
                     return temp.commandType;
+                }
+            }
+
             return null;
         }
 

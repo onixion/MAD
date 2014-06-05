@@ -60,7 +60,7 @@ namespace MAD.CLI
                 }
                 else
                 {
-                    output = "<color><red>Job does not exist!";
+                    output = "<color><red>Job does not exist!\n";
                 }
 
                 return output;
@@ -68,13 +68,26 @@ namespace MAD.CLI
 
             else
             {
+                output += "<color><yellow>Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n\n";
 
+                foreach (Job _job in MadComponents.components.jobSystem.jobs)
+                {
+                    output += _job.Status() + "\n";
+                }
             }
 
             return output;
         }
     
     }
+
+    public static class JobDefaultValues
+    {
+        public static int defaultDelay = 20000;
+        public static int defaultPort = 80;
+        public static int defaultTTL;
+    }
+
 
     public class JobSystemAddPingCommand : Command
     {
@@ -92,25 +105,30 @@ namespace MAD.CLI
             string jobName = (string)parameters.GetParameter("n").value;
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
 
+            JobPing _job;
+
             if (OptionalParameterUsed("t") && OptionalParameterUsed("ttl"))
             {
                 // both optional parameter are used
-
+                _job = new JobPing(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), targetAddress, (int)parameters.GetParameter("ttl").value);
             }
             else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("ttl"))
             {
                 // no optional parameter are used
-
+                _job = new JobPing(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PingRequest), targetAddress, JobDefaultValues.defaultTTL);
             }
             else if (OptionalParameterUsed("t"))
             {
                 // optional parameter "t" used
+                _job = new JobPing(new JobOptions(jobName, (int) parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), targetAddress, JobDefaultValues.defaultTTL);
             }
             else
             {
                 // optional parameter "ttl" used
-
+                _job = new JobPing(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PingRequest), targetAddress, (int)parameters.GetParameter("ttl").value);
             }
+
+            MadComponents.components.jobSystem.CreateJob(_job);
 
             return output;
         }
@@ -132,26 +150,30 @@ namespace MAD.CLI
             string jobName = (string)parameters.GetParameter("n").value;
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
 
+            JobHttp _job;
+
             if (OptionalParameterUsed("t") && OptionalParameterUsed("p"))
             {
                 // both optional parameter are used
-
+                _job = new JobHttp(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), targetAddress, (int)parameters.GetParameter("p").value);
             }
             else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("p"))
             {
                 // no optional parameter are used
- 
+                _job = new JobHttp(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.HttpRequest), targetAddress, JobDefaultValues.defaultPort);
             }
             else if (OptionalParameterUsed("t"))
             {
                 // optional parameter "t" used
- 
+                _job = new JobHttp(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), targetAddress, JobDefaultValues.defaultPort);
             }
             else
             {
                 // optional parameter "p" used
-               
+                _job = new JobHttp(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.HttpRequest), targetAddress, (int)parameters.GetParameter("p").value);
             }
+
+            MadComponents.components.jobSystem.CreateJob(_job);
 
             return output;
         }
@@ -184,7 +206,7 @@ namespace MAD.CLI
             else
             {
                 // optional parameter "t"  not used
-                _job = new JobPort(new JobOptions(jobName, 20000, JobOptions.JobType.PortRequest), targetAddress, port);
+                _job = new JobPort(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PortRequest), targetAddress, port);
             }
 
             // add job to jobsystem

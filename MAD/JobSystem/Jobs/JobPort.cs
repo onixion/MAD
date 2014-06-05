@@ -27,8 +27,6 @@ namespace MAD.JobSystem
 
         #region methodes
 
-        public override void Update() { }
-
         public override void DoJob()
         {
             try
@@ -40,6 +38,16 @@ namespace MAD.JobSystem
             {
                 jobOutput.jobState = JobOutput.State.Failed;
             }
+        }
+
+        public override string Status()
+        {
+            string _temp = base.Status();
+
+            _temp += "<color><yellow>TARGET-IP: <color><white>" + targetAddress.ToString() + "\n";
+            _temp += "<color><yellow>TARGET-PORT: <color><white>" + port.ToString() +"\n";
+
+            return _temp;
         }
 
         #endregion
