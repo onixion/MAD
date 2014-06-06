@@ -3,7 +3,7 @@ using System.Net;
 
 namespace MAD.JobSystem
 {
-    class JobHttp : Job
+    public class JobHttp : Job
     {
         #region members
 
@@ -14,6 +14,15 @@ namespace MAD.JobSystem
         private WebResponse _response;
 
         #endregion
+
+        public JobHttp()
+        {
+            InitJob(JobDefaultValues.defaultJobOptions);
+            jobOptions.jobType = JobOptions.JobType.HttpRequest;
+
+            this.targetAddress = JobDefaultValues.defaultTargetAddress;
+            this.port = JobDefaultValues.defaultPort;
+        }
 
         public JobHttp(JobOptions jobOption, IPAddress targetAddress, int port)
         {
@@ -42,13 +51,13 @@ namespace MAD.JobSystem
                 {
                     jobOutput.jobState = JobOutput.State.Failed;
                 }
+
+                _request.Abort();
             }
             catch (Exception)
             {
                 jobOutput.jobState = JobOutput.State.Exception;
             }
-
-            _request.Abort();
         }
 
         public override string Status()

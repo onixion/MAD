@@ -36,8 +36,6 @@ namespace MAD.JobSystem
             this.jobOptions = jobOptions;
 
             // init threads
-            _jobThread = new Thread(WorkerThread);
-            _cycleThread = new Thread(CycleLockSignal);
         }
 
         public bool Start()
@@ -45,6 +43,9 @@ namespace MAD.JobSystem
             if (jobState == State.Stopped)
             {
                 jobState = State.Running;
+
+                _jobThread = new Thread(WorkerThread);
+
                 _jobThread.Start();
 
                 return true;
@@ -73,6 +74,8 @@ namespace MAD.JobSystem
         {
             while (true)
             {
+                _cycleThread = new Thread(CycleLockSignal);
+
                 // execute cycleThread and start decreasing delayTime
                 _cycleThread.Start();
 
@@ -81,6 +84,7 @@ namespace MAD.JobSystem
 
                 // wait for cycleThread to be finished OR get an stop-request
                 _cycleLock.WaitOne();
+                _cycleThread.Join();
 
                 // check for any stop-requests
                 if (jobState == State.StopRequest)

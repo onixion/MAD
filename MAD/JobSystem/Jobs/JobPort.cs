@@ -15,6 +15,17 @@ namespace MAD.JobSystem
 
         #endregion
 
+        public JobPort()
+        {
+            InitJob(JobDefaultValues.defaultJobOptions);
+            this.jobOptions.jobType = JobOptions.JobType.PortRequest;
+
+            this.targetAddress = JobDefaultValues.defaultTargetAddress;
+            this.port = JobDefaultValues.defaultPort;
+
+            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        }
+
         public JobPort(JobOptions jobOptions, IPAddress targetAddress, int port)
         {
             InitJob(jobOptions);

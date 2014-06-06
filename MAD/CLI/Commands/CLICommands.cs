@@ -45,7 +45,21 @@ namespace MAD.CLI
                     output += "<color><yellow>COMMAND <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
 
                     Type commandType = commandOptions.commandType;
-                    Command tempCommand = (Command)commandType.GetConstructor(new Type[1] { typeof(object[]) }).Invoke(new object[]{commandOptions.commandParameterObjects});
+                    Command tempCommand;
+
+                    System.Reflection.ConstructorInfo cInfo = commandType.GetConstructor(new Type[1] { typeof(object[]) });
+
+                    if (cInfo == null)
+                    {
+                        cInfo = commandType.GetConstructor(new Type[0]);
+                        tempCommand = (Command)cInfo.Invoke(null);
+                    }
+                    else
+                    {
+                        tempCommand = (Command)cInfo.Invoke(new object[] { commandOptions.commandParameterObjects });
+                    }
+
+                    
 
                     output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
 

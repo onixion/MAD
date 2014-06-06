@@ -8,10 +8,8 @@ namespace MAD
         public string jobName;
         public int jobDelay;
 
-       
-
         public JobType jobType;
-        public enum JobType { PingRequest, PortRequest, HttpRequest }
+        public enum JobType { Null, PingRequest, PortRequest, HttpRequest }
 
         public JobOptions(string jobName, int jobDelay, JobType jobType)
         {

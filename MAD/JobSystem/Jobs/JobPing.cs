@@ -11,12 +11,26 @@ namespace MAD.JobSystem
 
         public IPAddress targetAddress;
         public int ttl;
+        public bool dontFragment;
 
         private Ping _ping;
         private PingOptions _pingOptions;
         private PingReply _reply;
 
         #endregion
+
+        public JobPing()
+        { 
+            InitJob(JobDefaultValues.defaultJobOptions);
+            jobOptions.jobType = JobOptions.JobType.PingRequest;
+
+            this.targetAddress = JobDefaultValues.defaultTargetAddress;
+            this.ttl = JobDefaultValues.defaultTTL;
+            this.dontFragment = JobDefaultValues.defaultDontFragment;
+
+            _ping = new Ping();
+            _pingOptions = new PingOptions(ttl, dontFragment);
+        }
 
         public JobPing(JobOptions jobOptions, IPAddress targetAddress, int ttl)
         {

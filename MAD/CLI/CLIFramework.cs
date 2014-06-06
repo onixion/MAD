@@ -40,10 +40,6 @@ namespace MAD.CLI
             new CommandOptions("job add http", typeof(JobSystemAddHttpCommand)),
             new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
 
-            // CLI SERVER COMMANDS
-            new CommandOptions("cliserver", typeof(CLIServerInfo)),
-            new CommandOptions("cliserver start", typeof(CLIServerStart)),
-            new CommandOptions("cliserver stop", typeof(CLIServerStop))
         };
         */
         #endregion
@@ -60,15 +56,51 @@ namespace MAD.CLI
          */
         protected void _InitCLI(int authLevel)
         {
+            if (authLevel < 100)
+            {
+                // commands for everyone
+                commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+                commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+                commands.Add(new CommandOptions("info", typeof(InfoCommand), new object[0]));
+            }
 
-                    commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[0]));
-                    commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[0]));
-                    commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[0]));
-                    commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[0]));
+            if (authLevel < 75)
+            {
 
-                    commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[]{commands}));
-                    commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
-                    commands.Add(new CommandOptions("info", typeof(InfoCommand), new object[0]));
+
+            }
+            
+            if (authLevel < 50)
+            {
+                commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[0]));
+                commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[0]));
+                commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[0]));
+                commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[0]));
+                commands.Add(new CommandOptions("js remove", typeof(JobSystemRemoveCommand), new object[0]));
+                commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[0]));
+                commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[0]));
+                commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[0]));
+            }
+            
+            if (authLevel < 10)
+            {
+                commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[0]));
+                commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[0]));
+                commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[0]));
+            }
+            
+            if (authLevel == 0)
+            { 
+            
+            
+            
+            }
+
+
+
+
+
+
         }
 
         /*

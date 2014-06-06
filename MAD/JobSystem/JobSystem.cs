@@ -48,15 +48,20 @@ namespace MAD.JobSystem
 
         public void DestroyJob(int jobID)
         {
-            Job job = GetJob(jobID);
+            Job _job = GetJob(jobID);
 
-            if (job != null)
-            {
-                job.Stop();
-            }
-            else
+            if (_job == null)
             {
                 throw new Exception("Job does not exist!");
+            }
+
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                if (jobs[i].jobID == jobID)
+                {
+                    jobs[i].Stop();
+                    jobs.RemoveAt(i);
+                }
             }
         }
 
