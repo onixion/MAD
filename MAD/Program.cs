@@ -27,7 +27,7 @@ namespace MAD
                         return 1;
                 }
             }
-
+            LOLWASGEHT
             return 0;
         }
     }
