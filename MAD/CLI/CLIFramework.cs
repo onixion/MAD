@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace MAD.CLI
 {
@@ -14,39 +15,68 @@ namespace MAD.CLI
         // cli vars
         protected string cursor = "=> ";
 
-        // cli command vars
-        protected List<CommandOptions> commandOptions;
+        // all commands useable for this cli
+        protected List<CommandOptions> commands = new List<CommandOptions>();
+
         protected Command command;
         protected Type inputCommandType;
+
+        #region all available commands
+        /*
+        private static List<CommandOptions> availableCommands = new List<CommandOptions>()
+        {
+            // GENERAL COMMANDS
+            new CommandOptions("help", typeof(HelpCommand)),
+            new CommandOptions("info", typeof(InfoCommand)),
+            new CommandOptions("colortest", typeof(ColorTest)),
+                
+            // JOBSYSTEM COMMANDS
+            new CommandOptions("jobsystem", typeof(JobSystemStatusCommand)),
+            new CommandOptions("job status", typeof(JobStatusCommand)),
+            new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
+            new CommandOptions("job start", typeof(JobSystemStartCommand)),
+            new CommandOptions("job stop", typeof(JobSystemStopCommand)),
+            new CommandOptions("job add ping", typeof(JobSystemAddPingCommand)),
+            new CommandOptions("job add http", typeof(JobSystemAddHttpCommand)),
+            new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
+
+            // CLI SERVER COMMANDS
+            new CommandOptions("cliserver", typeof(CLIServerInfo)),
+            new CommandOptions("cliserver start", typeof(CLIServerStart)),
+            new CommandOptions("cliserver stop", typeof(CLIServerStop))
+        };
+        */
+        #endregion
 
         #endregion
 
         #region CLI main methodes
 
-        protected void _InitCLI()
+        /*
+         * authLevel = 0 -> all commands
+         * authLevel = 1 -> FileSystem, CLIServer
+         * authLevel = 2 -> FileSystem
+         * ...
+         */
+        protected void _InitCLI(int authLevel)
         {
-            commandOptions = new List<CommandOptions>()
+            switch(authLevel)
             {
-                // GENERAL COMMANDS
-                new CommandOptions("help", typeof(HelpCommand)),
-                new CommandOptions("info", typeof(InfoCommand)),
-                new CommandOptions("colortest", typeof(ColorTest)),
-                
-                // JOBSYSTEM COMMANDS
-                new CommandOptions("jobsystem", typeof(JobSystemStatusCommand)),
-                new CommandOptions("job status", typeof(JobStatusCommand)),
-                new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
-                new CommandOptions("job start", typeof(JobSystemStartCommand)),
-                new CommandOptions("job stop", typeof(JobSystemStopCommand)),
-                new CommandOptions("job add ping", typeof(JobSystemAddPingCommand)),
-                new CommandOptions("job add http", typeof(JobSystemAddHttpCommand)),
-                new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
+                case 0:
 
-                // CLI SERVER COMMANDS
-                new CommandOptions("cliserver", typeof(CLIServerInfo)),
-                new CommandOptions("cliserver start", typeof(CLIServerStart)),
-                new CommandOptions("cliserver stop", typeof(CLIServerStop))
-            };
+                case 1:
+
+                case 2:
+
+                case 3:
+
+                case 4:
+                
+                case 100: // commands for everyone
+                    commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[]{commands}));
+                    commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), new object[0]));
+                    break;
+            }
         }
 
         /*
@@ -59,41 +89,39 @@ namespace MAD.CLI
         {
             string commandInput;
 
-            if (cliInput != "")
+            // get command
+            commandInput = GetCommandName(cliInput);
+
+            // check if command is known
+            if (CommandExists(commandInput))
             {
-                // get command
-                commandInput = GetCommand(cliInput);
+                // get command 
+                CommandOptions commandOptions = GetCommandOptions(commandInput);
+                // get parameter and arguments from input
+                ParameterInput parameterInput = GetParamtersFromInput(cliInput);
 
-                // check if command is known
-                if (CommandExists(commandInput))
+                // get command type
+                Type commandType = commandOptions.commandType;
+                // get parameter objects to pass to constructor of the command
+                object[] commandParameters = commandOptions.commandParameterObjects;
+
+                ConstructorInfo cInfo = commandType.GetConstructor(new Type[1] { typeof(object[]) });
+                command = (Command)cInfo.Invoke(new object[]{commandParameters});
+
+                // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
+                string parameterValid = command.ValidParameters(parameterInput);
+
+                // set parameters if the parameter are valid
+                if (parameterValid == "VALID_PARAMETER")
                 {
-                    // get command type
-                    Type inputCommandType = GetCommandType(commandInput);
-                    // get parameter and arguments from input
-                    ParameterInput parameterInput = GetParamtersFromInput(cliInput);
-
-                    // create command object (pass the command none objects)
-                    command = (Command)inputCommandType.GetConstructor(new Type[0]).Invoke(new object[0]);
-
-                    // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
-                    string parameterValid = command.ValidParameters(parameterInput);
-
-                    // set parameters if the parameter are valid
-                    if (parameterValid == "VALID_PARAMETER")
-                    {
-                        command.SetParameters(parameterInput);
-                    }
-
-                    return parameterValid;
+                    command.SetParameters(parameterInput);
                 }
-                else
-                {
-                    return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.\n";
-                }
+
+                return parameterValid;
             }
             else
             {
-                return "";
+                return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.";
             }
         }
 
@@ -101,7 +129,7 @@ namespace MAD.CLI
 
         #region CLI format methodes
 
-        protected string GetCommand(string input)
+        protected string GetCommandName(string input)
         {
             string[] buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -152,7 +180,7 @@ namespace MAD.CLI
 
         protected bool CommandExists(string command)
         {
-            foreach (CommandOptions temp in commandOptions)
+            foreach (CommandOptions temp in commands)
             {
                 if (temp.command == command)
                 {
@@ -163,13 +191,13 @@ namespace MAD.CLI
             return false;
         }
 
-        protected Type GetCommandType(string command)
+        protected CommandOptions GetCommandOptions(string command)
         {
-            foreach (CommandOptions temp in commandOptions)
+            foreach (CommandOptions temp in commands)
             {
                 if (temp.command == command)
                 {
-                    return temp.commandType;
+                    return temp;
                 }
             }
 

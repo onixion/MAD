@@ -7,7 +7,7 @@ using MAD.JobSystem;
 namespace MAD
 {
     public class MadComponents
-    {LOLWASGEHT
+    {
         private static MadComponents _components;
         public static MadComponents components
         {
@@ -28,9 +28,9 @@ namespace MAD
 
         public const string dataPath = "data";
 
+        public JobSystem.JobSystem jobSystem;
         public CLI.CLI cli;
         public CLIServer cliServer;
-        public JobSystem.JobSystem jobSystem;
 
         // ----------------------------------
         //     DEFAULT CONSTRUCTORS
@@ -38,15 +38,14 @@ namespace MAD
 
         private MadComponents()
         {
-            // create data-path
             if (!System.IO.Directory.Exists(dataPath))
             {
                 System.IO.Directory.CreateDirectory(dataPath);
             }
 
-            // init components
-            cli = new CLI.CLI();
             jobSystem = new JobSystem.JobSystem();
+
+            cli = new CLI.CLI();
             cliServer = new CLIServer(dataPath, 999);
         }
     }

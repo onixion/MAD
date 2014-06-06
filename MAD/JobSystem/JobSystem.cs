@@ -8,7 +8,7 @@ namespace MAD.JobSystem
     {
         #region member
 
-        public Version version = new Version(1, 2, 6000);
+        public Version version = new Version(1, 3, 3000);
         public List<Job> jobs = new List<Job>();
 
         #endregion
@@ -64,7 +64,7 @@ namespace MAD.JobSystem
         {
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (!jobs[i].Active())
+                /*if (!jobs[i].Active())
                 {
                     jobs.RemoveAt(i);
                 }
@@ -72,7 +72,7 @@ namespace MAD.JobSystem
                 {
                     jobs[i].Stop();
                     jobs.RemoveAt(i);
-                }
+                }*/
             }
         }
 
@@ -84,7 +84,7 @@ namespace MAD.JobSystem
             {
                 if (!_job.Start())
                 {
-                    throw new Exception("Job is already active!");
+                    throw new Exception("Job is already running!");
                 }
             }
             else
@@ -101,7 +101,7 @@ namespace MAD.JobSystem
             {
                 if (!_job.Stop())
                 {
-                    throw new Exception("Job is already inactive!");
+                    throw new Exception("Job is already stopped!");
                 }
             }
             else
@@ -110,13 +110,13 @@ namespace MAD.JobSystem
             }
         }
 
-        public int JobsActive()
+        public int JobsRunning()
         {
             int _count = 0;
 
             for (int i = 0; i < jobs.Count; i++)
             {
-                if (jobs[i].Active())
+                if (jobs[i].jobState == Job.State.Running)
                 {
                     _count++;
                 }
@@ -125,9 +125,19 @@ namespace MAD.JobSystem
             return _count;
         }
 
-        public int JobsInactive()
+        public int JobsStopped()
         {
-            return jobs.Count - JobsActive(); 
+            int _count = 0;
+
+            for (int i = 0; i < jobs.Count; i++)
+            {
+                if (jobs[i].jobState == Job.State.Stopped)
+                {
+                    _count++;
+                }
+            }
+
+            return _count;
         }
 
         public void SaveTable(string path)

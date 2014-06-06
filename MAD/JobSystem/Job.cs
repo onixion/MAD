@@ -10,7 +10,6 @@ namespace MAD.JobSystem
 
         private static int _jobsCount = 0;
         private Thread _jobThread;
-        private bool _threadStopRequest = false;
         
         private AutoResetEvent _cycleLock = new AutoResetEvent(false);
         private Thread _cycleThread;
@@ -19,6 +18,9 @@ namespace MAD.JobSystem
         public int jobID;
         public JobOptions jobOptions;
         public JobOutput jobOutput = new JobOutput();
+
+        public State jobState = State.Stopped;
+        public enum State { Running, StopRequest, Stopped, Exception }
 
         #endregion
 
@@ -40,9 +42,9 @@ namespace MAD.JobSystem
 
         public bool Start()
         {
-            if (!_threadStopRequest)
+            if (jobState == State.Stopped)
             {
-                _threadStopRequest = true;
+                jobState = State.Running;
                 _jobThread.Start();
 
                 return true;
@@ -53,13 +55,13 @@ namespace MAD.JobSystem
 
         public bool Stop()
         {
-            if (_threadStopRequest)
+            if (jobState == State.Running)
             {
-                _threadStopRequest = false;
-                _cycleLock.Set();
+                jobState = State.StopRequest;
 
-                // wait for thread to close
+                // wait for threads to close
                 _jobThread.Join();
+                _cycleThread.Join();
 
                 return true;
             }
@@ -67,34 +69,40 @@ namespace MAD.JobSystem
             return false;
         }
 
-        public bool Active()
-        {
-            return _jobThread.IsAlive;
-        }
-
         private void WorkerThread()
         {
             while (true)
             {
-                // execute cycleThread and start counting cycleTime
+                // execute cycleThread and start decreasing delayTime
                 _cycleThread.Start();
 
                 // do job
                 DoJob();
+
+                // wait for cycleThread to be finished OR get an stop-request
                 _cycleLock.WaitOne();
 
                 // check for any stop-requests
-                if (_threadStopRequest)
+                if (jobState == State.StopRequest)
+                {
+                    jobState = State.Stopped;
                     break;
+                }
             }
         }
 
         private void CycleLockSignal()
         {
+            int buffer = jobOptions.jobDelay;
+
             // check every _cycleTime for 
-            while (!_threadStopRequest)
+            while (jobState == State.Running)
             {
                 Thread.Sleep(_cycleTime);
+                buffer = buffer - _cycleTime;
+
+                if (buffer <= 0)
+                    break;
             }
 
             _cycleLock.Set();
@@ -110,9 +118,9 @@ namespace MAD.JobSystem
 
             _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
             _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
-            _temp += "<color><yellow>TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
+            _temp += "<color><yellow>JOB-TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
             _temp += "<color><yellow>DELAY(ms): <color><white>" + jobOptions.jobDelay + "\n";
-            _temp += "<color><yellow>ACTIVE: <color><white>" + Active().ToString() + "\n";
+            _temp += "<color><yellow>JOB-STATE: <color><white>" + jobState.ToString()+ "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
 
             return _temp;

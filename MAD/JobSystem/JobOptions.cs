@@ -8,7 +8,8 @@ namespace MAD
         public string jobName;
         public int jobDelay;
 
-        // jobType is needed for the jobSystem to create the right job.
+       
+
         public JobType jobType;
         public enum JobType { PingRequest, PortRequest, HttpRequest }
 

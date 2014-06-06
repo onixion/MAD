@@ -10,14 +10,14 @@ namespace MAD.CLI
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "ID", "Name", "Type", "Delay", "Active", "Output-State" };
+            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Delay", "Job-State", "Output-State" };
             jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
             tableRow = jobTable.FormatStringArray(tableRow);
 
             output += "<color><yellow>\n";
             output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
-            output += "Jobs active:      " + MadComponents.components.jobSystem.JobsActive() + "\n";
-            output += "Jobs inactive:    " + MadComponents.components.jobSystem.JobsInactive() + "\n\n";
+            output += "Jobs running:     " + MadComponents.components.jobSystem.JobsRunning() + "\n";
+            output += "Jobs stopped:     " + MadComponents.components.jobSystem.JobsStopped() + "\n\n";
 
             output += jobTable.WriteColumnes(tableRow) + "\n";
             output += jobTable.splitline + "\n";
@@ -30,7 +30,7 @@ namespace MAD.CLI
                 tableRow[1] = _temp.jobOptions.jobName;
                 tableRow[2] = _temp.jobOptions.jobType.ToString();
                 tableRow[3] = _temp.jobOptions.jobDelay.ToString();
-                tableRow[4] = _temp.Active().ToString();
+                tableRow[4] = _temp.jobState.ToString();
                 tableRow[5] = _temp.jobOutput.jobState.ToString();
 
                 tableRow = jobTable.FormatStringArray(tableRow);
@@ -45,7 +45,7 @@ namespace MAD.CLI
     {
         public JobStatusCommand()
         {
-            optionalParameter.Add(new ParameterOption("id", false, typeof(int)));
+            optionalParameter.Add(new ParameterOption("id", "Job ID.", false, typeof(int)));
         }
 
         public override string Execute()
@@ -85,19 +85,18 @@ namespace MAD.CLI
     {
         public static int defaultDelay = 20000;
         public static int defaultPort = 80;
-        public static int defaultTTL;
+        public static int defaultTTL = 250;
     }
-
 
     public class JobSystemAddPingCommand : Command
     {
         public JobSystemAddPingCommand()
         {
-            requiredParameter.Add(new ParameterOption("n", false, typeof(String)));
-            requiredParameter.Add(new ParameterOption("ip", false, typeof(IPAddress)));
+            requiredParameter.Add(new ParameterOption("n", "Name of the job", false, typeof(String)));
+            requiredParameter.Add(new ParameterOption("ip", "Target IP-Address", false, typeof(IPAddress)));
 
-            optionalParameter.Add(new ParameterOption("t", false, typeof(Int32)));
-            optionalParameter.Add(new ParameterOption("ttl", false, typeof(Int32)));
+            optionalParameter.Add(new ParameterOption("t", "Delaytime.", false, typeof(Int32)));
+            optionalParameter.Add(new ParameterOption("ttl", "TTL", false, typeof(Int32)));
         }
 
         public override string Execute()

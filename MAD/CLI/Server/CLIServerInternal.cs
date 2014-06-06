@@ -10,7 +10,7 @@ namespace MAD.CLI.Server
     {
         # region member
 
-        public Version internalVersion = new Version(0, 0, 1000);
+        public Version internalVersion = new Version(0, 1, 9000);
 
         private Thread _listenThread;
         private bool _listenThreadRunning = false;
@@ -19,7 +19,6 @@ namespace MAD.CLI.Server
         public bool listening { get { return _listenThreadRunning; } }
 
         private SmartThreadPool _threadPool = new SmartThreadPool();
-        private int _threadPoolThreadStopTime = 5000;
 
         #endregion
 

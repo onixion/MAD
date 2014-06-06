@@ -33,7 +33,7 @@ namespace MAD.CLI.Server
             _InitSession();
 
             // init CLI
-            _InitCLI();
+            _InitCLI(0);
 
             // start session
             this.Start();

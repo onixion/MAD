@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MAD.JobSystem
 {
-    class JobPing : Job
+    public class JobPing : Job
     {
         #region members
 
@@ -26,6 +26,7 @@ namespace MAD.JobSystem
             this.ttl = ttl;
 
             _ping = new Ping();
+            _pingOptions = new PingOptions(ttl, true);
         }
 
         #region methodes
