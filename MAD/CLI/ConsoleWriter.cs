@@ -52,7 +52,7 @@ namespace MAD.CLI
                 }
 
                 Console.Write("\n");
-                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.ForegroundColor = ConsoleColor.White;
             }
         }
     }

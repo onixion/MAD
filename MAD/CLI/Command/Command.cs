@@ -128,6 +128,8 @@ namespace MAD.CLI
                     requiredArgsFound++;
                 }
 
+                object argument;
+
                 // check if the given args can have a value or not
                 if (GetParameterOptions(temp.indicator).argumentEmpty)
                 {
@@ -136,6 +138,8 @@ namespace MAD.CLI
                     {
                         return "<color><red>Value of parameter '-" + temp.indicator + "' must be null!";
                     }
+
+                    argument = new object();
                 }
                 else
                 { 
@@ -144,10 +148,10 @@ namespace MAD.CLI
                     {
                         return "<color><red>Value of parameter '-" + temp.indicator + "' can't be null!";
                     }
-                }
 
-                // try to parse the argument to the specific type
-                object argument = Convert((string)temp.value, GetArgumentType(temp.indicator));
+                    // try to parse the argument to the specific type
+                    argument = Convert((string)temp.value, GetArgumentType(temp.indicator));
+                }
 
                 if (argument == null)
                 {
@@ -173,8 +177,7 @@ namespace MAD.CLI
          * 
          *  System.Int32
          *  System.String
-         *  System.Net.IPAddress
-         */
+         *  System.Net.IPAddress */
         private object Convert(string value, Type convertType)
         {
             try

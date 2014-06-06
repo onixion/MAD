@@ -21,11 +21,11 @@ namespace MAD.CLI
             {
                 output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
-                output += "<color><gray>";
+                output += "<color><white>";
 
                 for (int i = 0; i < commands.Count; i++)
                 {
-                    output += commands[i].command + "<color><darkyellow> [" + i + "]<color><gray>";
+                    output += commands[i].command + "<color><darkyellow> [" + i + "]<color><white>";
 
                     if (i != commands.Count - 1)
                     {
@@ -42,36 +42,43 @@ namespace MAD.CLI
                 try
                 {
                     CommandOptions commandOptions = commands[commandIndex];
-                    output += "<color><yellow>COMMAND <color><gray> " + commandOptions.command + "<color><darkyellow>[" + commandIndex + "]<color><gray>\n\n";
+                    output += "<color><yellow>COMMAND <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
 
                     Type commandType = commandOptions.commandType;
                     Command tempCommand = (Command)commandType.GetConstructor(new Type[1] { typeof(object[]) }).Invoke(new object[]{commandOptions.commandParameterObjects});
 
-                    output += "DESCRIPTION: " + tempCommand.description + "\n\n";
+                    output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
 
-                    if (tempCommand.requiredParameter.Count != 0)
+                    output += "<color><yellow>PARAMETER\n";
+
+                    if (!(tempCommand.requiredParameter.Count == 0 && tempCommand.optionalParameter.Count == 0))
                     {
-                        output += "<color><yellow>REQUIRED PARAMETER\n\n";
-
-                        foreach (ParameterOption _temp in tempCommand.requiredParameter)
+                        if (tempCommand.requiredParameter.Count != 0)
                         {
-                            output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
-                            output += "\t<color><white>Description: " + _temp.description + "\n";
+                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
+
+                            foreach (ParameterOption _temp in tempCommand.requiredParameter)
+                            {
+                                output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
+                                output += "\t<color><white>Description:<color><gray> " + _temp.description + "\n";
+                            }
+                        }
+
+                        if (tempCommand.optionalParameter.Count != 0)
+                        {
+                            output += "\t<color><yellow>OPTIONAL PARAMETER\n\n";
+
+                            foreach (ParameterOption _temp in tempCommand.optionalParameter)
+                            {
+                                output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
+                                output += "\t<color><white>Description:<color><gray> " + _temp.description + "\n";
+                            }
                         }
                     }
-
-                    if (tempCommand.optionalParameter.Count != 0)
+                    else
                     {
-                        output += "<color><yellow>OPTIONAL PARAMETER\n\n";
-
-                        foreach (ParameterOption _temp in tempCommand.optionalParameter)
-                        {
-                            output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
-                            output += "\t<color><white>Description: " + _temp.description + "\n";
-                        }
+                        output += "\n\t<color><gray>(no parameters)\n";
                     }
-
-                    tempCommand = null;
                 }
                 catch (Exception)
                 {
@@ -85,23 +92,39 @@ namespace MAD.CLI
 
     public class InfoCommand : Command
     {
+        public InfoCommand()
+        { 
+            optionalParameter.Add(new ParameterOption("hack", true, null));
+        }
+
         public override string Execute()
         {
-            output += "<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n";
-            output += "Components:\n";
+            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
+
+            output += "Components:<color><white>\n";
             output += "CLI         v" + MadComponents.components.cli.version.ToString() + " (CLI-Framework v" + MadComponents.components.cli.versionFramework + ")\n";
             output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + "\n";
             output += "JobSystem   v" + MadComponents.components.jobSystem.version.ToString();
+
+            if (OptionalParameterUsed("hack"))
+            {
+                output += "\n\n<color><yellow>J<color><green>A<color><blue>C";
+                output += "<color><red>K <color><magenta>B<color><darkgray>Ö";
+                output += "<color><darkred>S<color><green>E <color><blue>";
+                output += "W<color><yellow>A<color><magenta>S <color><blue>H";
+                output += "<color><darkred>E<color><magenta>R<color><white>E ";
+                output += "  <color><green>.<color><red>.<color><darkgray>.\n"; ;
+            }
+
             return output;
         }
     }
 
     public class ColorTestCommand : Command
     {
-        public ColorTestCommand(object[] commandParameter)
+        public ColorTestCommand()
         {
             description = "This command tests all supported colors on the console.";
-        
         }
 
         public override string Execute()

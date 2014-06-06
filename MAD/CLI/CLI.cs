@@ -8,6 +8,9 @@ namespace MAD.CLI
     {
         public Version version = new Version(1, 3, 2000);
 
+        public ConsoleColor cursorColor = ConsoleColor.Cyan;
+        public ConsoleColor inputColor = ConsoleColor.White;
+
         public CLI()
         { 
             _InitCLI(0);
@@ -16,7 +19,7 @@ namespace MAD.CLI
         public void Start()
         {
             string cliInput;
-            Console.Write(cursor);
+            WriteCursor();
 
             while (true)
             {
@@ -31,20 +34,27 @@ namespace MAD.CLI
                     {
                         // input is valid -> execute command and write output of the command to console
                         ConsoleWriter.WriteToConsole(command.Execute());
-                        Console.Write(cursor);
+                        WriteCursor();
                     }
                     else
                     {
                         // something is wrong with the input (false arguments, missing arguments, ..)
                         ConsoleWriter.WriteToConsole(response);
-                        Console.Write(cursor);
+                        WriteCursor();
                     }
                 }
                 else
                 {
-                    Console.Write(cursor);
+                    WriteCursor();
                 }
             }
+        }
+
+        private void WriteCursor()
+        {
+            Console.ForegroundColor = cursorColor;
+            Console.Write(cursor);
+            Console.ForegroundColor = inputColor;
         }
     }
 }
