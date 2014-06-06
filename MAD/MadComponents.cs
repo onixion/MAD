@@ -7,7 +7,7 @@ using MAD.JobSystem;
 namespace MAD
 {
     public class MadComponents
-    {
+    {LOLWASGEHT
         private static MadComponents _components;
         public static MadComponents components
         {
