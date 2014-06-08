@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 
 namespace MAD.JobSystem
 {
@@ -15,13 +15,14 @@ namespace MAD.JobSystem
 
         #endregion
 
+        #region constructors
+
         public JobPort()
         {
-            InitJob(JobDefaultValues.defaultJobOptions);
+            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
             this.jobOptions.jobType = JobOptions.JobType.PortRequest;
-
-            this.targetAddress = JobDefaultValues.defaultTargetAddress;
-            this.port = JobDefaultValues.defaultPort;
+            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
+            this.port = JobDefaultValues.defaultValues.defaultPort;
 
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
@@ -35,6 +36,8 @@ namespace MAD.JobSystem
 
             _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
+
+        #endregion
 
         #region methodes
 

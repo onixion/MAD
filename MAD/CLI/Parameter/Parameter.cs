@@ -4,22 +4,22 @@ namespace MAD.CLI
 {
     public class Parameter
     {
-        public string indicator;
-        public object value;
-
         /*
-         * Example:
+         * EXAMPE:
          * 
-         *  string indicator = "id"
-         *  string value = "0"
-         *  
-         * Parameter "id", Argument is "0".
+         * string parameter = "n";
+         * object[] argumentValue = new object[]{ "Name1", "Name2" };
+         * 
+         * With this configuration we have a parameter 'n' which can have multi-arguments.
          */
 
-        public Parameter(string indicator, string value)
+        public string parameter;
+        public object[] argumentValue;
+
+        public Parameter(string parameter, object[] argumentValue)
         {
-            this.indicator = indicator;
-            this.value = value;
+            this.parameter = parameter;
+            this.argumentValue = argumentValue;
         }
     }
 }

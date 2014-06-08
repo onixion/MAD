@@ -4,6 +4,12 @@ namespace MAD.CLI
 {
     public class CLIServerInfo : Command
     {
+        public CLIServerInfo()
+        {
+            description = "This command shows informations about the CLIServer.";
+            usage = "cliserver";
+        }
+
         public override string Execute()
         {
             output += "<color><yellow>CLI-Server v" + MadComponents.components.cliServer.version + "\n";
@@ -17,6 +23,12 @@ namespace MAD.CLI
 
     public class CLIServerStart : Command
     {
+        public CLIServerStart()
+        {
+            description = "This command starts the CLIServer.";
+            usage = "cliserver start";
+        }
+
         public override string Execute()
         {
             try
@@ -35,6 +47,12 @@ namespace MAD.CLI
 
     public class CLIServerStop : Command
     {
+        public CLIServerStop()
+        {
+            description = "This command stops the CLIServer.";
+            usage = "cliserver stop";
+        }
+
         public override string Execute()
         {
             try

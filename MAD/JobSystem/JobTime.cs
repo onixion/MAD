@@ -5,21 +5,26 @@ namespace MAD.JobSystem
     public class JobTime
     {
         public TimeType type;
-        public enum TimeType { Absolute, Relativ }
+        public enum TimeType { Absolute, Relativ, Null }
 
-        public DateTime[] times;
-        public int delay;
+        public DateTime[] jobTimes;
+        public int jobDelay;
 
-        public JobTime(DateTime[] times)
+        public JobTime()
+        {
+            this.type = TimeType.Null;
+        }
+
+        public JobTime(DateTime[] jobTimes)
         {
             type = TimeType.Absolute;
-            this.times = times;
+            this.jobTimes = jobTimes;
         }
-        
-        public JobTime(int delay)
+
+        public JobTime(int jobDelay)
         {
             type = TimeType.Relativ;
-            this.delay = delay;
+            this.jobDelay = jobDelay;
         }
     }
 }

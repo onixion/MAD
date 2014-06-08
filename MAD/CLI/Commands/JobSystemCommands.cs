@@ -10,7 +10,7 @@ namespace MAD.CLI
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Delay", "Job-State", "Output-State" };
+            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value", "Job-State", "Output-State" };
             jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
             tableRow = jobTable.FormatStringArray(tableRow);
 
@@ -29,9 +29,19 @@ namespace MAD.CLI
                 tableRow[0] = _temp.jobID.ToString();
                 tableRow[1] = _temp.jobOptions.jobName;
                 tableRow[2] = _temp.jobOptions.jobType.ToString();
-                tableRow[3] = _temp.jobOptions.jobDelay.ToString();
-                tableRow[4] = _temp.jobState.ToString();
-                tableRow[5] = _temp.jobOutput.jobState.ToString();
+                tableRow[3] = _temp.jobOptions.jobTime.type.ToString();
+
+                if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                {
+                    tableRow[4] = _temp.jobOptions.jobTime.jobDelay.ToString();
+                }
+                else
+                {
+                    tableRow[4] = _temp.jobOptions.jobTime.jobTimes[0].ToString("hh:mm");
+                }
+
+                tableRow[5] = _temp.jobState.ToString();
+                tableRow[6] = _temp.jobOutput.jobState.ToString();
 
                 tableRow = jobTable.FormatStringArray(tableRow);
                 output += jobTable.WriteColumnes(tableRow) + "\n";
@@ -45,14 +55,14 @@ namespace MAD.CLI
     {
         public JobStatusCommand()
         {
-            optionalParameter.Add(new ParameterOption("id", false, typeof(int)));
+            optionalParameter.Add(new ParameterOption("id", false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
         {
             if (OptionalParameterUsed("id"))
             {
-                Job _job = MadComponents.components.jobSystem.GetJob((int)parameters.GetParameter("id").value);
+                Job _job = MadComponents.components.jobSystem.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
 
                 if (_job != null)
                 {
@@ -92,17 +102,20 @@ namespace MAD.CLI
     {
         public JobSystemAddPingCommand()
         {
-            requiredParameter.Add(new ParameterOption("n", false, typeof(String)));
-            requiredParameter.Add(new ParameterOption("ip", false, typeof(IPAddress)));
+            requiredParameter.Add(new ParameterOption("n", false, new Type[] { typeof(String) }));
+            requiredParameter.Add(new ParameterOption("ip", "IPAddress", false, true, new Type[] { typeof(IPAddress) }));
 
-            optionalParameter.Add(new ParameterOption("t", false, typeof(Int32)));
-            optionalParameter.Add(new ParameterOption("ttl", false, typeof(Int32)));
+            optionalParameter.Add(new ParameterOption("t", false, new Type[] { typeof(Int32), typeof(string) }));
+            optionalParameter.Add(new ParameterOption("ttl", false, new Type[] { typeof(Int32) }));
+
+            description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
+            usage = "js add ping -n <JOBNAME> -ip <TARGET-IPADDRESS> [-ttl <TTL>]";
         }
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").value;
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
+            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
 
             JobPing _job = new JobPing();
 
@@ -111,37 +124,13 @@ namespace MAD.CLI
 
             if (OptionalParameterUsed("t"))
             {
-                _job.jobOptions.jobDelay = (int)parameters.GetParameter("t").value;
+                _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
             }
 
             if (OptionalParameterUsed("ttl"))
             {
-                _job.ttl = (int)parameters.GetParameter("ttl").value;
+                _job.ttl = (int)parameters.GetParameter("ttl").argumentValue[0];
             }
-
-
-            /*
-            if (OptionalParameterUsed("t") && OptionalParameterUsed("ttl"))
-            {
-                // both optional parameter are used
-                _job = new JobPing(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), targetAddress, (int)parameters.GetParameter("ttl").value);
-            }
-            else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("ttl"))
-            {
-                // no optional parameter are used
-                _job = new JobPing(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PingRequest), targetAddress, JobDefaultValues.defaultTTL);
-            }
-            else if (OptionalParameterUsed("t"))
-            {
-                // optional parameter "t" used
-                _job = new JobPing(new JobOptions(jobName, (int) parameters.GetParameter("t").value, JobOptions.JobType.PingRequest), targetAddress, JobDefaultValues.defaultTTL);
-            }
-            else
-            {
-                // optional parameter "ttl" used
-                _job = new JobPing(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PingRequest), targetAddress, (int)parameters.GetParameter("ttl").value);
-            }
-            */
 
             MadComponents.components.jobSystem.CreateJob(_job);
 
@@ -153,17 +142,17 @@ namespace MAD.CLI
     {
         public JobSystemAddHttpCommand()
         {
-            requiredParameter.Add(new ParameterOption("n", false, typeof(String)));
-            requiredParameter.Add(new ParameterOption("ip", false, typeof(IPAddress)));
+            requiredParameter.Add(new ParameterOption("n", false, new Type[] { typeof(String) }));
+            requiredParameter.Add(new ParameterOption("ip", false, new Type[] { typeof(IPAddress) }));
 
-            optionalParameter.Add(new ParameterOption("t", false, typeof(Int32)));
-            optionalParameter.Add(new ParameterOption("p", false, typeof(Int32)));
+            optionalParameter.Add(new ParameterOption("t", false, new Type[] { typeof(Int32) }));
+            optionalParameter.Add(new ParameterOption("p", false, new Type[] { typeof(Int32) }));
         }
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").value;
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
+            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
 
             JobHttp _job = new JobHttp();
 
@@ -172,36 +161,14 @@ namespace MAD.CLI
 
             if (OptionalParameterUsed("t"))
             {
-                _job.jobOptions.jobDelay = (int)parameters.GetParameter("t").value;
+                _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
             }
 
             if (OptionalParameterUsed("p"))
             {
-                _job.port = (int)parameters.GetParameter("p").value;
+                _job.port = (int)parameters.GetParameter("p").argumentValue[0];
             }
 
-            /*
-            if (OptionalParameterUsed("t") && OptionalParameterUsed("p"))
-            {
-                // both optional parameter are used
-                _job = new JobHttp(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), targetAddress, (int)parameters.GetParameter("p").value);
-            }
-            else if (!OptionalParameterUsed("t") && !OptionalParameterUsed("p"))
-            {
-                // no optional parameter are used
-                _job = new JobHttp(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.HttpRequest), targetAddress, JobDefaultValues.defaultPort);
-            }
-            else if (OptionalParameterUsed("t"))
-            {
-                // optional parameter "t" used
-                _job = new JobHttp(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.HttpRequest), targetAddress, JobDefaultValues.defaultPort);
-            }
-            else
-            {
-                // optional parameter "p" used
-                _job = new JobHttp(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.HttpRequest), targetAddress, (int)parameters.GetParameter("p").value);
-            }
-            */
             MadComponents.components.jobSystem.CreateJob(_job);
 
             return output;
@@ -212,18 +179,18 @@ namespace MAD.CLI
     {
         public JobSystemAddPortCommand()
         {
-            requiredParameter.Add(new ParameterOption("n", false, typeof(String)));
-            requiredParameter.Add(new ParameterOption("ip", false, typeof(IPAddress)));
-            requiredParameter.Add(new ParameterOption("p", false, typeof(Int32)));
+            requiredParameter.Add(new ParameterOption("n", false, new Type[] {typeof(String) }));
+            requiredParameter.Add(new ParameterOption("ip", false, new Type[] {typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("p", false, new Type[] {typeof(Int32) }));
 
-            optionalParameter.Add(new ParameterOption("t", false, typeof(Int32)));
+            optionalParameter.Add(new ParameterOption("t", false, new Type[] {typeof(Int32) }));
         }
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").value;
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").value;
-            int port = (int)parameters.GetParameter("p").value;
+            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
+            int port = (int)parameters.GetParameter("p").argumentValue[0];
 
             JobPort _job = new JobPort();
 
@@ -233,21 +200,8 @@ namespace MAD.CLI
 
             if (OptionalParameterUsed("t"))
             {
-                _job.jobOptions.jobDelay = (int)parameters.GetParameter("t").value;
+                _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
             }
-
-            /*
-            if (OptionalParameterUsed("t"))
-            {
-                // optional parameter "t" used
-                _job = new JobPort(new JobOptions(jobName, (int)parameters.GetParameter("t").value, JobOptions.JobType.PortRequest), targetAddress, port);
-            }
-            else
-            {
-                // optional parameter "t"  not used
-                _job = new JobPort(new JobOptions(jobName, JobDefaultValues.defaultDelay, JobOptions.JobType.PortRequest), targetAddress, port);
-            }
-            */
 
             // add job to jobsystem
             MadComponents.components.jobSystem.CreateJob(_job);
@@ -260,12 +214,12 @@ namespace MAD.CLI
     {
         public JobSystemRemoveCommand()
         {
-            requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
+            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
         }
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").value;
+            int id = (int)parameters.GetParameter("id").argumentValue[0];
 
             try
             {
@@ -285,12 +239,12 @@ namespace MAD.CLI
     {
         public JobSystemStartCommand()
         {
-            requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
+            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32)} ));
         }
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").value;
+            int id = (int)parameters.GetParameter("id").argumentValue[0];
 
             try
             {
@@ -310,12 +264,12 @@ namespace MAD.CLI
     {
         public JobSystemStopCommand()
         {
-            requiredParameter.Add(new ParameterOption("id", false, typeof(Int32)));
+            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
         }
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").value;
+            int id = (int)parameters.GetParameter("id").argumentValue[0];
 
             try
             {
@@ -335,12 +289,12 @@ namespace MAD.CLI
     {
         public JobSystemOutputCommand()
         {
-            requiredParameter.Add(new ParameterOption("id", false, typeof(int)));
+            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").value;
+            int id = (int)parameters.GetParameter("id").argumentValue[0];
 
             Job job = MadComponents.components.jobSystem.GetJob(id);
 

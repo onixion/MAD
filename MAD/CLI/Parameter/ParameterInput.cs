@@ -8,11 +8,11 @@ namespace MAD.CLI
         // All parameter from input.
         public List<Parameter> parameters = new List<Parameter>();
 
-        public Parameter GetParameter(string indicator)
+        public Parameter GetParameter(string parameter)
         {
             foreach (Parameter temp in parameters)
             {
-                if (temp.indicator == indicator)
+                if (temp.parameter == parameter)
                 {
                     return temp;
                 }

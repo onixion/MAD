@@ -10,7 +10,7 @@ namespace MAD.CLI
         #region member
 
         // cli framework version
-        public Version versionFramework = new Version(1,4);
+        public Version versionFramework = new Version(1,6);
 
         // cli vars
         protected string cursor = "=> ";
@@ -20,29 +20,6 @@ namespace MAD.CLI
 
         protected Command command;
         protected Type inputCommandType;
-
-        #region all available commands
-        /*
-        private static List<CommandOptions> availableCommands = new List<CommandOptions>()
-        {
-            // GENERAL COMMANDS
-            new CommandOptions("help", typeof(HelpCommand)),
-            new CommandOptions("info", typeof(InfoCommand)),
-            new CommandOptions("colortest", typeof(ColorTest)),
-                
-            // JOBSYSTEM COMMANDS
-            new CommandOptions("jobsystem", typeof(JobSystemStatusCommand)),
-            new CommandOptions("job status", typeof(JobStatusCommand)),
-            new CommandOptions("job remove", typeof(JobSystemRemoveCommand)),
-            new CommandOptions("job start", typeof(JobSystemStartCommand)),
-            new CommandOptions("job stop", typeof(JobSystemStopCommand)),
-            new CommandOptions("job add ping", typeof(JobSystemAddPingCommand)),
-            new CommandOptions("job add http", typeof(JobSystemAddHttpCommand)),
-            new CommandOptions("job add port", typeof(JobSystemAddPortCommand)),
-
-        };
-        */
-        #endregion
 
         #endregion
 
@@ -95,41 +72,32 @@ namespace MAD.CLI
             
             
             }
-
-
-
-
-
-
         }
 
         /*
-         * This function checks if the parms are valid and sets the command
+         * This function checks if the parms and args are valid and sets the command
          * object.
          * 
-         * It returns the string "VALID_PARAMETER" when the parameter are valid.
+         * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
          * If the parameter are not valid it returns the error text. */
         public string AnalyseInput(string cliInput, ref Command command)
         {
-            string commandInput;
-
             // get command
-            commandInput = GetCommandName(cliInput);
+            string commandInput = commandInput = GetCommandName(cliInput);
 
-            // check if command is known
+            // check if command is known by cli
             if (CommandExists(commandInput))
             {
-                // get command 
+                // get command options
                 CommandOptions commandOptions = GetCommandOptions(commandInput);
                 // get parameter and arguments from input
                 ParameterInput parameterInput = GetParamtersFromInput(cliInput);
-
                 // get command type
                 Type commandType = commandOptions.commandType;
-                // get parameter objects to pass to constructor of the command
-                object[] commandParameters = commandOptions.commandParameterObjects;
 
-                // get constructor
+                // get objects to pass to constructor of the command
+                object[] commandObjects = commandOptions.commandObjects;
+                // get constructor and pass object[] to it (if cInfo == null)
                 ConstructorInfo cInfo = commandType.GetConstructor(new Type[1] { typeof(object[]) });
 
                 if (cInfo == null)
@@ -140,7 +108,7 @@ namespace MAD.CLI
                 }
                 else
                 {
-                    command = (Command)cInfo.Invoke(new object[]{commandParameters});
+                    command = (Command)cInfo.Invoke(new object[]{commandObjects});
                 }
 
                 // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
@@ -185,24 +153,42 @@ namespace MAD.CLI
         {
             ParameterInput parameterTemp = new ParameterInput();
 
-            string[] temp = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] _temp = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 1; i < temp.Length; i++)
-                temp[i] = temp[i].Trim();
-
-            for (int i = 1; i < temp.Length; i++)
+            for (int i = 1; i < _temp.Length; i++)
             {
-                string[] temp2 = temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                _temp[i] = _temp[i].Trim();
+            }
 
-                if (temp2.Length == 1)
+            for (int i = 1; i < _temp.Length; i++)
+            {
+                string[] _temp2 = _temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (_temp2.Length == 1)
                 {
-                    // parameter argument is null
-                    parameterTemp.parameters.Add(new Parameter(temp2[0], null));
+                    // parameter arguments are null
+                    parameterTemp.parameters.Add(new Parameter(_temp2[0], null));
                 }
                 else
                 {
-                    // more than one argument do NOT get recordnized by the CLI!!!
-                    parameterTemp.parameters.Add(new Parameter(temp2[0], temp2[1]));
+                    // one or multiple arguments
+                    if (_temp2.Length == 2)
+                    {
+                        // one argument
+                        parameterTemp.parameters.Add(new Parameter(_temp2[0], new object[] { _temp2[1] }));
+                    }
+                    else
+                    { 
+                        //multiple arguments
+                        object[] _buffer = new object[_temp2.Length-1];
+                        
+                        for(int i2 = 1; i < _temp2.Length; i++)
+                        {
+                            _buffer[i2-1] = _temp2[i2];
+                        }
+
+                        parameterTemp.parameters.Add(new Parameter(_temp2[0], _buffer));
+                    }
                 }
             }
 

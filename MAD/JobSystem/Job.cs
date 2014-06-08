@@ -97,16 +97,24 @@ namespace MAD.JobSystem
 
         private void CycleLockSignal()
         {
-            int buffer = jobOptions.jobDelay;
+            int buffer = jobOptions.jobTime.jobDelay;
 
-            // check every _cycleTime for 
             while (jobState == State.Running)
             {
-                Thread.Sleep(_cycleTime);
-                buffer = buffer - _cycleTime;
+                if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                {
+                    // check every _cycleTime for
+                    Thread.Sleep(_cycleTime);
+                    buffer = buffer - _cycleTime;
 
-                if (buffer <= 0)
-                    break;
+                    if (buffer <= 0)
+                        break;
+                }
+                else
+                {
+                    if (DateTime.Now.Minute == jobOptions.jobTime.jobTimes[0].Minute && DateTime.Now.Hour == jobOptions.jobTime.jobTimes[0].Hour)
+                        break;
+                }
             }
 
             _cycleLock.Set();
@@ -123,7 +131,24 @@ namespace MAD.JobSystem
             _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
             _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
             _temp += "<color><yellow>JOB-TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
-            _temp += "<color><yellow>DELAY(ms): <color><white>" + jobOptions.jobDelay + "\n";
+            _temp += "<color><yellow>JOB-TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
+
+            if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+            {
+                _temp += "<color><yellow>JOB-DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
+            }
+            else
+            {
+                _temp += "<color><yellow>JOB-TIMES: <color><white>";
+
+                foreach (DateTime _buffer in jobOptions.jobTime.jobTimes)
+                {
+                    _temp += _buffer.ToString("HH:mm ");
+                }
+
+                _temp += "\n";
+            }
+
             _temp += "<color><yellow>JOB-STATE: <color><white>" + jobState.ToString()+ "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
 

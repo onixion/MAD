@@ -4,46 +4,43 @@ namespace MAD.CLI
 {
     public class ParameterOption
     {
-        public string indicator;
+        public string parameter;
         public string description;
-
-        // arguemntEmpty = true -> No argument needed. argumentEmpty = false -> Argument required.
         public bool argumentEmpty;
+        public bool multiArguments;
+        public Type[] argumentTypes;
 
-        // if argumentEmpty = true -> argumentType = null
-        public Type argumentType;
-
-        public ParameterOption(string indicator,bool argumentEmpty, Type argumentType)
+        public ParameterOption(string parameter,bool argumentEmpty, Type[] argumentTypes)
         {
-            this.indicator = indicator;
+            this.parameter = parameter;
 
-            ParameterDescriptionAuto(indicator);
+            ParameterDescriptionAuto(parameter);
 
             this.argumentEmpty = argumentEmpty;
 
             if (argumentEmpty != true)
             {
-                this.argumentType = argumentType;
+                this.argumentTypes = argumentTypes;
             }
             else
             {
-                this.argumentType = null;
+                this.argumentTypes = null;
             }
         }
 
-        public ParameterOption(string indicator, string description, bool argumentEmpty, Type argumentType)
+        public ParameterOption(string parameter, string description, bool argumentEmpty, bool multiArguments, Type[] argumentTypes)
         {
-            this.indicator = indicator;
+            this.parameter = parameter;
             this.description = description;
             this.argumentEmpty = argumentEmpty;
 
             if (argumentEmpty != true)
             {
-                this.argumentType = argumentType;
+                this.argumentTypes = argumentTypes;
             }
             else
             {
-                this.argumentType = null;
+                this.argumentTypes = null;
             }
         }
 

@@ -15,13 +15,15 @@ namespace MAD.JobSystem
 
         #endregion
 
+        #region constructors
+
         public JobHttp()
         {
-            InitJob(JobDefaultValues.defaultJobOptions);
+            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
             jobOptions.jobType = JobOptions.JobType.HttpRequest;
 
-            this.targetAddress = JobDefaultValues.defaultTargetAddress;
-            this.port = JobDefaultValues.defaultPort;
+            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
+            this.port = JobDefaultValues.defaultValues.defaultPort;
         }
 
         public JobHttp(JobOptions jobOption, IPAddress targetAddress, int port)
@@ -31,6 +33,8 @@ namespace MAD.JobSystem
             this.targetAddress = targetAddress;
             this.port = port;
         }
+
+        #endregion
 
         #region methodes
 

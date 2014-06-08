@@ -10,9 +10,10 @@ namespace MAD.CLI
         public HelpCommand(object[] commandPars)
         {
             this.commands = (List<CommandOptions>)commandPars[0];
-            optionalParameter.Add(new ParameterOption("id", "Command-ID", false, typeof(int)));
+            optionalParameter.Add(new ParameterOption("id", "Command-ID (INT)", false, false, new Type[] { typeof(int) }));
 
-            description = "This command shows information about all available commands.";
+            description = "This command shows information about other available commands.";
+            usage = "help -id <COMMAND_ID>";
         }
 
         public override string Execute()
@@ -37,7 +38,7 @@ namespace MAD.CLI
             }
             else
             {
-                int commandIndex = (int)parameters.GetParameter("id").value;
+                int commandIndex = (int)parameters.GetParameter("id").argumentValue[0];
 
                 try
                 {
@@ -56,12 +57,12 @@ namespace MAD.CLI
                     }
                     else
                     {
-                        tempCommand = (Command)cInfo.Invoke(new object[] { commandOptions.commandParameterObjects });
+                        tempCommand = (Command)cInfo.Invoke(new object[] { commandOptions.commandObjects });
                     }
 
-                    
-
                     output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
+
+                    output += "<color><yellow>USAGE <color><white>" + tempCommand.usage + "\n";
 
                     output += "<color><yellow>PARAMETER\n";
 
@@ -69,29 +70,31 @@ namespace MAD.CLI
                     {
                         if (tempCommand.requiredParameter.Count != 0)
                         {
-                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
+                            output += "\t<color><yellow>REQUIRED PARAMETER\n";
 
                             foreach (ParameterOption _temp in tempCommand.requiredParameter)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
-                                output += "\t<color><white>Description:<color><gray> " + _temp.description + "\n";
+                                output += "\t<color><darkyellow>-" + _temp.parameter + "<color><gray> " + _temp.description + "\n";
                             }
+
+                            output += "\n";
                         }
 
                         if (tempCommand.optionalParameter.Count != 0)
                         {
-                            output += "\t<color><yellow>OPTIONAL PARAMETER\n\n";
+                            output += "\t<color><yellow>OPTIONAL PARAMETER\n";
 
                             foreach (ParameterOption _temp in tempCommand.optionalParameter)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.indicator + "\n";
-                                output += "\t<color><white>Description:<color><gray> " + _temp.description + "\n";
+                                output += "\t<color><darkyellow>-" + _temp.parameter + "<color><gray> " + _temp.description + "\n";
                             }
+
+                            output += "\n";
                         }
                     }
                     else
                     {
-                        output += "\n\t<color><gray>(no parameters)\n";
+                        output += "\n\t<color><gray>(command does not use any parameter)\n";
                     }
                 }
                 catch (Exception)
@@ -151,6 +154,25 @@ namespace MAD.CLI
             }
             
             return output;
+        }
+    }
+
+    public class TestCommand : Command
+    {
+        public TestCommand()
+        {
+            description = "This command is used to test the CLI-Framework.";
+
+            requiredParameter.Add(new ParameterOption("a", false, new Type[] { typeof(string), typeof(int) }));
+            requiredParameter.Add(new ParameterOption("b", true, null));
+        }
+
+        public override string Execute()
+        {
+            output += "<color><white>-a\n";
+
+
+            return "JKI";
         }
     }
 }

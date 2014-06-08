@@ -20,13 +20,13 @@ namespace MAD.JobSystem
         #endregion
 
         public JobPing()
-        { 
-            InitJob(JobDefaultValues.defaultJobOptions);
+        {
+            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
             jobOptions.jobType = JobOptions.JobType.PingRequest;
 
-            this.targetAddress = JobDefaultValues.defaultTargetAddress;
-            this.ttl = JobDefaultValues.defaultTTL;
-            this.dontFragment = JobDefaultValues.defaultDontFragment;
+            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
+            this.ttl = JobDefaultValues.defaultValues.defaultTTL;
+            this.dontFragment = JobDefaultValues.defaultValues.defaultDontFragment;
 
             _ping = new Ping();
             _pingOptions = new PingOptions(ttl, dontFragment);

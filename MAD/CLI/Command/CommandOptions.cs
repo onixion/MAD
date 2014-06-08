@@ -6,13 +6,13 @@ namespace MAD.CLI
     {
         public string command;
         public Type commandType;
-        public object[] commandParameterObjects;
+        public object[] commandObjects;
 
-        public CommandOptions(string command, Type commandType, object[] commandParameterObjects)
+        public CommandOptions(string command, Type commandType, object[] commandObjects)
         {
             this.command = command;
             this.commandType = commandType;
-            this.commandParameterObjects = commandParameterObjects;
+            this.commandObjects = commandObjects;
         }
     }
 }

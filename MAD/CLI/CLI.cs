@@ -6,7 +6,7 @@ namespace MAD.CLI
 {
     public class CLI : CLIFramework
     {
-        public Version version = new Version(1, 3, 2000);
+        public Version version = new Version(1, 4, 3000);
 
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor inputColor = ConsoleColor.White;
@@ -32,7 +32,7 @@ namespace MAD.CLI
 
                     if (response == "VALID_PARAMETER")
                     {
-                        // input is valid -> execute command and write output of the command to console
+                        // input is valid -> execute command and write output to console
                         ConsoleWriter.WriteToConsole(command.Execute());
                         WriteCursor();
                     }

@@ -29,3 +29,4 @@ Now using the TcpListener and TcpClient)
 (NOTE: Communication is working, but it is cannot be encrypted yet. )
 
 [06.06.2014][14:00-18:00][4h][61h] CLIFramewokr. Improved many things. Re-Building many parts...
+[08.06.2014][19:00-21:00][2h][63h] CLI supports multiple arguments and multiple types. Other improvements

@@ -2,13 +2,24 @@
 using System.Net;
 namespace MAD.JobSystem
 {
-    public static class JobDefaultValues
+    public class JobDefaultValues
     {
-        public static JobOptions defaultJobOptions = new JobOptions("unknown", 20000, JobOptions.JobType.Null);
+        private static JobDefaultValues _defaultValues;
+        public static JobDefaultValues defaultValues
+        {
+            get
+            {
+                if (_defaultValues == null)
+                    _defaultValues = new JobDefaultValues();
 
-        public static IPAddress defaultTargetAddress = IPAddress.Loopback;
-        public static int defaultPort = 80;
-        public static int defaultTTL = 200;
-        public static bool defaultDontFragment = true;
+                return _defaultValues;
+            }
+        }
+
+        public JobOptions defaultJobOptions = new JobOptions("unknown", 20000, JobOptions.JobType.Null);
+        public IPAddress defaultTargetAddress = IPAddress.Loopback;
+        public int defaultPort = 80;
+        public int defaultTTL = 200;
+        public bool defaultDontFragment = true;
     }
 }
