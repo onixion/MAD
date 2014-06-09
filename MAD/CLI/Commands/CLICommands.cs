@@ -10,7 +10,8 @@ namespace MAD.CLI
         public HelpCommand(object[] commandPars)
         {
             this.commands = (List<CommandOptions>)commandPars[0];
-            optionalParameter.Add(new ParameterOption("id", "Command-ID (INT)", false, false, new Type[] { typeof(int) }));
+
+            optionalParameter.Add(new ParameterOption("id", "Command-ID (interger)", false, false, new Type[] { typeof(int) }));
 
             description = "This command shows information about other available commands.";
             usage = "help -id <COMMAND_ID>";
@@ -20,7 +21,7 @@ namespace MAD.CLI
         {
             if (!OptionalParameterUsed("id"))
             {
-                output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
+                output += "<color><yellow>Type 'help -id <COMMAND_ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
                 output += "<color><white>";
 
@@ -43,8 +44,6 @@ namespace MAD.CLI
                 try
                 {
                     CommandOptions commandOptions = commands[commandIndex];
-                    output += "<color><yellow>COMMAND <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
-
                     Type commandType = commandOptions.commandType;
                     Command tempCommand;
 
@@ -60,36 +59,59 @@ namespace MAD.CLI
                         tempCommand = (Command)cInfo.Invoke(new object[] { commandOptions.commandObjects });
                     }
 
+                    output += "<color><yellow>COMMAND     <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
                     output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
-
-                    output += "<color><yellow>USAGE <color><white>" + tempCommand.usage + "\n";
-
+                    output += "<color><yellow>USAGE       <color><white>" + tempCommand.usage + "\n";
                     output += "<color><yellow>PARAMETER\n";
 
                     if (!(tempCommand.requiredParameter.Count == 0 && tempCommand.optionalParameter.Count == 0))
                     {
                         if (tempCommand.requiredParameter.Count != 0)
                         {
-                            output += "\t<color><yellow>REQUIRED PARAMETER\n";
+                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
 
                             foreach (ParameterOption _temp in tempCommand.requiredParameter)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.parameter + "<color><gray> " + _temp.description + "\n";
-                            }
+                                output += "\t<color><darkyellow>-" + _temp.parameter + " <color><white>";
 
-                            output += "\n";
+                                if (_temp.multiArguments)
+                                {
+                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...\n";
+                                }
+                                else
+                                {
+                                    output += "<ARGUMENT>\n";
+                                }
+
+                                output += "\t<color><gray>" + _temp.description + "\n\n";
+                            }
                         }
 
                         if (tempCommand.optionalParameter.Count != 0)
                         {
-                            output += "\t<color><yellow>OPTIONAL PARAMETER\n";
+                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
 
                             foreach (ParameterOption _temp in tempCommand.optionalParameter)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.parameter + "<color><gray> " + _temp.description + "\n";
-                            }
+                                output += "\t<color><darkyellow>-" + _temp.parameter + " <color><white>";
 
-                            output += "\n";
+                                if (_temp.multiArguments)
+                                {
+                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...\n";
+                                }
+                                else
+                                {
+                                    if (!_temp.argumentEmpty)
+                                    {
+                                        output += "<ARGUMENT>\n";
+                                    }
+                                    {
+                                        output += "\n";
+                                    }
+                                }
+
+                                output += "\t<color><gray>" + _temp.description + "\n\n";
+                            }
                         }
                     }
                     else
@@ -109,31 +131,19 @@ namespace MAD.CLI
 
     public class InfoCommand : Command
     {
-        public InfoCommand()
-        { 
-            optionalParameter.Add(new ParameterOption("hack", true, null));
-        }
-
         public override string Execute()
         {
-            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
+            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n";
 
-            output += "Components:<color><white>\n";
+            output += "Program written by: \n";
+            output += "<color><white><PORCIC Alin>\n<RANALTER Daniel>\n<SINGH Manpreet>\n<STOJANOVIC Marko>\n\n";
+
+            output += "<color><yellow>Components:<color><white>\n";
             output += "CLI         v" + MadComponents.components.cli.version.ToString() + " (CLI-Framework v" + MadComponents.components.cli.versionFramework + ")\n";
             output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + "\n";
             output += "JobSystem   v" + MadComponents.components.jobSystem.version.ToString();
 
-            if (OptionalParameterUsed("hack"))
-            {
-                output += "\n\n<color><yellow>J<color><green>A<color><blue>C";
-                output += "<color><red>K <color><magenta>B<color><darkgray>Ö";
-                output += "<color><darkred>S<color><green>E <color><blue>";
-                output += "W<color><yellow>A<color><magenta>S <color><blue>H";
-                output += "<color><darkred>E<color><magenta>R<color><white>E ";
-                output += "  <color><green>.<color><red>.<color><darkgray>.\n"; ;
-            }
-
-            return output;
+            return output + "\n";
         }
     }
 
@@ -163,16 +173,21 @@ namespace MAD.CLI
         {
             description = "This command is used to test the CLI-Framework.";
 
-            requiredParameter.Add(new ParameterOption("a", false, new Type[] { typeof(string), typeof(int) }));
-            requiredParameter.Add(new ParameterOption("b", true, null));
+            requiredParameter.Add(new ParameterOption("a", "FOR-TESTING", false, true, new Type[] { typeof(string), typeof(int) }));
         }
 
         public override string Execute()
         {
-            output += "<color><white>-a\n";
+            object[] buffer = parameters.GetParameter("a").argumentValue;
 
+            output += "<color><white>PARAMETER a\n";
 
-            return "JKI";
+            foreach (object _temp in buffer)
+            {
+                output += "\t" + _temp.ToString();
+            }
+
+            return output;
         }
     }
 }

@@ -11,11 +11,13 @@ namespace MAD.CLI
         public List<ParameterOption> requiredParameter = new List<ParameterOption>();
         public List<ParameterOption> optionalParameter = new List<ParameterOption>();
 
-        protected ParameterInput parameters;
-        protected string output = "";
-
         public string description = "NO DESCRIPTION-TEXT YET!";
         public string usage = "NO USAGE-TEXT YET!";
+        protected string output = "";
+
+        // this object contains all parameters from cli
+        // (it has been checked and converted the argument types)
+        protected ParameterInput parameters;
 
         #endregion
 
@@ -83,6 +85,7 @@ namespace MAD.CLI
 
                     object[] arguments = new object[_temp.argumentValue.Length];
 
+                    // try to convert the args into the needed types
                     foreach (Type _type in GetArgumentTypes(_temp.parameter))
                     {
                         int _temp2 = _temp.argumentValue.Length;
@@ -100,7 +103,12 @@ namespace MAD.CLI
                         // check if all arguments could be converted to the type
                         if (_temp2 != 0)
                         {
-                            return "<color><red>Could not parse argument '" + _temp.argumentValue + "'. Type help for view full commands.";
+                            return "<color><red>Could not parse some arguments from parameter '" + _temp.parameter + "'. Type help for view full commands.";
+                        }
+                        else
+                        { 
+                            // all arguments could be parsed without any problems
+                            break;
                         }
                     }
 

@@ -33,6 +33,7 @@ namespace MAD.CLI
             this.parameter = parameter;
             this.description = description;
             this.argumentEmpty = argumentEmpty;
+            this.multiArguments = multiArguments;
 
             if (argumentEmpty != true)
             {

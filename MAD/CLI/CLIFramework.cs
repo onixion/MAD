@@ -39,6 +39,8 @@ namespace MAD.CLI
                 commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
                 commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
                 commands.Add(new CommandOptions("info", typeof(InfoCommand), new object[0]));
+
+                commands.Add(new CommandOptions("test", typeof(TestCommand), new object[0]));
             }
 
             if (authLevel < 75)
@@ -68,7 +70,7 @@ namespace MAD.CLI
             
             if (authLevel == 0)
             { 
-            
+
             
             
             }
@@ -182,7 +184,7 @@ namespace MAD.CLI
                         //multiple arguments
                         object[] _buffer = new object[_temp2.Length-1];
                         
-                        for(int i2 = 1; i < _temp2.Length; i++)
+                        for(int i2 = 1; i2 < _temp2.Length; i2++)
                         {
                             _buffer[i2-1] = _temp2[i2];
                         }
