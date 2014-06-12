@@ -8,6 +8,12 @@ namespace MAD.CLI
     {
         ConsoleTable jobTable;
 
+        public JobSystemStatusCommand()
+        {
+            InitCommand();
+            description = "This command prints a table with all jobs!";
+        }
+
         public override string Execute()
         {
             string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value", "Job-State", "Output-State" };
@@ -55,7 +61,9 @@ namespace MAD.CLI
     {
         public JobStatusCommand()
         {
-            optionalParameter.Add(new ParameterOption("id", false, new Type[] { typeof(int) }));
+            InitCommand();
+
+            optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -102,14 +110,13 @@ namespace MAD.CLI
     {
         public JobSystemAddPingCommand()
         {
-            requiredParameter.Add(new ParameterOption("n", false, new Type[] { typeof(String) }));
-            requiredParameter.Add(new ParameterOption("ip", "IPAddress", false, true, new Type[] { typeof(IPAddress) }));
+            InitCommand();
 
-            optionalParameter.Add(new ParameterOption("t", false, new Type[] { typeof(Int32), typeof(string) }));
-            optionalParameter.Add(new ParameterOption("ttl", false, new Type[] { typeof(Int32) }));
-
+            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IPAddress of the target-machine.", false, false, new Type[] { typeof(IPAddress) }));
+            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
             description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
-            usage = "js add ping -n <JOBNAME> -ip <TARGET-IPADDRESS> [-ttl <TTL>]";
         }
 
         public override string Execute()
@@ -142,9 +149,10 @@ namespace MAD.CLI
     {
         public JobSystemAddHttpCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("n", false, new Type[] { typeof(String) }));
             requiredParameter.Add(new ParameterOption("ip", false, new Type[] { typeof(IPAddress) }));
-
             optionalParameter.Add(new ParameterOption("t", false, new Type[] { typeof(Int32) }));
             optionalParameter.Add(new ParameterOption("p", false, new Type[] { typeof(Int32) }));
         }
@@ -179,10 +187,11 @@ namespace MAD.CLI
     {
         public JobSystemAddPortCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("n", false, new Type[] {typeof(String) }));
             requiredParameter.Add(new ParameterOption("ip", false, new Type[] {typeof(IPAddress) }));
             requiredParameter.Add(new ParameterOption("p", false, new Type[] {typeof(Int32) }));
-
             optionalParameter.Add(new ParameterOption("t", false, new Type[] {typeof(Int32) }));
         }
 
@@ -214,6 +223,8 @@ namespace MAD.CLI
     {
         public JobSystemRemoveCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
         }
 
@@ -239,6 +250,8 @@ namespace MAD.CLI
     {
         public JobSystemStartCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32)} ));
         }
 
@@ -264,6 +277,8 @@ namespace MAD.CLI
     {
         public JobSystemStopCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
         }
 
@@ -289,6 +304,8 @@ namespace MAD.CLI
     {
         public JobSystemOutputCommand()
         {
+            InitCommand();
+
             requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(int) }));
         }
 

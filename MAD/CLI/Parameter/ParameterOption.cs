@@ -5,6 +5,7 @@ namespace MAD.CLI
     public class ParameterOption
     {
         public string parameter;
+        public string parameterInfo;
         public string description;
         public bool argumentEmpty;
         public bool multiArguments;
@@ -28,9 +29,10 @@ namespace MAD.CLI
             }
         }
 
-        public ParameterOption(string parameter, string description, bool argumentEmpty, bool multiArguments, Type[] argumentTypes)
+        public ParameterOption(string parameter, string parameterInfo, string description, bool argumentEmpty, bool multiArguments, Type[] argumentTypes)
         {
             this.parameter = parameter;
+            this.parameterInfo = parameterInfo;
             this.description = description;
             this.argumentEmpty = argumentEmpty;
             this.multiArguments = multiArguments;

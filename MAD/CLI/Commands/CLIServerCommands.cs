@@ -7,7 +7,6 @@ namespace MAD.CLI
         public CLIServerInfo()
         {
             description = "This command shows informations about the CLIServer.";
-            usage = "cliserver";
         }
 
         public override string Execute()
@@ -26,7 +25,6 @@ namespace MAD.CLI
         public CLIServerStart()
         {
             description = "This command starts the CLIServer.";
-            usage = "cliserver start";
         }
 
         public override string Execute()
@@ -50,7 +48,6 @@ namespace MAD.CLI
         public CLIServerStop()
         {
             description = "This command stops the CLIServer.";
-            usage = "cliserver stop";
         }
 
         public override string Execute()

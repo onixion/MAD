@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace MAD.JobSystem
 {
-    class JobPort : Job
+    public class JobPort : Job
     {
         #region members
 

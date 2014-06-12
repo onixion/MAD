@@ -41,9 +41,19 @@ namespace MAD.JobSystem
             return null;
         }
 
-        public void CreateJob(Job job)
+        public void CreateJob(JobPing job)
         {
-            jobs.Add(job);
+            jobs.Add((JobPing)job);
+        }
+
+        public void CreateJob(JobHttp job)
+        {
+            jobs.Add((JobHttp)job);
+        }
+
+        public void CreateJob(JobPort job)
+        {
+            jobs.Add((JobPort)job);
         }
 
         public void DestroyJob(int jobID)

@@ -30,7 +30,7 @@ namespace MAD.CLI
          * authLevel = 1 -> FileSystem, CLIServer
          * authLevel = 2 -> FileSystem
          * ...
-         */
+         *
         protected void _InitCLI(int authLevel)
         {
             if (authLevel < 100)
@@ -75,6 +75,7 @@ namespace MAD.CLI
             
             }
         }
+         * */
 
         /*
          * This function checks if the parms and args are valid and sets the command

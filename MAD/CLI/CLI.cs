@@ -12,8 +12,17 @@ namespace MAD.CLI
         public ConsoleColor inputColor = ConsoleColor.White;
 
         public CLI()
-        { 
-            _InitCLI(0);
+        {
+            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+            commands.Add(new CommandOptions("test", typeof(TestCommand), null));
+
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
+            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), null));
+            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), null));
+            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), null));
+            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), null));
         }
 
         public void Start()

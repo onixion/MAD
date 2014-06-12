@@ -8,12 +8,11 @@ namespace MAD.CLI
     {
         #region members
 
-        public List<ParameterOption> requiredParameter = new List<ParameterOption>();
-        public List<ParameterOption> optionalParameter = new List<ParameterOption>();
+        public List<ParameterOption> requiredParameter;
+        public List<ParameterOption> optionalParameter;
 
-        public string description = "NO DESCRIPTION-TEXT YET!";
-        public string usage = "NO USAGE-TEXT YET!";
-        protected string output = "";
+        public string description;
+        protected string output;
 
         // this object contains all parameters from cli
         // (it has been checked and converted the argument types)
@@ -22,6 +21,15 @@ namespace MAD.CLI
         #endregion
 
         #region methodes
+
+        protected void InitCommand()
+        {
+            requiredParameter = new List<ParameterOption>();
+            optionalParameter = new List<ParameterOption>();
+
+            description = "(undefined)";
+            output = "";
+        }
 
         public void SetParameters(ParameterInput parameters)
         {

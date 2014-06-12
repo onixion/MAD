@@ -16,10 +16,10 @@ namespace MAD.JobSystem
             }
         }
 
-        public JobOptions defaultJobOptions = new JobOptions("unknown", 20000, JobOptions.JobType.Null);
-        public IPAddress defaultTargetAddress = IPAddress.Loopback;
-        public int defaultPort = 80;
-        public int defaultTTL = 200;
-        public bool defaultDontFragment = true;
+        public readonly JobOptions defaultJobOptions = new JobOptions("unknown", 20000, JobOptions.JobType.Null);
+        public readonly IPAddress defaultTargetAddress = IPAddress.Loopback;
+        public readonly int defaultPort = 80;
+        public readonly int defaultTTL = 200;
+        public readonly bool defaultDontFragment = true;
     }
 }

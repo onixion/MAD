@@ -2,7 +2,7 @@
 
 namespace MAD.CLI
 {
-    // command definitions
+    /* This object defines a command. */
     public class CommandOptions
     {
         public string command;
