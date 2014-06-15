@@ -127,6 +127,7 @@ namespace MAD.CLI
             JobPing _job = new JobPing();
 
             _job.jobOptions.jobName = jobName;
+            _job.jobOptions.jobType = JobOptions.JobType.PingRequest;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -165,6 +166,7 @@ namespace MAD.CLI
             JobHttp _job = new JobHttp();
 
             _job.jobOptions.jobName = jobName;
+            _job.jobOptions.jobType = JobOptions.JobType.HttpRequest;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -204,6 +206,7 @@ namespace MAD.CLI
             JobPort _job = new JobPort();
 
             _job.jobOptions.jobName = jobName;
+            _job.jobOptions.jobType = JobOptions.JobType.PortRequest;
             _job.targetAddress = targetAddress;
             _job.port = port;
 

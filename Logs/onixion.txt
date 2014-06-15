@@ -31,3 +31,6 @@ Now using the TcpListener and TcpClient)
 [06.06.2014][14:00-18:00][4h][61h] CLIFramewokr. Improved many things. Re-Building many parts...
 [08.06.2014][19:00-21:00][2h][63h] CLI supports multiple arguments and multiple types. Other improvements
 [09.06.2014][20:00-22:00][2h][65h] CLI multiple arguments and types ... clean coding
+[15.06.2014][13:30-14:30][1h][66h] CLIServer / CLIClient
+
+(NOTE: CLIServer do not support CLIUsers yet. Working on it.)
