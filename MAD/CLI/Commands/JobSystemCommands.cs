@@ -21,16 +21,16 @@ namespace MAD.CLI
             tableRow = jobTable.FormatStringArray(tableRow);
 
             output += "<color><yellow>\n";
-            output += "Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n";
-            output += "Jobs running:     " + MadComponents.components.jobSystem.JobsRunning() + "\n";
-            output += "Jobs stopped:     " + MadComponents.components.jobSystem.JobsStopped() + "\n\n";
+            output += "Jobs initialized: " + Handler.components.jobSystem.jobs.Count + "\n";
+            output += "Jobs running:     " + Handler.components.jobSystem.JobsRunning() + "\n";
+            output += "Jobs stopped:     " + Handler.components.jobSystem.JobsStopped() + "\n\n";
 
             output += jobTable.WriteColumnes(tableRow) + "\n";
             output += jobTable.splitline + "\n";
             output += "<color><white>";
 
             /* It improves the performance when you can work with jobs directly! */
-            foreach (Job _temp in MadComponents.components.jobSystem.jobs)
+            foreach (Job _temp in Handler.components.jobSystem.jobs)
             {
                 tableRow[0] = _temp.jobID.ToString();
                 tableRow[1] = _temp.jobOptions.jobName;
@@ -70,7 +70,7 @@ namespace MAD.CLI
         {
             if (OptionalParameterUsed("id"))
             {
-                Job _job = MadComponents.components.jobSystem.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
+                Job _job = Handler.components.jobSystem.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
 
                 if (_job != null)
                 {
@@ -86,9 +86,9 @@ namespace MAD.CLI
 
             else
             {
-                output += "<color><yellow>Jobs initialized: " + MadComponents.components.jobSystem.jobs.Count + "\n\n";
+                output += "<color><yellow>Jobs initialized: " + Handler.components.jobSystem.jobs.Count + "\n\n";
 
-                foreach (Job _job in MadComponents.components.jobSystem.jobs)
+                foreach (Job _job in Handler.components.jobSystem.jobs)
                 {
                     output += _job.Status() + "\n";
                 }
@@ -139,7 +139,7 @@ namespace MAD.CLI
                 _job.ttl = (int)parameters.GetParameter("ttl").argumentValue[0];
             }
 
-            MadComponents.components.jobSystem.CreateJob(_job);
+            Handler.components.jobSystem.CreateJob(_job);
 
             return output;
         }
@@ -151,10 +151,10 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("n", false, new Type[] { typeof(String) }));
-            requiredParameter.Add(new ParameterOption("ip", false, new Type[] { typeof(IPAddress) }));
-            optionalParameter.Add(new ParameterOption("t", false, new Type[] { typeof(Int32) }));
-            optionalParameter.Add(new ParameterOption("p", false, new Type[] { typeof(Int32) }));
+            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
+            optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
+            optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -177,7 +177,7 @@ namespace MAD.CLI
                 _job.port = (int)parameters.GetParameter("p").argumentValue[0];
             }
 
-            MadComponents.components.jobSystem.CreateJob(_job);
+            Handler.components.jobSystem.CreateJob(_job);
 
             return output;
         }
@@ -189,10 +189,10 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("n", false, new Type[] {typeof(String) }));
-            requiredParameter.Add(new ParameterOption("ip", false, new Type[] {typeof(IPAddress) }));
-            requiredParameter.Add(new ParameterOption("p", false, new Type[] {typeof(Int32) }));
-            optionalParameter.Add(new ParameterOption("t", false, new Type[] {typeof(Int32) }));
+            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
+            optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -213,7 +213,7 @@ namespace MAD.CLI
             }
 
             // add job to jobsystem
-            MadComponents.components.jobSystem.CreateJob(_job);
+            Handler.components.jobSystem.CreateJob(_job);
 
             return output;
         }
@@ -225,7 +225,7 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -234,7 +234,7 @@ namespace MAD.CLI
 
             try
             {
-                MadComponents.components.jobSystem.DestroyJob(id);
+                Handler.components.jobSystem.DestroyJob(id);
                 output += "<color><green>Job destroyed.";
             }
             catch (Exception e)
@@ -252,7 +252,7 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32)} ));
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -261,12 +261,12 @@ namespace MAD.CLI
 
             try
             {
-                MadComponents.components.jobSystem.StartJob(id);
+                Handler.components.jobSystem.StartJob(id);
                 output = "<color><green>Job started.";
             }
             catch (Exception e)
             {
-                output = "<color><red>FAIL: " + e.Message;
+                output = "<color><red>" + e.Message;
             }      
 
             return output;
@@ -279,7 +279,7 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(Int32) }));
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
@@ -288,7 +288,7 @@ namespace MAD.CLI
 
             try
             {
-                MadComponents.components.jobSystem.StopJob(id);
+                Handler.components.jobSystem.StopJob(id);
                 output = "<color><green>Job stopped.";
             }
             catch (Exception e)
@@ -306,14 +306,14 @@ namespace MAD.CLI
         {
             InitCommand();
 
-            requiredParameter.Add(new ParameterOption("id", false, new Type[] { typeof(int) }));
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
         {
             int id = (int)parameters.GetParameter("id").argumentValue[0];
 
-            Job job = MadComponents.components.jobSystem.GetJob(id);
+            Job job = Handler.components.jobSystem.GetJob(id);
 
             if (job != null)
             {

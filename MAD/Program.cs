@@ -4,13 +4,17 @@ namespace MAD
 {
     class Program
     {
+        /*
+         *  MAD - Network Monitoring v0.0.2.7 RC1
+         */
+
         static int Main(string[] args)
         {
             if (args.Length == 0)
             { 
                 //---------------------------------------------
                 // TEST YOUR SHIT IN HERE
-                MadComponents.components.cli.Start();
+                Handler.components.cli.Start();
                 //---------------------------------------------
             }
             else if (args.Length >= 1)
@@ -18,7 +22,7 @@ namespace MAD
                 switch (args[0])
                 {
                     case "-console":
-                        MadComponents.components.cli.Start();
+                        Handler.components.cli.Start();
                         break;
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");

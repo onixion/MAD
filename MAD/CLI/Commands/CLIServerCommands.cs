@@ -6,15 +6,16 @@ namespace MAD.CLI
     {
         public CLIServerInfo()
         {
+            InitCommand();
             description = "This command shows informations about the CLIServer.";
         }
 
         public override string Execute()
         {
-            output += "<color><yellow>CLI-Server v" + MadComponents.components.cliServer.version + "\n";
-            output += "Server listening: " + MadComponents.components.cliServer.listening + "\n";
-            output += "Active Sessions:  " + MadComponents.components.cliServer.sessions.Count + "\n";
-            output += "Available Users:  " + MadComponents.components.cliServer.users.Count;
+            output += "<color><yellow>CLI-Server v" + Handler.components.cliServer.version + "\n";
+            output += "Server listening: " + Handler.components.cliServer.listening + "\n";
+            output += "Active Sessions:  " + Handler.components.cliServer.sessions.Count + "\n";
+            output += "Available Users:  " + Handler.components.cliServer.users.Count;
 
             return output;
         }
@@ -24,6 +25,8 @@ namespace MAD.CLI
     {
         public CLIServerStart()
         {
+            InitCommand();
+
             description = "This command starts the CLIServer.";
         }
 
@@ -31,7 +34,7 @@ namespace MAD.CLI
         {
             try
             {
-                MadComponents.components.cliServer.Start();
+                Handler.components.cliServer.Start();
                 output += "<color><green>CLI server started.";
             }
             catch (Exception e)
@@ -47,6 +50,8 @@ namespace MAD.CLI
     {
         public CLIServerStop()
         {
+            InitCommand();
+
             description = "This command stops the CLIServer.";
         }
 
@@ -54,7 +59,7 @@ namespace MAD.CLI
         {
             try
             {
-                MadComponents.components.cliServer.Stop();
+                Handler.components.cliServer.Stop();
                 output += "<color><green>CLI server stopped.";
             }
             catch (Exception e)

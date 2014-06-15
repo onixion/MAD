@@ -6,16 +6,16 @@ using MAD.JobSystem;
 
 namespace MAD
 {
-    public class MadComponents
+    public class Handler
     {
-        private static MadComponents _components;
-        public static MadComponents components
+        private static Handler _components;
+        public static Handler components
         {
             get
             {
                 if (_components == null)
                 {
-                    _components = new MadComponents();
+                    _components = new Handler();
                 }
   
                 return _components;
@@ -36,15 +36,15 @@ namespace MAD
         //     DEFAULT CONSTRUCTORS
         // ----------------------------------
 
-        private MadComponents()
+        private Handler()
         {
+            // create data-folder
             if (!System.IO.Directory.Exists(dataPath))
             {
                 System.IO.Directory.CreateDirectory(dataPath);
             }
 
-            jobSystem = new JobSystem.JobSystem();
-
+            jobSystem = new JobSystem.JobSystem(dataPath);
             cli = new CLI.CLI();
             cliServer = new CLIServer(dataPath, 999);
         }

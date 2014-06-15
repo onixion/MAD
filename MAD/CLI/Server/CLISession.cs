@@ -32,8 +32,7 @@ namespace MAD.CLI.Server
             // init CLISession
             _InitSession();
 
-            // init CLI
-            //_InitCLI(0);
+            InitCLI(user);
 
             // start session
             this.Start();
@@ -47,6 +46,31 @@ namespace MAD.CLI.Server
             {
                 sessionID = _sessionsCount;
                 _sessionsCount++;
+            }
+        }
+
+        private void InitCLI(CLIUser user)
+        {
+            // GENERAL
+            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+            commands.Add(new CommandOptions("test", typeof(TestCommand), null));
+
+            // JOBSYSTEM
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
+            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), null));
+            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), null));
+            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), null));
+            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), null));
+            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), null));
+            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), null));
+            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), null));
+
+
+            if (user.group == CLIUser.Group.root)
+            { 
+            
             }
         }
 

@@ -8,12 +8,19 @@ namespace MAD.JobSystem
     {
         #region member
 
-        public Version version = new Version(1, 3, 3000);
+        public Version version = new Version(1, 4);
+        public readonly string _dataPath;
+
         public List<Job> jobs = new List<Job>();
 
         #endregion
 
         #region methodes
+
+        public JobSystem(string dataPath)
+        {
+            _dataPath = dataPath;
+        }
 
         public bool JobExist(int jobID)
         {

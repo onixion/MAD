@@ -13,16 +13,30 @@ namespace MAD.CLI
 
         public CLI()
         {
+            // GENERAL
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
             commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
+            // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), null));
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), null));
             commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), null));
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), null));
+            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), null));
+            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), null));
+            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), null));
+
+            // CLISERVER
+            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), null));
+            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), null));
+            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), null));
+
+            // NOTIFICATION
+
+            // OTHER
         }
 
         public void Start()

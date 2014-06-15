@@ -11,28 +11,27 @@ namespace MAD.CLI.Server
     {
         #region members
 
-        public Version version = new Version(0, 8, 1000);
+        public Version version = new Version(1,0);
 
-        private readonly string dataPath;
-        private const string logDirName = "log";
+        private readonly string _dataPath;
+        private const string _logFilename = "log";
 
         private TcpListener serverListener;
 
-        public List<CLIUser> users;
-        public List<CLISession> sessions;
+        public List<CLIUser> users = new List<CLIUser>();
+        public List<CLISession> sessions = new List<CLISession>();
 
         #endregion
 
         public CLIServer(string dataPath, int port)
         {
-            this.dataPath = dataPath;
+            _dataPath = dataPath;
 
             // init tcp-server
             serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
 
-            // init server vars
-            users = new List<CLIUser>(){new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root)};
-            sessions = new List<CLISession>();
+            // init cli users
+            users.Add(new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root));
         }
 
         #region methodes
@@ -66,20 +65,24 @@ namespace MAD.CLI.Server
             IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
             NetworkStream _clientStream = _client.GetStream();
 
+            // client connected
             Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") connected.");
 
             try
             {
                 // send server info
-                NetCommunication.SendString(_clientStream, "Mad CLI-Server v" + version, true);
+                NetCommunication.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
                 // receive login data
                 string loginData = NetCommunication.ReceiveString(_clientStream);
 
+                // TODO: USER-MANAGMENT
+
+                // check login data
                 if (Login(loginData))
                 {
                     NetCommunication.SendString(_clientStream, "ACCESS GRANTED", true);
-                    sessions.Add(new CLISession(_client, null)); // TODO: CLIUser Managment
+                    sessions.Add(new CLISession(_client, null));
                 }
                 else
                 {
@@ -88,8 +91,12 @@ namespace MAD.CLI.Server
             }
             catch (Exception)
             {
+                // client lost connection
+                Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") lost connection to server.");
+            }
 
-            }             
+            // client disconnected
+            Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") disconnected.");
 
             _client.Close();
 
@@ -174,17 +181,17 @@ namespace MAD.CLI.Server
 
         private void CreateLogDir()
         {
-            if (!Directory.Exists(Path.Combine(dataPath, logDirName)))
+            if (!Directory.Exists(_dataPath))
             {
-                Directory.CreateDirectory(Path.Combine(dataPath, logDirName));
+                Directory.CreateDirectory(_dataPath);
             }
-        }
+       }
 
         private void Log(string data)
         {
             CreateLogDir();
 
-            using(FileStream stream = new FileStream(Path.Combine(dataPath, logDirName, "logCLISERVER.txt"), FileMode.Append, FileAccess.Write, FileShare.Read))
+            using(FileStream stream = new FileStream(Path.Combine(_dataPath, _logFilename), FileMode.Append, FileAccess.Write, FileShare.Read))
             using (StreamWriter writer = new StreamWriter(stream))
             {
                 writer.WriteLine("[ " + NetCommunication.DateStamp() + " | " + NetCommunication.TimeStamp() + " ] " + data);

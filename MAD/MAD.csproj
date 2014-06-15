@@ -60,7 +60,7 @@
     <Compile Include="JobSystem\Jobs\JobPing.cs" />
     <Compile Include="JobSystem\Jobs\JobPort.cs" />
     <Compile Include="JobSystem\JobTime.cs" />
-    <Compile Include="MadComponents.cs" />
+    <Compile Include="Handler.cs" />
     <Compile Include="JobSystem\JobSystem.cs" />
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\Server\CLISession.cs" />

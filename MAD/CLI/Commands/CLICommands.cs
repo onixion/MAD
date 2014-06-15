@@ -161,9 +161,9 @@ namespace MAD.CLI
             output += "<color><white><PORCIC Alin>\n<RANALTER Daniel>\n<SINGH Manpreet>\n<STOJANOVIC Marko>\n\n";
 
             output += "<color><yellow>Components:<color><white>\n";
-            output += "CLI         v" + MadComponents.components.cli.version.ToString() + " (CLI-Framework v" + MadComponents.components.cli.versionFramework + ")\n";
-            output += "CLI-Server  v" + MadComponents.components.cliServer.version.ToString() + "\n";
-            output += "JobSystem   v" + MadComponents.components.jobSystem.version.ToString();
+            output += "CLI         v" + Handler.components.cli.version.ToString() + " (CLI-Framework v" + Handler.components.cli.versionFramework + ")\n";
+            output += "CLI-Server  v" + Handler.components.cliServer.version.ToString() + "\n";
+            output += "JobSystem   v" + Handler.components.jobSystem.version.ToString();
 
             return output + "\n";
         }
