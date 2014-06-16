@@ -2,6 +2,7 @@
 
 namespace MAD.CLI
 {
+    /* This object defines one parameter for a command. */
     public class ParameterOption
     {
         public string parameter;

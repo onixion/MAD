@@ -5,20 +5,13 @@ namespace MAD.JobSystem
 {
     public class JobOutput
     {
-        public State jobState; 
-        public enum State
-        { 
-            Success,
-            Failed,
-            Exception,
-            Unknown
-        }
-
         public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
+
+        public State jobState = State.NULL;
+        public enum State { NULL, Success, Failed, Exception}
 
         public JobOutput()
         {
-            jobState = State.Unknown;
         }
     }
 

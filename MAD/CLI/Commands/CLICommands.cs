@@ -8,10 +8,9 @@ namespace MAD.CLI
         private List<CommandOptions> _commands;
 
         public HelpCommand(object[] commands)
+            : base()
         {
             _commands = (List<CommandOptions>)commands[0];
-
-            InitCommand();
 
             optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID for the specific command." , false, false, new Type[] { typeof(int) }));
             description = "This command shows information about other available commands.";
@@ -89,7 +88,7 @@ namespace MAD.CLI
 
                         if (tempCommand.optionalParameter.Count != 0)
                         {
-                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
+                            output += "\t<color><yellow>OPTIONAL PARAMETER\n\n";
 
                             foreach (ParameterOption _temp in tempCommand.optionalParameter)
                             {
@@ -149,21 +148,25 @@ namespace MAD.CLI
     public class InfoCommand : Command
     {
         public InfoCommand()
+            :base()
         {
-            InitCommand();
+            optionalParameter.Add(new ParameterOption("hack", null, null, true, false, null));
         }
 
         public override string Execute()
         {
-            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n";
+            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n<color><white>";
+            output += "CLI        v" + Handler.components.cli.version.ToString() + " (CLI-Framework v" + Handler.components.cli.versionFramework + ")\n";
+            output += "CLI-Server v" + Handler.components.cliServer.version.ToString() + "\n";
+            output += "JobSystem  v" + Handler.components.jobSystem.version.ToString() + "\n\n";
 
-            output += "Program written by: \n";
-            output += "<color><white><PORCIC Alin>\n<RANALTER Daniel>\n<SINGH Manpreet>\n<STOJANOVIC Marko>\n\n";
+            output += "<color><yellow>Program written by: \n";
+            output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
 
-            output += "<color><yellow>Components:<color><white>\n";
-            output += "CLI         v" + Handler.components.cli.version.ToString() + " (CLI-Framework v" + Handler.components.cli.versionFramework + ")\n";
-            output += "CLI-Server  v" + Handler.components.cliServer.version.ToString() + "\n";
-            output += "JobSystem   v" + Handler.components.jobSystem.version.ToString();
+            if (OptionalParameterUsed("hack"))
+            {
+                output += "<color><red>\nBe careful, Jack may be sniffing arround ...";
+            }
 
             return output + "\n";
         }
@@ -172,33 +175,31 @@ namespace MAD.CLI
     public class ColorTestCommand : Command
     {
         public ColorTestCommand()
+            : base()
         {
-            InitCommand();
-
             description = "This command prints all supported colors to the console.";
         }
 
         public override string Execute()
         {
-            output += "<color><white>" + ConsoleWriter.colors.Count + " colors available.\n";
+            output += "<color><white>" + CommandIO.colors.Count + " colors available.\n";
             
-            foreach(object[] temp in ConsoleWriter.colors)
+            foreach(object[] _temp in CommandIO.colors)
             {
-                output += "<color>" + (string) temp[0] + (string) temp[0] + "\n";
+                output += "<color>" + (string) _temp[0] + (string) _temp[0] + "\n";
             }
             
             return output;
         }
     }
 
+    /*
     public class TestCommand : Command
     {
         public TestCommand()
+            : base()
         {
-            // first init command
-            InitCommand();
-
-            // than add parameters and other things
+            // add parameters and other things
             requiredParameter.Add(new ParameterOption("par", "TEXT", "Text to print to console.", false, true, new Type[] { typeof(string) }));
             optionalParameter.Add(new ParameterOption("par2", "INTEGER", "Integer to print to console.", false, true, new Type[] { typeof(int) }));
             description = "This command is used to test the CLI.";
@@ -244,4 +245,5 @@ namespace MAD.CLI
             return output;
         }
     }
+     * */
 }

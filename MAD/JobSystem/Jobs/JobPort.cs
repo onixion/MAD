@@ -8,33 +8,25 @@ namespace MAD.JobSystem
     {
         #region members
 
-        public IPAddress targetAddress;
-        public int port;
-
-        private Socket _socket;
+        public IPAddress targetAddress { get; set; }
+        public int port { get; set; }
 
         #endregion
 
         #region constructors
 
         public JobPort()
+            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.PortRequest))
         {
-            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
-            this.jobOptions.jobType = JobOptions.JobType.PortRequest;
-            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
-            this.port = JobDefaultValues.defaultValues.defaultPort;
-
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.targetAddress = IPAddress.Loopback;
+            this.port = 80;
         }
 
         public JobPort(JobOptions jobOptions, IPAddress targetAddress, int port)
+            : base(jobOptions)
         {
-            InitJob(jobOptions);
-
             this.targetAddress = targetAddress;
             this.port = port;
-
-            _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
         #endregion
@@ -43,6 +35,8 @@ namespace MAD.JobSystem
 
         public override void DoJob()
         {
+            Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));
@@ -52,6 +46,8 @@ namespace MAD.JobSystem
             {
                 jobOutput.jobState = JobOutput.State.Failed;
             }
+
+            _socket.Close();
         }
 
         public override string Status()

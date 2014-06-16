@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,8 +9,11 @@ namespace MAD.JobSystem
     {
         #region member
 
-        public Version version = new Version(1, 4);
-        public readonly string _dataPath;
+        private Version _version = new Version(1, 5);
+        public string version { get { return _version.ToString(); } }
+
+        private string _dataPath;
+        public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
 
@@ -17,9 +21,10 @@ namespace MAD.JobSystem
 
         #region methodes
 
-        public JobSystem(string dataPath)
+        public JobSystem(string dataPath, int jobTableCapacity)
         {
             _dataPath = dataPath;
+            jobs.Capacity = jobTableCapacity;
         }
 
         public bool JobExist(int jobID)
@@ -48,19 +53,9 @@ namespace MAD.JobSystem
             return null;
         }
 
-        public void CreateJob(JobPing job)
+        public void CreateJob(Job job)
         {
-            jobs.Add((JobPing)job);
-        }
-
-        public void CreateJob(JobHttp job)
-        {
-            jobs.Add((JobHttp)job);
-        }
-
-        public void CreateJob(JobPort job)
-        {
-            jobs.Add((JobPort)job);
+            jobs.Add(job);
         }
 
         public void DestroyJob(int jobID)
@@ -78,6 +73,8 @@ namespace MAD.JobSystem
                 {
                     jobs[i].Stop();
                     jobs.RemoveAt(i);
+
+                    break;
                 }
             }
         }
@@ -86,15 +83,8 @@ namespace MAD.JobSystem
         {
             for (int i = 0; i < jobs.Count; i++)
             {
-                /*if (!jobs[i].Active())
-                {
-                    jobs.RemoveAt(i);
-                }
-                else
-                {
-                    jobs[i].Stop();
-                    jobs.RemoveAt(i);
-                }*/
+                jobs[i].Stop();
+                jobs.RemoveAt(i);
             }
         }
 
@@ -162,12 +152,23 @@ namespace MAD.JobSystem
             return _count;
         }
 
-        public void SaveTable(string path)
-        { 
-            // TODO
+        public void ClearJobTable()
+        {
+            jobs.Clear();
         }
 
-        public void LoadTable(string path)
+        public void SaveJobTable(string path)
+        {
+            foreach (Job _temp in jobs)
+            { 
+                
+            
+            
+            
+            }
+        }
+
+        public void LoadJobTable(string path)
         { 
             // TODO
         }

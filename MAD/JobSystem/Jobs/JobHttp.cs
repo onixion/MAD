@@ -17,19 +17,16 @@ namespace MAD.JobSystem
 
         #region constructors
 
-        public JobHttp()
+        public JobHttp() 
+            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.HttpRequest))
         {
-            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
-            jobOptions.jobType = JobOptions.JobType.HttpRequest;
-
-            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
-            this.port = JobDefaultValues.defaultValues.defaultPort;
+            this.targetAddress = IPAddress.Loopback;
+            this.port = 80;
         }
 
-        public JobHttp(JobOptions jobOption, IPAddress targetAddress, int port)
+        public JobHttp(JobOptions jobOptions, IPAddress targetAddress, int port) 
+            : base (jobOptions)
         {
-            InitJob(jobOption);
-
             this.targetAddress = targetAddress;
             this.port = port;
         }

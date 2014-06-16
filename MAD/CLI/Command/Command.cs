@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Collections.Generic;
 
 namespace MAD.CLI
@@ -8,28 +7,31 @@ namespace MAD.CLI
     {
         #region members
 
-        public List<ParameterOption> requiredParameter;
-        public List<ParameterOption> optionalParameter;
+        private List<ParameterOption> _requiredParameter;
+        public List<ParameterOption> requiredParameter { get { return _requiredParameter; } }
+       
+        private List<ParameterOption> _optionalParameter;
+        public List<ParameterOption> optionalParameter { get { return _optionalParameter; } }
 
-        public string description;
-        protected string output;
+        public string description { get; set; }
+        protected string output = "";
 
-        // this object contains all parameters from cli
-        // (it has been checked and converted the argument types)
+        // This object contains all parameters given by the cli.
         protected ParameterInput parameters;
 
         #endregion
 
-        #region methodes
+        #region constructor
 
-        protected void InitCommand()
+        protected Command()
         {
-            requiredParameter = new List<ParameterOption>();
-            optionalParameter = new List<ParameterOption>();
-
-            description = "(undefined)";
-            output = "";
+            _requiredParameter = new List<ParameterOption>();
+            _optionalParameter = new List<ParameterOption>();
         }
+
+        #endregion
+
+        #region methodes
 
         public void SetParameters(ParameterInput parameters)
         {
@@ -56,7 +58,6 @@ namespace MAD.CLI
                     requiredArgsFound++;
                 }
 
-                // TODO: MULTIPLE ARGUMENTS DO NOT WORK YET! SOMETHING HERE DO NOT WORK RIGHT!
                 ParameterOption _parOptions = GetParameterOptions(_temp.parameter);
 
                 // check if the given args can have a value or not
@@ -85,42 +86,39 @@ namespace MAD.CLI
                         }
                     }
 
-                    /*
-                     * This CLI supports multi-type arguments.
-                     * But it is importand when writing the command to check
-                     * the type of the arguments, else the program throws
-                     * exceptions. */
+                    /* Try to convert the given args into the specific types.
+                     * If it cannot convert all args into ONE type, it will fail. */
 
-                    object[] arguments = new object[_temp.argumentValue.Length];
+                    object[] _arguments = new object[_temp.argumentValue.Length];
+                    int _argsConverted = 0;
+                    bool _validConvert = false;
 
-                    // try to convert the args into the needed types
-                    foreach (Type _type in GetArgumentTypes(_temp.parameter))
+                    foreach (Type _type in GetAcceptedArgumentTypes(_temp.parameter))
                     {
-                        int _temp2 = _temp.argumentValue.Length;
-
                         for (int i2 = 0; i2 < _temp.argumentValue.Length; i2++)
                         {
-                            arguments[i2] = Convert((string)_temp.argumentValue[i2], _type);
+                            _arguments[i2] = Convert((string)_temp.argumentValue[i2], _type);
 
-                            if (arguments[i2] != null)
+                            if (_arguments[i2] != null)
                             {
-                                _temp2 = _temp2 - 1;
+                                _argsConverted++;
                             }
                         }
 
-                        // check if all arguments could be converted to the type
-                        if (_temp2 != 0)
+                        if (_argsConverted == _arguments.Length)
                         {
-                            return "<color><red>Could not parse some arguments from parameter '" + _temp.parameter + "'. Type help for view full commands.";
-                        }
-                        else
-                        { 
-                            // all arguments could be parsed without any problems
+                            // All args could be converted into one type.
+                            _validConvert = true;
                             break;
                         }
                     }
 
-                    _temp.argumentValue = arguments;
+                    if (_validConvert == false)
+                    {
+                        return "<color><red>Could not parse some arguments from parameter '" + _temp.parameter + "'. Type help for view full commands.";
+                    }
+
+                    _temp.argumentValue = _arguments;
                 }
             }
 
@@ -134,8 +132,6 @@ namespace MAD.CLI
         }
 
         public abstract string Execute();
-
-        #region helper methodes
 
         /* The method 'Convert' can only parse object to: 
          * 
@@ -153,7 +149,7 @@ namespace MAD.CLI
                     case "System.String":
                         return value;
                     case "System.Net.IPAddress":
-                        return IPAddress.Parse(value);
+                        return System.Net.IPAddress.Parse(value);
                 }
 
                 return null;
@@ -164,42 +160,42 @@ namespace MAD.CLI
             }
         }
 
-        public ParameterOption GetParameterOptions(string indicator)
+        private ParameterOption GetParameterOptions(string parameter)
         {
-            foreach (ParameterOption temp in requiredParameter)
+            foreach (ParameterOption _temp in requiredParameter)
             {
-                if (temp.parameter == indicator)
+                if (_temp.parameter == parameter)
                 {
-                    return temp;
+                    return _temp;
                 }
             }
 
-            foreach (ParameterOption temp in optionalParameter)
+            foreach (ParameterOption _temp in optionalParameter)
             {
-                if (temp.parameter == indicator)
+                if (_temp.parameter == parameter)
                 {
-                    return temp;
+                    return _temp;
                 }
             }
 
             return null;
         }
 
-        public bool ParameterExists(Parameter parameter)
+        private bool ParameterExists(Parameter parameter)
         {
             // required parameter
-            foreach (ParameterOption temp in requiredParameter)
+            foreach (ParameterOption _temp in requiredParameter)
             {
-                if (temp.parameter == parameter.parameter)
+                if (_temp.parameter == parameter.parameter)
                 {
                     return true;
                 }
             }
 
             // optional parameter
-            foreach (ParameterOption temp in optionalParameter)
+            foreach (ParameterOption _temp in optionalParameter)
             {
-                if (temp.parameter == parameter.parameter)
+                if (_temp.parameter == parameter.parameter)
                 {
                     return true;
                 }
@@ -208,11 +204,11 @@ namespace MAD.CLI
             return false;
         }
 
-        public bool RequiredParameterExist(Parameter parameter)
+        private bool RequiredParameterExist(Parameter parameter)
         {
-            foreach (ParameterOption temp in requiredParameter)
+            foreach (ParameterOption _temp in requiredParameter)
             {
-                if (temp.parameter == parameter.parameter)
+                if (_temp.parameter == parameter.parameter)
                 {
                     return true;
                 }
@@ -221,11 +217,11 @@ namespace MAD.CLI
             return false;
         }
 
-        public bool OptionalParameterExist(Parameter parameter)
+        private bool OptionalParameterExist(Parameter parameter)
         {
-            foreach (ParameterOption temp in optionalParameter)
+            foreach (ParameterOption _temp in optionalParameter)
             {
-                if (temp.parameter == parameter.parameter)
+                if (_temp.parameter == parameter.parameter)
                 {
                     return true;
                 }
@@ -234,11 +230,11 @@ namespace MAD.CLI
             return false;
         }
 
-        public bool OptionalParameterUsed(string indicator)
+        protected bool OptionalParameterUsed(string parameter)
         {
-            foreach (Parameter temp in parameters.parameters)
+            foreach (Parameter _temp in parameters.parameters)
             {
-                if ((string)temp.parameter == indicator)
+                if ((string)_temp.parameter == parameter)
                 {
                     return true;
                 }
@@ -247,28 +243,39 @@ namespace MAD.CLI
             return false;
         }
 
-        public Type[] GetArgumentTypes(string indicator)
+        private Type[] GetAcceptedArgumentTypes(string parameter)
         {
-            foreach (ParameterOption temp in requiredParameter)
+            foreach (ParameterOption _temp in requiredParameter)
             {
-                if (temp.parameter == indicator)
+                if (_temp.parameter == parameter)
                 {
-                    return temp.argumentTypes;
+                    return _temp.argumentTypes;
                 }
             }
 
-            foreach (ParameterOption temp in optionalParameter)
+            foreach (ParameterOption _temp in optionalParameter)
             {
-                if (temp.parameter == indicator)
+                if (_temp.parameter == parameter)
                 {
-                    return temp.argumentTypes;
+                    return _temp.argumentTypes;
                 }
             }
 
             return null;
         }
 
-        #endregion
+        protected Type GetArgumentType(string parameter)
+        {
+            foreach (Parameter _temp in parameters.parameters)
+            {
+                if (_temp.parameter == parameter)
+                {
+                    return _temp.argumentValue[0].GetType();
+                }
+            }
+
+            return null;
+        }
 
         #endregion
     }

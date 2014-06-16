@@ -9,17 +9,9 @@ namespace MAD.CLI
     {
         #region member
 
-        // cli framework version
-        public Version versionFramework = new Version(1,6);
-
-        // cli vars
+        public Version versionFramework = new Version(1,7);
         protected string cursor = "=> ";
-
-        // all commands useable for this cli
         protected List<CommandOptions> commands = new List<CommandOptions>();
-
-        protected Command command;
-        protected Type inputCommandType;
 
         #endregion
 

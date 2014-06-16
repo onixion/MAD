@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace MAD.CLI
 {
+    /* This object contains all parameter of the input. */
     public class ParameterInput
     {
-        // All parameter from input.
         public List<Parameter> parameters = new List<Parameter>();
 
         public Parameter GetParameter(string parameter)

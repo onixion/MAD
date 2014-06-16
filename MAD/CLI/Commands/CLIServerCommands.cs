@@ -5,8 +5,8 @@ namespace MAD.CLI
     public class CLIServerInfo : Command
     {
         public CLIServerInfo()
+            : base()
         {
-            InitCommand();
             description = "This command shows informations about the CLIServer.";
         }
 
@@ -24,9 +24,8 @@ namespace MAD.CLI
     public class CLIServerStart : Command
     {
         public CLIServerStart()
+            : base()
         {
-            InitCommand();
-
             description = "This command starts the CLIServer.";
         }
 
@@ -49,9 +48,8 @@ namespace MAD.CLI
     public class CLIServerStop : Command
     {
         public CLIServerStop()
+            : base()
         {
-            InitCommand();
-
             description = "This command stops the CLIServer.";
         }
 

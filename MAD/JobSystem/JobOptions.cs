@@ -9,27 +9,19 @@ namespace MAD.JobSystem
 
         public string jobName;
         public JobType jobType;
-        public enum JobType { Null, PingRequest, PortRequest, HttpRequest }
+        public enum JobType { NULL, PingRequest, PortRequest, HttpRequest }
         public JobTime jobTime = new JobTime();
+        public JobOutput jobOutput = new JobOutput();
 
         #endregion
 
         #region constructors
 
-        public JobOptions(string jobName, int jobDelay, JobType jobType)
+        public JobOptions(string jobName, JobTime jobTime, JobType jobType)
         {
             this.jobName = jobName;
-            this.jobTime.jobDelay = jobDelay;
-            jobTime.type = JobTime.TimeType.Relativ;
+            this.jobTime = jobTime;
             this.jobType = jobType; 
-        }
-
-        public JobOptions(string jobName, DateTime[] times, JobType jobType)
-        {
-            this.jobName = jobName;
-            this.jobTime.jobTimes = times;
-            jobTime.type = JobTime.TimeType.Absolute;
-            this.jobType = jobType;
         }
 
         #endregion

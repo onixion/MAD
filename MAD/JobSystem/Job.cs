@@ -9,6 +9,8 @@ namespace MAD.JobSystem
         #region members
 
         private static int _jobsCount = 0;
+        private static object _jobInitLock = new object();
+
         private Thread _jobThread;
         
         private AutoResetEvent _cycleLock = new AutoResetEvent(false);
@@ -24,19 +26,22 @@ namespace MAD.JobSystem
 
         #endregion
 
-        #region methodes
+        #region constructor
 
-        protected void InitJob(JobOptions jobOptions)
+        protected Job(JobOptions jobOptions)
         {
-            // set job-ID
-            jobID = _jobsCount;
-            _jobsCount++;
-
-            // set jobName, jobDelay and jobType
             this.jobOptions = jobOptions;
 
-            // init threads
+            lock (_jobInitLock)
+            {
+                jobID = _jobsCount;
+                _jobsCount++;
+            }
         }
+
+        #endregion
+
+        #region methodes
 
         public bool Start()
         {
@@ -45,7 +50,6 @@ namespace MAD.JobSystem
                 jobState = State.Running;
 
                 _jobThread = new Thread(WorkerThread);
-
                 _jobThread.Start();
 
                 return true;
@@ -75,11 +79,8 @@ namespace MAD.JobSystem
             while (true)
             {
                 _cycleThread = new Thread(CycleLockSignal);
-
-                // execute cycleThread and start decreasing delayTime
                 _cycleThread.Start();
 
-                // do job
                 DoJob();
 
                 // wait for cycleThread to be finished OR get an stop-request
@@ -103,17 +104,31 @@ namespace MAD.JobSystem
             {
                 if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                 {
-                    // check every _cycleTime for
                     Thread.Sleep(_cycleTime);
+
                     buffer = buffer - _cycleTime;
 
                     if (buffer <= 0)
                         break;
                 }
-                else
+                else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                 {
-                    if (DateTime.Now.Minute == jobOptions.jobTime.jobTimes[0].Minute && DateTime.Now.Hour == jobOptions.jobTime.jobTimes[0].Hour)
-                        break;
+                    Thread.Sleep(20000);
+
+                    int _hourNow = DateTime.Now.Hour;
+                    int _minuteNow = DateTime.Now.Hour;
+
+                    foreach (DayTime _temp in jobOptions.jobTime.jobTimes)
+                    {
+                        if (_hourNow == _temp.hour && _minuteNow == _temp.minute)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                { 
+                    // JOBTIME NULL
                 }
             }
 
@@ -124,15 +139,15 @@ namespace MAD.JobSystem
 
         #region for CLI only
 
-        public virtual string Status()
+        public string Status()
         {
             string _temp = "";
 
-            _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
-            _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
-            _temp += "<color><yellow>JOB-TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
-            _temp += "<color><yellow>JOB-TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
-
+            _temp += "<color><yellow>ID:\t\t<color><white>" + jobID + "\n";
+            _temp += "<color><yellow>NAME:\t<color><white>" + jobOptions.jobName + "\n";
+            _temp += "<color><yellow>JOB-TYPE:\t<color><white>" + jobOptions.jobType.ToString() + "\n";
+            _temp += "<color><yellow>JOB-TIME-TYPE:\t<color><white>" + jobOptions.jobTime.type.ToString() + "\n";
+            // HERE!!
             if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
             {
                 _temp += "<color><yellow>JOB-DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
@@ -141,9 +156,9 @@ namespace MAD.JobSystem
             {
                 _temp += "<color><yellow>JOB-TIMES: <color><white>";
 
-                foreach (DateTime _buffer in jobOptions.jobTime.jobTimes)
+                foreach (DayTime _buffer in jobOptions.jobTime.jobTimes)
                 {
-                    _temp += _buffer.ToString("HH:mm ");
+                    _temp += _buffer.hour + ":" + _buffer.minute;
                 }
 
                 _temp += "\n";
@@ -152,8 +167,10 @@ namespace MAD.JobSystem
             _temp += "<color><yellow>JOB-STATE: <color><white>" + jobState.ToString()+ "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
 
-            return _temp;
+            return _temp + JobStatus();
         }
+
+        protected abstract string JobStatus();
 
         #endregion
 

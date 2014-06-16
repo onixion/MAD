@@ -55,7 +55,7 @@ namespace MAD.CLI.Server
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-            commands.Add(new CommandOptions("test", typeof(TestCommand), null));
+            //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
@@ -78,25 +78,22 @@ namespace MAD.CLI.Server
         {
             NetworkStream stream = client.GetStream();
 
-            // first time send cursor
-            NetCommunication.SendString(stream, cursor, true);
+            Command _command = null;
 
-            string cliInput;
-            string response;
+            NetCommunication.SendString(stream, cursor, true);
 
             while (true)
             {
-                cliInput = NetCommunication.ReceiveString(stream);
+                string _cliInput = NetCommunication.ReceiveString(stream);
+                string _response = AnalyseInput(_cliInput, ref _command);
 
-                response = AnalyseInput(cliInput, ref command);
-
-                if (response == "VALID_PARAMETER")
+                if (_response == "VALID_PARAMETER")
                 {
-                    NetCommunication.SendString(stream, command.Execute() + "\n<color><gray>" + cursor, true);
+                    NetCommunication.SendString(stream, _command.Execute() + "\n<color><gray>" + cursor, true);
                 }
                 else
                 {
-                    NetCommunication.SendString(stream, response + "\n<color><gray>" + cursor, true);
+                    NetCommunication.SendString(stream, _response + "\n<color><gray>" + cursor, true);
                 }
             }
         }

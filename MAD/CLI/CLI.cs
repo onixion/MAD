@@ -6,7 +6,7 @@ namespace MAD.CLI
 {
     public class CLI : CLIFramework
     {
-        public Version version = new Version(1, 4, 3000);
+        public Version version = new Version(1, 5);
 
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor inputColor = ConsoleColor.White;
@@ -17,7 +17,7 @@ namespace MAD.CLI
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-            commands.Add(new CommandOptions("test", typeof(TestCommand), null));
+            //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
@@ -41,28 +41,29 @@ namespace MAD.CLI
 
         public void Start()
         {
-            string cliInput;
+            Command _command = null;
+
             WriteCursor();
 
             while (true)
             {
-                cliInput = Console.ReadLine();
+                string _cliInput = Console.ReadLine();
 
-                if (cliInput != "")
+                if (_cliInput != "")
                 {
                     // check if input is valid
-                    string response = AnalyseInput(cliInput, ref command);
+                    string response = AnalyseInput(_cliInput, ref _command);
 
                     if (response == "VALID_PARAMETER")
                     {
-                        // input is valid -> execute command and write output to console
-                        ConsoleWriter.WriteToConsole(command.Execute());
+                        // Execute command and write output to console
+                        CommandIO.WriteToConsole(_command.Execute());
                         WriteCursor();
                     }
                     else
                     {
-                        // something is wrong with the input (false arguments, missing arguments, ..)
-                        ConsoleWriter.WriteToConsole(response);
+                        // something went wrong with the input (false arguments, missing arguments, ..)
+                        CommandIO.WriteToConsole(response);
                         WriteCursor();
                     }
                 }

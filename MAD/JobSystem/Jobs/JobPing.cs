@@ -13,43 +13,34 @@ namespace MAD.JobSystem
         public int ttl;
         public bool dontFragment;
 
-        private Ping _ping;
-        private PingOptions _pingOptions;
-        private PingReply _reply;
+        private Ping _ping = new Ping();
 
         #endregion
 
         public JobPing()
+            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.PingRequest))
         {
-            InitJob(JobDefaultValues.defaultValues.defaultJobOptions);
-            jobOptions.jobType = JobOptions.JobType.PingRequest;
-
-            this.targetAddress = JobDefaultValues.defaultValues.defaultTargetAddress;
-            this.ttl = JobDefaultValues.defaultValues.defaultTTL;
-            this.dontFragment = JobDefaultValues.defaultValues.defaultDontFragment;
-
-            _ping = new Ping();
-            _pingOptions = new PingOptions(ttl, dontFragment);
+            this.targetAddress = IPAddress.Loopback;
+            this.ttl = 250;
+            this.dontFragment = true;
         }
 
         public JobPing(JobOptions jobOptions, IPAddress targetAddress, int ttl)
+            : base (jobOptions)
         {
-            InitJob(jobOptions);
-
             this.targetAddress = targetAddress;
             this.ttl = ttl;
-
-            _ping = new Ping();
-            _pingOptions = new PingOptions(ttl, true);
         }
 
         #region methodes
 
         public override void DoJob()
         {
+            PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
+
             try
             {
-                _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
+                PingReply _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
 
                 if (_reply.Status == IPStatus.Success)
                 {

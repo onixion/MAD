@@ -44,7 +44,7 @@ namespace MAD
                 System.IO.Directory.CreateDirectory(dataPath);
             }
 
-            jobSystem = new JobSystem.JobSystem(dataPath);
+            jobSystem = new JobSystem.JobSystem(dataPath, 20);
             cli = new CLI.CLI();
             cliServer = new CLIServer(dataPath, 999);
         }
