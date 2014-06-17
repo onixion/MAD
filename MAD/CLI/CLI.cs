@@ -8,6 +8,8 @@ namespace MAD.CLI
     {
         public Version version = new Version(1, 5);
 
+        protected string cursor = "=> ";
+
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor inputColor = ConsoleColor.White;
 

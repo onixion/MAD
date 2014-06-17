@@ -57,9 +57,9 @@ namespace MAD.JobSystem
             }
         }
 
-        public override string Status()
+        protected override string JobStatus()
         {
-            string _temp = base.Status();
+            string _temp = "";
 
             _temp += "<color><yellow>TARGET-IP: <color><white>" + targetAddress.ToString() + "\n";
             _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";

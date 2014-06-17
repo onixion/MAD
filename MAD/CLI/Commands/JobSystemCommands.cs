@@ -45,10 +45,10 @@ namespace MAD.CLI
                 {
                     tableRow[4] = "";
 
-                    foreach(DayTime _temp2 in _temp.jobOptions.jobTime.jobTimes)
+                    /*foreach(DayTime _temp2 in _temp.jobOptions.jobTime.jobTimes)
                     {
                         tableRow[4] += _temp2.hour + ":" + _temp2.minute + " ";
-                    }
+                    }*/
                 }
                 else
                 {
@@ -135,14 +135,21 @@ namespace MAD.CLI
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
                     _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
                 }
                 else if (_argumentType == typeof(string))
                 {
-                    // NEED TO BE PARSED FIRSTLY!
-                    //_job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
                     _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+
+                    try
+                    {
+                        _job.jobOptions.jobTime.jobTimes = _job.jobOptions.jobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
                 }
             }
             else

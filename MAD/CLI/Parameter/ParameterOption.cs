@@ -19,15 +19,7 @@ namespace MAD.CLI
             this.description = description;
             this.argumentEmpty = argumentEmpty;
             this.multiArguments = multiArguments;
-
-            if (argumentEmpty != true)
-            {
-                this.argumentTypes = argumentTypes;
-            }
-            else
-            {
-                this.argumentTypes = null;
-            }
+            this.argumentTypes = argumentTypes;
         }
     }
 }

@@ -12,9 +12,9 @@ namespace MAD.JobSystem
         private static object _jobInitLock = new object();
 
         private Thread _jobThread;
-        
-        private AutoResetEvent _cycleLock = new AutoResetEvent(false);
+
         private Thread _cycleThread;
+        private AutoResetEvent _cycleLock = new AutoResetEvent(false);
         private static int _cycleTime = 100;
 
         public int jobID;
@@ -102,10 +102,10 @@ namespace MAD.JobSystem
 
             while (jobState == State.Running)
             {
+                Thread.Sleep(_cycleTime);
+
                 if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                 {
-                    Thread.Sleep(_cycleTime);
-
                     buffer = buffer - _cycleTime;
 
                     if (buffer <= 0)
@@ -113,22 +113,13 @@ namespace MAD.JobSystem
                 }
                 else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                 {
-                    Thread.Sleep(20000);
-
-                    int _hourNow = DateTime.Now.Hour;
-                    int _minuteNow = DateTime.Now.Hour;
-
-                    foreach (DayTime _temp in jobOptions.jobTime.jobTimes)
+                    foreach (JobTimeHandler _handler in jobOptions.jobTime.jobTimes)
                     {
-                        if (_hourNow == _temp.hour && _minuteNow == _temp.minute)
+                        if (_handler.CheckTime())
                         {
                             break;
                         }
                     }
-                }
-                else
-                { 
-                    // JOBTIME NULL
                 }
             }
 
@@ -156,10 +147,10 @@ namespace MAD.JobSystem
             {
                 _temp += "<color><yellow>JOB-TIMES: <color><white>";
 
-                foreach (DayTime _buffer in jobOptions.jobTime.jobTimes)
+                /*foreach (DayTime _buffer in jobOptions.jobTime.jobTimes)
                 {
                     _temp += _buffer.hour + ":" + _buffer.minute;
-                }
+                }*/
 
                 _temp += "\n";
             }

@@ -14,8 +14,6 @@ namespace MAD.CLI
         {
             output += "<color><yellow>CLI-Server v" + Handler.components.cliServer.version + "\n";
             output += "Server listening: " + Handler.components.cliServer.listening + "\n";
-            output += "Active Sessions:  " + Handler.components.cliServer.sessions.Count + "\n";
-            output += "Available Users:  " + Handler.components.cliServer.users.Count;
 
             return output;
         }

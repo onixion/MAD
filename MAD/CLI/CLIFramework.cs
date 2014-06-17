@@ -9,8 +9,9 @@ namespace MAD.CLI
     {
         #region member
 
-        public Version versionFramework = new Version(1,7);
-        protected string cursor = "=> ";
+        private Version _version = new Version(1,7);
+        public string versionFramework { get { return _version.ToString(); } }
+
         protected List<CommandOptions> commands = new List<CommandOptions>();
 
         #endregion
@@ -26,48 +27,49 @@ namespace MAD.CLI
         public string AnalyseInput(string cliInput, ref Command command)
         {
             // get command
-            string commandInput = commandInput = GetCommandName(cliInput);
+            string _commandInput = GetCommandName(cliInput);
 
             // check if command is known by cli
-            if (CommandExists(commandInput))
+            if (CommandExists(_commandInput))
             {
                 // get command options
-                CommandOptions commandOptions = GetCommandOptions(commandInput);
+                CommandOptions _commandOptions = GetCommandOptions(_commandInput);
                 // get parameter and arguments from input
-                ParameterInput parameterInput = GetParamtersFromInput(cliInput);
+                ParameterInput _parameterInput = GetParamtersFromInput(cliInput);
                 // get command type
-                Type commandType = commandOptions.commandType;
+                Type _commandType = _commandOptions.commandType;
 
                 // get objects to pass to constructor of the command
-                object[] commandObjects = commandOptions.commandObjects;
-                // get constructor and pass object[] to it (if cInfo == null)
-                ConstructorInfo cInfo = commandType.GetConstructor(new Type[1] { typeof(object[]) });
+                object[] _commandObjects = _commandOptions.commandObjects;
+                // get constructor and pass object[] to it
+                ConstructorInfo _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
 
-                if (cInfo == null)
+                // if _cInfo == null, constuctor is wrong
+                if (_cInfo != null)
                 {
-                    // try with empty constructor
-                    cInfo = commandType.GetConstructor(new Type[0]);
-                    command = (Command)cInfo.Invoke(null);
+                    command = (Command)_cInfo.Invoke(new object[]{_commandObjects});
                 }
                 else
                 {
-                    command = (Command)cInfo.Invoke(new object[]{commandObjects});
+                    // try with empty constructor
+                    _cInfo = _commandType.GetConstructor(new Type[0]);
+                    command = (Command)_cInfo.Invoke(null);
                 }
 
                 // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
-                string parameterValid = command.ValidParameters(parameterInput);
+                string _parameterValid = command.ValidParameters(_parameterInput);
 
                 // set parameters if the parameter are valid
-                if (parameterValid == "VALID_PARAMETER")
+                if (_parameterValid == "VALID_PARAMETER")
                 {
-                    command.SetParameters(parameterInput);
+                    command.SetParameters(_parameterInput);
                 }
 
-                return parameterValid;
+                return _parameterValid;
             }
             else
             {
-                return "<color><red>Command '" + commandInput + "' unknown! Type 'help' for more information.";
+                return "<color><red>Command '" + _commandInput + "' unknown! Type 'help' for more information.";
             }
         }
 

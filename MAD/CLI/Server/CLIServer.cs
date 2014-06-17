@@ -11,15 +11,16 @@ namespace MAD.CLI.Server
     {
         #region members
 
-        public Version version = new Version(1,0);
+        private Version _version = new Version(1,0);
+        public string version { get { return _version.ToString(); } }
 
         private readonly string _dataPath;
-        private const string _logFilename = "log";
+        private const string _logFilename = "log.txt";
 
-        private TcpListener serverListener;
+        private TcpListener _serverListener;
 
-        public List<CLIUser> users = new List<CLIUser>();
-        public List<CLISession> sessions = new List<CLISession>();
+        private List<CLIUser> _users = new List<CLIUser>();
+        private List<CLISession> _sessions = new List<CLISession>();
 
         #endregion
 
@@ -27,11 +28,8 @@ namespace MAD.CLI.Server
         {
             _dataPath = dataPath;
 
-            // init tcp-server
-            serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
-
-            // init cli users
-            users.Add(new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root));
+            _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
+            _users.Add(new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root));
         }
 
         #region methodes
@@ -40,7 +38,7 @@ namespace MAD.CLI.Server
         {
             try
             {
-                serverListener.Start();
+                _serverListener.Start();
                 return true;
             }
             catch (Exception)
@@ -51,12 +49,12 @@ namespace MAD.CLI.Server
 
         protected override void StopListener()
         {
-            serverListener.Stop();
+            _serverListener.Stop();
         }
 
         protected override object GetClient()
         {
-            return serverListener.AcceptTcpClient();
+            return _serverListener.AcceptTcpClient();
         }
 
         protected override object HandleClient(object clientObject)
@@ -65,7 +63,6 @@ namespace MAD.CLI.Server
             IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
             NetworkStream _clientStream = _client.GetStream();
 
-            // client connected
             Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") connected.");
 
             try
@@ -82,7 +79,7 @@ namespace MAD.CLI.Server
                 if (Login(loginData))
                 {
                     NetCommunication.SendString(_clientStream, "ACCESS GRANTED", true);
-                    sessions.Add(new CLISession(_client, null));
+                    _sessions.Add(new CLISession(_client, null));
                 }
                 else
                 {
@@ -134,11 +131,6 @@ namespace MAD.CLI.Server
             }
         }
 
-        private void Logout(string username)
-        {
-        
-        }
-
         private bool CheckUsernameAndPassword(string username, string passwordMD5)
         {
             CLIUser user = GetCLIUser(username);
@@ -151,20 +143,18 @@ namespace MAD.CLI.Server
                 }
                 else
                 {
-                    // password wrong.
                     return false;
                 }
             }
             else
             {
-                // username wrong.
                 return false;
             }
         }
 
         private CLIUser GetCLIUser(string username)
         {
-            foreach (CLIUser temp in users)
+            foreach (CLIUser temp in _users)
             {
                 if (temp.username == username)
                 {

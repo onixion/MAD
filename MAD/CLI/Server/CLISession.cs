@@ -15,24 +15,28 @@ namespace MAD.CLI.Server
         public int sessionID;
         private object _sessionInitLock = new object();
 
-        private TcpClient client;
-        private IPEndPoint clientEndPoint;
+        private TcpClient _client;
+        private IPEndPoint _clientEndPoint;
 
-        private CLIUser user;
+        private CLIUser _user;
+
+        private string _cursor = "=> ";
 
         #endregion
 
         public CLISession(TcpClient client, CLIUser user)
         {
-            this.client = client;
-            this.clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+            lock (_sessionInitLock)
+            {
+                sessionID = _sessionsCount;
+                _sessionsCount++;
+            }
 
-            this.user = user;
+            _client = client;
+            _clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+            _user = user;
 
-            // init CLISession
-            _InitSession();
-
-            InitCLI(user);
+            InitCLI();
 
             // start session
             this.Start();
@@ -40,16 +44,7 @@ namespace MAD.CLI.Server
 
         #region methodes
 
-        private void _InitSession()
-        {
-            lock (_sessionInitLock)
-            {
-                sessionID = _sessionsCount;
-                _sessionsCount++;
-            }
-        }
-
-        private void InitCLI(CLIUser user)
+        private void InitCLI()
         {
             // GENERAL
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
@@ -66,34 +61,28 @@ namespace MAD.CLI.Server
             commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), null));
             commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), null));
             commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), null));
-
-
-            if (user.group == CLIUser.Group.root)
-            { 
-            
-            }
         }
 
         private void Start()
         {
-            NetworkStream stream = client.GetStream();
+            NetworkStream _stream = _client.GetStream();
 
             Command _command = null;
 
-            NetCommunication.SendString(stream, cursor, true);
+            NetCommunication.SendString(_stream, _cursor, true);
 
             while (true)
             {
-                string _cliInput = NetCommunication.ReceiveString(stream);
+                string _cliInput = NetCommunication.ReceiveString(_stream);
                 string _response = AnalyseInput(_cliInput, ref _command);
 
                 if (_response == "VALID_PARAMETER")
                 {
-                    NetCommunication.SendString(stream, _command.Execute() + "\n<color><gray>" + cursor, true);
+                    NetCommunication.SendString(_stream, _command.Execute() + "\n<color><gray>" + _cursor, true);
                 }
                 else
                 {
-                    NetCommunication.SendString(stream, _response + "\n<color><gray>" + cursor, true);
+                    NetCommunication.SendString(_stream, _response + "\n<color><gray>" + _cursor, true);
                 }
             }
         }

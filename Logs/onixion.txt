@@ -34,3 +34,5 @@ Now using the TcpListener and TcpClient)
 [15.06.2014][13:30-14:30][1h][66h] CLIServer / CLIClient
 
 (NOTE: CLIServer do not support CLIUsers yet. Working on it.)
+
+[17.06.2014][18:00-20:30][2,5h][68,5h] Working on JobTime. Jobs can now have delay or times (e.g. daily 19:30 ...).

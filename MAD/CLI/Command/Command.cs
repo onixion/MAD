@@ -40,30 +40,31 @@ namespace MAD.CLI
 
         public string ValidParameters(ParameterInput parameters)
         {
-            int requiredArgsFound = 0;
+            int _requiredArgsFound = 0;
 
             for (int i = 0; i < parameters.parameters.Count; i++)
             {
                 Parameter _temp = parameters.parameters[i];
+                ParameterOption _parOptions = GetParameterOptions(_temp.parameter);
 
-                // check if all arguments are known by the command
+                // Check if the parameter is known.
                 if (!ParameterExists(_temp))
                 {
                     return "<color><red>Parameter '-" + _temp.parameter + "' does not exist for this command!";
                 }
 
-                // if the given parameter is a required parameter increase requiredParamterFound
+                // If it is a required parameter, increase _requiredArgsFound.
+                // If _requiredArgsFound is equal to the lengh of the _requiredParamters,
+                // all required parameter are given.
                 if (RequiredParameterExist(_temp))
                 {
-                    requiredArgsFound++;
+                    _requiredArgsFound++;
                 }
 
-                ParameterOption _parOptions = GetParameterOptions(_temp.parameter);
-
-                // check if the given args can have a value or not
+                // Check if the given parameter can have a value or not.
                 if (_parOptions.argumentEmpty)
                 {
-                    // check if argument is not null
+                    // Check if the argument is not null.
                     if (_temp.argumentValue != null)
                     {
                         return "<color><red>Value of parameter '-" + _temp.parameter + "' must be null!";
@@ -71,15 +72,16 @@ namespace MAD.CLI
                 }
                 else
                 {
-                    // check if argument is null
+                    // Check if argument is null
                     if (_temp.argumentValue == null)
                     {
                         return "<color><red>Value of parameter '-" + _temp.parameter + "' can't be null!";
                     }
 
-                    // check if multi-args are supported for this parameter
+                    // Check if multiple args are supported for this parameter
                     if (!_parOptions.multiArguments)
                     {
+                        // Check if more than one arg is given.
                         if (_temp.argumentValue.Length > 1)
                         {
                             return "<color><red>The parameter '-" + _temp.parameter + "' can't have multiple arguments!";
@@ -90,11 +92,12 @@ namespace MAD.CLI
                      * If it cannot convert all args into ONE type, it will fail. */
 
                     object[] _arguments = new object[_temp.argumentValue.Length];
-                    int _argsConverted = 0;
-                    bool _validConvert = false;
+                    bool _convertSuccess = false;
 
                     foreach (Type _type in GetAcceptedArgumentTypes(_temp.parameter))
                     {
+                        int _argsConverted = 0;
+
                         for (int i2 = 0; i2 < _temp.argumentValue.Length; i2++)
                         {
                             _arguments[i2] = Convert((string)_temp.argumentValue[i2], _type);
@@ -103,27 +106,29 @@ namespace MAD.CLI
                             {
                                 _argsConverted++;
                             }
+                            else
+                            {
+                                break;
+                            }
                         }
 
                         if (_argsConverted == _arguments.Length)
                         {
-                            // All args could be converted into one type.
-                            _validConvert = true;
-                            break;
+                            _convertSuccess = true;
                         }
                     }
 
-                    if (_validConvert == false)
+                    if (!_convertSuccess)
                     {
-                        return "<color><red>Could not parse some arguments from parameter '" + _temp.parameter + "'. Type help for view full commands.";
+                        return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
                     }
 
                     _temp.argumentValue = _arguments;
                 }
             }
 
-            // check if all required parameters are known
-            if (requiredParameter.Count != requiredArgsFound)
+            // Check if all required parameters has been found.
+            if (requiredParameter.Count != _requiredArgsFound)
             {
                 return "<color><red>Some required parameters are missing! Type help for view full commands.";
             }
