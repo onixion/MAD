@@ -8,7 +8,7 @@ namespace MAD.JobSystem
         #region members
 
         public TimeType type;
-        public enum TimeType { Absolute, Relativ, Null }
+        public enum TimeType { NULL, Absolute, Relativ }
 
         public List<JobTimeHandler> jobTimes;
         public int jobDelay;
@@ -19,7 +19,7 @@ namespace MAD.JobSystem
 
         public JobTime()
         {
-            this.type = TimeType.Null;
+            this.type = TimeType.NULL;
         }
 
         public JobTime(List<JobTimeHandler> jobTimes)
@@ -44,61 +44,192 @@ namespace MAD.JobSystem
 
                 for (int i = 0; i < data.Length; i++)
                 {
-                    string[] _split = data[i].ToString().Split(new char[] { '.' });
-                    string[] _split2;
+                    string[] _split = data[i].ToString().Split(new char[] { ';' });
+
+                    int _minute = 0;
+                    int _hour = 0;
+                    int _day = 0;
+                    int _month = 0;
+                    int _year = 0;
 
                     if (_split.Length == 1)
                     {
-                        // DAILY
+                        // 19:30 | Daily at 19:30
 
-                        _split2 = _split[0].Split(new char[] { ':' });
-
-                        if (_split2.Length == 2)
-                        {
-                            // NEED TO BE TRY {}
-                            int _hour = Convert.ToInt32(_split2[0]);
-                            int _minute = Convert.ToInt32(_split2[1]);
-
-                            if (_hour <= 23 && _hour >= 0)
-                            {
-                                if (_minute <= 59 && _minute >= 0)
-                                {
-                                    _buffer.Add(new JobTimeHandler(_hour, _minute));
-                                }
-                                else
-                                {
-                                    throw new Exception("<color><red>Minute can't be '" + _minute + "'!");
-                                }
-                            }
-                            else
-                            {
-                                throw new Exception("<color><red>Hour can't be '" + _minute + "'!");
-                            }
-                        }
-                        else
-                        {
-                            throw new Exception("<color><red>Syntax-Error! Maybe to many ':'?");
-                        }
+                        ParseHourMinute(_split[0], ref _hour, ref _minute);
+                        _buffer.Add(new JobTimeHandler(_hour, _minute));
                     }
                     else if (_split.Length == 2)
                     {
-                        // MONTHLY
-                    }
-                    else if (_split.Length == 3)
-                    {
-                        // YEARLY
-                    }
-                    else if (_split.Length == 4)
-                    {
-                        // UNIQUE
+                        /* WARNING: NOT EVERY MONTH HAVE THE SAME AMOUNT OF DAYS!
+                         * JOB WILL NOT BE TRIGGERED IF THE DAY DOES
+                         * NOT EXIST FOR THIS MONTH! e.g. 31 Febuary */
+
+                        ParseHourMinute(_split[1], ref _hour, ref _minute);
+                        ParseYearMonthDay(_split[0], ref _year, ref _month, ref _day);
+
+                        if (_month == 0 && _year == 0) // 5;19:30 | Monthly at 5th 19:30
+                        {
+                            _buffer.Add(new JobTimeHandler(_hour, _minute, _day));
+                        }
+                        else if (_month != 0 && _year == 0) // 5.6;19:30 | Yearly at 5th June 19:30
+                        {
+                            _buffer.Add(new JobTimeHandler(_hour, _minute, _day, _month));
+                        }
+                        else // 5.6.2015;19:30 | Unique at 5th June 2015 19:30
+                        {
+                            _buffer.Add(new JobTimeHandler(_hour, _minute, _day, _month, _year));
+                        }
                     }
                     else
                     {
-                        throw new Exception("JOBTIME NOT INITILIZED YET!");
+                        throw new Exception("<color><red>JOB-TIME: NOT INITILIZED YET!");
                     }
                 }
 
             return _buffer;
+        }
+
+        private void ParseHourMinute(string data, ref int hour, ref int minute)
+        {
+            string[] _split = data.Split(new char[] { ':' });
+
+            if (_split.Length == 2)
+            {
+                int _hour;
+                int _minute;
+
+                try
+                {
+                    _hour = Convert.ToInt32(_split[0]);
+                    _minute = Convert.ToInt32(_split[1]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception("<color><red>JOB-TIME: Could not parse time argument(s)!");
+                }
+
+                if (_hour <= 23 && _hour >= 0)
+                {
+                    if (_minute <= 59 && _minute >= 0)
+                    {
+                        hour = _hour;
+                        minute = _minute;
+                    }
+                    else
+                    {
+                        throw new Exception("<color><red>JOB-TIME: Minute can't be '" + _minute + "'!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("<color><red>JOB-TIME: Hour can't be '" + _hour + "'!");
+                }
+            }
+            else
+            {
+                throw new Exception("<color><red>JOB-TIME: Syntax-Error! Maybe too many ':'?");
+            }
+        }
+
+        private void ParseYearMonthDay(string data, ref int year, ref int month, ref int day)
+        {
+            string[] _split = data.Split(new char[]{'.'});
+            
+            if(_split.Length == 1)
+            {
+                int _day = 0;
+
+                try
+                {
+                    _day = Convert.ToInt32(_split[0]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                }
+
+                if (_day <= 31 && _day >= 1)
+                {
+                    day = _day;
+                }
+                else
+                {
+                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31!");
+                }
+
+            }
+            else if (_split.Length == 2)
+            {
+                int _day = 0;
+                int _month = 0;
+
+                try
+                {
+                    _day = Convert.ToInt32(_split[0]);
+                    _month = Convert.ToInt32(_split[1]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                }
+
+                if (_day <= 31 && _day >= 1)
+                {
+                    if (_month <= 12 && _month >= 1)
+                    {
+                        day = _day;
+                        month = _month;
+                    }
+                    else
+                    {
+                        throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 12 or smaller than 1!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31 or smaller than 1!");
+                }
+            }
+            else if (_split.Length == 3)
+            {
+                int _day = 0;
+                int _month = 0;
+                int _year = 0;
+
+                try
+                {
+                    _day = Convert.ToInt32(_split[0]);
+                    _month = Convert.ToInt32(_split[1]);
+                    _year = Convert.ToInt32(_split[2]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                }
+
+                if (_day <= 31 && _day >= 1)
+                {
+                    if (_month <= 12 && _month >= 1)
+                    {
+                        day = _day;
+                        month = _month;
+                        year = _year;
+                    }
+                    else
+                    {
+                        throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 12 or smaller than 1!");
+                    }
+                }
+                else
+                {
+                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31 or smaller than 1!");
+                }
+            }
+            else
+            {
+                throw new Exception("<color><red>JOB-TIME: Syntax-Error! Maybe too many '.'?");
+            }
         }
 
         #endregion
@@ -213,6 +344,25 @@ namespace MAD.JobSystem
                     return false;
             }
 
+        }
+
+        public string JobTimeStatus()
+        { 
+            switch(type)
+            {
+                case Type.Daily:
+                    return hour + ":" + minute;
+                case Type.Monthly:
+                    return day + ";" + hour + ":" + minute;
+                case Type.Yearly:
+                    return day + "." + month + ";" + hour + ":" + minute;
+                case Type.Unique:
+                    return day + "." + month + "." + year + ";" + hour + ":" + minute;
+                case Type.NULL:
+                    return "NULL";
+                default:
+                    return null;
+            }
         }
 
         #endregion

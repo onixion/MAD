@@ -115,6 +115,7 @@ namespace MAD.CLI
                         if (_argsConverted == _arguments.Length)
                         {
                             _convertSuccess = true;
+                            break;
                         }
                     }
 
@@ -122,8 +123,10 @@ namespace MAD.CLI
                     {
                         return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
                     }
-
-                    _temp.argumentValue = _arguments;
+                    else
+                    {
+                        _temp.argumentValue = _arguments;
+                    }
                 }
             }
 

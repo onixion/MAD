@@ -138,19 +138,19 @@ namespace MAD.JobSystem
             _temp += "<color><yellow>NAME:\t<color><white>" + jobOptions.jobName + "\n";
             _temp += "<color><yellow>JOB-TYPE:\t<color><white>" + jobOptions.jobType.ToString() + "\n";
             _temp += "<color><yellow>JOB-TIME-TYPE:\t<color><white>" + jobOptions.jobTime.type.ToString() + "\n";
-            // HERE!!
+
             if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
             {
                 _temp += "<color><yellow>JOB-DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
             }
-            else
+            else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
             {
                 _temp += "<color><yellow>JOB-TIMES: <color><white>";
 
-                /*foreach (DayTime _buffer in jobOptions.jobTime.jobTimes)
+                foreach (JobTimeHandler _buffer in jobOptions.jobTime.jobTimes)
                 {
-                    _temp += _buffer.hour + ":" + _buffer.minute;
-                }*/
+                    _temp += _buffer.JobTimeStatus() + " ";
+                }
 
                 _temp += "\n";
             }

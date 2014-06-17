@@ -193,7 +193,31 @@ namespace MAD.CLI
 
             if (OptionalParameterUsed("t"))
             {
-                _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
+                Type _argumentType = GetArgumentType("t");
+
+                if (_argumentType == typeof(int))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
+                }
+                else if (_argumentType == typeof(string))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+
+                    try
+                    {
+                        _job.jobOptions.jobTime.jobTimes = _job.jobOptions.jobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
+                }
+            }
+            else
+            {
+                _job.jobOptions.jobTime.jobDelay = 20000;
+                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
             }
 
             if (OptionalParameterUsed("p"))
@@ -214,8 +238,8 @@ namespace MAD.CLI
         {
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
-            requiredParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
-            optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            requiredParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
         }
 
         public override string Execute()
@@ -233,10 +257,33 @@ namespace MAD.CLI
 
             if (OptionalParameterUsed("t"))
             {
-                _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
+                Type _argumentType = GetArgumentType("t");
+
+                if (_argumentType == typeof(int))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
+                }
+                else if (_argumentType == typeof(string))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+
+                    try
+                    {
+                        _job.jobOptions.jobTime.jobTimes = _job.jobOptions.jobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
+                }
+            }
+            else
+            {
+                _job.jobOptions.jobTime.jobDelay = 20000;
+                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
             }
 
-            // add job to jobsystem
             Handler.components.jobSystem.CreateJob(_job);
 
             return output;
