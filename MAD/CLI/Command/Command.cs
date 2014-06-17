@@ -92,7 +92,7 @@ namespace MAD.CLI
                      * If it cannot convert all args into ONE type, it will fail. */
 
                     object[] _arguments = new object[_temp.argumentValue.Length];
-                    bool _convertSuccess = false;
+                    bool _allArgsConverted = false;
 
                     foreach (Type _type in GetAcceptedArgumentTypes(_temp.parameter))
                     {
@@ -112,21 +112,19 @@ namespace MAD.CLI
                             }
                         }
 
-                        if (_argsConverted == _arguments.Length)
+                        if (_argsConverted != _arguments.Length)
                         {
-                            _convertSuccess = true;
+                            _allArgsConverted = true;
                             break;
                         }
                     }
 
-                    if (!_convertSuccess)
+                    if (!_allArgsConverted)
                     {
                         return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
                     }
-                    else
-                    {
-                        _temp.argumentValue = _arguments;
-                    }
+                    
+                    _temp.argumentValue = _arguments;
                 }
             }
 

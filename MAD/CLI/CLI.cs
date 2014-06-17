@@ -45,6 +45,7 @@ namespace MAD.CLI
         {
             Command _command = null;
 
+            CommandIO.WriteToConsole(GetBanner());
             WriteCursor();
 
             while (true)
@@ -81,6 +82,15 @@ namespace MAD.CLI
             Console.ForegroundColor = cursorColor;
             Console.Write(cursor);
             Console.ForegroundColor = inputColor;
+        }
+
+        private string GetBanner()
+        {
+            string _buffer = "";
+
+            _buffer += "<color><red>MAD - Network Monitoring";
+
+            return _buffer;
         }
     }
 }
