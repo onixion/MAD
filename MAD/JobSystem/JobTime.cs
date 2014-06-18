@@ -16,7 +16,7 @@ namespace MAD.JobSystem
 
         #endregion
 
-        #region constructor
+        #region constructors
 
         public JobTime()
         {

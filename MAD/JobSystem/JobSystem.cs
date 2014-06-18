@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Xml;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace MAD.JobSystem
@@ -9,23 +7,28 @@ namespace MAD.JobSystem
     {
         #region member
 
-        private Version _version = new Version(1, 5);
+        private Version _version = new Version(1, 6);
         public string version { get { return _version.ToString(); } }
 
         private string _dataPath;
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
+        public int jobsCapacity { get { return jobs.Capacity; } }
+
+        #endregion
+
+        #region constructor
+
+        public JobSystem(string dataPath, int jobsCapacity)
+        {
+            _dataPath = dataPath;
+            jobs.Capacity = jobsCapacity;
+        }
 
         #endregion
 
         #region methodes
-
-        public JobSystem(string dataPath, int jobTableCapacity)
-        {
-            _dataPath = dataPath;
-            jobs.Capacity = jobTableCapacity;
-        }
 
         public bool JobExist(int jobID)
         {
@@ -161,10 +164,7 @@ namespace MAD.JobSystem
         {
             foreach (Job _temp in jobs)
             { 
-                
-            
-            
-            
+                // TODO
             }
         }
 

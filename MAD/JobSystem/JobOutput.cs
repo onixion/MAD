@@ -5,10 +5,13 @@ namespace MAD.JobSystem
 {
     public class JobOutput
     {
-        public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
+        #region members
 
+        public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
         public State jobState = State.NULL;
-        public enum State { NULL, Success, Failed, Exception}
+        public enum State { NULL, Success, Failed, Exception }
+
+        #endregion
     }
 
     /*
@@ -16,9 +19,15 @@ namespace MAD.JobSystem
      * A job can have multiple outputs. */
     public class JobDescriptor
     {
+        #region members
+
         public string jobDescription;
         Type jobDataType;
         object jobData;
+
+        #endregion
+
+        #region constructor
 
         public JobDescriptor(string jobDescription, Type jobDataType, object jobData)
         {
@@ -26,5 +35,7 @@ namespace MAD.JobSystem
             this.jobDataType = jobDataType;
             this.jobData = jobData;
         }
+
+        #endregion
     }
 }
