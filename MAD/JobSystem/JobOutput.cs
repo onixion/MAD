@@ -9,10 +9,6 @@ namespace MAD.JobSystem
 
         public State jobState = State.NULL;
         public enum State { NULL, Success, Failed, Exception}
-
-        public JobOutput()
-        {
-        }
     }
 
     /*

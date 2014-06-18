@@ -3,6 +3,21 @@ using System.Collections.Generic;
 
 namespace MAD.CLI
 {
+    public class ExitCommand : Command
+    {
+        public ExitCommand()
+            : base()
+        {
+            description = "This command exit the program.";
+        }
+
+        public override string Execute()
+        {
+            Environment.Exit(0);
+            return "";
+        }
+    }
+
     public class HelpCommand : Command
     {
         private List<CommandOptions> _commands;

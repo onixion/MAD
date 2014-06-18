@@ -112,7 +112,7 @@ namespace MAD.CLI
                             }
                         }
 
-                        if (_argsConverted != _arguments.Length)
+                        if (_argsConverted == _arguments.Length)
                         {
                             _allArgsConverted = true;
                             break;

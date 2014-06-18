@@ -12,8 +12,8 @@ namespace MAD.JobSystem
         private static object _jobInitLock = new object();
 
         private Thread _jobThread;
-
         private Thread _cycleThread;
+
         private AutoResetEvent _cycleLock = new AutoResetEvent(false);
         private static int _cycleTime = 100;
 
@@ -78,10 +78,20 @@ namespace MAD.JobSystem
         {
             while (true)
             {
-                _cycleThread = new Thread(CycleLockSignal);
-                _cycleThread.Start();
+                if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                {
+                    _cycleThread = new Thread(CycleLockSignal);
+                }
+                else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+                {
+                    _cycleThread = new Thread(TimeLockSignal);
+                }
+                else
+                {
+                    throw new Exception("JOB-TIME-TYPE NULL!");
+                }
 
-                DoJob();
+                _cycleThread.Start();
 
                 // wait for cycleThread to be finished OR get an stop-request
                 _cycleLock.WaitOne();
@@ -93,33 +103,54 @@ namespace MAD.JobSystem
                     jobState = State.Stopped;
                     break;
                 }
+
+                DoJob();
             }
         }
 
         private void CycleLockSignal()
         {
-            int buffer = jobOptions.jobTime.jobDelay;
+            int _buffer = jobOptions.jobTime.jobDelay;
 
             while (jobState == State.Running)
             {
                 Thread.Sleep(_cycleTime);
+                _buffer = _buffer - _cycleTime;
 
-                if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                if (_buffer <= 0)
                 {
-                    buffer = buffer - _cycleTime;
-
-                    if (buffer <= 0)
-                        break;
+                    break;
                 }
-                else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+            }
+
+            _cycleLock.Set();
+        }
+
+        private void TimeLockSignal()
+        {
+            bool _finished = false;
+
+            while (jobState == State.Running)
+            {
+                Thread.Sleep(_cycleTime);
+                DateTime _now = DateTime.Now;
+
+                foreach (JobTimeHandler _handler in jobOptions.jobTime.jobTimes)
                 {
-                    foreach (JobTimeHandler _handler in jobOptions.jobTime.jobTimes)
+                    if (_handler.CheckTime(_now))
                     {
-                        if (_handler.CheckTime())
+                        if(!_handler.blockSignal)
                         {
+                            _handler.BlockHandler();
+                            _finished = true;
                             break;
                         }
                     }
+                }
+
+                if (_finished)
+                {
+                    break;
                 }
             }
 
@@ -134,10 +165,10 @@ namespace MAD.JobSystem
         {
             string _temp = "";
 
-            _temp += "<color><yellow>ID:\t\t<color><white>" + jobID + "\n";
-            _temp += "<color><yellow>NAME:\t<color><white>" + jobOptions.jobName + "\n";
-            _temp += "<color><yellow>JOB-TYPE:\t<color><white>" + jobOptions.jobType.ToString() + "\n";
-            _temp += "<color><yellow>JOB-TIME-TYPE:\t<color><white>" + jobOptions.jobTime.type.ToString() + "\n";
+            _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
+            _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
+            _temp += "<color><yellow>JOB-TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
+            _temp += "<color><yellow>JOB-TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
 
             if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
             {

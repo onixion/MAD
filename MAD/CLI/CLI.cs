@@ -16,6 +16,7 @@ namespace MAD.CLI
         public CLI()
         {
             // GENERAL
+            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
@@ -88,7 +89,13 @@ namespace MAD.CLI
         {
             string _buffer = "";
 
-            _buffer += "<color><red>MAD - Network Monitoring";
+            _buffer += "<color><cyan>";
+            _buffer += @" ___  ___  ___ ______ " + "\n";
+            _buffer += @" |  \/  | / _ \|  _  \" + "\n";
+            _buffer += @" | .  . |/ /_\ \ | | |" + "\n";
+            _buffer += @" | |\/| ||  _  | | | |" + "\n";
+            _buffer += @" | |  | || | | | |_/ |" + "\n";
+            _buffer += @" \_|  |_/\_| |_/_____/" + "\n";
 
             return _buffer;
         }

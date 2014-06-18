@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 
 namespace MAD.JobSystem
@@ -248,6 +249,10 @@ namespace MAD.JobSystem
         public int hour { get; set; }
         public int minute { get; set; }
 
+        private bool _blockSignal = false;
+        public bool blockSignal { get { return _blockSignal; } }
+        
+
         #endregion
 
         #region constructors
@@ -290,60 +295,77 @@ namespace MAD.JobSystem
 
         #region methodes
 
-        public bool CheckTime()
+        public bool CheckTime(DateTime now)
         {
-            DateTime _now = DateTime.Now;
+            if (!blockSignal)
+            {
+                switch (type)
+                {
+                    case Type.Daily:
 
-            switch (type)
-            { 
-                case Type.Daily:
+                        if (now.Hour == hour && now.Minute == minute)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
 
-                    if (_now.Hour == hour && _now.Minute == minute)
-                    {
-                        return true;
-                    }
-                    else
-                    {
+                    case Type.Monthly:
+
+                        if (now.Hour == hour && now.Minute == minute && now.Day == day)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                    case Type.Yearly:
+
+                        if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                    case Type.Unique:
+
+                        if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month && now.Year == year)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+
+                    default:
                         return false;
-                    }
-
-                case Type.Monthly:
-
-                    if (_now.Hour == hour && _now.Minute == minute && _now.Day == day)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case Type.Yearly:
-
-                    if (_now.Hour == hour && _now.Minute == minute && _now.Day == day && _now.Month == month)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                case Type.Unique:
-
-                    if (_now.Hour == hour && _now.Minute == minute && _now.Day == day && _now.Month == month && _now.Year == year)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                default:
-                    return false;
+                }
             }
+            else
+            {
+                return false;
+            }
+        }
 
+        public void BlockHandler()
+        {
+            Thread _block = new Thread(WaitToUnBlock);
+            _block.Start();
+        }
+
+        private void WaitToUnBlock()
+        {
+            _blockSignal = true;
+            Thread.Sleep(70000);
+            _blockSignal = false;
         }
 
         public string JobTimeStatus()
