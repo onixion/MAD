@@ -1,4 +1,4 @@
-#MAD - Network Monitoring Program
+#MAD - Network-Monitoring Program
 
 MAD is an opensource network monitoring software, which should become an alternative version of Nagios, but shouldn't get as complex as Nagios. The main aim is to get a simple, easy-to-use, easy-understandable and nice-written C# program, which can analyse and monitoring a network.
 

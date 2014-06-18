@@ -68,7 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetCommunication\NetCommunication\NetCommunication.csproj">
+    <ProjectReference Include="..\NetCommunication\NetCommunication.csproj">
       <Project>{e7664de4-32d2-4ce1-8630-902b81e69d0e}</Project>
       <Name>NetCommunication</Name>
     </ProjectReference>
