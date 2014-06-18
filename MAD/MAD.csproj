@@ -52,6 +52,8 @@
     <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
+    <Compile Include="HostDetection\NetworkHelper.cs" />
+    <Compile Include="HostDetection\HostDetect.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\JobOptions.cs" />
