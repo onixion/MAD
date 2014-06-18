@@ -26,7 +26,7 @@ namespace MAD.CLI.Server
             BinaryReader reader = new BinaryReader(stream);
             return reader.ReadString();
         }
-
+        
         #endregion
 
         #region sending / receiving WITH encryption
@@ -41,29 +41,7 @@ namespace MAD.CLI.Server
             return null;
         }
 
-        private static string AESEncrypt(byte[] key, byte[] iv, string data)
-        {
-            if (key.Length != 0 || iv.Length != 0 || data.Length != 0)
-            {
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private static string AESDecrypt(int blocksize, byte[] key, byte[] iv, string data)
-        {
-            if (key.Length != 0 || iv.Length != 0 || data.Length != 0)
-            {
-                return null;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        
 
         #endregion
 

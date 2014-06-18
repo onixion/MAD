@@ -10,15 +10,14 @@ namespace MAD.CLI.Server
     {
         # region member
 
-        public Version internalVersion = new Version(0, 1, 9000);
+        public Version internalVersion = new Version(0, 2);
 
         private Thread _listenThread;
+        private SmartThreadPool _threadPool = new SmartThreadPool();
+
         private bool _listenThreadRunning = false;
         private object _lock = new object();
-
         public bool listening { get { return _listenThreadRunning; } }
-
-        private SmartThreadPool _threadPool = new SmartThreadPool();
 
         #endregion
 
@@ -35,7 +34,6 @@ namespace MAD.CLI.Server
             {
                 if (!_listenThreadRunning)
                 {
-                    // init listener thread
                     _listenThread = new Thread(new ThreadStart(HandleClientInternal));
 
                     if (!StartListener())
@@ -44,8 +42,6 @@ namespace MAD.CLI.Server
                     }
 
                     _listenThreadRunning = true;
-
-                    // start listener thread
                     _listenThread.Start();
                 }
                 else
@@ -64,10 +60,7 @@ namespace MAD.CLI.Server
                     _listenThreadRunning = false;
                     StopListener();
 
-                    // wait for listen-thread to finish
                     _listenThread.Join();
-
-                    // abort all threads
                     _threadPool.Cancel();
                 }
                 else

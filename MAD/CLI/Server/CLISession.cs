@@ -12,12 +12,13 @@ namespace MAD.CLI.Server
         #region members
 
         private static int _sessionsCount = 0;
-        public int sessionID;
+        private int _sessionID;
+        public int sessionID { get { return _sessionID; } }
+
         private object _sessionInitLock = new object();
 
         private TcpClient _client;
         private IPEndPoint _clientEndPoint;
-
         private CLIUser _user;
 
         private string _cursor = "=> ";
@@ -25,10 +26,11 @@ namespace MAD.CLI.Server
         #endregion
 
         public CLISession(TcpClient client, CLIUser user)
+            :base()
         {
             lock (_sessionInitLock)
             {
-                sessionID = _sessionsCount;
+                _sessionID = _sessionsCount;
                 _sessionsCount++;
             }
 
@@ -37,8 +39,6 @@ namespace MAD.CLI.Server
             _user = user;
 
             InitCLI();
-
-            // start session
             this.Start();
         }
 
@@ -66,7 +66,6 @@ namespace MAD.CLI.Server
         private void Start()
         {
             NetworkStream _stream = _client.GetStream();
-
             Command _command = null;
 
             NetCommunication.SendString(_stream, _cursor, true);

@@ -14,6 +14,7 @@ namespace MAD.CLI
         public ConsoleColor inputColor = ConsoleColor.White;
 
         public CLI()
+            :base()
         {
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
