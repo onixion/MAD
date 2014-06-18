@@ -29,10 +29,11 @@ namespace nc
         
         #endregion
 
-        #region sending / receiving WITH encryption
+        #region sending / receiving WITH AES encryption
 
         public static void SendStringAES128(NetworkStream stream, string data, string pass, bool flush)
         {
+
 
         }
 
@@ -41,7 +42,73 @@ namespace nc
             return null;
         }
 
-        
+        public static string EncryptAES(string data, string pass)
+        {
+            byte[] _pass = Encoding.UTF8.GetBytes(pass);
+            byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
+            
+            PasswordDeriveBytes _passDerive = new PasswordDeriveBytes(_pass, _salt, "SHA1", 2);
+
+            byte[] _key = _passDerive.GetBytes(256 / 8);
+
+            RijndaelManaged _symKey = new RijndaelManaged();
+            _symKey.Mode = CipherMode.CBC;
+
+            byte[] _iv = Encoding.ASCII.GetBytes("DrdsfEikrDslFeof");
+            byte[] _data = Encoding.ASCII.GetBytes(data);
+
+            byte[] _clipherText = null;
+
+            using (ICryptoTransform _encryptor = _symKey.CreateEncryptor(_key, _iv))
+            {
+                using (MemoryStream _stream = new MemoryStream())
+                {
+                    using (CryptoStream _cryptStream = new CryptoStream(_stream, _encryptor, CryptoStreamMode.Write))
+                    {
+                        _cryptStream.Write(_data, 0, _data.Length);
+                        _cryptStream.FlushFinalBlock();
+                        _clipherText = _stream.ToArray();
+                    }
+                }
+            }
+
+            return Convert.ToBase64String(_clipherText);
+        }
+
+        public static string DecryptAES(string clipherText, string pass)
+        {
+            byte[] _pass = Encoding.UTF8.GetBytes(pass);
+            byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
+
+            PasswordDeriveBytes _passDerive = new PasswordDeriveBytes(_pass, _salt, "SHA1", 2);
+
+            byte[] _key = _passDerive.GetBytes(256 / 8);
+
+            RijndaelManaged _symKey = new RijndaelManaged();
+            _symKey.Mode = CipherMode.CBC;
+
+            byte[] _iv = Encoding.ASCII.GetBytes("DrdsfEikrDslFeof");
+
+            byte[] _clipherText = Convert.FromBase64String(clipherText);
+            byte[] _data = new byte[clipherText.Length];
+
+            using (ICryptoTransform _decryptor = _symKey.CreateDecryptor(_key, _iv))
+            {
+                using (MemoryStream _stream = new MemoryStream())
+                {
+                    _stream.Write(_clipherText, 0, _clipherText.Length);
+                    _stream.Flush();
+                    _stream.Seek(0, SeekOrigin.Begin);
+
+                    using (CryptoStream _cryptStream = new CryptoStream(_stream, _decryptor, CryptoStreamMode.Read))
+                    {
+                        _cryptStream.Read(_data, 0, _data.Length);
+                    }
+                }
+            }
+
+            return Encoding.ASCII.GetString(_data);
+        }
 
         #endregion
 
