@@ -31,25 +31,33 @@ namespace nc
 
         #region sending / receiving WITH AES encryption
 
-        public static void SendStringAES128(NetworkStream stream, string data, string pass, bool flush)
+        public enum KeySize { Bit128, Bit192, Bit256 }
+
+        public static void SendStringAES(NetworkStream stream, string data, string pass, KeySize keySize, bool flush)
         {
+            BinaryWriter _writer = new BinaryWriter(stream);
+            _writer.Write(EncryptAES(data, pass, GetKeySize(keySize)));
 
-
+            if (flush)
+            {
+                _writer.Flush();
+            }
         }
 
-        public static string ReceiveAES128(NetworkStream stream, string pass)
+        public static string ReceiveAES(NetworkStream stream, string pass, KeySize keySize)
         {
-            return null;
+            BinaryReader _reader = new BinaryReader(stream);
+            return DecryptAES(_reader.ReadString(), pass, GetKeySize(keySize));
         }
 
-        public static string EncryptAES(string data, string pass)
+        private static string EncryptAES(string data, string pass, int keySize)
         {
             byte[] _pass = Encoding.UTF8.GetBytes(pass);
             byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
             
             PasswordDeriveBytes _passDerive = new PasswordDeriveBytes(_pass, _salt, "SHA1", 2);
 
-            byte[] _key = _passDerive.GetBytes(256 / 8);
+            byte[] _key = _passDerive.GetBytes(keySize / 8);
 
             RijndaelManaged _symKey = new RijndaelManaged();
             _symKey.Mode = CipherMode.CBC;
@@ -75,14 +83,14 @@ namespace nc
             return Convert.ToBase64String(_clipherText);
         }
 
-        public static string DecryptAES(string clipherText, string pass)
+        private static string DecryptAES(string clipherText, string pass, int keySize)
         {
             byte[] _pass = Encoding.UTF8.GetBytes(pass);
             byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
 
             PasswordDeriveBytes _passDerive = new PasswordDeriveBytes(_pass, _salt, "SHA1", 2);
 
-            byte[] _key = _passDerive.GetBytes(256 / 8);
+            byte[] _key = _passDerive.GetBytes(keySize / 8);
 
             RijndaelManaged _symKey = new RijndaelManaged();
             _symKey.Mode = CipherMode.CBC;
@@ -108,6 +116,21 @@ namespace nc
             }
 
             return Encoding.ASCII.GetString(_data);
+        }
+
+        private static int GetKeySize(KeySize keySize)
+        {
+            switch (keySize)
+            { 
+                case KeySize.Bit128:
+                    return 128;
+                case KeySize.Bit192:
+                    return 192;
+                case KeySize.Bit256:
+                    return 256;
+                default:
+                    throw new Exception("INVALID-KEYSIZE!");
+            }
         }
 
         #endregion
