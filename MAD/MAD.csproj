@@ -52,7 +52,6 @@
     <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
-    <Compile Include="CLI\Server\NetCommunication.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\JobOptions.cs" />
@@ -69,6 +68,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetCommunication\NetCommunication\NetCommunication.csproj">
+      <Project>{e7664de4-32d2-4ce1-8630-902b81e69d0e}</Project>
+      <Name>NetCommunication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
       <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>
       <Name>SmartThreadPool</Name>

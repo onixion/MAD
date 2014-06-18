@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
+using nc;
 
 namespace MAD.CLI.Server
 {
@@ -29,7 +30,7 @@ namespace MAD.CLI.Server
             _dataPath = dataPath;
 
             _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
-            _users.Add(new CLIUser("root", NetCommunication.GetHash("123"), CLIUser.Group.root));
+            _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
         }
 
         #region methodes
@@ -68,22 +69,22 @@ namespace MAD.CLI.Server
             try
             {
                 // send server info
-                NetCommunication.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
+                nc.NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
                 // receive login data
-                string loginData = NetCommunication.ReceiveString(_clientStream);
+                string loginData = nc.NetCom.ReceiveString(_clientStream);
 
                 // TODO: USER-MANAGMENT
 
                 // check login data
                 if (Login(loginData))
                 {
-                    NetCommunication.SendString(_clientStream, "ACCESS GRANTED", true);
+                    nc.NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
                     _sessions.Add(new CLISession(_client, null));
                 }
                 else
                 {
-                    NetCommunication.SendString(_clientStream, "ACCESS DENIED", true);
+                    nc.NetCom.SendString(_clientStream, "ACCESS DENIED", true);
                 }
             }
             catch (Exception)
@@ -184,7 +185,7 @@ namespace MAD.CLI.Server
             using(FileStream stream = new FileStream(Path.Combine(_dataPath, _logFilename), FileMode.Append, FileAccess.Write, FileShare.Read))
             using (StreamWriter writer = new StreamWriter(stream))
             {
-                writer.WriteLine("[ " + NetCommunication.DateStamp() + " | " + NetCommunication.TimeStamp() + " ] " + data);
+                writer.WriteLine("[ " + nc.NetCom.DateStamp() + " | " + nc.NetCom.TimeStamp() + " ] " + data);
             }
         }
 

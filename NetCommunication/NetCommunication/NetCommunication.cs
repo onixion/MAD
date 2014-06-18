@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
-using System.Security.Cryptography;
 using System.IO;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 
-namespace MAD.CLI.Server
+namespace nc
 {
-    public static class NetCommunication
+    public static class NetCom
     {
         #region sending / receiving WITHOUT encryption
 

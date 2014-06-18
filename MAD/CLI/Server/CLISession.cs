@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using nc;
 
 namespace MAD.CLI.Server
 {
@@ -68,20 +69,20 @@ namespace MAD.CLI.Server
             NetworkStream _stream = _client.GetStream();
             Command _command = null;
 
-            NetCommunication.SendString(_stream, _cursor, true);
+            nc.NetCom.SendString(_stream, _cursor, true);
 
             while (true)
             {
-                string _cliInput = NetCommunication.ReceiveString(_stream);
+                string _cliInput = nc.NetCom.ReceiveString(_stream);
                 string _response = AnalyseInput(_cliInput, ref _command);
 
                 if (_response == "VALID_PARAMETER")
                 {
-                    NetCommunication.SendString(_stream, _command.Execute() + "\n<color><gray>" + _cursor, true);
+                    nc.NetCom.SendString(_stream, _command.Execute() + "\n<color><gray>" + _cursor, true);
                 }
                 else
                 {
-                    NetCommunication.SendString(_stream, _response + "\n<color><gray>" + _cursor, true);
+                    nc.NetCom.SendString(_stream, _response + "\n<color><gray>" + _cursor, true);
                 }
             }
         }
