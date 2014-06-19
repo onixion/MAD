@@ -71,10 +71,10 @@ namespace MAD.CLI.Server
                 // send server info
                 nc.NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
+                /* TODO: asymmetric handshake and then AES encryption. */
+
                 // receive login data
                 string loginData = nc.NetCom.ReceiveString(_clientStream);
-
-                // TODO: USER-MANAGMENT
 
                 // check login data
                 if (Login(loginData))
