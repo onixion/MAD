@@ -2,21 +2,23 @@
 
 MAD is an opensource network monitoring software, which should become an alternative version of Nagios, but shouldn't get as complex as Nagios. The main aim is to get a simple, easy-to-use, easy-understandable and nice-written C# program, which can analyse and monitoring a network.
 
-===
-
-###Things to implement:
+##Things to implement:
 
 - GUI
 - NotificationSystem (E-Mail ...)
 - Database
-- JobSystem (Ping, HttpRequest, Port Scan, Arp-Request, ...)
+- JobSystem (PingRequest, HttpRequest, PortRequest, Arp-Request, ~~SNMP~~ ...)
 - CLI
 - CLI-Server
 - CLI-Client
 
-===
+##What is working yet?
 
-
+- CLI working. It can parse command, parameter and arguments. Some commands supports multiple arguments and multiple types.
+- JobSystem working. Currently available and working jobs are PingRequest, PortRequest and HttpRequest.
+- JobTime working. Jobs can have delaytime or multiple times (with dates) on which they should be executed.
+- CLIServer not working yet. Symmetric encryption working (Rijndael 128Bit, 192Bit or 256Bit). TODO: asymmetric encryption (RSA, Elgamal, ...) for the handshake. 
+- CLIClient not working yet. TODO: (same like CLIServer)
 
 
 
