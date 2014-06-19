@@ -30,6 +30,8 @@ namespace MAD.CLI.Server
             _dataPath = dataPath;
 
             _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
+
+            // TODO: Load users out of the database.
             _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
         }
 
@@ -76,11 +78,13 @@ namespace MAD.CLI.Server
                 // receive login data
                 string loginData = nc.NetCom.ReceiveString(_clientStream);
 
-                // check login data
-                if (Login(loginData))
+                // check login data and load cliuser
+                CLIUser _user = Login(loginData);
+
+                if (_user != null)
                 {
                     nc.NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
-                    _sessions.Add(new CLISession(_client, null));
+                    _sessions.Add(new CLISession(_client, _user));
                 }
                 else
                 {
@@ -101,7 +105,7 @@ namespace MAD.CLI.Server
             return null;
         }
 
-        private bool Login(string loginData)
+        private CLIUser Login(string loginData)
         {
             string[] buffer = loginData.Split(new string[] { "<seperator>" },StringSplitOptions.None);
 
@@ -109,26 +113,26 @@ namespace MAD.CLI.Server
             {
                 if (CheckUsernameAndPassword(buffer[0], buffer[1]))
                 {
-                    CLIUser user = GetCLIUser(buffer[0]);
+                    CLIUser _user = GetCLIUser(buffer[0]);
 
-                    if (!user.online)
+                    if (!_user.online)
                     {
-                        user.online = true;
-                        return true;
+                        _user.online = true;
+                        return _user;
                     }
                     else
                     {
-                        return false;
+                        return null;
                     }
                 }
                 else
                 {
-                    return false;
+                    return null;
                 }
             }
             else
             {
-                return false;
+                return null;
             }
         }
 
