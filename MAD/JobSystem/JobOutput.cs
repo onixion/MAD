@@ -3,37 +3,76 @@ using System.Collections.Generic;
 
 namespace MAD.JobSystem
 {
+    /*
+     * Every job has a JobOutput object. It contains a state, which describes if
+     * the job has ended successful or not, and a list of JobDescriptors.
+     * Every job can have multiple jobDescriptors. These describes job output objects.
+     * 
+     * EXAMPLE:
+     *  PingRequest have two JobDescriptor, one for the remaining TTL and one for
+     *  the passed time.
+     * */
+
     public class JobOutput
     {
         #region members
 
-        public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
         public State jobState = State.NULL;
         public enum State { NULL, Success, Failed, Exception }
+
+        public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
+
+        #endregion
+
+        #region methodes
+
+        public bool SetDataObject(string name, object data)
+        {
+            for(int i = 0; i < jobOutputDescriptors.Count; i++)
+            {
+                if (jobOutputDescriptors[i].name == name)
+                {
+                    jobOutputDescriptors[i].data = data;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public JobDescriptor GetJobDescriptor(string name)
+        {
+            for (int i = 0; i < jobOutputDescriptors.Count; i++)
+            {
+                if (jobOutputDescriptors[i].name == name)
+                {
+                    return jobOutputDescriptors[i];
+                }
+            }
+
+            return null;
+        }
 
         #endregion
     }
 
-    /*
-     * A JobDescriptor describes one job output.
-     * A job can have multiple outputs. */
     public class JobDescriptor
     {
         #region members
 
-        public string jobDescription;
-        Type jobDataType;
-        object jobData;
+        public string name;
+        public Type dataType;
+        public object data;
 
         #endregion
 
         #region constructor
 
-        public JobDescriptor(string jobDescription, Type jobDataType, object jobData)
+        public JobDescriptor(string name, Type dataType, object data)
         {
-            this.jobDescription = jobDescription;
-            this.jobDataType = jobDataType;
-            this.jobData = jobData;
+            this.name = name;
+            this.dataType = dataType;
+            this.data = data;
         }
 
         #endregion
