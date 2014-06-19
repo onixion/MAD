@@ -1,0 +1,206 @@
+\documentclass[10pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+
+\usepackage{ulem}
+
+\title{Diplomarbeit - Protokoll}
+\author{Ranalter Daniel}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Protokoll vom 24.2.2014 - Allgemein}
+\section{Allgemein}
+\begin{itemize}
+\item VIEL KOMMUNIKATION!!
+\item Kommentare sparsam und eindeutig
+\item Kommentare und Variablennamen in Englisch 
+\item Linux und Windows funktionstüchtig
+\item .Net Framework 4.x wird verwendet
+\item GitHub wird verwendet (Admin ist Alin)
+\item Skype als Kommunikationsplattform
+\end{itemize}
+\section{Zeitlich Arbeit}
+\begin{enumerate}
+\item Aufstellen der Arbeitsaufgaben 
+\item Zeitplan 
+\end{enumerate}
+\section{Programmtechnisch}
+Formatierung des Codes:
+\begin{itemize}
+\item Variablen: Indikator klein, jedes neue Wort Groß, Indikatoren werden verwendet zB iTageArbeit
+\item Methoden: Erster Buchstabe groß, jedes neue Wort Groß, keine Indikatoren zB Objekt.TuaAmalWeiter();
+\item Konstanten: Alles Groß, Worte durch Unterstrich getrennt
+\item Objekte: siehe Methoden
+\item GUI (fix) + CLI?! (Weiss fragen)
+\item Klare Trennung der Bereiche nichts darf irgendwo zweifach Vorkommen (zB Config-File aussehen)
+\end{itemize}
+\section{Programiersprache}
+Gegenüberstellung C++ und C\#:
+\begin{itemize}
+\item C++
+\begin{itemize}
+\item Pros
+\begin{itemize}
+\item Grundlegender
+\item Effizienter
+\end{itemize}
+\item Cons
+\begin{itemize}
+\item sehr viel Aufwändiger
+\item Potentiell unsichere Quellen
+\end{itemize}
+\end{itemize}
+\item C\# (momentane Präferenz, sehr sicher)
+\begin{itemize}
+\item Pros
+\begin{itemize}
+\item Sehr viel einfacher
+\item Versicherung das die Klassen untereinander funktionieren
+\item Netzwerktechnisch Speziellisiert
+\end{itemize}
+\item Con
+\begin{itemize}
+\item relativ abstrakt
+\item weniger effizient
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\section{Fixe Programmbestandteile}
+\begin{itemize}
+\item GUI
+\item Arten der Überwachung
+\begin{itemize}
+\item Ping (ICMP)
+\item TCP
+\item SNMP (vorraussichtlicher Hauptbestandteil)
+\item konkrete Serverdienst abfrage (http seite anfürdern, dhcp request, ...)
+\end{itemize}
+\item Liste der ausführbaren Sachen (es wird nicht immer alles erledigt sondern nur das gewünschte bei einem gewünschten Ziel)
+\end{itemize}
+\section{Modulare Programmbestandteile}
+\begin{itemize}
+\item Benachrichtigung (eher fix als modular)
+\item CLI
+\item Benachrichtigungs-App
+\end{itemize}
+\chapter{Protokoll vom 3.3.2014 - Programmcode}
+\section{grobe Zieldefinierung}
+Ein Programm zum Monitoring eines Netzwerkes der Größe eines Heimnetzwerkes oder einer kleinen Firma. Die Zielgruppe muss in der Lage sein die Basics der Netzwerktechnik(Ping, DHCP, Switch, Router, HTTP, SSH, ARP, ..) anzuwenden. Das Programm verfügt über einen Abstrakten Modus sowie einen detailreicheren Modus. Das Programm ist in der Lage verschiedene Jobs parallel aufzurufen, welche sich dann in einem eigenen Thread ihre Arbeit in einer Endlosschleife erfüllen. Die Argumente für einen Job beinhalten beispielsweise den Delay der Funktionsaufrufe, die Art des Requests oder eine eindeutige Job ID um sie einzigartig zu machen. Das Programm in ihrem Abstraktmodus wäre dann dazu in der Lage den Hostnamen dessen IP und dessen MAC anzuzeigen, um eine grobe Übersicht über das Netzwerk zu bieten. Im Detailierten Modus soll dann spezifische Pings und Arp requests möglich sein. Des weiteren sollen bestimmte Serverdienste abgefragt werden können(http, dhcp, dns, ..) oder einen Portscan durchzuführen. Außerdem soll das Programm in der Lage sein bestimmte Geräte MAC-Adressen zuzuordnen (Speicherung in einer Datei). 
+\section{Geplante zu Verwendende Sprache}
+\subsection{Vorschlag C\#}
+\begin{itemize}
+\item Grundlegendes Wissen über das Aussehen vorhanden (C Look-alikes seit der ersten Klasse)
+\item gut geeignet für Netzwerkprogrammierung
+\item komfortabel zu schreiben
+\item nicht sehr effizient
+\item benötigt Mono auf Linux und .net Framework auf Windows
+\end{itemize}
+\subsection{Vorschlag C++}
+\begin{itemize}
+\item Grundlegender wie C\#
+\item relativ effiziente Sprache 
+\item aufwändiger wie C\#
+\item nicht so Netzwerkgeeignet
+\end{itemize}
+\subsection{Vorschlag Perl}
+\begin{itemize}
+\item überhaupt keine Kenntnisse 
+\item extrem aufwändige Sprache 
+\end{itemize}
+\subsection{Ergebnis}
+Abgesehen von wenigen Nachteilen ist C\# für die Programmierung im Netzwerkbereich prädestiniert. Damit wurde in der Gruppe C\# bis auf weiteres als ausführende Sprache gewählt.
+\chapter{Protokoll vom 21.3.2014 - Aufgabenverteilung}
+\section{Aufgabenpool}
+\begin{itemize}
+\item GUI
+\item Speicherverwaltung (Config, Logs)
+\item Dokumentation
+\item Benachrichtigungssystem (Email fix, App optional, Webinterface optional, ..)
+\item HTTP
+\item DHCP
+\item Job System
+\item \sout{SNMP}
+\item Ping
+\item Fernzugriff - Client-Server
+\item CLI
+\item Port Scan
+\item main
+\end{itemize}
+\section{Aufgabenverteilung}
+\subsection{Porcic Alin}
+\begin{itemize}
+\item Job System
+\item HTTP
+\item Ping
+\item Port Scan
+\item CLI
+\end{itemize}
+\subsection{Ranalter Daniel}
+\begin{itemize}
+\item \sout{SNMP}
+\item main
+\item Dokumentation
+\item DHCP
+\end{itemize}
+\subsection{Singh Manpreet}
+\begin{itemize}
+\item Benachrichtigunssysteme
+\item Fernzugriff (Client Server)
+\end{itemize}
+\subsection{Stojanovic Marko}
+\begin{itemize}
+\item Speicherverwaltung 
+\item GUI
+\end{itemize}
+\chapter{Aufgabenstellung Neu}
+Was soll es können?\\
+\begin{itemize}
+\item IpAdressen 
+\item MacAdressen
+\item Portscan
+\item GUI (+Client)
+\item CLI (+Client)
+\item ping check
+\item Netztraffik Diagramm wichtig jedoch noch nicht geklärt wie
+\item Wichtige Dienste: http, dhcp, dns, ftp, ssh, samba 
+\item Momentaufnahme des Netzwerkes über Email mit html zur Überprüfung von Entfernten Orten (Email wird über SSH angefordert, Korrekturen über SSH ausgeführt)
+\item Speicherverwaltung: Config-XML Statistik-DB
+\item Installationsfile welche DB anlegt XML anlegt Icons erstellt...
+\end{itemize}
+Es werden zwei Icons verfügbar sein unter Windows, in einem wird rein die CLI gestartet in der anderen wird die GUI mitgestartet.\\
+Bereits erledigt: http, portscan, ping, CLI (client fast fertig)\\
+Neue Aufgabenverteilung:
+\begin{itemize}
+\item Porcic Alin\\
+\begin{itemize}
+\item Installation
+\item 
+\end{itemize}
+\item Ranalter Daniel
+\begin{itemize}
+\item Wichtige Dienste
+\item IpAdresse
+\item MacAdresse
+\end{itemize}
+\item Singh Manpreet
+\begin{itemize}
+\item Teil GUI
+\item EMail 
+\end{itemize}
+\item Stojanovic Marko
+\begin{itemize}
+\item Teil GUI
+\item Speicherverwaltung Statistik DB
+\end{itemize}
+\end{itemize}
+\chapter{Anmerkungen des Betreures}
+Vergangene wichtige Events wie ausfall eines Servers oder vll des gesamten Netzwerkes sollen mitgeteilt werden. retroperspektiv.\\
+Ausformulierung der Arbeit.\\
+\end{document}
