@@ -1,0 +1,12 @@
+PLEASE NOTICE THESE RULES:
+
+1# 	Work in YOUR OWN Branch.
+
+2# 	Do not push your branch before it can be compiled.
+
+3# 	You can make your own branches and merge them, but 
+	do not merge into other peoples branches or the branch 'master'.
+
+4# 	Public members, which other parts of the program 
+	uses, can not just be renamed. If you want to rename 
+	something, wait until the branches get merged togheter.
