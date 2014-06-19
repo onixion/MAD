@@ -29,7 +29,7 @@ namespace nc
         
         #endregion
 
-        #region sending / receiving WITH AES encryption
+        #region sending / receiving WITH AES encryption (symmetric)
 
         public enum KeySize { Bit128, Bit192, Bit256 }
 
@@ -132,6 +132,12 @@ namespace nc
                     throw new Exception("INVALID-KEYSIZE!");
             }
         }
+
+        #endregion
+
+        #region sending / receiving WITH Elgamal encryption (asymmetric)
+
+        // TODO
 
         #endregion
 
