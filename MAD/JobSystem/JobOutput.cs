@@ -40,6 +40,19 @@ namespace MAD.JobSystem
             return false;
         }
 
+        public JobDescriptor GetJobDescriptor(string name)
+        {
+            for (int i = 0; i < jobOutputDescriptors.Count; i++)
+            {
+                if (jobOutputDescriptors[i].name == name)
+                {
+                    return jobOutputDescriptors[i];
+                }
+            }
+
+            return null;
+        }
+
         #endregion
     }
 
