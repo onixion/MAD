@@ -163,20 +163,21 @@ namespace MAD.JobSystem
 
         public string Status()
         {
-            string _temp = "";
+            string _temp = "_______________________________\n";
 
             _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
             _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
-            _temp += "<color><yellow>JOB-TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
-            _temp += "<color><yellow>JOB-TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
+            _temp += "<color><yellow>TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
+            
+            _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
 
             if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
             {
-                _temp += "<color><yellow>JOB-DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
+                _temp += "<color><yellow>DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
             }
             else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
             {
-                _temp += "<color><yellow>JOB-TIMES: <color><white>";
+                _temp += "<color><yellow>TIMES: <color><white>";
 
                 foreach (JobTimeHandler _buffer in jobOptions.jobTime.jobTimes)
                 {
@@ -186,8 +187,26 @@ namespace MAD.JobSystem
                 _temp += "\n";
             }
 
-            _temp += "<color><yellow>JOB-STATE: <color><white>" + jobState.ToString()+ "\n";
+            _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString()+ "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
+            _temp += "<color><yellow>OUTPUT-DESCRIPTOR: \n";
+
+            foreach(JobDescriptor _buffer in jobOutput.jobOutputDescriptors)
+            {
+                _temp += "\n<color><yellow>Name: <color><white>" + _buffer.name + "\n";
+                _temp += "<color><yellow>Type: <color><white>" + _buffer.dataType + "\n";
+
+                if (_buffer.data != null)
+                {
+                    _temp += "<color><yellow>Value: <color><white>" + _buffer.data.ToString();
+                }
+                else
+                {
+                    _temp += "<color><yellow>Value: <color><white>NULL;";
+                }
+
+                _temp += "\n\n";
+            }
 
             return _temp + JobStatus();
         }
