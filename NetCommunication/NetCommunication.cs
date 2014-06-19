@@ -14,7 +14,7 @@ namespace nc
         {
             BinaryWriter writer = new BinaryWriter(stream);
             writer.Write(data);
-
+            
             if (flush)
             {
                 writer.Flush();
@@ -135,9 +135,9 @@ namespace nc
 
         #endregion
 
-        #region sending / receiving WITH Elgamal encryption (asymmetric)
+        #region asymmetric encryption handshake
 
-        // TODO
+        // TODO: get big prime numbers
 
         #endregion
 
