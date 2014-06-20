@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace MAD.JobSystem
+namespace MAD.jobSys
 {
     public class JobHttp : Job
     {

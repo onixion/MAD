@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Net;
-using MAD.JobSystem;
+using MAD.jobSys;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     public class JobSystemStatusCommand : Command
     {
+        JobSystem _js;
         ConsoleTable jobTable;
 
-        public JobSystemStatusCommand()
+        public JobSystemStatusCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
             description = "This command prints a table with all jobs!";
         }
 
@@ -21,16 +23,16 @@ namespace MAD.CLI
             tableRow = jobTable.FormatStringArray(tableRow);
 
             output += "<color><yellow>\n";
-            output += "Jobs initialized: " + Handler.components.jobSystem.jobs.Count + "\n";
-            output += "Jobs running:     " + Handler.components.jobSystem.JobsRunning() + "\n";
-            output += "Jobs stopped:     " + Handler.components.jobSystem.JobsStopped() + "\n\n";
+            output += "Jobs initialized: " + _js.jobs.Count + "\n";
+            output += "Jobs running:     " + _js.JobsRunning() + "\n";
+            output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
 
             output += jobTable.WriteColumnes(tableRow) + "\n";
             output += jobTable.splitline + "\n";
             output += "<color><white>";
 
             /* It improves the performance when you can work with jobs directly! */
-            foreach (Job _temp in Handler.components.jobSystem.jobs)
+            foreach (Job _temp in _js.jobs)
             {
                 tableRow[0] = _temp.jobID.ToString();
                 tableRow[1] = _temp.jobOptions.jobName;
@@ -68,9 +70,13 @@ namespace MAD.CLI
 
     public class JobStatusCommand : Command
     {
-        public JobStatusCommand()
+        private JobSystem _js;
+
+        public JobStatusCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
@@ -78,7 +84,7 @@ namespace MAD.CLI
         {
             if (OptionalParameterUsed("id"))
             {
-                Job _job = Handler.components.jobSystem.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
+                Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
 
                 if (_job != null)
                 {
@@ -94,9 +100,9 @@ namespace MAD.CLI
 
             else
             {
-                output += "<color><yellow>Jobs initialized: " + Handler.components.jobSystem.jobs.Count + "\n\n";
+                output += "<color><yellow>Jobs initialized: " + _js.jobs.Count + "\n\n";
 
-                foreach (Job _job in Handler.components.jobSystem.jobs)
+                foreach (Job _job in _js.jobs)
                 {
                     output += _job.Status() + "\n";
                 }
@@ -109,13 +115,18 @@ namespace MAD.CLI
 
     public class JobSystemAddPingCommand : Command
     {
-        public JobSystemAddPingCommand()
+        private JobSystem _js;
+
+        public JobSystemAddPingCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IPAddress of the target-machine.", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
+            
             description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
         }
 
@@ -163,7 +174,7 @@ namespace MAD.CLI
                 _job.ttl = (int)parameters.GetParameter("ttl").argumentValue[0];
             }
 
-            Handler.components.jobSystem.CreateJob(_job);
+            _js.CreateJob(_job);
 
             return output;
         }
@@ -171,9 +182,13 @@ namespace MAD.CLI
 
     public class JobSystemAddHttpCommand : Command
     {
-        public JobSystemAddHttpCommand()
+        private JobSystem _js;
+
+        public JobSystemAddHttpCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
@@ -225,7 +240,7 @@ namespace MAD.CLI
                 _job.port = (int)parameters.GetParameter("p").argumentValue[0];
             }
 
-            Handler.components.jobSystem.CreateJob(_job);
+            _js.CreateJob(_job);
 
             return output;
         }
@@ -233,9 +248,13 @@ namespace MAD.CLI
 
     public class JobSystemAddPortCommand : Command
     {
-        public JobSystemAddPortCommand()
+        private JobSystem _js;
+
+        public JobSystemAddPortCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
             requiredParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
@@ -284,7 +303,7 @@ namespace MAD.CLI
                 _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
             }
 
-            Handler.components.jobSystem.CreateJob(_job);
+            _js.CreateJob(_job);
 
             return output;
         }
@@ -292,9 +311,13 @@ namespace MAD.CLI
 
     public class JobSystemRemoveCommand : Command
     {
-        public JobSystemRemoveCommand()
+        private JobSystem _js;
+
+        public JobSystemRemoveCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -304,7 +327,7 @@ namespace MAD.CLI
 
             try
             {
-                Handler.components.jobSystem.DestroyJob(id);
+                _js.DestroyJob(id);
                 output += "<color><green>Job destroyed.";
             }
             catch (Exception e)
@@ -318,9 +341,13 @@ namespace MAD.CLI
 
     public class JobSystemStartCommand : Command
     {
-        public JobSystemStartCommand()
+        private JobSystem _js;
+
+        public JobSystemStartCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -330,7 +357,7 @@ namespace MAD.CLI
 
             try
             {
-                Handler.components.jobSystem.StartJob(id);
+                _js.StartJob(id);
                 output = "<color><green>Job started.";
             }
             catch (Exception e)
@@ -344,9 +371,13 @@ namespace MAD.CLI
 
     public class JobSystemStopCommand : Command
     {
-        public JobSystemStopCommand()
+        private JobSystem _js;
+
+        public JobSystemStopCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -356,7 +387,7 @@ namespace MAD.CLI
 
             try
             {
-                Handler.components.jobSystem.StopJob(id);
+                _js.StopJob(id);
                 output = "<color><green>Job stopped.";
             }
             catch (Exception e)
@@ -370,9 +401,13 @@ namespace MAD.CLI
 
     public class JobSystemOutputCommand : Command
     {
-        public JobSystemOutputCommand()
+        private JobSystem _js;
+
+        public JobSystemOutputCommand(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -380,7 +415,7 @@ namespace MAD.CLI
         {
             int id = (int)parameters.GetParameter("id").argumentValue[0];
 
-            Job job = Handler.components.jobSystem.GetJob(id);
+            Job job = _js.GetJob(id);
 
             if (job != null)
             {

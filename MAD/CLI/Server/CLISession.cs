@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using nc;
 
-namespace MAD.CLI.Server
+namespace MAD.cli.server
 {
     public class CLISession : CLIFramework
     {

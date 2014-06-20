@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading;
 
-namespace MAD.JobSystem
+namespace MAD.jobSys
 {
     public abstract class Job
     {

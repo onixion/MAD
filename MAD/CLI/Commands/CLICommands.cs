@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     public class ExitCommand : Command
     {
@@ -170,20 +170,16 @@ namespace MAD.CLI
 
         public override string Execute()
         {
-            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n<color><white>";
-            output += "CLI        v" + Handler.components.cli.version.ToString() + " (CLI-Framework v" + Handler.components.cli.versionFramework + ")\n";
-            output += "CLI-Server v" + Handler.components.cliServer.version.ToString() + "\n";
-            output += "JobSystem  v" + Handler.components.jobSystem.version.ToString() + "\n\n";
-
+            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
             output += "<color><yellow>Program written by: \n";
             output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
 
             if (OptionalParameterUsed("hack"))
             {
-                output += "<color><red>\nBe careful, Jack may be sniffing arround ...";
+                output += "<color><red>\n\nBe careful, Jack may be sniffing arround ...";
             }
 
-            return output + "\n";
+            return output;
         }
     }
 

@@ -2,20 +2,25 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace MAD.CLI
+using MAD.jobSys;
+
+namespace MAD.cli
 {
     public class CLI : CLIFramework
     {
         public Version version = new Version(1, 5);
-
         protected string cursor = "=> ";
 
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor inputColor = ConsoleColor.White;
 
-        public CLI()
+        private JobSystem _js;
+
+        public CLI(JobSystem js)
             :base()
         {
+            _js = js;
+
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
@@ -24,14 +29,14 @@ namespace MAD.CLI
             //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
             // JOBSYSTEM
-            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
-            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), null));
-            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), null));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), null));
-            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), null));
-            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), null));
-            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), null));
-            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), null));
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
 
             // CLISERVER
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), null));

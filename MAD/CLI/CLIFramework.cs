@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     public abstract class CLIFramework
     {

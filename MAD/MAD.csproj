@@ -47,7 +47,7 @@
     <Compile Include="CLI\Parameter\Parameter.cs" />
     <Compile Include="CLI\Parameter\ParameterInput.cs" />
     <Compile Include="CLI\Parameter\ParameterOption.cs" />
-    <Compile Include="CLI\CLIUser.cs" />
+    <Compile Include="CLI\Server\CLIUser.cs" />
     <Compile Include="CLI\Command\Command.cs" />
     <Compile Include="CLI\Command\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
@@ -61,7 +61,6 @@
     <Compile Include="JobSystem\Jobs\JobPing.cs" />
     <Compile Include="JobSystem\Jobs\JobPort.cs" />
     <Compile Include="JobSystem\JobTime.cs" />
-    <Compile Include="Handler.cs" />
     <Compile Include="JobSystem\JobSystem.cs" />
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\Server\CLISession.cs" />

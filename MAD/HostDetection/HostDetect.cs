@@ -6,10 +6,10 @@ using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 
-using MAD.JobSystem;
+using MAD.jobSys;
 
 namespace MAD.HostDetect
-{
+{/*
     public class HostDetect : Job
     {
         public List<IPAddress> Detect(string Net, string Subnetmask)
@@ -20,5 +20,5 @@ namespace MAD.HostDetect
             //Needs NetworkHelper
         }
 
-    }
+    }*/
 }

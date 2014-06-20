@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.JobSystem
+namespace MAD.jobSys
 {
     public class JobSystem
     {

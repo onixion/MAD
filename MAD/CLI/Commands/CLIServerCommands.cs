@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     public class CLIServerInfo : Command
     {
@@ -12,8 +12,8 @@ namespace MAD.CLI
 
         public override string Execute()
         {
-            output += "<color><yellow>CLI-Server v" + Handler.components.cliServer.version + "\n";
-            output += "Server listening: " + Handler.components.cliServer.listening + "\n";
+            output += "<color><yellow>CLI-Server v";// +Handler.components.cliServer.version + "\n";
+            output += "Server listening: ";// +Handler.components.cliServer.listening + "\n";
 
             return output;
         }
@@ -31,7 +31,7 @@ namespace MAD.CLI
         {
             try
             {
-                Handler.components.cliServer.Start();
+                //Handler.components.cliServer.Start();
                 output += "<color><green>CLI server started.";
             }
             catch (Exception e)
@@ -55,7 +55,7 @@ namespace MAD.CLI
         {
             try
             {
-                Handler.components.cliServer.Stop();
+                //Handler.components.cliServer.Stop();
                 output += "<color><green>CLI server stopped.";
             }
             catch (Exception e)

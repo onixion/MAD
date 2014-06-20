@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.JobSystem
+namespace MAD.jobSys
 {
     /*
      * Every job has a JobOutput object. It contains a state, which describes if

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     /* This object defines a command. */
     public class CommandOptions

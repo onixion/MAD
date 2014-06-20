@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace MAD.CLI
+namespace MAD.cli
 {
     public static class CommandIO
     {

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace MAD.JobSystem
+namespace MAD.jobSys
 {
     public class JobPort : Job
     {

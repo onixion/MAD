@@ -1,29 +1,33 @@
 ﻿using System;
-using nc;
+
+using MAD.jobSys;
+using MAD.cli;
+using MAD.cli.server;
 
 namespace MAD
 {
     class Program
     {
-        /*
-         *  MAD - Network Monitoring v0.0.2.7 RC1
-         */
+        /* MAD - Network Monitoring v0.0.2.9 RC1 */
+
+        private const string dataPath = "data";
 
         static int Main(string[] args)
         {
+            JobSystem js = new JobSystem(dataPath, 100);
+            CLI cli = new CLI(js);
+
             if (args.Length == 0)
             { 
-                //---------------------------------------------
-                // TEST YOUR SHIT IN HERE
-                Handler.components.cli.Start();
-                //---------------------------------------------
+                // START GUI
+                cli.Start();
             }
             else if (args.Length >= 1)
             {
                 switch (args[0])
                 {
                     case "-console":
-                        Handler.components.cli.Start();
+                        cli.Start();
                         break;
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");
