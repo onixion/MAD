@@ -35,7 +35,7 @@ namespace MAD.jobSys
 
         #region methodes
 
-        public override void DoJob()
+        public override void Execute()
         {
             try
             {

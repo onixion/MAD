@@ -45,7 +45,7 @@ namespace MAD.jobSys
             jobOutput.jobOutputDescriptors.Add(new JobDescriptor("TTLLeft", typeof(int), null));
         }
 
-        public override void DoJob()
+        public override void Execute()
         {
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
 

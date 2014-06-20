@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 
 namespace MAD.jobSys
@@ -80,7 +79,7 @@ namespace MAD.jobSys
             {
                 if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                 {
-                    _cycleThread = new Thread(CycleLockSignal);
+                    _cycleThread = new Thread(DelayLockSignal);
                 }
                 else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                 {
@@ -91,25 +90,33 @@ namespace MAD.jobSys
                     throw new Exception("JOB-TIME-TYPE NULL!");
                 }
 
+                // Start '_cycleThread' to wait for the signal from the JobTime-class.
                 _cycleThread.Start();
 
-                // wait for cycleThread to be finished OR get an stop-request
+                // Wait for '_cycleThread'.
                 _cycleLock.WaitOne();
+                // Wait for '_cycleThread' to close.
                 _cycleThread.Join();
 
-                // check for any stop-requests
+                // Check if the job has any stop-requests.
                 if (jobState == State.StopRequest)
                 {
                     jobState = State.Stopped;
                     break;
                 }
 
-                DoJob();
+                // Execute the job.
+                Execute();
             }
         }
 
-        private void CycleLockSignal()
+        private void DelayLockSignal()
         {
+            /* CycleLockSignal is used by the 'JobTime'-class when the type is 'Relativ'.
+             * This method is couting down the delay-time. If the delay-time is smaller than
+             * 0 or the job changes its state, the '_cycleLock' gets set and the
+             * '_cycleThread' will finish. */
+
             int _buffer = jobOptions.jobTime.jobDelay;
 
             while (jobState == State.Running)
@@ -128,6 +135,11 @@ namespace MAD.jobSys
 
         private void TimeLockSignal()
         {
+            /* TimeLockSignal is used by the 'JobTime'-class when the type is 'Absolute'.
+             * This method checks if one of the defined times is equal to the current time.
+             * If it is true or the job changes its state , the '_cycleLock' gets set and the
+             * '_cycleThread' will finish. */
+
             bool _finished = false;
 
             while (jobState == State.Running)
@@ -157,7 +169,7 @@ namespace MAD.jobSys
             _cycleLock.Set();
         }
 
-        public abstract void DoJob();
+        public abstract void Execute();
 
         #region for CLI only
 

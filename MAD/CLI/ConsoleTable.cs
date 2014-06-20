@@ -4,41 +4,46 @@ namespace MAD
 {
     public class ConsoleTable
     {
-        private string[] columnesTitles;
-        private int columneWidth;
+        private string[] _columnesTitles;
+        private int _columneWidth;
         public string splitline = "".PadRight(Console.BufferWidth, '_');
 
         public ConsoleTable(string[] columnesTitles, int consoleWidth)
         {
-            this.columnesTitles = columnesTitles;
-            columneWidth = consoleWidth / columnesTitles.Length - 1;
+            _columnesTitles = columnesTitles;
+            _columneWidth = consoleWidth / columnesTitles.Length - 1;
         }
 
         #region methodes
 
-        public string[] FormatStringArray(string[] data)
+        public string FormatStringArray(string[] data)
         {
-            for (int i = 0; i < columnesTitles.Length; i++)
+            for (int i = 0; i < _columnesTitles.Length; i++)
             {
-                if (data[i].Length > columneWidth)
-                    data[i] = data[i].Remove(columneWidth);
+                if (data[i].Length > _columneWidth)
+                {
+                    data[i] = data[i].Remove(_columneWidth);
+                }
                 else
-                    data[i] = data[i].PadRight(columneWidth);
+                {
+                    data[i] = data[i].PadRight(_columneWidth);
+                }
             }
-            return data;
+
+            return AppendColumnes(data);
         }
 
-        public string WriteColumnes(string[] data)
+        private string AppendColumnes(string[] data)
         {
-            string buffer = "";
+            string _buffer = "";
 
-            foreach (string temp in data)
+            foreach (string _temp in data)
             {
-                buffer += temp;
-                buffer += " ";
+                _buffer += _temp;
+                _buffer += " ";
             }
 
-            return buffer;
+            return _buffer;
         }
 
         #endregion

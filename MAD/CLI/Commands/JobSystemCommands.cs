@@ -7,31 +7,29 @@ namespace MAD.cli
     public class JobSystemStatusCommand : Command
     {
         JobSystem _js;
-        ConsoleTable jobTable;
+        ConsoleTable _jobTable;
 
         public JobSystemStatusCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
-            description = "This command prints a table with all jobs!";
+            description = "This command prints a table with all jobs.";
         }
 
         public override string Execute()
         {
             string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value", "Job-State", "Output-State" };
-            jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
-            tableRow = jobTable.FormatStringArray(tableRow);
+            _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
             output += "Jobs initialized: " + _js.jobs.Count + "\n";
             output += "Jobs running:     " + _js.JobsRunning() + "\n";
             output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
 
-            output += jobTable.WriteColumnes(tableRow) + "\n";
-            output += jobTable.splitline + "\n";
+            output += _jobTable.FormatStringArray(tableRow) + "\n";
+            output += _jobTable.splitline + "\n";
             output += "<color><white>";
 
-            /* It improves the performance when you can work with jobs directly! */
             foreach (Job _temp in _js.jobs)
             {
                 tableRow[0] = _temp.jobID.ToString();
@@ -60,8 +58,7 @@ namespace MAD.cli
                 tableRow[5] = _temp.jobState.ToString();
                 tableRow[6] = _temp.jobOutput.jobState.ToString();
 
-                tableRow = jobTable.FormatStringArray(tableRow);
-                output += jobTable.WriteColumnes(tableRow) + "\n";
+                output += _jobTable.FormatStringArray(tableRow);
             }
 
             return output;
@@ -76,7 +73,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
@@ -92,7 +88,7 @@ namespace MAD.cli
                 }
                 else
                 {
-                    output = "<color><red>Job does not exist!\n";
+                    output = "<color><red>Job does not exist!";
                 }
 
                 return output;
@@ -121,12 +117,10 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IPAddress of the target-machine.", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
-            
             description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
         }
 
@@ -188,7 +182,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
@@ -254,7 +247,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
             requiredParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
@@ -317,7 +309,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -347,7 +338,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -377,7 +367,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
@@ -407,7 +396,6 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
-
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
