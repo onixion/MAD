@@ -12,7 +12,7 @@ MAD is an opensource network monitoring software, which should become an alterna
 - CLI-Server
 - CLI-Client
 
-##What is working yet?
+##What is currently working?
 
 - CLI working. It can parse command, parameter and arguments. Some commands supports multiple arguments and multiple types.
 - JobSystem working. Currently available and working jobs are PingRequest, PortRequest and HttpRequest.
