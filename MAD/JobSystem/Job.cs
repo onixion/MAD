@@ -203,7 +203,7 @@ namespace MAD.jobSys
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
             _temp += "<color><yellow>OUTPUT-DESCRIPTOR: \n";
 
-            foreach(JobDescriptor _buffer in jobOutput.jobOutputDescriptors)
+            foreach (JobOutputDescriptor _buffer in jobOutput.jobOutputDescriptors)
             {
                 _temp += "\n<color><yellow>Name: <color><white>" + _buffer.name + "\n";
                 _temp += "<color><yellow>Type: <color><white>" + _buffer.dataType + "\n";

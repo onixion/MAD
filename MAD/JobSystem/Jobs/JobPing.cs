@@ -41,8 +41,8 @@ namespace MAD.jobSys
 
         private void InitJobDescriptors()
         {
-            jobOutput.jobOutputDescriptors.Add(new JobDescriptor("PingDelay", typeof(int), null));
-            jobOutput.jobOutputDescriptors.Add(new JobDescriptor("TTLLeft", typeof(int), null));
+            jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("PingDelay", typeof(int), null));
+            jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("TTLLeft", typeof(int), null));
         }
 
         public override void Execute()

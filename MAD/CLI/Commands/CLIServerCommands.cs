@@ -1,19 +1,24 @@
 ﻿using System;
 
+using MAD.cli.server;
+
 namespace MAD.cli
 {
     public class CLIServerInfo : Command
     {
-        public CLIServerInfo()
+        private CLIServer _cliServer;
+
+        public CLIServerInfo(object[] args)
             : base()
         {
+            _cliServer = (CLIServer)args[0];
             description = "This command shows informations about the CLIServer.";
         }
 
         public override string Execute()
         {
-            output += "<color><yellow>CLI-Server v";// +Handler.components.cliServer.version + "\n";
-            output += "Server listening: ";// +Handler.components.cliServer.listening + "\n";
+            output += "<color><yellow>CLI-Server v" + _cliServer.version + "\n";
+            output += "Server listening: " + _cliServer.listening + "\n";
 
             return output;
         }
@@ -21,9 +26,12 @@ namespace MAD.cli
 
     public class CLIServerStart : Command
     {
-        public CLIServerStart()
+        private CLIServer _cliServer;
+
+        public CLIServerStart(object[] args)
             : base()
         {
+            _cliServer = (CLIServer)args[0];
             description = "This command starts the CLIServer.";
         }
 
@@ -31,7 +39,7 @@ namespace MAD.cli
         {
             try
             {
-                //Handler.components.cliServer.Start();
+                _cliServer.Start();
                 output += "<color><green>CLI server started.";
             }
             catch (Exception e)
@@ -45,9 +53,12 @@ namespace MAD.cli
 
     public class CLIServerStop : Command
     {
-        public CLIServerStop()
+        private CLIServer _cliServer;
+
+        public CLIServerStop(object[] args)
             : base()
         {
+            _cliServer = (CLIServer) args[0];
             description = "This command stops the CLIServer.";
         }
 
@@ -55,7 +66,7 @@ namespace MAD.cli
         {
             try
             {
-                //Handler.components.cliServer.Stop();
+                _cliServer.Stop();
                 output += "<color><green>CLI server stopped.";
             }
             catch (Exception e)

@@ -48,9 +48,9 @@ namespace MAD.cli
             commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
 
             // CLISERVER COMMANDS
-            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), null));
-            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), null));
-            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), null));
+            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { _cliServer }));
+            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { _cliServer }));
+            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { _cliServer }));
 
             // NOTIFICATION COMMANDS
 
@@ -60,12 +60,12 @@ namespace MAD.cli
         public void Start()
         {
             CommandIO.WriteToConsole(GetBanner());
-            WriteCursor();
-
-            Command _command = null;
 
             while (true)
             {
+                WriteCursor();
+
+                Command _command = null;
                 string _cliInput = Console.ReadLine();
 
                 if (_cliInput != "")
@@ -82,19 +82,14 @@ namespace MAD.cli
                         if (response == "EXIT_CLI")
                             break;
 
+                        // Write command ouput to console.
                         CommandIO.WriteToConsole(response);
-                        WriteCursor();
                     }
                     else
                     {
                         // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
                         CommandIO.WriteToConsole(response);
-                        WriteCursor();
                     }
-                }
-                else
-                {
-                    WriteCursor();
                 }
             }
         }

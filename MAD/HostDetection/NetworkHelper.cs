@@ -9,7 +9,7 @@ using System.Net.NetworkInformation;
 namespace MAD.HostDetection
 {
     public class NetworkHelper
-    {/*
+    {/* SORRY DANI!
         public Byte[] GetHosts(IPAddress address, IPAddress subnet)
         {
             byte[] byteAddress = address.GetAddressBytes();

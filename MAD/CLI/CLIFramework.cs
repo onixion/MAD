@@ -26,57 +26,56 @@ namespace MAD.cli
          * the CLI. */
         public string AnalyseInput(string cliInput, ref Command command)
         {
-            // First get the command name.
+            // First get the command-name.
             string _commandInput = GetCommandName(cliInput);
 
-            // Check if the command exists.
-            if (_commandInput != null)
-            {
-                // Get the configuration of the command.
-                CommandOptions _commandOptions = GetCommandOptions(_commandInput);
-                // Get the parameters and arguments from input.
-                ParameterInput _parameterInput = GetParamtersFromInput(cliInput);
-                // Get the command-type.
-                Type _commandType = _commandOptions.commandType;
-                // Get the needed objects for the constructor of the command.
-                object[] _commandObjects = _commandOptions.commandObjects;
-                
-                // Constructor of the command.
-                ConstructorInfo _cInfo;
+            // Get the configuration of the command.
+            CommandOptions _commandOptions = GetCommandOptions(_commandInput);
 
-                // Check if the command need any objects.
-                if (_commandObjects == null)
-                {
-                    // Command does not need any objects for its constructor.
-                    _cInfo = _commandType.GetConstructor(new Type[0]);
-                    // Invoke the constructor.
-                    command = (Command)_cInfo.Invoke(null);
-                }
-                else
-                {
-                    // Command need some objects for its constructor.
-                    _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
-                    // Invoke the constructor.
-                    command = (Command)_cInfo.Invoke(new object[]{_commandObjects});
-                }
-
-                // Check if the parameters and arguments are valid.
-                string _parameterValid = command.ValidParameters(_parameterInput);
-
-                /* If the parameters and arguments are valid then '_parameterValid' is
-                 * equal to 'VALID_PARAMETERS'. */
-                if (_parameterValid == "VALID_PARAMETER")
-                {
-                    // Set parameters and arguments of the command.
-                    command.SetParameters(_parameterInput);
-                }
-
-                return _parameterValid;
-            }
-            else
+            // Check if the command exist.
+            if (_commandOptions == null)
             {
                 return "<color><red>Command '" + _commandInput + "' unknown! Type 'help' for more information.";
             }
+
+            // Get the parameters and arguments from input.
+            ParameterInput _parameterInput = GetParamtersFromInput(cliInput);
+            // Get the command-type.
+            Type _commandType = _commandOptions.commandType;
+            // Get the needed objects for the constructor of the command.
+            object[] _commandObjects = _commandOptions.commandObjects;
+
+            // Constructor of the command.
+            ConstructorInfo _cInfo;
+
+            // Check if the command need any objects.
+            if (_commandObjects == null)
+            {
+                // Command does not need any objects for its constructor.
+                _cInfo = _commandType.GetConstructor(new Type[0]);
+                // Invoke the constructor.
+                command = (Command)_cInfo.Invoke(null);
+            }
+            else
+            {
+                // Command need some objects for its constructor.
+                _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
+                // Invoke the constructor.
+                command = (Command)_cInfo.Invoke(new object[] { _commandObjects });
+            }
+
+            // Check if the parameters and arguments are valid.
+            string _parameterValid = command.ValidParameters(_parameterInput);
+
+            /* If the parameters and arguments are valid then '_parameterValid' is
+             * equal to 'VALID_PARAMETERS'. */
+            if (_parameterValid == "VALID_PARAMETER")
+            {
+                // Set parameters and arguments of the command.
+                command.SetParameters(_parameterInput);
+            }
+
+            return _parameterValid;
         }
 
         #endregion

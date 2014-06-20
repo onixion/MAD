@@ -5,13 +5,10 @@ namespace MAD.jobSys
 {
     /*
      * Every job has a JobOutput object. It contains a state, which describes if
-     * the job has ended successful or not, and a list of JobDescriptors.
-     * Every job can have multiple jobDescriptors. These describes job output objects.
+     * the job has ended successfully or not and a list of JobOutputDescriptors.
+     * Every job can have multiple JobOutputDescriptors.
      * 
-     * EXAMPLE:
-     *  PingRequest have two JobDescriptor, one for the remaining TTL and one for
-     *  the passed time.
-     * */
+     * One JobOutputDescriptors describes one job-output object. */
 
     public class JobOutput
     {
@@ -20,7 +17,7 @@ namespace MAD.jobSys
         public State jobState = State.NULL;
         public enum State { NULL, Success, Failed, Exception }
 
-        public List<JobDescriptor> jobOutputDescriptors = new List<JobDescriptor>();
+        public List<JobOutputDescriptor> jobOutputDescriptors = new List<JobOutputDescriptor>();
 
         #endregion
 
@@ -40,7 +37,7 @@ namespace MAD.jobSys
             return false;
         }
 
-        public JobDescriptor GetJobDescriptor(string name)
+        public JobOutputDescriptor GetJobDescriptor(string name)
         {
             for (int i = 0; i < jobOutputDescriptors.Count; i++)
             {
@@ -56,7 +53,7 @@ namespace MAD.jobSys
         #endregion
     }
 
-    public class JobDescriptor
+    public class JobOutputDescriptor
     {
         #region members
 
@@ -68,7 +65,7 @@ namespace MAD.jobSys
 
         #region constructor
 
-        public JobDescriptor(string name, Type dataType, object data)
+        public JobOutputDescriptor(string name, Type dataType, object data)
         {
             this.name = name;
             this.dataType = dataType;

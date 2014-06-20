@@ -9,7 +9,7 @@ using System.Net.NetworkInformation;
 using MAD.jobSys;
 
 namespace MAD.HostDetect
-{/*
+{/* SORRY DANI!
     public class HostDetect : Job
     {
         public List<IPAddress> Detect(string Net, string Subnetmask)
