@@ -64,7 +64,6 @@ namespace nc
 
             byte[] _iv = Encoding.ASCII.GetBytes("DrdsfEikrDslFeof");
             byte[] _data = Encoding.ASCII.GetBytes(data);
-
             byte[] _clipherText = null;
 
             using (ICryptoTransform _encryptor = _symKey.CreateEncryptor(_key, _iv))
@@ -137,7 +136,38 @@ namespace nc
 
         #region asymmetric encryption handshake
 
-        // TODO: get big prime numbers
+        public static string AsymmetricHandshakeTransmitter(NetworkStream stream)
+        {
+            return null;
+        }
+
+        public static string AsymmetricHandshakeReceiver(NetworkStream stream)
+        {
+            return null;
+        }
+
+        private static void ComputeAsymmetricHandshake()
+        { 
+        
+        }
+
+        public static long GetBigPrimeNumber()
+        {
+            return 0;
+        }
+
+        public static byte[] GenRandomPassword(int length)
+        {
+            Random _ran = new Random((int)DateTime.Now.Ticks);
+            byte[] _buffer = new byte[length];
+
+            for (int i = 0; i < length; i++)
+            {
+
+            }
+
+            return _buffer;
+        }
 
         #endregion
 
