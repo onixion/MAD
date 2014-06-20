@@ -1,34 +1,43 @@
 ﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
 
 using MAD.jobSys;
+using MAD.cli.server;
 
 namespace MAD.cli
 {
     public class CLI : CLIFramework
     {
-        public Version version = new Version(1, 5);
-        protected string cursor = "=> ";
+        private Version _version = new Version(1, 6);
+        public Version version { get { return _version; } }
 
+        private string cursor = "=> ";
         public ConsoleColor cursorColor = ConsoleColor.Cyan;
         public ConsoleColor inputColor = ConsoleColor.White;
 
+        private string _dataPath;
         private JobSystem _js;
+        private CLIServer _cliServer;
 
-        public CLI(JobSystem js)
+        public CLI(string dataPath, JobSystem js, CLIServer cliServer)
             :base()
         {
+            _dataPath = dataPath;
             _js = js;
+            _cliServer = cliServer;
 
-            // GENERAL
+            InitCommands();
+        }
+
+        private void InitCommands()
+        {
+            // GENERAL COMMANDS
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
             //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
-            // JOBSYSTEM
+            // JOBSYSTEM COMMANDS
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
@@ -38,22 +47,22 @@ namespace MAD.cli
             commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
 
-            // CLISERVER
+            // CLISERVER COMMANDS
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), null));
             commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), null));
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), null));
 
-            // NOTIFICATION
+            // NOTIFICATION COMMANDS
 
             // OTHER
         }
 
         public void Start()
         {
-            Command _command = null;
-
             CommandIO.WriteToConsole(GetBanner());
             WriteCursor();
+
+            Command _command = null;
 
             while (true)
             {
@@ -61,18 +70,24 @@ namespace MAD.cli
 
                 if (_cliInput != "")
                 {
-                    // check if input is valid
                     string response = AnalyseInput(_cliInput, ref _command);
 
+                    // Check if the parameter and arguments are valid.
                     if (response == "VALID_PARAMETER")
                     {
-                        // Execute command and write output to console
-                        CommandIO.WriteToConsole(_command.Execute());
+                        // Execute command and get response from command.
+                        response = _command.Execute();
+
+                        // When command response with 'EXIT_CLI' the CLI closes.
+                        if (response == "EXIT_CLI")
+                            break;
+
+                        CommandIO.WriteToConsole(response);
                         WriteCursor();
                     }
                     else
                     {
-                        // something went wrong with the input (false arguments, missing arguments, ..)
+                        // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
                         CommandIO.WriteToConsole(response);
                         WriteCursor();
                     }

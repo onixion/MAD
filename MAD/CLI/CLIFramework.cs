@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace MAD.cli
 {
@@ -10,7 +9,7 @@ namespace MAD.cli
         #region member
 
         private Version _version = new Version(1,7);
-        public string versionFramework { get { return _version.ToString(); } }
+        public Version versionFramework { get { return _version; } }
 
         protected List<CommandOptions> commands = new List<CommandOptions>();
 
@@ -19,49 +18,56 @@ namespace MAD.cli
         #region CLI main methodes
 
         /*
-         * This function checks if the parms and args are valid and sets the command
-         * object.
+         * This method checks the parameters and arguments of their validity.
+         * If everything is alright, the command object will be set.
          * 
          * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
-         * If the parameter are not valid it returns the error text. */
+         * If the parameter are not valid it returns the error text, which get displayed ont
+         * the CLI. */
         public string AnalyseInput(string cliInput, ref Command command)
         {
-            // get command
+            // First get the command name.
             string _commandInput = GetCommandName(cliInput);
 
-            // check if command is known by cli
-            if (CommandExists(_commandInput))
+            // Check if the command exists.
+            if (_commandInput != null)
             {
-                // get command options
+                // Get the configuration of the command.
                 CommandOptions _commandOptions = GetCommandOptions(_commandInput);
-                // get parameter and arguments from input
+                // Get the parameters and arguments from input.
                 ParameterInput _parameterInput = GetParamtersFromInput(cliInput);
-                // get command type
+                // Get the command-type.
                 Type _commandType = _commandOptions.commandType;
-
-                // get objects to pass to constructor of the command
+                // Get the needed objects for the constructor of the command.
                 object[] _commandObjects = _commandOptions.commandObjects;
-                // get constructor and pass object[] to it
-                ConstructorInfo _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
+                
+                // Constructor of the command.
+                ConstructorInfo _cInfo;
 
-                // if _cInfo == null, constuctor is wrong
-                if (_cInfo != null)
+                // Check if the command need any objects.
+                if (_commandObjects == null)
                 {
-                    command = (Command)_cInfo.Invoke(new object[]{_commandObjects});
+                    // Command does not need any objects for its constructor.
+                    _cInfo = _commandType.GetConstructor(new Type[0]);
+                    // Invoke the constructor.
+                    command = (Command)_cInfo.Invoke(null);
                 }
                 else
                 {
-                    // try with empty constructor
-                    _cInfo = _commandType.GetConstructor(new Type[0]);
-                    command = (Command)_cInfo.Invoke(null);
+                    // Command need some objects for its constructor.
+                    _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
+                    // Invoke the constructor.
+                    command = (Command)_cInfo.Invoke(new object[]{_commandObjects});
                 }
 
-                // check if the arguments are valid (parameter valid = "VALID_PARAMETER")
+                // Check if the parameters and arguments are valid.
                 string _parameterValid = command.ValidParameters(_parameterInput);
 
-                // set parameters if the parameter are valid
+                /* If the parameters and arguments are valid then '_parameterValid' is
+                 * equal to 'VALID_PARAMETERS'. */
                 if (_parameterValid == "VALID_PARAMETER")
                 {
+                    // Set parameters and arguments of the command.
                     command.SetParameters(_parameterInput);
                 }
 
@@ -79,24 +85,28 @@ namespace MAD.cli
 
         protected string GetCommandName(string input)
         {
-            string[] buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] _buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (buffer.Length != 0)
+            if (_buffer.Length != 0)
             {
-                if (buffer[0] == "")
+                if (_buffer[0] == "")
+                {
                     return null;
+                }
 
-                buffer[0] = buffer[0].Trim();
+                _buffer[0] = _buffer[0].Trim();
 
-                return buffer[0];
+                return _buffer[0];
             }
             else
+            {
                 return null;
+            }
         }
 
         protected ParameterInput GetParamtersFromInput(string input)
         {
-            ParameterInput parameterTemp = new ParameterInput();
+            ParameterInput _parameterTemp = new ParameterInput();
 
             string[] _temp = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -112,7 +122,7 @@ namespace MAD.cli
                 if (_temp2.Length == 1)
                 {
                     // parameter arguments are null
-                    parameterTemp.parameters.Add(new Parameter(_temp2[0], null));
+                    _parameterTemp.parameters.Add(new Parameter(_temp2[0], null));
                 }
                 else
                 {
@@ -120,7 +130,7 @@ namespace MAD.cli
                     if (_temp2.Length == 2)
                     {
                         // one argument
-                        parameterTemp.parameters.Add(new Parameter(_temp2[0], new object[] { _temp2[1] }));
+                        _parameterTemp.parameters.Add(new Parameter(_temp2[0], new object[] { _temp2[1] }));
                     }
                     else
                     { 
@@ -132,30 +142,17 @@ namespace MAD.cli
                             _buffer[i2-1] = _temp2[i2];
                         }
 
-                        parameterTemp.parameters.Add(new Parameter(_temp2[0], _buffer));
+                        _parameterTemp.parameters.Add(new Parameter(_temp2[0], _buffer));
                     }
                 }
             }
 
-            return parameterTemp;
+            return _parameterTemp;
         }
 
         #endregion
 
         #region CLI internal methodes
-
-        protected bool CommandExists(string command)
-        {
-            foreach (CommandOptions temp in commands)
-            {
-                if (temp.command == command)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
 
         protected CommandOptions GetCommandOptions(string command)
         {
