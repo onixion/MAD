@@ -6,7 +6,7 @@ using System.Text;
 using System.IO;
 using nc;
 
-namespace MAD.cli.server
+namespace MAD.cli
 {
     public class CLIServer : CLIServerInternal
     {

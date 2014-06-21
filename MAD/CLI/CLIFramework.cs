@@ -15,16 +15,16 @@ namespace MAD.cli
 
         #endregion
 
-        #region CLI main methodes
+        #region methodes
 
         /*
          * This method checks the parameters and arguments of their validity.
          * If everything is alright, the command object will be set.
          * 
          * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
-         * If the parameter are not valid it returns the error text, which get displayed ont
+         * If the parameter are not valid it returns the error text, which get displayed onto
          * the CLI. */
-        public string AnalyseInput(string cliInput, ref Command command)
+        protected string AnalyseInput(string cliInput, ref Command command)
         {
             // First get the command-name.
             string _commandInput = GetCommandName(cliInput);
@@ -78,11 +78,7 @@ namespace MAD.cli
             return _parameterValid;
         }
 
-        #endregion
-
-        #region CLI format methodes
-
-        protected string GetCommandName(string input)
+        private string GetCommandName(string input)
         {
             string[] _buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -103,7 +99,7 @@ namespace MAD.cli
             }
         }
 
-        protected ParameterInput GetParamtersFromInput(string input)
+        private ParameterInput GetParamtersFromInput(string input)
         {
             ParameterInput _parameterTemp = new ParameterInput();
 
@@ -149,11 +145,7 @@ namespace MAD.cli
             return _parameterTemp;
         }
 
-        #endregion
-
-        #region CLI internal methodes
-
-        protected CommandOptions GetCommandOptions(string command)
+        private CommandOptions GetCommandOptions(string command)
         {
             foreach (CommandOptions temp in commands)
             {
@@ -164,15 +156,6 @@ namespace MAD.cli
             }
 
             return null;
-        }
-
-        #endregion
-
-        #region CLI TimeStamp
-
-        protected string GetTimeStamp()
-        {
-            return DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
         }
 
         #endregion

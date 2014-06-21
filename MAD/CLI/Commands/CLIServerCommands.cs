@@ -1,7 +1,5 @@
 ﻿using System;
 
-using MAD.cli.server;
-
 namespace MAD.cli
 {
     public class CLIServerInfo : Command

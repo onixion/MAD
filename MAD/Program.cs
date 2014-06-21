@@ -2,7 +2,6 @@
 
 using MAD.jobSys;
 using MAD.cli;
-using MAD.cli.server;
 
 namespace MAD
 {

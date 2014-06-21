@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 using MAD.jobSys;
-using MAD.cli.server;
 
 namespace MAD.cli
 {
@@ -10,9 +11,11 @@ namespace MAD.cli
         private Version _version = new Version(1, 6);
         public Version version { get { return _version; } }
 
-        private string cursor = "=> ";
-        public ConsoleColor cursorColor = ConsoleColor.Cyan;
-        public ConsoleColor inputColor = ConsoleColor.White;
+        private string _cursor = "=> ";
+        private ConsoleColor _cursorColor = ConsoleColor.Cyan;
+        private ConsoleColor _inputColor = ConsoleColor.White;
+
+        private List<string> _cliHistory = new List<string>(20);
 
         private string _dataPath;
         private JobSystem _js;
@@ -35,7 +38,6 @@ namespace MAD.cli
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-            //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
 
             // JOBSYSTEM COMMANDS
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
@@ -66,7 +68,10 @@ namespace MAD.cli
                 WriteCursor();
 
                 Command _command = null;
-                string _cliInput = Console.ReadLine();
+
+                //string _cliInput = Console.ReadLine();
+
+                string _cliInput = ReadInput();
 
                 if (_cliInput != "")
                 {
@@ -94,11 +99,40 @@ namespace MAD.cli
             }
         }
 
+        private string ReadInput()
+        {
+            string _cliInput = "";
+
+            while (true)
+            {
+                ConsoleKeyInfo _key = Console.ReadKey();
+
+                if (_key.Key == ConsoleKey.Enter)
+                {
+                    break;
+                }
+                else if (_key.Key == ConsoleKey.Backspace)
+                {
+                    // Problem: Windows do not recognized '\b' properly.
+                }
+                else if (_key.Key == ConsoleKey.UpArrow)
+                { 
+                
+                }
+
+                _cliInput += _key.KeyChar.ToString();
+            }
+
+            Console.Write("\n");
+
+            return _cliInput;
+        }
+
         private void WriteCursor()
         {
-            Console.ForegroundColor = cursorColor;
-            Console.Write(cursor);
-            Console.ForegroundColor = inputColor;
+            Console.ForegroundColor = _cursorColor;
+            Console.Write(_cursor);
+            Console.ForegroundColor = _inputColor;
         }
 
         private string GetBanner()

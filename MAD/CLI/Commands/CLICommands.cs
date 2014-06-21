@@ -8,7 +8,7 @@ namespace MAD.cli
         public ExitCommand()
             : base()
         {
-            description = "This command exit the program.";
+            description = "This command exits the program.";
         }
 
         public override string Execute()
@@ -148,12 +148,24 @@ namespace MAD.cli
 
             foreach (ParameterOption _temp in _command.requiredParameter)
             {
-                _buffer += " -" + _temp.parameter + " <" + _temp.parameterInfo + ">";
+                _buffer += " -" + _temp.parameter;
+
+                if (!_temp.argumentEmpty)
+                {
+                    _buffer += " <" + _temp.parameterInfo + ">";
+                }
             }
 
             foreach (ParameterOption _temp in _command.optionalParameter)
             {
-                _buffer += " [-" + _temp.parameter + " <" + _temp.parameterInfo + ">]";
+                _buffer += " [-" + _temp.parameter;
+
+                if (!_temp.argumentEmpty)
+                { 
+                    _buffer += " <" + _temp.parameterInfo + ">";
+                }
+
+                _buffer += "]";
             }
 
             return _buffer;
@@ -166,6 +178,7 @@ namespace MAD.cli
             :base()
         {
             optionalParameter.Add(new ParameterOption("hack", null, null, true, false, null));
+            description = "This command shows informations about the program.";
         }
 
         public override string Execute()
@@ -203,58 +216,4 @@ namespace MAD.cli
             return output;
         }
     }
-
-    /*
-    public class TestCommand : Command
-    {
-        public TestCommand()
-            : base()
-        {
-            // add parameters and other things
-            requiredParameter.Add(new ParameterOption("par", "TEXT", "Text to print to console.", false, true, new Type[] { typeof(string) }));
-            optionalParameter.Add(new ParameterOption("par2", "INTEGER", "Integer to print to console.", false, true, new Type[] { typeof(int) }));
-            description = "This command is used to test the CLI.";
-        }
-
-        public override string Execute()
-        {
-            // The Parameter "par" has multipleArguments on true, so that means
-            // we get an array of objects, which we can convert to strings.
-            object[] _buffer = parameters.GetParameter("par").argumentValue;
-
-            // Because "par" is a required-parameter, we do not need to check
-            // the value of it (optional-parameters need to be checked first!).
-            output += "<color><white>Arguments of parameter 'par':\n";
-
-            foreach (object _temp in _buffer)
-            {
-                output += "\t" + _temp.ToString();
-            }
-
-            output += "\n";
-
-            // The parameter "par2" is an optional parameter, so we do not know for
-            // sure if the user have set it or not. So we need to check, if the
-            // parameter is used. Also it wants arguments as integer.
-            if (OptionalParameterUsed("par2"))
-            {
-                // get arguments
-                object[] _buffer2 = parameters.GetParameter("par2").argumentValue;
-
-                output += "<color><white>Arguments of parameter 'par2':\n";
-
-                foreach (object _temp in _buffer2)
-                {
-                    output += "\t" + _temp.ToString();
-                }
-            }
-            else
-            {
-                output += "<color><red>Parameter 'par2' not used.\n";
-            }
-
-            return output;
-        }
-    }
-     * */
 }
