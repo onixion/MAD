@@ -6,21 +6,27 @@ using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 
-namespace MAD.HostDetection
+namespace MAD.HostDetect
 {
     public class NetworkHelper
-    {/* SORRY DANI!
-        public Byte[] GetHosts(IPAddress address, IPAddress subnet)
+    {
+        public Byte[] GetHosts(IPAddress subnet)
         {
-            byte[] byteAddress = address.GetAddressBytes();
+            byte[] byteSubnet = subnet.GetAddressBytes();
 
-            //Loading
+            for (int i = 0; i < byteSubnet.Length; i++)
+            {
+                byteSubnet[i] = (byte)~byteSubnet[i];
+            }
 
+            return (byteSubnet);
         }
 
-        public Byte[] GetNet(IPAddress address, IPAddress subnet)
+        public Byte[] GetNet(IPAddress subnet)                      //Not really a komplex function, just for completeness
         {
-            //Loading
-        }*/
+            byte[] byteSubnet = subnet.GetAddressBytes();
+
+            return (byteSubnet);
+        }
     }
 }
