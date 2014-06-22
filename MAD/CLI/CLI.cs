@@ -11,6 +11,7 @@ namespace MAD.cli
         private Version _version = new Version(1, 6);
         public Version version { get { return _version; } }
 
+        private int _maxHistoryEntries = 5;
         private string _cursor = "=> ";
         private ConsoleColor _cursorColor = ConsoleColor.Cyan;
         private ConsoleColor _inputColor = ConsoleColor.White;
@@ -101,7 +102,7 @@ namespace MAD.cli
         private string ReadInput()
         {
             string _cliInput = "";
-            int _historyPointer = 0;
+            int _historyPointer = -1;
 
             while (true)
             {
@@ -111,12 +112,11 @@ namespace MAD.cli
 
                 if (_key.Key == ConsoleKey.Enter)
                 {
-                    _cliHistory.Add(_cliInput);
+                    AddToHistory(_cliInput);
                     break;
                 }
                 else if (_key.Key == ConsoleKey.Backspace)
                 {
-                    // Problem: Windows does not recognized '\b' properly.
                     if (_cursorPos == _cursor.Length - 1)
                     {
                         Console.Write(" ");
@@ -127,15 +127,55 @@ namespace MAD.cli
                         _cliInput = _cliInput.Remove(_cliInput.Length - 1);
                     }
                 }
+                else if (_key.Key == ConsoleKey.LeftArrow)
+                {
+                    ShiftCursorLeft();
+
+                    if (_cursor.Length < Console.CursorLeft)
+                    {
+                        ShiftCursorLeft();
+                    }
+                }
+                else if (_key.Key == ConsoleKey.RightArrow)
+                {
+                    // HERE
+
+                    if (_cliInput.Length <= Console.CursorLeft)
+                    {
+                        ShiftCursorLeft();
+                    }
+                }
                 else if (_key.Key == ConsoleKey.UpArrow)
                 {
-                    string _lastInput = GetLastHistoryEntry(_historyPointer);
-                    _historyPointer++;
+                    Console.Write(" \b");
 
-                    while (_cursorPos != _cursor.Length - 1)
-                    { 
-                    
+                    if (_cliHistory.Count - 1 > _historyPointer)
+                    {
+                        _historyPointer++;
                     }
+
+                    string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                    ClearInput(_cliInput);
+                    WriteIntoInput(_lastInput);
+
+                    _cliInput = _lastInput;
+                }
+                else if (_key.Key == ConsoleKey.DownArrow)
+                {
+                    Console.Write(" \b");
+
+                    if (0 < _historyPointer)
+                    {
+                        _historyPointer--;
+                    }
+
+                    string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                    ClearInput(_cliInput);
+                    WriteIntoInput(_lastInput);
+                 
+                    _cliInput = _lastInput;
                 }
                 else
                 {
@@ -148,9 +188,51 @@ namespace MAD.cli
             return _cliInput;
         }
 
-        private string GetLastHistoryEntry(int offset)
+        private string GetLastHistoryEntry(int pointer)
         {
-            return _cliHistory[_cliHistory.Count - 1 - offset];
+            if (pointer != -1)
+            {
+                return _cliHistory[_cliHistory.Count - 1 - pointer];
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        private void AddToHistory(string command)
+        {
+            if (_cliHistory.Count >= _maxHistoryEntries)
+            {
+                _cliHistory.RemoveAt(0);
+                _cliHistory.Add(command);
+            }
+            else
+            {
+                _cliHistory.Add(command);
+            }
+        }
+
+        private void ClearInput(string text)
+        {
+            Console.SetCursorPosition(_cursor.Length, Console.CursorTop);
+            Console.Write("".PadLeft(text.Length, ' '));
+        }
+
+        private void WriteIntoInput(string text)
+        {
+            Console.SetCursorPosition(_cursor.Length, Console.CursorTop);
+            Console.Write(text);
+        }
+
+        private void ShiftCursorLeft()
+        {
+            Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+        }
+
+        private void ShiftCursorRight()
+        {
+            Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
         }
 
         private void WriteCursor()
