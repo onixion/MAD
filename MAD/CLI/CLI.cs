@@ -15,7 +15,7 @@ namespace MAD.cli
         private ConsoleColor _cursorColor = ConsoleColor.Cyan;
         private ConsoleColor _inputColor = ConsoleColor.White;
 
-        private List<string> _cliHistory = new List<string>(20);
+        private List<string> _cliHistory = new List<string>();
 
         private string _dataPath;
         private JobSystem _js;
@@ -65,12 +65,11 @@ namespace MAD.cli
 
             while (true)
             {
-                WriteCursor();
-
                 Command _command = null;
 
-                //string _cliInput = Console.ReadLine();
+                WriteCursor();
 
+                //string _cliInput = Console.ReadLine();
                 string _cliInput = ReadInput();
 
                 if (_cliInput != "")
@@ -102,30 +101,56 @@ namespace MAD.cli
         private string ReadInput()
         {
             string _cliInput = "";
+            int _historyPointer = 0;
 
             while (true)
             {
                 ConsoleKeyInfo _key = Console.ReadKey();
 
+                int _cursorPos = Console.CursorLeft;
+
                 if (_key.Key == ConsoleKey.Enter)
                 {
+                    _cliHistory.Add(_cliInput);
                     break;
                 }
                 else if (_key.Key == ConsoleKey.Backspace)
                 {
-                    // Problem: Windows do not recognized '\b' properly.
+                    // Problem: Windows does not recognized '\b' properly.
+                    if (_cursorPos == _cursor.Length - 1)
+                    {
+                        Console.Write(" ");
+                    }
+                    else
+                    {
+                        Console.Write(" \b");
+                        _cliInput = _cliInput.Remove(_cliInput.Length - 1);
+                    }
                 }
                 else if (_key.Key == ConsoleKey.UpArrow)
-                { 
-                
-                }
+                {
+                    string _lastInput = GetLastHistoryEntry(_historyPointer);
+                    _historyPointer++;
 
-                _cliInput += _key.KeyChar.ToString();
+                    while (_cursorPos != _cursor.Length - 1)
+                    { 
+                    
+                    }
+                }
+                else
+                {
+                    _cliInput += _key.KeyChar.ToString();
+                }
             }
 
             Console.Write("\n");
 
             return _cliInput;
+        }
+
+        private string GetLastHistoryEntry(int offset)
+        {
+            return _cliHistory[_cliHistory.Count - 1 - offset];
         }
 
         private void WriteCursor()
