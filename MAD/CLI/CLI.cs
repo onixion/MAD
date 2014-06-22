@@ -140,7 +140,13 @@ namespace MAD.cli
                 {
                     // HERE
 
-                    if (_cliInput.Length <= Console.CursorLeft)
+                    if (_cursor.Length + _cliInput.Length + 1 > Console.CursorLeft)
+                    {
+                        char _overwrittenChar = GetOverwrittenChar(_cliInput, Console.CursorLeft - 1);
+                        ShiftCursorLeft();
+                        Console.Write(_overwrittenChar);
+                    }
+                    else
                     {
                         ShiftCursorLeft();
                     }
@@ -186,6 +192,11 @@ namespace MAD.cli
             Console.Write("\n");
 
             return _cliInput;
+        }
+
+        private char GetOverwrittenChar(string cliInput, int pos)
+        {
+            return cliInput[pos - _cursor.Length];
         }
 
         private string GetLastHistoryEntry(int pointer)
