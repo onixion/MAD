@@ -7,6 +7,3 @@ PLEASE NOTICE THESE RULES:
 3# 	You can make your own branches and merge them, but 
 	do not merge into other peoples branches or the branch 'master'.
 
-4# 	Public members, which other parts of the program 
-	uses, can not just be renamed. If you want to rename 
-	something, wait until the branches get merged togheter.
