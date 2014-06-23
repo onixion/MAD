@@ -130,26 +130,10 @@ namespace MAD.cli
                 else if (_key.Key == ConsoleKey.LeftArrow)
                 {
                     ShiftCursorLeft();
-
-                    if (_cursor.Length < Console.CursorLeft)
-                    {
-                        ShiftCursorLeft();
-                    }
                 }
                 else if (_key.Key == ConsoleKey.RightArrow)
                 {
-                    // HERE
-
-                    if (_cursor.Length + _cliInput.Length + 1 > Console.CursorLeft)
-                    {
-                        char _overwrittenChar = GetOverwrittenChar(_cliInput, Console.CursorLeft - 1);
-                        ShiftCursorLeft();
-                        Console.Write(_overwrittenChar);
-                    }
-                    else
-                    {
-                        ShiftCursorLeft();
-                    }
+                    ShiftCursorLeft();
                 }
                 else if (_key.Key == ConsoleKey.UpArrow)
                 {
@@ -192,11 +176,6 @@ namespace MAD.cli
             Console.Write("\n");
 
             return _cliInput;
-        }
-
-        private char GetOverwrittenChar(string cliInput, int pos)
-        {
-            return cliInput[pos - _cursor.Length];
         }
 
         private string GetLastHistoryEntry(int pointer)
