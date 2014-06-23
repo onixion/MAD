@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace MAD.jobSys
+namespace MAD.JobSystem
 {
     public class JobOptions
     {
@@ -9,7 +9,7 @@ namespace MAD.jobSys
 
         public string jobName;
         public JobType jobType;
-        public enum JobType { NULL, PingRequest, PortRequest, HttpRequest }
+        public enum JobType { NULL, PingRequest, PortRequest, HttpRequest, HostDetect }
         public JobTime jobTime = new JobTime();
         public JobOutput jobOutput = new JobOutput();
 
