@@ -14,16 +14,17 @@ namespace MAD.jobSys
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
-        public int jobsCapacity { get { return jobs.Capacity; } }
+
+        private int _maxJobs = 100;
+        public int maxJobs { get { return _maxJobs; } }
 
         #endregion
 
         #region constructor
 
-        public JobSystem(string dataPath, int jobsCapacity)
+        public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
-            jobs.Capacity = jobsCapacity;
         }
 
         #endregion
@@ -58,7 +59,14 @@ namespace MAD.jobSys
 
         public void CreateJob(Job job)
         {
-            jobs.Add(job);
+            if (_maxJobs >= jobs.Count)
+            {
+                jobs.Add(job);
+            }
+            else
+            {
+                throw new Exception("Job could not be added, becauce the jobsystem has reached the max numbers of jobs.");
+            }
         }
 
         public void DestroyJob(int jobID)

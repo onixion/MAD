@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 using MAD.jobSys;
 using MAD.cli;
@@ -11,17 +12,19 @@ namespace MAD
 
         private const string dataPath = "data";
 
+        [STAThread]
         static int Main(string[] args)
         {
-            JobSystem js = new JobSystem(dataPath, 100);
-
+            JobSystem js = new JobSystem(dataPath);
             CLIServer cliServer = new CLIServer(dataPath, 999);
             CLI cli = new CLI(dataPath, js, cliServer);
             
-
             if (args.Length == 0)
             { 
                 // START GUI
+                Application.EnableVisualStyles();
+                Application.Run(new Form());
+
                 cli.Start();
             }
             else if (args.Length == 1)
