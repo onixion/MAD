@@ -8,7 +8,7 @@ namespace MAD
 {
     class Program
     {
-        /* MAD - Network Monitoring v0.0.2.9 RC1 */
+        /* MAD - Network Monitoring v0.0.2.9 RC2 */
 
         private const string dataPath = "data";
 
