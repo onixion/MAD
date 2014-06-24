@@ -144,6 +144,66 @@ namespace MAD.cli
     
     }
 
+    public class JobSystemAddHostDetectCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemAddHostDetectCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            description = "This command adds a job with the jobtype 'HostDetect' to the jobsystem.";
+        }
+
+        public override string Execute()
+        {
+            JobHostDetect _job = new JobHostDetect();
+
+            _job.jobOptions.jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            _job.jobOptions.jobType = JobOptions.JobType.HostDetect;
+
+            _job.Net = (IPAddress)parameters.GetParameter("a").argumentValue[0];
+            _job.Net = (IPAddress)parameters.GetParameter("m").argumentValue[0];
+
+            if (OptionalParameterUsed("t"))
+            {
+                Type _argumentType = GetArgumentType("t");
+
+                if (_argumentType == typeof(int))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobOptions.jobTime.jobDelay = (int)parameters.GetParameter("t").argumentValue[0];
+                }
+                else if (_argumentType == typeof(string))
+                {
+                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+
+                    try
+                    {
+                        _job.jobOptions.jobTime.jobTimes = _job.jobOptions.jobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
+                }
+            }
+            else
+            {
+                _job.jobOptions.jobTime.jobDelay = 20000;
+                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+            }
+
+            _js.CreateJob(_job);
+
+            return output;
+        }
+    }
+
     public class JobSystemAddPingCommand : Command
     {
         private JobSystem _js;

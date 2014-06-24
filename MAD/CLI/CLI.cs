@@ -48,6 +48,7 @@ namespace MAD.cli
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
