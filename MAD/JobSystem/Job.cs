@@ -62,12 +62,18 @@ namespace MAD.jobSys
             }
         }
 
-        public void TryExecute()
+        public void LaunchJob()
         {
             if (jobState == State.Running)
             {
                 Execute();
                 jobOutput.jobOutputTime = DateTime.Now;
+
+                // Check if any notification is necessary.
+                if (!jobOptions.jobNotification.CheckRules())
+                {
+                    // MAKE A NOTIFICATION
+                }
             }
         }
 

@@ -88,7 +88,7 @@ namespace MAD.jobSys
                 if (_jobTime.jobDelayRemaining <= 0)
                 {
                     _jobTime.jobDelayRemaining = _jobTime.jobDelay;
-                    job.TryExecute();
+                    job.LaunchJob();
                 }
             }
             else if (_jobTime.type == JobTime.TimeType.Absolute)
@@ -96,8 +96,8 @@ namespace MAD.jobSys
                 foreach (JobTimeHandler _handler in _jobTime.jobTimes)
                 {
                     if (_handler.CheckTime(time))
-                    { 
-                        job.TryExecute();
+                    {
+                        job.LaunchJob();
                     }
                 }
             }
