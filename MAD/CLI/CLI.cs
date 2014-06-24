@@ -238,13 +238,12 @@ namespace MAD.cli
         {
             string _buffer = "";
 
-            _buffer += "<color><cyan>";
-            _buffer += @" ___  ___  ___ ______ " + "\n";
-            _buffer += @" |  \/  | / _ \|  _  \" + "\n";
-            _buffer += @" | .  . |/ /_\ \ | | |" + "\n";
-            _buffer += @" | |\/| ||  _  | | | |" + "\n";
-            _buffer += @" | |  | || | | | |_/ |" + "\n";
-            _buffer += @" \_|  |_/\_| |_/_____/" + "\n";
+            _buffer += @"<color><cyan> ___  ___  ___ ______ " + "\n";
+            _buffer += @"<color><cyan> |  \/  | / _ \|  _  \" + "\n";
+            _buffer += @"<color><cyan> |      |/ /_\ \ | | |" + "\n";
+            _buffer += @"<color><cyan> | |\/| ||  _  | | | | <color><yellow>VERSION <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
+            _buffer += @"<color><cyan> | |  | || | | | |_/ | <color><yellow>TIME: <color><white>" + DateTime.Now.ToString("HH:mm:ss") + " <color><yellow>DATE: <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
+            _buffer += @"<color><cyan> \_|  |_/\_| |_/_____/_________________________________" + "\n";
 
             return _buffer;
         }
