@@ -14,9 +14,9 @@ namespace MAD.jobSys
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
-        private Object _jobsLock = new Object();
+        public Object jobsLock = new Object();
 
-        private int _maxJobs = 100;
+        private int _maxJobs = 1;
         public int maxJobs { get { return _maxJobs; } }
 
         private JobScedule _scedule;
@@ -29,7 +29,7 @@ namespace MAD.jobSys
         public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
-            _scedule = new JobScedule(jobs, _jobsLock);
+            _scedule = new JobScedule(jobs, jobsLock);
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace MAD.jobSys
 
         public void CreateJob(Job job)
         {
-            if (_maxJobs >= jobs.Count)
+            if (_maxJobs > jobs.Count)
             {
                 jobs.Add(job);
             }
@@ -84,33 +84,27 @@ namespace MAD.jobSys
             }
         }
 
-        public void DestroyJob(int jobID)
+        public bool DestroyJob(int jobID)
         {
-            Job _job = GetJob(jobID);
-
-            if (_job == null)
+            lock (jobsLock)
             {
-                throw new Exception("Job does not exist!");
-            }
-
-            for (int i = 0; i < jobs.Count; i++)
-            {
-                if (jobs[i].jobID == jobID)
+                for(int i = 0; i < jobs.Count; i++)
                 {
-                    // NOT TESTED YET!
-
-                    if (jobs[i].jobState == Job.State.Stopped)
+                    if (jobs[i].jobID == jobID)
                     {
                         jobs.RemoveAt(i);
+                        return true;
                     }
-
-                    break;
                 }
+
+                return false;
             }
         }
 
         public void DestroyAllJobs()
         {
+            int _jobsCount = jobs.Count;
+
             for (int i = 0; i < jobs.Count; i++)
             {
                 DestroyJob(jobs[i].jobID);
@@ -155,11 +149,14 @@ namespace MAD.jobSys
         {
             int _count = 0;
 
-            for (int i = 0; i < jobs.Count; i++)
+            lock (jobsLock)
             {
-                if (jobs[i].jobState == Job.State.Running)
+                for (int i = 0; i < jobs.Count; i++)
                 {
-                    _count++;
+                    if (jobs[i].jobState == Job.State.Running)
+                    {
+                        _count++;
+                    }
                 }
             }
 
@@ -170,11 +167,14 @@ namespace MAD.jobSys
         {
             int _count = 0;
 
-            for (int i = 0; i < jobs.Count; i++)
+            lock (jobsLock)
             {
-                if (jobs[i].jobState == Job.State.Stopped)
+                for (int i = 0; i < jobs.Count; i++)
                 {
-                    _count++;
+                    if (jobs[i].jobState == Job.State.Stopped)
+                    {
+                        _count++;
+                    }
                 }
             }
 
@@ -183,15 +183,15 @@ namespace MAD.jobSys
 
         public void ClearJobTable()
         {
-            jobs.Clear();
+            lock (jobsLock)
+            {
+                jobs.Clear();
+            }
         }
 
         public void SaveJobTable(string path)
         {
-            foreach (Job _temp in jobs)
-            { 
-                // TODO
-            }
+            // TODO
         }
 
         public void LoadJobTable(string path)

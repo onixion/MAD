@@ -22,8 +22,20 @@ namespace MAD.cli
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
-            output += "Scedule-State:    " + _js.sceduleState.ToString() +"\n\n";
+            output += "Scedule-State: ";
 
+            if (_js.sceduleState == JobScedule.State.Running)
+            {
+                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+            else
+            {
+                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+
+            output += "\n\n";
+
+            output += "Jobs max:         " + _js.maxJobs + "\n";
             output += "Jobs initialized: " + _js.jobs.Count + "\n";
             output += "Jobs running:     " + _js.JobsRunning() + "\n";
             output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
@@ -33,35 +45,38 @@ namespace MAD.cli
             output += _jobTable.splitline + "\n";
             output += "<color><white>";
 
-            foreach (Job _temp in _js.jobs)
+            lock (_js.jobsLock)
             {
-                tableRow[0] = _temp.jobID.ToString();
-                tableRow[1] = _temp.jobOptions.jobName;
-                tableRow[2] = _temp.jobOptions.jobType.ToString();
-                tableRow[3] = _temp.jobOptions.jobTime.type.ToString();
-
-                if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                foreach (Job _temp in _js.jobs)
                 {
-                    tableRow[4] = _temp.jobOptions.jobTime.jobDelay.ToString();
-                }
-                else if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
-                {
-                    tableRow[4] = "";
+                    tableRow[0] = _temp.jobID.ToString();
+                    tableRow[1] = _temp.jobOptions.jobName;
+                    tableRow[2] = _temp.jobOptions.jobType.ToString();
+                    tableRow[3] = _temp.jobOptions.jobTime.type.ToString();
 
-                    foreach(JobTimeHandler _temp2 in _temp.jobOptions.jobTime.jobTimes)
+                    if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                     {
-                        tableRow[4] += _temp2.JobTimeStatus() + " ";
+                        tableRow[4] = _temp.jobOptions.jobTime.jobDelay.ToString();
                     }
-                }
-                else
-                {
-                    tableRow[4] = "NULL";
-                }
+                    else if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+                    {
+                        tableRow[4] = "";
 
-                tableRow[5] = _temp.jobState.ToString();
-                tableRow[6] = _temp.jobOutput.jobState.ToString();
+                        foreach (JobTimeHandler _temp2 in _temp.jobOptions.jobTime.jobTimes)
+                        {
+                            tableRow[4] += _temp2.JobTimeStatus() + " ";
+                        }
+                    }
+                    else
+                    {
+                        tableRow[4] = "NULL";
+                    }
 
-                output += _jobTable.FormatStringArray(tableRow);
+                    tableRow[5] = _temp.jobState.ToString();
+                    tableRow[6] = _temp.jobOutput.jobState.ToString();
+
+                    output += _jobTable.FormatStringArray(tableRow);
+                }
             }
 
             return output;
@@ -205,7 +220,14 @@ namespace MAD.cli
                 _job.ttl = (int)parameters.GetParameter("ttl").argumentValue[0];
             }
 
-            _js.CreateJob(_job);
+            try
+            {
+                _js.CreateJob(_job);
+            }
+            catch (Exception e)
+            {
+                output = "<color><red>" + e.Message;
+            }
 
             return output;
         }
@@ -270,7 +292,14 @@ namespace MAD.cli
                 _job.port = (int)parameters.GetParameter("p").argumentValue[0];
             }
 
-            _js.CreateJob(_job);
+            try
+            {
+                _js.CreateJob(_job);
+            }
+            catch (Exception e)
+            {
+                output = "<color><red>" + e.Message;
+            }
 
             return output;
         }
@@ -332,7 +361,14 @@ namespace MAD.cli
                 _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
             }
 
-            _js.CreateJob(_job);
+            try
+            {
+                _js.CreateJob(_job);
+            }
+            catch (Exception e)
+            {
+                output = "<color><red>" + e.Message;
+            }
 
             return output;
         }
