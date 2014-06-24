@@ -117,6 +117,18 @@ namespace MAD.cli
                     AddToHistory(_cliInput);
                     break;
                 }
+                else if (_key.Key == ConsoleKey.Tab)
+                {
+                    ShiftCursorLeft();
+                    ShiftCursorLeft();
+                    ShiftCursorLeft();
+                    ShiftCursorLeft();
+                    ShiftCursorLeft();
+                }
+                else if (_key.Key == ConsoleKey.Escape)
+                {
+                    _cliInput = "";
+                }
                 else if (_key.Key == ConsoleKey.Backspace)
                 {
                     if (_cursorPos == _cursor.Length - 1)
@@ -168,7 +180,7 @@ namespace MAD.cli
 
                     ClearInput(_cliInput);
                     WriteIntoInput(_lastInput);
-                 
+
                     _cliInput = _lastInput;
                 }
                 else
