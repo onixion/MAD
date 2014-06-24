@@ -7,6 +7,7 @@ namespace MAD.jobSys
     public class JobScedule
     {
         private List<Job> _jobs;
+        private Object _jobsLock;
 
         private Thread _cycleThread;
         private object _cycleThreadLock = new object();
@@ -16,9 +17,10 @@ namespace MAD.jobSys
         private State _state = State.Stopped;
         public State state { get { return _state; } }
 
-        public JobScedule(List<Job> jobs)
+        public JobScedule(List<Job> jobs, Object jobsLock)
         {
             _jobs = jobs;
+            _jobsLock = jobsLock;
         }
 
         public void Start()
@@ -59,10 +61,13 @@ namespace MAD.jobSys
                 Thread.Sleep(_cycleTime);
 
                 DateTime _time = DateTime.Now;
-               
-                foreach(Job _job in _jobs)
+
+                lock (_jobsLock)
                 {
-                    CheckJobTimeAndExecute(_time, _job);
+                    foreach (Job _job in _jobs)
+                    {
+                        CheckJobTimeAndExecute(_time, _job);
+                    }
                 }
 
                 if (_state == State.StopRequest)

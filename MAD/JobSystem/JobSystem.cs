@@ -14,6 +14,8 @@ namespace MAD.jobSys
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
+        private Object _jobsLock = new Object();
+
         private int _maxJobs = 100;
         public int maxJobs { get { return _maxJobs; } }
 
@@ -27,7 +29,7 @@ namespace MAD.jobSys
         public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
-            _scedule = new JobScedule(jobs);
+            _scedule = new JobScedule(jobs, _jobsLock);
         }
 
         #endregion
