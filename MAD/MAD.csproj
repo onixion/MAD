@@ -71,6 +71,7 @@
     <Compile Include="Helper\HostDetectBACKUP.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobScedule.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\JobOptions.cs" />

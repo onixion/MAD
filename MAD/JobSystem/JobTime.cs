@@ -13,6 +13,7 @@ namespace MAD.jobSys
 
         public List<JobTimeHandler> jobTimes;
         public int jobDelay;
+        public int jobDelayRemaining;
 
         #endregion
 
@@ -33,6 +34,7 @@ namespace MAD.jobSys
         {
             type = TimeType.Relativ;
             this.jobDelay = jobDelay;
+            this.jobDelayRemaining = jobDelay;
         }
 
         #endregion

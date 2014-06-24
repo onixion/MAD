@@ -8,7 +8,7 @@ namespace MAD
 {
     class Program
     {
-        /* MAD - Network Monitoring v0.0.2.9 RC2 */
+        /* MAD - Network Monitoring v0.0.2.9 RC3 */
 
         private const string dataPath = "data";
 
@@ -22,8 +22,8 @@ namespace MAD
             if (args.Length == 0)
             { 
                 // START GUI
-                Application.EnableVisualStyles();
-                Application.Run(new Form());
+                //Application.EnableVisualStyles();
+                //Application.Run(new Form());
 
                 cli.Start();
             }

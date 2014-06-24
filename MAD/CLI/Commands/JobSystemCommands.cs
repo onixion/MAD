@@ -22,6 +22,7 @@ namespace MAD.cli
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
+            output += "Scedule-State:    " + _js.GetSceduleState() + "\n";
             output += "Jobs initialized: " + _js.jobs.Count + "\n";
             output += "Jobs running:     " + _js.JobsRunning() + "\n";
             output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
@@ -62,6 +63,40 @@ namespace MAD.cli
             }
 
             return output;
+        }
+    }
+
+    public class JobSceduleStartCommand : Command
+    {
+        JobSystem _js;
+
+        public JobSceduleStartCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+        }
+
+        public override string Execute()
+        {
+            _js.StartScedule();
+            return "<color><green>Scedule started.";
+        }
+    }
+
+    public class JobSceduleStopCommand : Command
+    {
+        JobSystem _js;
+
+        public JobSceduleStopCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+        }
+
+        public override string Execute()
+        {
+            _js.StopScedule();
+            return "<color><green>Scedule stopped.";
         }
     }
 

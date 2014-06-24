@@ -14,6 +14,7 @@ namespace MAD.jobSys
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
+        private JobScedule _scedule;
 
         private int _maxJobs = 100;
         public int maxJobs { get { return _maxJobs; } }
@@ -25,11 +26,27 @@ namespace MAD.jobSys
         public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
+            _scedule = new JobScedule(jobs);
         }
 
         #endregion
 
         #region methodes
+
+        public void StartScedule()
+        {
+            _scedule.Start();
+        }
+
+        public void StopScedule()
+        {
+            _scedule.Stop();
+        }
+
+        public string GetSceduleState()
+        {
+            return _scedule.GetState();
+        }
 
         public bool JobExist(int jobID)
         {
@@ -82,8 +99,12 @@ namespace MAD.jobSys
             {
                 if (jobs[i].jobID == jobID)
                 {
-                    jobs[i].Stop();
-                    jobs.RemoveAt(i);
+                    // NOT TESTED YET!
+
+                    if (jobs[i].jobState == Job.State.Stopped)
+                    {
+                        jobs.RemoveAt(i);
+                    }
 
                     break;
                 }
@@ -94,8 +115,7 @@ namespace MAD.jobSys
         {
             for (int i = 0; i < jobs.Count; i++)
             {
-                jobs[i].Stop();
-                jobs.RemoveAt(i);
+                DestroyJob(jobs[i].jobID);
             }
         }
 
