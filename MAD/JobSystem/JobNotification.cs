@@ -13,7 +13,7 @@ namespace MAD.jobSys
         {
             _mailAddresses = mailAddresses;
         }
-
+        // HERE THIS SHIT
         public bool CheckAllRules()
         {
             foreach (JobNotificationRule _rule in rules)
