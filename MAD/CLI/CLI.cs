@@ -131,10 +131,12 @@ namespace MAD.cli
                 }
                 else if (_key.Key == ConsoleKey.LeftArrow)
                 {
+                    // TODO
                     ShiftCursorLeft();
                 }
                 else if (_key.Key == ConsoleKey.RightArrow)
                 {
+                    // TODO
                     ShiftCursorLeft();
                 }
                 else if (_key.Key == ConsoleKey.UpArrow)
@@ -194,14 +196,17 @@ namespace MAD.cli
 
         private void AddToHistory(string command)
         {
-            if (_cliHistory.Count >= _maxHistoryEntries)
+            if (command != "")
             {
-                _cliHistory.RemoveAt(0);
-                _cliHistory.Add(command);
-            }
-            else
-            {
-                _cliHistory.Add(command);
+                if (_cliHistory.Count >= _maxHistoryEntries)
+                {
+                    _cliHistory.RemoveAt(0);
+                    _cliHistory.Add(command);
+                }
+                else
+                {
+                    _cliHistory.Add(command);
+                }
             }
         }
 
