@@ -6,34 +6,12 @@ namespace MAD.jobSys
 {
     public class JobNotification
     {
-        private List<MailAddress> _mailAddresses = new List<MailAddress>();
+        private MailAddress[] _mailAddresses = new MailAddress[0];
         public List<JobNotificationRule> rules = new List<JobNotificationRule>();
 
-        public JobNotification(List<MailAddress> mailAddresses)
+        public JobNotification(params MailAddress[] mailAddresses)
         {
             _mailAddresses = mailAddresses;
         }
-        // HERE THIS SHIT
-        public bool CheckAllRules()
-        {
-            foreach (JobNotificationRule _rule in rules)
-            {
-                if (_rule.CheckRule() == JobNotificationRule.Result.RuleObserved)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-    public class JobNotificationArgs
-    { 
-        
     }
 }

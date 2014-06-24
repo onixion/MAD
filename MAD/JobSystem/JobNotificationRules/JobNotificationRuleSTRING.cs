@@ -4,39 +4,39 @@ namespace MAD.jobSys
 {
     public class JobNotificationRuleSTRING : JobNotificationRule
     {
-        private string _trackValue;
-        private string _expectedValue;
+        public Operation operation;
+        public enum Operation { Equal, NotEqual, BiggerThan, SmallerThan }
 
-        private Operation _operation;
-        public enum Operation { Equal, NotEqual }
+        public string trackObject;
+        public string operationValue;
 
-        public JobNotificationRuleSTRING(string trackValue, Operation operation, string expectedValue)
+        public JobNotificationRuleSTRING(string trackObject, Operation operation, string operationValue)
+            : base(ObjectType.String)
         {
-            _trackValue = trackValue;
-            _operation = operation;
-            _expectedValue = expectedValue;
+            this.trackObject = trackObject;
+            this.operation = operation;
+            this.operationValue = operationValue;
         }
 
-        public override Result CheckRule()
+        public override bool CheckRuleValidity()
         {
-            switch (_operation)
+            switch (operation)
             {
                 case Operation.Equal:
 
-                    if (_trackValue == _expectedValue)
-                        return Result.RuleObserved;
+                    if (trackObject == operationValue)
+                        return true;
                     else
-                        return Result.RuleNotObserved;
+                        return false;
 
                 case Operation.NotEqual:
 
-                    if (_trackValue != _expectedValue)
-                        return Result.RuleObserved;
+                    if (trackObject != operationValue)
+                        return true;
                     else
-                        return Result.RuleNotObserved;
-
+                        return false;
                 default:
-                    return Result.NULL;
+                    return true;
             }
         }
     }
