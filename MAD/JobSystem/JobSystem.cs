@@ -7,17 +7,18 @@ namespace MAD.jobSys
     {
         #region member
 
-        private Version _version = new Version(1, 6);
+        private Version _version = new Version(1, 7);
         public string version { get { return _version.ToString(); } }
 
         private string _dataPath;
         public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
-        private JobScedule _scedule;
-
         private int _maxJobs = 100;
         public int maxJobs { get { return _maxJobs; } }
+
+        private JobScedule _scedule;
+        public JobScedule.State sceduleState { get { return _scedule.state; } }
 
         #endregion
 
@@ -41,11 +42,6 @@ namespace MAD.jobSys
         public void StopScedule()
         {
             _scedule.Stop();
-        }
-
-        public string GetSceduleState()
-        {
-            return _scedule.GetState();
         }
 
         public bool JobExist(int jobID)

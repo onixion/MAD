@@ -9,7 +9,7 @@ namespace MAD.jobSys
 
         public string jobName;
         public JobType jobType;
-        public enum JobType { NULL, PingRequest, PortRequest, HttpRequest, HostDetect }
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect }
         public JobTime jobTime = new JobTime();
         public JobOutput jobOutput = new JobOutput();
 

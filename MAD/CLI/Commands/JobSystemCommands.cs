@@ -18,15 +18,17 @@ namespace MAD.cli
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value", "Job-State", "Output-State" };
+            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value(s)", "Job-State", "Output-State" };
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
-            output += "Scedule-State:    " + _js.GetSceduleState() + "\n";
+            output += "Scedule-State:    " + _js.sceduleState.ToString() +"\n\n";
+
             output += "Jobs initialized: " + _js.jobs.Count + "\n";
             output += "Jobs running:     " + _js.JobsRunning() + "\n";
             output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
 
+            output += _jobTable.splitline + "\n";
             output += _jobTable.FormatStringArray(tableRow) + "\n";
             output += _jobTable.splitline + "\n";
             output += "<color><white>";
@@ -46,10 +48,10 @@ namespace MAD.cli
                 {
                     tableRow[4] = "";
 
-                    /*foreach(DayTime _temp2 in _temp.jobOptions.jobTime.jobTimes)
+                    foreach(JobTimeHandler _temp2 in _temp.jobOptions.jobTime.jobTimes)
                     {
-                        tableRow[4] += _temp2.hour + ":" + _temp2.minute + " ";
-                    }*/
+                        tableRow[4] += _temp2.JobTimeStatus() + " ";
+                    }
                 }
                 else
                 {
@@ -166,7 +168,7 @@ namespace MAD.cli
 
             JobPing _job = new JobPing();
             _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.PingRequest;
+            _job.jobOptions.jobType = JobOptions.JobType.Ping;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -231,7 +233,7 @@ namespace MAD.cli
             JobHttp _job = new JobHttp();
 
             _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.HttpRequest;
+            _job.jobOptions.jobType = JobOptions.JobType.Http;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -297,7 +299,7 @@ namespace MAD.cli
             JobPort _job = new JobPort();
 
             _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.PortRequest;
+            _job.jobOptions.jobType = JobOptions.JobType.PortScan;
             _job.targetAddress = targetAddress;
             _job.port = port;
 

@@ -18,7 +18,7 @@ namespace MAD.jobSys
         #endregion
 
         public JobPing()
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.PingRequest))
+            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.Ping))
         {
             this.targetAddress = IPAddress.Loopback;
             this.ttl = 250;

@@ -8,11 +8,9 @@ namespace MAD.jobSys
         #region members
 
         private static int _jobsCount = 0;
+        public int jobID;
         private static object _jobInitLock = new object();
 
-        private Thread _jobThread;
-
-        public int jobID;
         public JobOptions jobOptions;
         public JobOutput jobOutput = new JobOutput();
 

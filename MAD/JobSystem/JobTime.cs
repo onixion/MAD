@@ -254,7 +254,6 @@ namespace MAD.jobSys
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
         
-
         #endregion
 
         #region constructors
