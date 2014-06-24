@@ -16,7 +16,7 @@ namespace MAD.jobSys
         #region constructors
 
         public JobPort()
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.PortRequest))
+            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.PortScan))
         {
             this.targetAddress = IPAddress.Loopback;
             this.port = 80;

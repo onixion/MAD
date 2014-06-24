@@ -56,8 +56,9 @@ namespace MAD.jobSys
         {
             while(true)
             {
-                DateTime _time = DateTime.Now;
                 Thread.Sleep(_cycleTime);
+
+                DateTime _time = DateTime.Now;
                
                 foreach(Job _job in _jobs)
                 {
@@ -91,7 +92,6 @@ namespace MAD.jobSys
                 {
                     if (_handler.CheckTime(time))
                     { 
-                        // execute job
                         job.TryExecute();
                     }
                 }

@@ -17,6 +17,8 @@ namespace MAD.jobSys
         public State jobState = State.NULL;
         public enum State { NULL, Success, Failed, Exception }
 
+        public DateTime jobOutputTime;
+
         public List<JobOutputDescriptor> jobOutputDescriptors = new List<JobOutputDescriptor>();
 
         #endregion

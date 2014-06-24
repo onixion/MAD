@@ -67,6 +67,7 @@ namespace MAD.jobSys
             if (jobState == State.Running)
             {
                 Execute();
+                jobOutput.jobOutputTime = DateTime.Now;
             }
         }
 
