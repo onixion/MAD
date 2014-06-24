@@ -11,11 +11,11 @@ namespace MAD.jobSys
         public int jobID;
         private static object _jobInitLock = new object();
 
-        public JobOptions jobOptions;
-        public JobOutput jobOutput = new JobOutput();
-
         public State jobState = State.Stopped;
         public enum State { Running, Stopped, Exception }
+
+        public JobOptions jobOptions;
+        public JobOutput jobOutput = new JobOutput();
 
         #endregion
 

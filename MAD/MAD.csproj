@@ -71,6 +71,10 @@
     <Compile Include="Helper\HostDetectBACKUP.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobNotification.cs" />
+    <Compile Include="JobSystem\JobNotificationRules\JobNotificationRule.cs" />
+    <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
+    <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleSTRING.cs" />
     <Compile Include="JobSystem\JobScedule.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
@@ -118,6 +122,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
