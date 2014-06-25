@@ -97,6 +97,7 @@ namespace MAD.jobSys
         private void GiveAddresses(IPAddress _tmpAdr)
         {
             _tmp += "IP: " + _tmpAdr.ToString() + "\n";
+            //jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("Host", typeof(IPAddress), _tmpAdr));
         }
 
         #endregion
