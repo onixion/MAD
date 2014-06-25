@@ -6,6 +6,8 @@ namespace MAD.jobSys
 {
     public class JobScedule
     {
+        #region members
+
         private List<Job> _jobs;
         private Object _jobsLock;
 
@@ -17,11 +19,19 @@ namespace MAD.jobSys
         private State _state = State.Stopped;
         public State state { get { return _state; } }
 
+        #endregion
+
+        #region constructor
+
         public JobScedule(List<Job> jobs, Object jobsLock)
         {
             _jobs = jobs;
             _jobsLock = jobsLock;
         }
+
+        #endregion
+
+        #region methodes
 
         public void Start()
         {
@@ -86,12 +96,15 @@ namespace MAD.jobSys
 
             if (_jobTime.type == JobTime.TimeType.Relativ)
             {
-                _jobTime.jobDelayRemaining = _jobTime.jobDelayRemaining - _cycleTime;
-
-                if (_jobTime.jobDelayRemaining <= 0)
+                if (_jobTime.jobDelay.CheckTime())
                 {
-                    _jobTime.jobDelayRemaining = _jobTime.jobDelay;
+                    _jobTime.jobDelay.ResetRemainTime();
+
                     job.LaunchJob();
+                }
+                else
+                {
+                    _jobTime.jobDelay.WorkDelayTime(_cycleTime);
                 }
             }
             else if (_jobTime.type == JobTime.TimeType.Absolute)
@@ -109,5 +122,7 @@ namespace MAD.jobSys
                 throw new Exception("JOBTIME-Type is NULL!");
             }
         }
+
+        #endregion
     }
 }

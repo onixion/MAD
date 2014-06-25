@@ -6,8 +6,14 @@ namespace MAD.jobSys
 {
     public class JobNotification
     {
+        #region members
+
         private MailAddress[] _mailAddresses = new MailAddress[0];
         public List<JobNotificationRule> rules = new List<JobNotificationRule>();
+
+        #endregion
+
+        #region constructors
 
         public JobNotification() { }
 
@@ -15,6 +21,10 @@ namespace MAD.jobSys
         {
             _mailAddresses = mailAddresses;
         }
+
+        #endregion
+
+        #region methodes
 
         public void ParseAndSetNotification(string textToParse)
         { 
@@ -33,5 +43,7 @@ namespace MAD.jobSys
 
             return false;
         }
+
+        #endregion
     }
 }

@@ -6,14 +6,17 @@ namespace MAD.jobSys
 {
     public class JobTime
     {
+        /*
+         * The purpose of this class is to handle the times of every job.
+         * A job can have a JobDelayHandler (relative, delay-time e.g. 20s) or multiple JobTimeHandlers (absolute, times e.g. 19:30). */
+
         #region members
 
         public enum TimeType { NULL, Absolute, Relativ }
         public TimeType type;
 
         // Relative
-        public int jobDelay;
-        public int jobDelayRemaining;
+        public JobDelayHandler jobDelay;
 
         // Absolute
         public List<JobTimeHandler> jobTimes;
@@ -33,11 +36,10 @@ namespace MAD.jobSys
             this.jobTimes = jobTimes;
         }
 
-        public JobTime(int jobDelay)
+        public JobTime(JobDelayHandler jobDelay)
         {
             type = TimeType.Relativ;
             this.jobDelay = jobDelay;
-            this.jobDelayRemaining = jobDelay;
         }
 
         #endregion
@@ -61,7 +63,6 @@ namespace MAD.jobSys
                     if (_split.Length == 1)
                     {
                         // 19:30 | Daily at 19:30
-
                         ParseHourMinute(_split[0], ref _hour, ref _minute);
                         _buffer.Add(new JobTimeHandler(_hour, _minute));
                     }
@@ -74,16 +75,19 @@ namespace MAD.jobSys
                         ParseHourMinute(_split[1], ref _hour, ref _minute);
                         ParseYearMonthDay(_split[0], ref _year, ref _month, ref _day);
 
-                        if (_month == 0 && _year == 0) // 5;19:30 | Monthly at 5th 19:30
+                        if (_month == 0 && _year == 0)
                         {
+                            // 5;19:30 | Monthly at 5th 19:30
                             _buffer.Add(new JobTimeHandler(_hour, _minute, _day));
                         }
-                        else if (_month != 0 && _year == 0) // 5.6;19:30 | Yearly at 5th June 19:30
+                        else if (_month != 0 && _year == 0) 
                         {
+                            // 5.6;19:30 | Yearly at 5th June 19:30
                             _buffer.Add(new JobTimeHandler(_hour, _minute, _day, _month));
                         }
-                        else // 5.6.2015;19:30 | Unique at 5th June 2015 19:30
+                        else 
                         {
+                            // 5.6.2015;19:30 | Unique at 5th June 2015 19:30
                             _buffer.Add(new JobTimeHandler(_hour, _minute, _day, _month, _year));
                         }
                     }
@@ -392,5 +396,42 @@ namespace MAD.jobSys
         }
 
         #endregion
+    }
+
+    public class JobDelayHandler
+    {
+        private int _delayTime;
+        public int delayTime { get { return _delayTime; } }
+
+        private int _delayTimeRemaining;
+        private int delayTimeRemaining { get { return _delayTimeRemaining; } }
+
+        public JobDelayHandler(int delayTime)
+        {
+            _delayTime = delayTime;
+            _delayTimeRemaining = delayTime;
+        }
+
+        public void ResetRemainTime()
+        {
+            _delayTimeRemaining = _delayTime;
+        }
+
+        public bool CheckTime()
+        {
+            if (_delayTimeRemaining <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void WorkDelayTime(int deltaTime)
+        {
+            _delayTimeRemaining = _delayTimeRemaining - deltaTime;
+        }
     }
 }
