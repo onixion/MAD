@@ -7,11 +7,7 @@ namespace MAD.jobSys
     {
         #region member
 
-        private Version _version = new Version(1, 7);
-        public string version { get { return _version.ToString(); } }
-
         private string _dataPath;
-        public string dataPath { get { return _dataPath; } }
 
         public List<Job> jobs = new List<Job>();
         public Object jobsLock = new Object();
@@ -80,7 +76,7 @@ namespace MAD.jobSys
             }
             else
             {
-                throw new Exception("Job could not be added, becauce the jobsystem has reached the max numbers of jobs.");
+                throw new Exception("Job could not be added, because the jobsystem has reached its max numbers of jobs.");
             }
         }
 

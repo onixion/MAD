@@ -25,13 +25,13 @@ namespace MAD.jobSys
         { 
             for(int i = 0; i < rules.Count; i++)
             {
-                if (!rules[i].CheckRuleValidity())
+                if (rules[i].CheckRuleValidity())
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
     }
 }

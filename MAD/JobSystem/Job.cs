@@ -11,9 +11,9 @@ namespace MAD.jobSys
         public int jobID;
         private static object _jobInitLock = new object();
 
-        public State jobState = State.Stopped;
         public enum State { Running, Stopped, Exception }
-
+        public State jobState = State.Stopped;
+        
         public JobOptions jobOptions;
         public JobOutput jobOutput = new JobOutput();
 
@@ -64,17 +64,9 @@ namespace MAD.jobSys
 
         public void LaunchJob()
         {
-            if (jobState == State.Running)
-            {
-                Execute();
-                jobOutput.jobOutputTime = DateTime.Now;
-
-                // Check if any notification is necessary.
-                if (!jobOptions.jobNotification.CheckRules())
-                {
-                    // MAKE A NOTIFICATION
-                }
-            }
+            // First execute the job (-> sets the jobOutput-object).
+            Execute();
+            jobOutput.jobOutputTime = DateTime.Now;
         }
 
         public abstract void Execute();

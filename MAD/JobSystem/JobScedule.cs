@@ -66,7 +66,10 @@ namespace MAD.jobSys
                 {
                     foreach (Job _job in _jobs)
                     {
-                        CheckJobTimeAndExecute(_time, _job);
+                        if (_job.jobState == Job.State.Running)
+                        {
+                            CheckJobTimeAndExecute(_time, _job);
+                        }
                     }
                 }
 

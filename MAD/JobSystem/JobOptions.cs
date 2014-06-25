@@ -8,8 +8,10 @@ namespace MAD.jobSys
         #region members
 
         public string jobName;
-        public JobType jobType;
+        
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect }
+        public JobType jobType;
+
         public JobTime jobTime = new JobTime();
         public JobNotification jobNotification = new JobNotification();
 

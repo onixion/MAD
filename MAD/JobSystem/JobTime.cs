@@ -8,12 +8,15 @@ namespace MAD.jobSys
     {
         #region members
 
-        public TimeType type;
         public enum TimeType { NULL, Absolute, Relativ }
+        public TimeType type;
 
-        public List<JobTimeHandler> jobTimes;
+        // Relative
         public int jobDelay;
         public int jobDelayRemaining;
+
+        // Absolute
+        public List<JobTimeHandler> jobTimes;
 
         #endregion
 
@@ -24,7 +27,7 @@ namespace MAD.jobSys
             this.type = TimeType.NULL;
         }
 
-        public JobTime(List<JobTimeHandler> jobTimes)
+        public JobTime(params List<JobTimeHandler> jobTimes)
         {
             type = TimeType.Absolute;
             this.jobTimes = jobTimes;
@@ -41,7 +44,7 @@ namespace MAD.jobSys
 
         #region methodes
 
-        public List<JobTimeHandler> ParseStringArray(object[] data)
+        public static List<JobTimeHandler> ParseStringArray(object[] data)
         {
             List<JobTimeHandler> _buffer = new List<JobTimeHandler>();
 
@@ -93,7 +96,7 @@ namespace MAD.jobSys
             return _buffer;
         }
 
-        private void ParseHourMinute(string data, ref int hour, ref int minute)
+        private static void ParseHourMinute(string data, ref int hour, ref int minute)
         {
             string[] _split = data.Split(new char[] { ':' });
 
@@ -135,7 +138,7 @@ namespace MAD.jobSys
             }
         }
 
-        private void ParseYearMonthDay(string data, ref int year, ref int month, ref int day)
+        private static void ParseYearMonthDay(string data, ref int year, ref int month, ref int day)
         {
             string[] _split = data.Split(new char[]{'.'});
             
