@@ -19,7 +19,7 @@ namespace MAD.jobSys
 
         public JobNotification(params MailAddress[] mailAddresses)
         {
-            _mailAddresses = mailAddresses;
+            _mailAddresses = mailAddresses;            
         }
 
         #endregion

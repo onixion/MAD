@@ -12,7 +12,7 @@ namespace MAD.jobSys
         public List<Job> jobs = new List<Job>();
         public Object jobsLock = new Object();
 
-        private int _maxJobs = 1;
+        private int _maxJobs = 100;
         public int maxJobs { get { return _maxJobs; } }
 
         private JobScedule _scedule;

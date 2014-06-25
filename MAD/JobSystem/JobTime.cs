@@ -30,7 +30,7 @@ namespace MAD.jobSys
             this.type = TimeType.NULL;
         }
 
-        public JobTime(params List<JobTimeHandler> jobTimes)
+        public JobTime(List<JobTimeHandler> jobTimes)
         {
             type = TimeType.Absolute;
             this.jobTimes = jobTimes;
