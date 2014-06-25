@@ -15,6 +15,9 @@ namespace MAD.jobSys
         private object _cycleThreadLock = new object();
         private int _cycleTime = 100;
 
+        private Thread[] _workerThreads;
+        private int _workerThreadsCount = 10;
+
         public enum State { Running, Stopped, StopRequest }
         private State _state = State.Stopped;
         public State state { get { return _state; } }
@@ -27,6 +30,13 @@ namespace MAD.jobSys
         {
             _jobs = jobs;
             _jobsLock = jobsLock;
+
+            InitWorkerThreads();
+        }
+
+        private void InitWorkerThreads()
+        {
+            _workerThreads = new Thread[_workerThreadsCount];
         }
 
         #endregion
@@ -59,11 +69,6 @@ namespace MAD.jobSys
             }
         }
 
-        public string GetState()
-        {
-            return _state.ToString();
-        }
-
         private void CycleJobTracker()
         {
             while(true)
@@ -78,7 +83,15 @@ namespace MAD.jobSys
                     {
                         if (_job.jobState == Job.State.Running)
                         {
-                            CheckJobTimeAndExecute(_time, _job);
+                            if (CheckJobTime(_job.jobOptions.jobTime, _time))
+                            {
+                                UpdateJobTime(_job.jobOptions.jobTime);
+                                JobThreadStart(_job);
+                            }
+                            else
+                            {
+                                UpdateJobTime(_job.jobOptions.jobTime);
+                            }
                         }
                     }
                 }
@@ -90,37 +103,90 @@ namespace MAD.jobSys
             }
         }
 
-        private void CheckJobTimeAndExecute(DateTime time, Job job)
+        private bool CheckJobTime( JobTime jobTime, DateTime time)
         {
-            JobTime _jobTime = job.jobOptions.jobTime;
-
-            if (_jobTime.type == JobTime.TimeType.Relativ)
+            if (jobTime.type == JobTime.TimeType.Relativ)
             {
-                if (_jobTime.jobDelay.CheckTime())
+                if (jobTime.jobDelay.CheckTime())
                 {
-                    _jobTime.jobDelay.ResetRemainTime();
-
-                    job.LaunchJob();
+                    return true;
                 }
                 else
                 {
-                    _jobTime.jobDelay.WorkDelayTime(_cycleTime);
+                    return false;
                 }
             }
-            else if (_jobTime.type == JobTime.TimeType.Absolute)
+            else if (jobTime.type == JobTime.TimeType.Absolute)
             {
-                foreach (JobTimeHandler _handler in _jobTime.jobTimes)
+                foreach (JobTimeHandler _handler in jobTime.jobTimes)
                 {
                     if (_handler.CheckTime(time))
                     {
-                        job.LaunchJob();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
                     }
                 }
             }
+            
+            return false;
+        }
+
+        private void UpdateJobTime(JobTime jobTime)
+        {
+            if (jobTime.type == JobTime.TimeType.Relativ)
+            {
+                if (jobTime.jobDelay.delayTimeRemaining <= 0)
+                {
+                    jobTime.jobDelay.ResetRemainTime();
+                }
+                else
+                {
+                    jobTime.jobDelay.WorkDelayTime(_cycleTime);
+                }
+            }
+            else if (jobTime.type == JobTime.TimeType.Absolute)
+            {
+
+            }
             else
             {
-                throw new Exception("JOBTIME-Type is NULL!");
+                throw new Exception("JOBTIME-TYPE NULL!");
             }
+        }
+
+        private void JobThreadStart(Job job)
+        {
+            bool _workerThreadStarted = false;
+
+            while (true)
+            {
+                for (int i = 0; i < _workerThreads.Length; i++)
+                {/*
+                    if (_workerThreads[i])
+                    {
+                        _workerThreads[i] = new Thread(JobInvoke);
+
+                        _workerThreads[i].Start(job);
+                        _workerThreadStarted = true;
+
+                        break;
+                    }*/
+                }
+
+                if (_workerThreadStarted)
+                {
+                    break;
+                }
+            }
+        }
+
+        private void JobInvoke(object job)
+        {
+            Job _job = (Job)job;
+            _job.LaunchJob();
         }
 
         #endregion

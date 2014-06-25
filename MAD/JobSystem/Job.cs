@@ -64,7 +64,6 @@ namespace MAD.jobSys
 
         public void LaunchJob()
         {
-            // First execute the job (-> sets the jobOutput-object).
             Execute();
             jobOutput.jobOutputTime = DateTime.Now;
         }

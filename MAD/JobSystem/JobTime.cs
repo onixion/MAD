@@ -404,7 +404,7 @@ namespace MAD.jobSys
         public int delayTime { get { return _delayTime; } }
 
         private int _delayTimeRemaining;
-        private int delayTimeRemaining { get { return _delayTimeRemaining; } }
+        public int delayTimeRemaining { get { return _delayTimeRemaining; } }
 
         public JobDelayHandler(int delayTime)
         {
