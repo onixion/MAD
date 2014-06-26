@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MAD.JobSystem.Jobs
+using System.Net;
+
+namespace MAD.jobSys
 {
-    class JobDeamonCheck
+    class JobDeamonCheck : Job
     {
         #region members
+
+		private string argument = "";
+        private bool working; 
 
         #endregion
 
@@ -17,6 +22,31 @@ namespace MAD.JobSystem.Jobs
 
         #region methods
 
-        #endregion
+		#region extern
+
+		public override void Execute ()
+		{
+			switch (argument) 
+			{
+			case "dns":
+				dnsCheck ();
+				break;
+			}
+		}
+       
+		#endregion
+
+		#region intern
+
+		private void dnsCheck()
+		{
+            string name = Dns.GetHostName();
+            if (name != null)
+                working = true;
+		}
+
+		#endregion 
+
+		#endregion
     }
 }
