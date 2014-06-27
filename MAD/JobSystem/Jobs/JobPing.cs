@@ -24,7 +24,7 @@ namespace MAD.jobSys
             this.ttl = 250;
             this.dontFragment = true;
 
-            InitJobDescriptors();
+            InitOutDescriptors();
         }
 
         public JobPing(JobOptions jobOptions, IPAddress targetAddress, int ttl)
@@ -34,15 +34,14 @@ namespace MAD.jobSys
             this.ttl = ttl;
             this.dontFragment = true;
 
-            InitJobDescriptors();
+            InitOutDescriptors();
         }
 
         #region methodes
 
-        private void InitJobDescriptors()
+        private void InitOutDescriptors()
         {
-            jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("PingDelay", typeof(int), null));
-            jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("TTLLeft", typeof(int), null));
+            outDescriptors.Add(new OutDescriptor("TTL-Left", typeof(int), null));
         }
 
         public override void Execute()
@@ -55,18 +54,16 @@ namespace MAD.jobSys
 
                 if (_reply.Status == IPStatus.Success)
                 {
-                    jobOutput.jobState = JobOutput.State.Success;
-                    jobOutput.SetDataObject("PingDelay", _reply.RoundtripTime);
-                    jobOutput.SetDataObject("TTLLeft", _reply.Options.Ttl);
+                    outState = OutState.Success;
                 }
                 else
                 {
-                    jobOutput.jobState = JobOutput.State.Failed;
+                    outState = OutState.Failed;
                 }
             }
             catch (Exception)
             {
-                jobOutput.jobState = JobOutput.State.Exception;
+                outState = OutState.Exception;
             }
         }
 

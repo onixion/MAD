@@ -120,11 +120,6 @@ namespace MAD.cli
                 }
                 else if (_key.Key == ConsoleKey.Tab)
                 {
-                    ShiftCursorLeft();
-                    ShiftCursorLeft();
-                    ShiftCursorLeft();
-                    ShiftCursorLeft();
-                    ShiftCursorLeft();
                 }
                 else if (_key.Key == ConsoleKey.Escape)
                 {

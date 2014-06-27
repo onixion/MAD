@@ -44,20 +44,20 @@ namespace MAD.jobSys
                 try
                 {
                     _response = _request.GetResponse();
-                    jobOutput.jobState = JobOutput.State.Success;
+                    outState = OutState.Success;
 
                     _response.Close();
                 }
                 catch (Exception)
                 {
-                    jobOutput.jobState = JobOutput.State.Failed;
+                    outState = OutState.Failed;
                 }
 
                 _request.Abort();
             }
             catch (Exception)
             {
-                jobOutput.jobState = JobOutput.State.Exception;
+                outState = OutState.Exception;
             }
         }
 

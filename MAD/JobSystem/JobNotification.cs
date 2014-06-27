@@ -28,7 +28,7 @@ namespace MAD.jobSys
 
         public void ParseAndSetNotification(string textToParse)
         { 
-            // TODO
+            
         }
 
         public bool CheckRules()

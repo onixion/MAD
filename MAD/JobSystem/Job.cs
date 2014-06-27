@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace MAD.jobSys
@@ -11,11 +12,19 @@ namespace MAD.jobSys
         public int jobID;
         private static object _jobInitLock = new object();
 
-        public enum State { Running, Stopped, Exception }
-        public State jobState = State.Stopped;
+        public enum JobState { Running, Stopped, Exception }
+        public JobState jobState = JobState.Stopped;
+
+        public enum OutState { NULL, Success, Failed, Exception }
+        public OutState outState = OutState.NULL;
         
         public JobOptions jobOptions;
-        public JobOutput jobOutput = new JobOutput();
+
+        public DateTime lastStarted;
+        public DateTime lastFinished;
+        //public int deltaTime
+
+        public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
 
         #endregion
 
@@ -38,9 +47,9 @@ namespace MAD.jobSys
 
         public bool Start()
         {
-            if (jobState == State.Stopped)
+            if (jobState == JobState.Stopped)
             {
-                jobState = State.Running;
+                jobState = JobState.Running;
                 return true;
             }
             else
@@ -51,9 +60,9 @@ namespace MAD.jobSys
 
         public bool Stop()
         {
-            if (jobState == State.Running)
+            if (jobState == JobState.Running)
             {
-                jobState = State.Stopped;
+                jobState = JobState.Stopped;
                 return true;
             }
             else
@@ -64,8 +73,9 @@ namespace MAD.jobSys
 
         public void LaunchJob()
         {
+            lastStarted = DateTime.Now;
             Execute();
-            jobOutput.jobOutputTime = DateTime.Now;
+            lastFinished = DateTime.Now;
         }
 
         public abstract void Execute();
@@ -99,8 +109,8 @@ namespace MAD.jobSys
                 _temp += "\n";
             }
 
-            _temp += "<color><yellow>OUTPUT-TIME: <color><white>" + jobOutput.jobOutputTime.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
-            _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
+            _temp += "<color><yellow>OUTPUT-TIME: <color><white>" + lastFinished.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + outState.ToString() +"\n";
 
             return _temp + JobStatus();
         }

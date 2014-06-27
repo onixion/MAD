@@ -40,11 +40,11 @@ namespace MAD.jobSys
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));
-                jobOutput.jobState = JobOutput.State.Success;
+                outState = OutState.Success;
             }
             catch (Exception)
             {
-                jobOutput.jobState = JobOutput.State.Failed;
+                outState = OutState.Failed;
             }
 
             _socket.Close();

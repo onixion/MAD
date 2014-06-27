@@ -149,7 +149,7 @@ namespace MAD.jobSys
             {
                 for (int i = 0; i < jobs.Count; i++)
                 {
-                    if (jobs[i].jobState == Job.State.Running)
+                    if (jobs[i].jobState == Job.JobState.Running)
                     {
                         _count++;
                     }
@@ -167,7 +167,7 @@ namespace MAD.jobSys
             {
                 for (int i = 0; i < jobs.Count; i++)
                 {
-                    if (jobs[i].jobState == Job.State.Stopped)
+                    if (jobs[i].jobState == Job.JobState.Stopped)
                     {
                         _count++;
                     }

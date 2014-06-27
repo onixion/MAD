@@ -18,7 +18,7 @@ namespace MAD.cli
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value(s)", "Job-State", "Output-State" };
+            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value(s)", "Job-State", "Out-State" };
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
@@ -73,7 +73,7 @@ namespace MAD.cli
                     }
 
                     tableRow[5] = _temp.jobState.ToString();
-                    tableRow[6] = _temp.jobOutput.jobState.ToString();
+                    tableRow[6] = _temp.outState.ToString();
 
                     output += _jobTable.FormatStringArray(tableRow) + "\n";
                 }
@@ -518,36 +518,6 @@ namespace MAD.cli
             }      
 
             return output;
-        }
-    }
-
-    public class JobSystemOutputCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemOutputCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValue[0];
-
-            Job job = _js.GetJob(id);
-
-            if (job != null)
-            {
-                output += "<color><yellow>" + job.jobOutput;
-                return output;
-            }
-            else
-            {
-                output += "<color><red>Job does not exist!";
-                return output;
-            }
         }
     }
 }

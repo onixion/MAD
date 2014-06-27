@@ -75,11 +75,11 @@ namespace MAD.jobSys
                         _hostAddresses.Add(_reply.Address);
                     }
 
-                    jobOutput.jobState = JobOutput.State.Success;
+                    outState = OutState.Success;
                 }
                 catch (Exception)
                 {
-                    jobOutput.jobState = JobOutput.State.Exception;
+                    outState = OutState.Exception;
                 }
 
                 _ping.Dispose();
