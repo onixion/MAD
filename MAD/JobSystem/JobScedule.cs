@@ -84,6 +84,7 @@ namespace MAD.jobSys
                                 if (_job.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                                 {
                                     _job.jobOptions.jobTime.jobDelay.ResetRemainTime();
+                                    JobThreadStart(_job);
                                 }
                                 else if (_job.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                                 {
@@ -92,14 +93,9 @@ namespace MAD.jobSys
                                     if (!_handler.IsBlocked(_time))
                                     {
                                         _handler.minuteAtBlock = _time.Minute;
+                                        JobThreadStart(_job);
                                     }
                                 }
-                                else
-                                {
-                                    throw new Exception("JOBTIME-TYPE NULL!");
-                                }
-
-                                JobThreadStart(_job);
                             }
                             else
                             {
@@ -147,23 +143,7 @@ namespace MAD.jobSys
                 }
             }
 
-            throw new Exception("JOBTIME-TYPE NULL!");
-        }
-
-        private void UpdateJobTime(JobTime jobTime)
-        {
-            if (jobTime.type == JobTime.TimeType.Relativ)
-            {
-                jobTime.jobDelay.WorkDelayTime(_cycleTime);
-            }
-            else if (jobTime.type == JobTime.TimeType.Absolute)
-            {
-
-            }
-            else
-            {
-                throw new Exception("JOBTIME-TYPE NULL!");
-            }
+            return false;
         }
 
         private void JobThreadStart(Job job)

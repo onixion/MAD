@@ -99,6 +99,7 @@ namespace MAD.jobSys
                 _temp += "\n";
             }
 
+            _temp += "<color><yellow>OUTPUT-TIME: <color><white>" + jobOutput.jobOutputTime.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
 
             return _temp + JobStatus();
