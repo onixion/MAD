@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Collections.Generic;
 
+using Amib.Threading;
+
 namespace MAD.jobSys
 {
     public class JobScedule
@@ -15,8 +17,8 @@ namespace MAD.jobSys
         private object _cycleThreadLock = new object();
         private int _cycleTime = 100;
 
-        private Thread[] _workerThreads;
-        private int _workerThreadsCount = 10;
+        private SmartThreadPool _workerPool;
+        private int _maxThreads = 10;
 
         public enum State { Running, Stopped, StopRequest }
         private State _state = State.Stopped;
@@ -31,12 +33,7 @@ namespace MAD.jobSys
             _jobs = jobs;
             _jobsLock = jobsLock;
 
-            InitWorkerThreads();
-        }
-
-        private void InitWorkerThreads()
-        {
-            _workerThreads = new Thread[_workerThreadsCount];
+            _workerPool = new SmartThreadPool(2000, _maxThreads);
         }
 
         #endregion
@@ -74,9 +71,8 @@ namespace MAD.jobSys
             while(true)
             {
                 Thread.Sleep(_cycleTime);
-
                 DateTime _time = DateTime.Now;
-
+                // HERE
                 lock (_jobsLock)
                 {
                     foreach (Job _job in _jobs)
@@ -85,12 +81,34 @@ namespace MAD.jobSys
                         {
                             if (CheckJobTime(_job.jobOptions.jobTime, _time))
                             {
-                                UpdateJobTime(_job.jobOptions.jobTime);
+                                if (_job.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                                {
+                                    _job.jobOptions.jobTime.jobDelay.ResetRemainTime();
+                                }
+                                else if (_job.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+                                {
+                                    // GET the JobTime objects, which time is now and set minute and block boolean.
+
+                                    JobTimeHandler _handler = _job.jobOptions.jobTime.GetJobTimeHandler(_time);
+                                    if (!_handler.IsBlocked(_time))
+                                    {
+                                        // set block minute to the current minute.
+                                        _handler.minuteAtBlock = _time.Minute;
+                                    }
+                                }
+                                else
+                                {
+                                    throw new Exception("JOBTIME-TYPE NULL!");
+                                }
+
                                 JobThreadStart(_job);
                             }
                             else
                             {
-                                UpdateJobTime(_job.jobOptions.jobTime);
+                                if (_job.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                                {
+                                    _job.jobOptions.jobTime.jobDelay.WorkDelayTime(_cycleTime);
+                                }
                             }
                         }
                     }
@@ -103,7 +121,7 @@ namespace MAD.jobSys
             }
         }
 
-        private bool CheckJobTime( JobTime jobTime, DateTime time)
+        private bool CheckJobTime(JobTime jobTime, DateTime time)
         {
             if (jobTime.type == JobTime.TimeType.Relativ)
             {
@@ -130,22 +148,15 @@ namespace MAD.jobSys
                     }
                 }
             }
-            
-            return false;
+
+            throw new Exception("JOBTIME-TYPE NULL!");
         }
 
         private void UpdateJobTime(JobTime jobTime)
         {
             if (jobTime.type == JobTime.TimeType.Relativ)
             {
-                if (jobTime.jobDelay.delayTimeRemaining <= 0)
-                {
-                    jobTime.jobDelay.ResetRemainTime();
-                }
-                else
-                {
-                    jobTime.jobDelay.WorkDelayTime(_cycleTime);
-                }
+                jobTime.jobDelay.WorkDelayTime(_cycleTime);
             }
             else if (jobTime.type == JobTime.TimeType.Absolute)
             {
@@ -159,34 +170,14 @@ namespace MAD.jobSys
 
         private void JobThreadStart(Job job)
         {
-            bool _workerThreadStarted = false;
-
-            while (true)
-            {
-                for (int i = 0; i < _workerThreads.Length; i++)
-                {/*
-                    if (_workerThreads[i])
-                    {
-                        _workerThreads[i] = new Thread(JobInvoke);
-
-                        _workerThreads[i].Start(job);
-                        _workerThreadStarted = true;
-
-                        break;
-                    }*/
-                }
-
-                if (_workerThreadStarted)
-                {
-                    break;
-                }
-            }
+            _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke), job);
         }
 
-        private void JobInvoke(object job)
+        private object JobInvoke(object job)
         {
             Job _job = (Job)job;
             _job.LaunchJob();
+            return null;
         }
 
         #endregion

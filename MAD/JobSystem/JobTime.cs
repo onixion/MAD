@@ -100,6 +100,19 @@ namespace MAD.jobSys
             return _buffer;
         }
 
+        public JobTimeHandler GetJobTimeHandler(DateTime time)
+        {
+            foreach (JobTimeHandler _handler in jobTimes)
+            {
+                if (_handler.CheckTime(time))
+                {
+                    return _handler;
+                }
+            }
+
+            return null;
+        }
+
         private static void ParseHourMinute(string data, ref int hour, ref int minute)
         {
             string[] _split = data.Split(new char[] { ':' });
@@ -260,7 +273,9 @@ namespace MAD.jobSys
 
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
-        
+        private int _minuteAtBlock;
+        public int minuteAtBlock { set; }
+
         #endregion
 
         #region constructors
@@ -303,59 +318,11 @@ namespace MAD.jobSys
 
         #region methodes
 
-        public bool CheckTime(DateTime now)
+        public bool IsBlocked(DateTime now)
         {
-            if (!blockSignal)
+            if (now.Minute == _minuteAtBlock)
             {
-                switch (type)
-                {
-                    case Type.Daily:
-
-                        if (now.Hour == hour && now.Minute == minute)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-
-                    case Type.Monthly:
-
-                        if (now.Hour == hour && now.Minute == minute && now.Day == day)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-
-                    case Type.Yearly:
-
-                        if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-
-                    case Type.Unique:
-
-                        if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month && now.Year == year)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-
-                    default:
-                        return false;
-                }
+                return true;
             }
             else
             {
@@ -363,17 +330,57 @@ namespace MAD.jobSys
             }
         }
 
-        public void BlockHandler()
+        public bool CheckTime(DateTime now)
         {
-            Thread _block = new Thread(WaitToUnBlock);
-            _block.Start();
-        }
+            switch (type)
+            {
+                case Type.Daily:
 
-        private void WaitToUnBlock()
-        {
-            _blockSignal = true;
-            Thread.Sleep(70000);
-            _blockSignal = false;
+                    if (now.Hour == hour && now.Minute == minute)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                case Type.Monthly:
+
+                    if (now.Hour == hour && now.Minute == minute && now.Day == day)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                case Type.Yearly:
+
+                    if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                case Type.Unique:
+
+                    if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month && now.Year == year)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                default:
+                    return false;
+            }
         }
 
         public string JobTimeStatus()
