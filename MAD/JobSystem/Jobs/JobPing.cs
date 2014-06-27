@@ -18,7 +18,7 @@ namespace MAD.jobSys
         #endregion
 
         public JobPing()
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.Ping))
+            : base("NULL", JobType.Ping, new JobTime())
         {
             this.targetAddress = IPAddress.Loopback;
             this.ttl = 250;
@@ -27,8 +27,8 @@ namespace MAD.jobSys
             InitOutDescriptors();
         }
 
-        public JobPing(JobOptions jobOptions, IPAddress targetAddress, int ttl)
-            : base (jobOptions)
+        public JobPing(string jobName, JobType jobType, JobTime jobTime, IPAddress targetAddress, int ttl)
+            : base (jobName, jobType, jobTime)
         {
             this.targetAddress = targetAddress;
             this.ttl = ttl;

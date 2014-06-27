@@ -25,14 +25,14 @@ namespace MAD.jobSys
         #region constructors
 
         public JobHostDetect()
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.HostDetect))
+            : base("NULL", JobType.HostDetect, new JobTime())
         {
             this.Net = IPAddress.Parse("192.168.0.0");
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
         }
 
-        public JobHostDetect(JobOptions jobOptions, IPAddress Net, IPAddress Subnetmask)
-            : base(jobOptions)
+        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, IPAddress Net, IPAddress Subnetmask)
+            : base(jobName, jobType, jobTime)
         {
             this.Net = Net;
             this.Subnetmask = Subnetmask;

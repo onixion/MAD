@@ -12,27 +12,33 @@ namespace MAD.jobSys
         public int jobID;
         private static object _jobInitLock = new object();
 
+        public string jobName;
+
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect }
+        public JobType jobType;
+
         public enum JobState { Running, Stopped, Exception }
         public JobState jobState = JobState.Stopped;
 
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;
-        
-        public JobOptions jobOptions;
 
         public DateTime lastStarted;
         public DateTime lastFinished;
         //public int deltaTime
 
+        public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
 
         #endregion
 
         #region constructor
 
-        protected Job(JobOptions jobOptions)
+        protected Job(string jobName, JobType jobType, JobTime jobTime)
         {
-            this.jobOptions = jobOptions;
+            this.jobName = jobName;
+            this.jobType = jobType;
+            this.jobTime = jobTime;
 
             lock (_jobInitLock)
             {
@@ -87,21 +93,21 @@ namespace MAD.jobSys
             string _temp = "\n";
 
             _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
-            _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
-            _temp += "<color><yellow>TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
+            _temp += "<color><yellow>NAME: <color><white>" + jobName + "\n";
+            _temp += "<color><yellow>TYPE: <color><white>" + jobType.ToString() + "\n";
             _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString() + "\n";
-            _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
+            _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobTime.type.ToString() + "\n";
 
-            if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+            if (jobTime.type == JobTime.TimeType.Relativ)
             {
-                _temp += "<color><yellow>DELAY-TIME: <color><white>" + jobOptions.jobTime.jobDelay.delayTime + "\n";
-                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + jobOptions.jobTime.jobDelay.delayTimeRemaining + "\n";
+                _temp += "<color><yellow>DELAY-TIME: <color><white>" + jobTime.jobDelay.delayTime + "\n";
+                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + jobTime.jobDelay.delayTimeRemaining + "\n";
             }
-            else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+            else if (jobTime.type == JobTime.TimeType.Absolute)
             {
                 _temp += "<color><yellow>TIMES: <color><white>";
 
-                foreach (JobTimeHandler _buffer in jobOptions.jobTime.jobTimes)
+                foreach (JobTimeHandler _buffer in jobTime.jobTimes)
                 {
                     _temp += _buffer.JobTimeStatus() + " ";
                 }

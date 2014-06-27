@@ -78,7 +78,6 @@
     <Compile Include="JobSystem\JobScedule.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
-    <Compile Include="JobSystem\JobOptions.cs" />
     <Compile Include="JobSystem\OutDescriptor.cs" />
     <Compile Include="JobSystem\Jobs\JobPing.cs" />
     <Compile Include="JobSystem\Jobs\JobPort.cs" />

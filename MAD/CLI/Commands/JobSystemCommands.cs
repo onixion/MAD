@@ -50,19 +50,19 @@ namespace MAD.cli
                 foreach (Job _temp in _js.jobs)
                 {
                     tableRow[0] = _temp.jobID.ToString();
-                    tableRow[1] = _temp.jobOptions.jobName;
-                    tableRow[2] = _temp.jobOptions.jobType.ToString();
-                    tableRow[3] = _temp.jobOptions.jobTime.type.ToString();
+                    tableRow[1] = _temp.jobName;
+                    tableRow[2] = _temp.jobType.ToString();
+                    tableRow[3] = _temp.jobTime.type.ToString();
 
-                    if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
+                    if (_temp.jobTime.type == JobTime.TimeType.Relativ)
                     {
-                        tableRow[4] = _temp.jobOptions.jobTime.jobDelay.delayTime.ToString();
+                        tableRow[4] = _temp.jobTime.jobDelay.delayTime.ToString();
                     }
-                    else if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
+                    else if (_temp.jobTime.type == JobTime.TimeType.Absolute)
                     {
                         tableRow[4] = "";
 
-                        foreach (JobTimeHandler _temp2 in _temp.jobOptions.jobTime.jobTimes)
+                        foreach (JobTimeHandler _temp2 in _temp.jobTime.jobTimes)
                         {
                             tableRow[4] += _temp2.JobTimeStatus() + " ";
                         }
@@ -180,8 +180,8 @@ namespace MAD.cli
         {
             JobHostDetect _job = new JobHostDetect();
 
-            _job.jobOptions.jobName = (string)parameters.GetParameter("n").argumentValue[0];
-            _job.jobOptions.jobType = JobOptions.JobType.HostDetect;
+            _job.jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            _job.jobType = Job.JobType.HostDetect;
 
             _job.Net = (IPAddress)parameters.GetParameter("a").argumentValue[0];
             _job.Net = (IPAddress)parameters.GetParameter("m").argumentValue[0];
@@ -192,16 +192,16 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
-                    _job.jobOptions.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+                    _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobOptions.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
                     }
                     catch (Exception e)
                     {
@@ -211,8 +211,8 @@ namespace MAD.cli
             }
             else
             {
-                _job.jobOptions.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.jobDelay = new JobDelayHandler(20000);
+                _job.jobTime.type = JobTime.TimeType.Relativ;
             }
 
             _js.CreateJob(_job);
@@ -229,10 +229,12 @@ namespace MAD.cli
             : base()
         {
             _js = (JobSystem)args[0];
+
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IPAddress of the target-machine.", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
+
             description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
         }
 
@@ -242,8 +244,8 @@ namespace MAD.cli
             IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
 
             JobPing _job = new JobPing();
-            _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.Ping;
+            _job.jobName = jobName;
+            _job.jobType = Job.JobType.Ping;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -252,27 +254,27 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
-                    _job.jobOptions.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+                    _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobOptions.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
                     }
                     catch (Exception e)
                     {
-                        return e.Message;
+                        return "<color><red>" + e.Message;
                     }
                 }
             }
             else
             {
-                _job.jobOptions.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.jobDelay = new JobDelayHandler(20000);
+                _job.jobTime.type = JobTime.TimeType.Relativ;
             }
 
             if (OptionalParameterUsed("ttl"))
@@ -314,8 +316,8 @@ namespace MAD.cli
 
             JobHttp _job = new JobHttp();
 
-            _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.Http;
+            _job.jobName = jobName;
+            _job.jobType = Job.JobType.Http;
             _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
@@ -324,16 +326,16 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
-                    _job.jobOptions.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+                    _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobOptions.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
                     }
                     catch (Exception e)
                     {
@@ -343,8 +345,8 @@ namespace MAD.cli
             }
             else
             {
-                _job.jobOptions.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.jobDelay = new JobDelayHandler(20000);
+                _job.jobTime.type = JobTime.TimeType.Relativ;
             }
 
             if (OptionalParameterUsed("p"))
@@ -387,8 +389,8 @@ namespace MAD.cli
 
             JobPort _job = new JobPort();
 
-            _job.jobOptions.jobName = jobName;
-            _job.jobOptions.jobType = JobOptions.JobType.PortScan;
+            _job.jobName = jobName;
+            _job.jobType = Job.JobType.PortScan;
             _job.targetAddress = targetAddress;
             _job.port = port;
 
@@ -398,16 +400,16 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
-                    _job.jobOptions.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
-                    _job.jobOptions.jobTime.type = JobTime.TimeType.Absolute;
+                    _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobOptions.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
                     }
                     catch (Exception e)
                     {
@@ -417,8 +419,8 @@ namespace MAD.cli
             }
             else
             {
-                _job.jobOptions.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobOptions.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.jobDelay = new JobDelayHandler(20000);
+                _job.jobTime.type = JobTime.TimeType.Relativ;
             }
 
             try

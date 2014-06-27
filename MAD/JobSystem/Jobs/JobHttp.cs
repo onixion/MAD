@@ -18,14 +18,14 @@ namespace MAD.jobSys
         #region constructors
 
         public JobHttp() 
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.Http))
+            : base("NULL", JobType.Http, new JobTime())
         {
             this.targetAddress = IPAddress.Loopback;
             this.port = 80;
         }
 
-        public JobHttp(JobOptions jobOptions, IPAddress targetAddress, int port) 
-            : base (jobOptions)
+        public JobHttp(string jobName, JobType jobType, JobTime jobTime, IPAddress targetAddress, int port) 
+            : base (jobName, jobType, jobTime)
         {
             this.targetAddress = targetAddress;
             this.port = port;
