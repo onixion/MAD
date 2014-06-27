@@ -56,7 +56,7 @@ namespace MAD.cli
 
                     if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Relativ)
                     {
-                        tableRow[4] = _temp.jobOptions.jobTime.jobDelay.ToString();
+                        tableRow[4] = _temp.jobOptions.jobTime.jobDelay.delayTime.ToString();
                     }
                     else if (_temp.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                     {
@@ -75,7 +75,7 @@ namespace MAD.cli
                     tableRow[5] = _temp.jobState.ToString();
                     tableRow[6] = _temp.jobOutput.jobState.ToString();
 
-                    output += _jobTable.FormatStringArray(tableRow);
+                    output += _jobTable.FormatStringArray(tableRow) + "\n";
                 }
             }
 

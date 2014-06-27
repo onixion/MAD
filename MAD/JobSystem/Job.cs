@@ -74,17 +74,18 @@ namespace MAD.jobSys
 
         public string Status()
         {
-            string _temp = "_______________________________\n";
+            string _temp = "\n";
 
             _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
             _temp += "<color><yellow>NAME: <color><white>" + jobOptions.jobName + "\n";
             _temp += "<color><yellow>TYPE: <color><white>" + jobOptions.jobType.ToString() + "\n";
-            
+            _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString() + "\n";
             _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobOptions.jobTime.type.ToString() + "\n";
 
             if (jobOptions.jobTime.type == JobTime.TimeType.Relativ)
             {
-                _temp += "<color><yellow>DELAY: <color><white>" + jobOptions.jobTime.jobDelay + "\n";
+                _temp += "<color><yellow>DELAY-TIME: <color><white>" + jobOptions.jobTime.jobDelay.delayTime + "\n";
+                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + jobOptions.jobTime.jobDelay.delayTimeRemaining + "\n";
             }
             else if (jobOptions.jobTime.type == JobTime.TimeType.Absolute)
             {
@@ -98,26 +99,7 @@ namespace MAD.jobSys
                 _temp += "\n";
             }
 
-            _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString()+ "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + jobOutput.jobState.ToString() +"\n";
-            _temp += "<color><yellow>OUTPUT-DESCRIPTOR: \n";
-
-            foreach (JobOutputDescriptor _buffer in jobOutput.jobOutputDescriptors)
-            {
-                _temp += "\n<color><yellow>Name: <color><white>" + _buffer.name + "\n";
-                _temp += "<color><yellow>Type: <color><white>" + _buffer.dataType + "\n";
-
-                if (_buffer.data != null)
-                {
-                    _temp += "<color><yellow>Value: <color><white>" + _buffer.data.ToString();
-                }
-                else
-                {
-                    _temp += "<color><yellow>Value: <color><white>NULL;";
-                }
-
-                _temp += "\n\n";
-            }
 
             return _temp + JobStatus();
         }

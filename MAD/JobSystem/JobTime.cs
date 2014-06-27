@@ -273,9 +273,8 @@ namespace MAD.jobSys
 
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
-        private int _minuteAtBlock = 999;
-        public int minuteAtBlock { set; }
-
+        public int minuteAtBlock = 999;
+        
         #endregion
 
         #region constructors
@@ -320,7 +319,7 @@ namespace MAD.jobSys
 
         public bool IsBlocked(DateTime now)
         {
-            if (now.Minute == _minuteAtBlock)
+            if (now.Minute == minuteAtBlock)
             {
                 return true;
             }
