@@ -76,7 +76,7 @@
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleSTRING.cs" />
     <Compile Include="JobSystem\JobScedule.cs" />
-    <Compile Include="JobSystem\Jobs\JobDeamonCheck.cs" />
+    <Compile Include="JobSystem\Jobs\JobServiceCheck.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\JobOptions.cs" />
