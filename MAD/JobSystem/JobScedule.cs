@@ -87,12 +87,10 @@ namespace MAD.jobSys
                                 }
                                 else if (_job.jobOptions.jobTime.type == JobTime.TimeType.Absolute)
                                 {
-                                    // GET the JobTime objects, which time is now and set minute and block boolean.
-
                                     JobTimeHandler _handler = _job.jobOptions.jobTime.GetJobTimeHandler(_time);
+                                    
                                     if (!_handler.IsBlocked(_time))
                                     {
-                                        // set block minute to the current minute.
                                         _handler.minuteAtBlock = _time.Minute;
                                     }
                                 }

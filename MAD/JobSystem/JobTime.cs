@@ -273,7 +273,7 @@ namespace MAD.jobSys
 
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
-        private int _minuteAtBlock;
+        private int _minuteAtBlock = 999;
         public int minuteAtBlock { set; }
 
         #endregion

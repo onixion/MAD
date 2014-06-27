@@ -1,0 +1,31 @@
+Das JobSystem hat die Aufgabe, alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
+Es bestimmt wieviele Jobs maximal initialisiert werden dürfen und ist für die Speicherung der Jobs verantwortlich.
+
+Der JobScedule hat die Aufgaben alle Jobs in periodischen Abständen (100ms) auf ihre JobTime-Objekte zu überprüfen.
+Das JobTime-Objekt entscheidet wann ein Job ausgeführt werden darf. Wenn das JobTime-Objekt für die Ausführung ein 'OK'
+gibt, kann der Scedule den Job in einem Pool aus Threads starten (SmartThreadPool). Dabei muss das JobTime-Objekt laufend
+vom JobScedule modifiziert werden, da sonst das JobTime-Objekt nur einmalig sein 'OK' gibt.
+
+Die JobTime-Klasse hat drei verschiedene Typen: NULL, Relativ und Absolute. 
+
+Alle JobTime-Objekte, die mit dem Typen NULL initalisiert werden,
+werden vom JobScedule nicht beachtet. D.h. auch wenn der Job laufen sollte, wird er NIE ausgeführt werden. 
+
+JobTime-Objekte mit dem Typen Relativ werden
+immer zyklisch ausgeführt (z.B. alle 20 Sekunden). 
+
+JobTime-Objekte mit dem Typen Absolute, können an ganz verschieden Tagen, Jahren, Stunden und 
+Minuten ausgeführt werden (z.B. jeden Tag um 19:30).
+
+Der JobScedule muss bei relativen Zeitangaben herunterählen und bei absoluten Zeitangaben das JobTime-Objekt sperren, damit der
+Job nicht mehrmals in der Minute ausgeführt wird.
+
+Die Job-Klasse ist eine 'abstrakte' Klasse, d.h. sie ist für die 'Vererbung' geschaffen und soll Objekte und Methoden, die ein Job für
+die Ausführung benötigen, bereitstellen.
+
+JobOutput ist eine Klasse, die die Ergebnisse des Jobs enthalten. (NOCH IN ARBEIT)
+
+JobNotification hat die Aufgabe, Regeln (auch JobNotificationRule) bereitzustellen, die nach dem Ausführen des Jobs kontrolliert werden.
+Werden die Regeln nicht eingehalten, wird eine Anfrage auf das NotificationSystem gestellt, eine Email an den Administrator zu senden.
+
+JobOptions ist eine Klasse, die die Aufgabe hat alle veränderbaren Eigenschaften des Jobs beisamenzuhalten.
