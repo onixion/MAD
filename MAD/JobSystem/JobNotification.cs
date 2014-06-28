@@ -26,9 +26,9 @@ namespace MAD.jobSys
 
         #region methodes
 
-        public void ParseAndSetNotification(string textToParse)
-        { 
-            
+        public static List<JobNotificationRule> ParseNotification(string textToParse)
+        {
+            return null;
         }
 
         public bool CheckRules()

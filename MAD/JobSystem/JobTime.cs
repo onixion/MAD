@@ -99,7 +99,7 @@ namespace MAD.jobSys
                     }
                     else
                     {
-                        throw new Exception("<color><red>JOB-TIME: NOT INITILIZED YET!");
+                        throw new Exception("Syntax-Error! Maybe too many ';'?");
                     }
                 }
 
@@ -122,7 +122,7 @@ namespace MAD.jobSys
                 }
                 catch (Exception)
                 {
-                    throw new Exception("<color><red>JOB-TIME: Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time argument(s)!");
                 }
 
                 if (_hour <= 23 && _hour >= 0)
@@ -134,17 +134,17 @@ namespace MAD.jobSys
                     }
                     else
                     {
-                        throw new Exception("<color><red>JOB-TIME: Minute can't be '" + _minute + "'!");
+                        throw new Exception("Minute can't be '" + _minute + "'!");
                     }
                 }
                 else
                 {
-                    throw new Exception("<color><red>JOB-TIME: Hour can't be '" + _hour + "'!");
+                    throw new Exception("Hour can't be '" + _hour + "'!");
                 }
             }
             else
             {
-                throw new Exception("<color><red>JOB-TIME: Syntax-Error! Maybe too many ':'?");
+                throw new Exception("Syntax-Error! Maybe too many ':'?");
             }
         }
 
@@ -162,7 +162,7 @@ namespace MAD.jobSys
                 }
                 catch (Exception)
                 {
-                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                    throw new Exception("Could not parse time argument(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -171,7 +171,7 @@ namespace MAD.jobSys
                 }
                 else
                 {
-                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31!");
+                    throw new Exception("Day can't be '" + _day + "'!");
                 }
 
             }
@@ -187,7 +187,7 @@ namespace MAD.jobSys
                 }
                 catch (Exception)
                 {
-                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                    throw new Exception("Could not parse time argument(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -199,12 +199,12 @@ namespace MAD.jobSys
                     }
                     else
                     {
-                        throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 12 or smaller than 1!");
+                        throw new Exception("Month can't be '" + _month + "'!");
                     }
                 }
                 else
                 {
-                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31 or smaller than 1!");
+                    throw new Exception("Day can't be '" + _day + "'!");
                 }
             }
             else if (_split.Length == 3)
@@ -221,7 +221,7 @@ namespace MAD.jobSys
                 }
                 catch (Exception)
                 {
-                    throw new Exception("<color><red>JOB-TIME: Could not parse job time!");
+                    throw new Exception("Could not parse time argument(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -234,17 +234,17 @@ namespace MAD.jobSys
                     }
                     else
                     {
-                        throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 12 or smaller than 1!");
+                        throw new Exception("Month can't be '" + _month + "'!");
                     }
                 }
                 else
                 {
-                    throw new Exception("<color><red>JOB-TIME: Day cannot be bigger than 31 or smaller than 1!");
+                    throw new Exception("Day can't be '" + _day + "'!");
                 }
             }
             else
             {
-                throw new Exception("<color><red>JOB-TIME: Syntax-Error! Maybe too many '.'?");
+                throw new Exception("Syntax-Error! Maybe too many '.'?");
             }
         }
 
