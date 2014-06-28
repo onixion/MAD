@@ -72,7 +72,7 @@ namespace MAD.jobSys
             {
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
-                // HERE
+
                 lock (_jobsLock)
                 {
                     foreach (Job _job in _jobs)
@@ -154,7 +154,18 @@ namespace MAD.jobSys
         private object JobInvoke(object job)
         {
             Job _job = (Job)job;
+
+            // Execute job and set all output varibales.
             _job.LaunchJob();
+
+            // Get Notificationrules which are validity and if necessary make a query to the NotificationSystem.
+            List<JobNotificationRule> _rules = _job.jobNotification.GetValidityRules();
+
+            if (_rules.Count != 0)
+            {
+                // Query to NotificationSystem.
+            }
+ 
             return null;
         }
 

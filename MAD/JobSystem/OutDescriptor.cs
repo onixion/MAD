@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace MAD.jobSys
 {
@@ -9,17 +8,32 @@ namespace MAD.jobSys
 
         public string name;
         public Type dataType;
-        public object[] data;
+        public object dataObject;
 
         #endregion
 
         #region constructor
 
-        public OutDescriptor(string name, Type dataType, params object[] data)
+        public OutDescriptor(string name, Type dataType)
         {
             this.name = name;
             this.dataType = dataType;
-            this.data = data;
+        }
+
+        #endregion
+
+        #region methodes
+
+        public void SetData(object dataObject)
+        {
+            if (dataObject.GetType() == dataType)
+            {
+                this.dataObject = dataObject;
+            }
+            else
+            {
+                throw new Exception("WRONG TYPE!");
+            }
         }
 
         #endregion

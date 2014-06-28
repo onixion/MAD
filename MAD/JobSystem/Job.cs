@@ -29,6 +29,8 @@ namespace MAD.jobSys
         public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
 
+        public JobNotification jobNotification = new JobNotification();
+
         #endregion
 
         #region constructor
