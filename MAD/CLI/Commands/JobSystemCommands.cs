@@ -164,13 +164,17 @@ namespace MAD.cli
     public class JobSystemAddServiceCheckCommand : Command
     {
         private JobSystem _js;
+        string serviceDescript = "Choose the service to check \n" +
+            "        Choose between following: \n" +
+            "           dns\n" +
+            "           NYI\n";
 
         public JobSystemAddServiceCheckCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("s", "SERVICE", "Choose the service to check", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
             //there will be more, still working
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
