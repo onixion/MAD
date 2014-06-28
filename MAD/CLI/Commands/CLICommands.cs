@@ -13,8 +13,7 @@ namespace MAD.cli
 
         public override string Execute()
         {
-            Environment.Exit(0);
-            return "";
+            return "EXIT_CLI";
         }
     }
 
@@ -90,13 +89,17 @@ namespace MAD.cli
 
                                 if (_temp.multiArguments)
                                 {
-                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...\n";
+                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...";
                                 }
                                 else
                                 {
-                                    output += "<ARGUMENT>\n";
+                                    if (!_temp.argumentEmpty)
+                                    {
+                                        output += "<ARGUMENT>";
+                                    }
                                 }
 
+                                output += "\n";
                                 output += "\t<color><gray>" + _temp.description + "\n\n";
                             }
                         }
@@ -111,19 +114,17 @@ namespace MAD.cli
 
                                 if (_temp.multiArguments)
                                 {
-                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...\n";
+                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...";
                                 }
                                 else
                                 {
                                     if (!_temp.argumentEmpty)
                                     {
-                                        output += "<ARGUMENT>\n";
-                                    }
-                                    {
-                                        output += "\n";
+                                        output += "<ARGUMENT>";
                                     }
                                 }
 
+                                output += "\n";
                                 output += "\t<color><gray>" + _temp.description + "\n\n";
                             }
                         }
