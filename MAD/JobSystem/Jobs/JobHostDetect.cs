@@ -72,7 +72,10 @@ namespace MAD.jobSys
 
                     if (_reply.Status == IPStatus.Success)
                     {
-                        _hostAddresses.Add(_reply.Address);
+                        if (!_hostAddresses.Contains(_reply.Address))
+                        {
+                            _hostAddresses.Add(_reply.Address);
+                        }
                     }
 
                     outState = OutState.Success;
@@ -89,6 +92,7 @@ namespace MAD.jobSys
 
         protected override string JobStatus()
         {
+            _tmp = "";
             _hostAddresses.ForEach(GiveAddresses);
 
             return (_tmp);
@@ -96,6 +100,7 @@ namespace MAD.jobSys
 
         private void GiveAddresses(IPAddress _tmpAdr)
         {
+
             _tmp += "IP: " + _tmpAdr.ToString() + "\n";
             //jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("Host", typeof(IPAddress), _tmpAdr));
         }
