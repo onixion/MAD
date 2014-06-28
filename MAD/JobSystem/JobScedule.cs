@@ -81,9 +81,9 @@ namespace MAD.jobSys
                         {
                             if (CheckJobTime(_job.jobTime, _time))
                             {
-                                if (_job.jobTime.type == JobTime.TimeType.Relativ)
+                                if (_job.jobTime.type == JobTime.TimeType.Relative)
                                 {
-                                    _job.jobTime.jobDelay.ResetRemainTime();
+                                    _job.jobTime.jobDelay.Reset();
                                     JobThreadStart(_job);
                                 }
                                 else if (_job.jobTime.type == JobTime.TimeType.Absolute)
@@ -99,9 +99,9 @@ namespace MAD.jobSys
                             }
                             else
                             {
-                                if (_job.jobTime.type == JobTime.TimeType.Relativ)
+                                if (_job.jobTime.type == JobTime.TimeType.Relative)
                                 {
-                                    _job.jobTime.jobDelay.WorkDelayTime(_cycleTime);
+                                    _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
                                 }
                             }
                         }
@@ -117,7 +117,7 @@ namespace MAD.jobSys
 
         private bool CheckJobTime(JobTime jobTime, DateTime time)
         {
-            if (jobTime.type == JobTime.TimeType.Relativ)
+            if (jobTime.type == JobTime.TimeType.Relative)
             {
                 if (jobTime.jobDelay.CheckTime())
                 {

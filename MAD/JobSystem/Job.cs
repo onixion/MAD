@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace MAD.jobSys
 {
@@ -9,8 +8,8 @@ namespace MAD.jobSys
         #region members
 
         private static int _jobsCount = 0;
-        public int jobID;
         private static object _jobInitLock = new object();
+        public int jobID;
 
         public string jobName;
 
@@ -80,7 +79,9 @@ namespace MAD.jobSys
         public void LaunchJob()
         {
             lastStarted = DateTime.Now;
+
             Execute();
+
             lastFinished = DateTime.Now;
 
             deltaTime = lastStarted.Subtract(lastFinished);
@@ -100,7 +101,7 @@ namespace MAD.jobSys
             _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString() + "\n";
             _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobTime.type.ToString() + "\n";
 
-            if (jobTime.type == JobTime.TimeType.Relativ)
+            if (jobTime.type == JobTime.TimeType.Relative)
             {
                 _temp += "<color><yellow>DELAY-TIME: <color><white>" + jobTime.jobDelay.delayTime + "\n";
                 _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + jobTime.jobDelay.delayTimeRemaining + "\n";

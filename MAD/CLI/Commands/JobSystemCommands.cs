@@ -54,7 +54,7 @@ namespace MAD.cli
                     tableRow[2] = _temp.jobType.ToString();
                     tableRow[3] = _temp.jobTime.type.ToString();
 
-                    if (_temp.jobTime.type == JobTime.TimeType.Relativ)
+                    if (_temp.jobTime.type == JobTime.TimeType.Relative)
                     {
                         tableRow[4] = _temp.jobTime.jobDelay.delayTime.ToString();
                     }
@@ -195,7 +195,7 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.type = JobTime.TimeType.Relative;
                     _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
@@ -215,7 +215,7 @@ namespace MAD.cli
             else
             {
                 _job.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
             _js.CreateJob(_job);
@@ -255,7 +255,7 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.type = JobTime.TimeType.Relative;
                     _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
@@ -275,7 +275,7 @@ namespace MAD.cli
             else
             {
                 _job.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
             _js.CreateJob(_job);
@@ -317,7 +317,7 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.type = JobTime.TimeType.Relative;
                     _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
@@ -337,7 +337,7 @@ namespace MAD.cli
             else
             {
                 _job.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
             if (OptionalParameterUsed("ttl"))
@@ -389,7 +389,7 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.type = JobTime.TimeType.Relative;
                     _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
@@ -409,7 +409,7 @@ namespace MAD.cli
             else
             {
                 _job.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
             if (OptionalParameterUsed("p"))
@@ -463,7 +463,7 @@ namespace MAD.cli
 
                 if (_argumentType == typeof(int))
                 {
-                    _job.jobTime.type = JobTime.TimeType.Relativ;
+                    _job.jobTime.type = JobTime.TimeType.Relative;
                     _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
                 }
                 else if (_argumentType == typeof(string))
@@ -483,7 +483,7 @@ namespace MAD.cli
             else
             {
                 _job.jobTime.jobDelay = new JobDelayHandler(20000);
-                _job.jobTime.type = JobTime.TimeType.Relativ;
+                _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
             try

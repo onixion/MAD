@@ -6,19 +6,12 @@ namespace MAD.jobSys
 {
     public class JobTime
     {
-        /*
-         * The purpose of this class is to handle the times of every job.
-         * A job can have a JobDelayHandler (relative, delay-time e.g. 20s) or multiple JobTimeHandlers (absolute, times e.g. 19:30). */
-
         #region members
 
-        public enum TimeType { NULL, Absolute, Relativ }
+        public enum TimeType { NULL, Absolute, Relative }
         public TimeType type;
 
-        // Relative
         public JobDelayHandler jobDelay;
-
-        // Absolute
         public List<JobTimeHandler> jobTimes;
 
         #endregion
@@ -38,13 +31,26 @@ namespace MAD.jobSys
 
         public JobTime(JobDelayHandler jobDelay)
         {
-            type = TimeType.Relativ;
+            type = TimeType.Relative;
             this.jobDelay = jobDelay;
         }
 
         #endregion
 
         #region methodes
+
+        public JobTimeHandler GetJobTimeHandler(DateTime time)
+        {
+            foreach (JobTimeHandler _handler in jobTimes)
+            {
+                if (_handler.CheckTime(time))
+                {
+                    return _handler;
+                }
+            }
+
+            return null;
+        }
 
         public static List<JobTimeHandler> ParseStringArray(object[] data)
         {
@@ -98,19 +104,6 @@ namespace MAD.jobSys
                 }
 
             return _buffer;
-        }
-
-        public JobTimeHandler GetJobTimeHandler(DateTime time)
-        {
-            foreach (JobTimeHandler _handler in jobTimes)
-            {
-                if (_handler.CheckTime(time))
-                {
-                    return _handler;
-                }
-            }
-
-            return null;
         }
 
         private static void ParseHourMinute(string data, ref int hour, ref int minute)
@@ -273,7 +266,7 @@ namespace MAD.jobSys
 
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
-        public int minuteAtBlock = 999;
+        public int minuteAtBlock = 100;
         
         #endregion
 
@@ -406,11 +399,17 @@ namespace MAD.jobSys
 
     public class JobDelayHandler
     {
+        #region members
+
         private int _delayTime;
         public int delayTime { get { return _delayTime; } }
 
         private int _delayTimeRemaining;
         public int delayTimeRemaining { get { return _delayTimeRemaining; } }
+
+        #endregion
+
+        #region constructor
 
         public JobDelayHandler(int delayTime)
         {
@@ -418,10 +417,9 @@ namespace MAD.jobSys
             _delayTimeRemaining = delayTime;
         }
 
-        public void ResetRemainTime()
-        {
-            _delayTimeRemaining = _delayTime;
-        }
+        #endregion
+
+        #region methodes
 
         public bool CheckTime()
         {
@@ -435,9 +433,16 @@ namespace MAD.jobSys
             }
         }
 
-        public void WorkDelayTime(int deltaTime)
+        public void Reset()
+        {
+            _delayTimeRemaining = _delayTime;
+        }
+
+        public void SubtractFromDelaytime(int deltaTime)
         {
             _delayTimeRemaining = _delayTimeRemaining - deltaTime;
         }
+
+        #endregion
     }
 }

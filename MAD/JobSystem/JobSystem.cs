@@ -25,6 +25,7 @@ namespace MAD.jobSys
         public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
+
             _scedule = new JobScedule(jobs, jobsLock);
         }
 
