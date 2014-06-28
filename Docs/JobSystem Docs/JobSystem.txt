@@ -29,4 +29,14 @@ JobTime-Objekte mit dem Typen Relativ werden immer zyklisch ausgeführt (z.B. all
 JobTime-Objekte mit dem Typen Absolute, können an verschieden Tagen, Jahren, Stunden und Minuten ausgeführt
 werden (z.B. jeden Tag um 19:30).
 
+JOBNOTIFICATION
+
+Diese Klasse beinhaltet alle JobNotificationRules. Diese Regeln werden nach der Ausführung des Jobs auf ihre Gültikeit
+überprüft. Ist mindestens eine Regel gültig, dann wird eine Anfrage an das NotificationSystem gegeben. Das NotificationSystem
+bekommt eine Liste mit allen gültigen Regeln und kann daraus, die nötigen Informationen herausholen.
+
+JONOTIFICATIONRULE
+
+Diese Klasse definiert eine Regel (=Rule). Die JobNotification-Klasse überprüft die Regeln auf ihre Gültigkeit.
+
 

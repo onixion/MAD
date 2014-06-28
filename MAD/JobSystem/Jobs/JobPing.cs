@@ -23,8 +23,6 @@ namespace MAD.jobSys
             this.targetAddress = IPAddress.Loopback;
             this.ttl = 250;
             this.dontFragment = true;
-
-            InitOutDescriptors();
         }
 
         public JobPing(string jobName, JobType jobType, JobTime jobTime, IPAddress targetAddress, int ttl)
@@ -33,16 +31,9 @@ namespace MAD.jobSys
             this.targetAddress = targetAddress;
             this.ttl = ttl;
             this.dontFragment = true;
-
-            InitOutDescriptors();
         }
 
         #region methodes
-
-        private void InitOutDescriptors()
-        {
-            outDescriptors.Add(new OutDescriptor("TTL-Left", typeof(int), null));
-        }
 
         public override void Execute()
         {
