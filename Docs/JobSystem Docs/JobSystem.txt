@@ -1,31 +1,32 @@
-Das JobSystem hat die Aufgabe, alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
-Es bestimmt wieviele Jobs maximal initialisiert werden dürfen und ist für die Speicherung der Jobs verantwortlich.
+JOBSYSTEM
 
-Der JobScedule hat die Aufgaben alle Jobs in periodischen Abständen (100ms) auf ihre JobTime-Objekte zu überprüfen.
+Das JobSystem hat die Aufgabe alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
+Es ist ein geschlossenes System und regelt den Zugriff auf die Jobs. 
+Das JobSystem kann die Jobs in einer JobTable speichern und diese zu einen anderen Zeitpunkt wieder hereinladen.
+
+
+JOBSCEDULE
+
+Der JobScedule hat die Aufgaben alle Jobs in periodischen Abständen (cycleTime) auf ihre JobTime-Objekte zu überprüfen.
 Das JobTime-Objekt entscheidet wann ein Job ausgeführt werden darf. Wenn das JobTime-Objekt für die Ausführung ein 'OK'
-gibt, kann der Scedule den Job in einem Pool aus Threads starten (SmartThreadPool). Dabei muss das JobTime-Objekt laufend
-vom JobScedule modifiziert werden, da sonst das JobTime-Objekt nur einmalig sein 'OK' gibt.
+gibt, kann der Scedule den Job in einem Pool aus Threads starten (SmartThreadPool).
 
-Die JobTime-Klasse hat drei verschiedene Typen: NULL, Relativ und Absolute. 
+Der Zugriff auf die JobTime-Klasse und die Verarbeitung der JobTime-Klasse ist einer der Hauptaufgaben des JobScedules.
+Die Verwaltung der NotificationRules ist die zweite Hauptaufgabe des JobScedules. Die JobNotification-Klasse muss nach
+dem Ausführen überprüft werden.
 
-Alle JobTime-Objekte, die mit dem Typen NULL initalisiert werden,
-werden vom JobScedule nicht beachtet. D.h. auch wenn der Job laufen sollte, wird er NIE ausgeführt werden. 
 
-JobTime-Objekte mit dem Typen Relativ werden
-immer zyklisch ausgeführt (z.B. alle 20 Sekunden). 
+JOBTIME
 
-JobTime-Objekte mit dem Typen Absolute, können an ganz verschieden Tagen, Jahren, Stunden und 
-Minuten ausgeführt werden (z.B. jeden Tag um 19:30).
+Wie oben bereits angeschnitten, ist die Hauptaufgabe der JobTime-Klasse das Überprüfen der Zeitangaben eines Jobs.
 
-Der JobScedule muss bei relativen Zeitangaben herunterählen und bei absoluten Zeitangaben das JobTime-Objekt sperren, damit der
-Job nicht mehrmals in der Minute ausgeführt wird.
+Die JobTime-Klasse hat drei verschiedene Typen: NULL, Relative und Absolute. 
+Alle JobTime-Objekte, die mit dem Typen NULL initalisiert werden, werden vom JobScedule nicht beachtet. 
+D.h. auch wenn der Job laufen sollte, wird er NIE ausgeführt. 
 
-Die Job-Klasse ist eine 'abstrakte' Klasse, d.h. sie ist für die 'Vererbung' geschaffen und soll Objekte und Methoden, die ein Job für
-die Ausführung benötigen, bereitstellen.
+JobTime-Objekte mit dem Typen Relativ werden immer zyklisch ausgeführt (z.B. alle 20 Sekunden). 
 
-JobOutput ist eine Klasse, die die Ergebnisse des Jobs enthalten. (NOCH IN ARBEIT)
+JobTime-Objekte mit dem Typen Absolute, können an verschieden Tagen, Jahren, Stunden und Minuten ausgeführt
+werden (z.B. jeden Tag um 19:30).
 
-JobNotification hat die Aufgabe, Regeln (auch JobNotificationRule) bereitzustellen, die nach dem Ausführen des Jobs kontrolliert werden.
-Werden die Regeln nicht eingehalten, wird eine Anfrage auf das NotificationSystem gestellt, eine Email an den Administrator zu senden.
 
-JobOptions ist eine Klasse, die die Aufgabe hat alle veränderbaren Eigenschaften des Jobs beisamenzuhalten.
