@@ -17,7 +17,7 @@ namespace MAD.jobSys
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
         public JobType jobType;
 
-        public enum JobState { Running, Stopped, Exception }
+        public enum JobState { Waiting, Running, Stopped, Exception }
         public JobState jobState = JobState.Stopped;
 
         public enum OutState { NULL, Success, Failed, Exception }
@@ -25,7 +25,7 @@ namespace MAD.jobSys
 
         public DateTime lastStarted;
         public DateTime lastFinished;
-        //public int deltaTime
+        public TimeSpan deltaTime;
 
         public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
@@ -55,7 +55,7 @@ namespace MAD.jobSys
         {
             if (jobState == JobState.Stopped)
             {
-                jobState = JobState.Running;
+                jobState = JobState.Waiting;
                 return true;
             }
             else
@@ -66,7 +66,7 @@ namespace MAD.jobSys
 
         public bool Stop()
         {
-            if (jobState == JobState.Running)
+            if (jobState != JobState.Stopped)
             {
                 jobState = JobState.Stopped;
                 return true;
@@ -82,6 +82,8 @@ namespace MAD.jobSys
             lastStarted = DateTime.Now;
             Execute();
             lastFinished = DateTime.Now;
+
+            deltaTime = lastStarted.Subtract(lastFinished);
         }
 
         public abstract void Execute();
@@ -115,7 +117,8 @@ namespace MAD.jobSys
                 _temp += "\n";
             }
 
-            _temp += "<color><yellow>OUTPUT-TIME: <color><white>" + lastFinished.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>LAST-STARTTIME: <color><white>" + lastStarted.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>LAST-STOPTIME: <color><white>" + lastFinished.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + outState.ToString() +"\n";
 
             return _temp + JobStatus();

@@ -39,3 +39,4 @@ Now using the TcpListener and TcpClient)
 [18.06.2014][17:30-18:00][0,5h][69h] JobTime now works.
 [20.06.2014][17:00-20:00][3h][72h] Removed singleton. Clean Coding..
 [27.06.2014][18:00-20:00][3h][75h] Removed JobOptions and JobOutput.
+[28.06.2014][18:30-19:30][1h][76h] Fixed some CLI-Mistakes and made some tests with the jobsystem. Seems to work properly...

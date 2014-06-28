@@ -190,7 +190,7 @@ namespace MAD.cli
 
             if (OptionalParameterUsed("hack"))
             {
-                output += "<color><red>\n\nBe careful, Jack may be sniffing arround ...";
+                output += "<color><red>\n\nBe careful, Jack may be listening ...";
             }
 
             return output;

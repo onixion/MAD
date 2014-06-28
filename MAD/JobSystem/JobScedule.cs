@@ -77,7 +77,7 @@ namespace MAD.jobSys
                 {
                     foreach (Job _job in _jobs)
                     {
-                        if (_job.jobState == Job.JobState.Running)
+                        if (_job.jobState == Job.JobState.Waiting)
                         {
                             if (CheckJobTime(_job.jobTime, _time))
                             {
