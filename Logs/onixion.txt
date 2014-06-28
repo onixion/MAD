@@ -38,3 +38,4 @@ Now using the TcpListener and TcpClient)
 [17.06.2014][18:00-20:30][2,5h][68,5h] Working on JobTime. Jobs can now have delay or times (e.g. daily 19:30 ...).
 [18.06.2014][17:30-18:00][0,5h][69h] JobTime now works.
 [20.06.2014][17:00-20:00][3h][72h] Removed singleton. Clean Coding..
+[27.06.2014][18:00-20:00][3h][75h] Removed JobOptions and JobOutput.
