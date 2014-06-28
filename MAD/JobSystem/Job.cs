@@ -14,7 +14,7 @@ namespace MAD.jobSys
 
         public string jobName;
 
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect }
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
         public JobType jobType;
 
         public enum JobState { Running, Stopped, Exception }

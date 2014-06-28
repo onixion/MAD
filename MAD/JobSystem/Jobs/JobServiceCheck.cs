@@ -19,13 +19,13 @@ namespace MAD.jobSys
         #region constructors
 
         public JobServiceCheck()
-            : base(new JobOptions("NULL", new JobTime(), JobOptions.JobType.ServiceCheck))
+            : base("NULL", JobType.ServiceCheck, new JobTime())
         {
             this.argument = "";
         }
 
-        public JobServiceCheck(JobOptions jobOptions, string argument)
-            : base(jobOptions)
+        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument)
+            : base(jobName, jobType, jobTime)
         {
             this.argument = argument;
         }
@@ -53,12 +53,12 @@ namespace MAD.jobSys
             if (working)
             {
                 _tmp += "Requestet service is working";
-                jobOutput.jobState = JobOutput.State.Success;
+                outState = OutState.Success;
             }
             else
             {
                 _tmp += "Requestet service seems to be dead";
-                jobOutput.jobState = JobOutput.State.Failed;
+                outState = OutState.Failed;
             }
 
             return (_tmp);
