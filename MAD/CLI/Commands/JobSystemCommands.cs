@@ -247,7 +247,7 @@ namespace MAD.cli
             _job.jobType = Job.JobType.HostDetect;
 
             _job.Net = (IPAddress)parameters.GetParameter("a").argumentValue[0];
-            _job.Net = (IPAddress)parameters.GetParameter("m").argumentValue[0];
+            _job.Subnetmask = (IPAddress)parameters.GetParameter("m").argumentValue[0];
 
             if (OptionalParameterUsed("t"))
             {
