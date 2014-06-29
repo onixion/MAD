@@ -72,7 +72,10 @@ namespace MAD.jobSys
 
                     if (_reply.Status == IPStatus.Success)
                     {
-                        _hostAddresses.Add(_reply.Address);
+                        if (!_hostAddresses.Contains(_reply.Address))
+                        {
+                            _hostAddresses.Add(_reply.Address);
+                        }
                     }
 
                     outState = OutState.Success;
