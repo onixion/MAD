@@ -12,6 +12,10 @@ namespace MAD.jobSys
         #region members
 
 		public string argument;
+        public string username;
+        public string password;
+        public IPAddress targetIP;
+        
         private bool working; 
 
         #endregion
@@ -22,12 +26,18 @@ namespace MAD.jobSys
             : base("NULL", JobType.ServiceCheck, new JobTime())
         {
             this.argument = "";
+            this.username = "";
+            this.password = "";
+            this.targetIP = IPAddress.Parse("127.0.0.1");
         }
 
-        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument)
+        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument, IPAddress targetIP, string username, string password)
             : base(jobName, jobType, jobTime)
         {
             this.argument = argument;
+            this.username = username;
+            this.password = password;
+            this.targetIP = targetIP;
         }
 
         #endregion
@@ -43,6 +53,9 @@ namespace MAD.jobSys
 			case "dns":
 				dnsCheck ();
 				break;
+            case "ftp":
+                ftpCheck();
+                break;
 			}
 		}
 
@@ -72,7 +85,7 @@ namespace MAD.jobSys
 		{
             try
             {
-                IPHostEntry _tmp = Dns.GetHostEntry("www.google.at");
+                IPHostEntry _tmp = Dns.GetHostEntry("www.google.com");
                 working = true;
             }
             catch (Exception)
@@ -81,6 +94,23 @@ namespace MAD.jobSys
             }
 		}
 
+        private void ftpCheck()
+        {
+            FtpWebRequest requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://"+targetIP.ToString()));
+            requestDir.Credentials = new NetworkCredential(username, password);
+            requestDir.Method = WebRequestMethods.Ftp.PrintWorkingDirectory;
+
+            try
+            {
+                FtpWebResponse response = (FtpWebResponse)requestDir.GetResponse();
+                working = true;
+            }
+
+            catch (Exception)
+            {
+                working = false;
+            }
+        }
 		#endregion 
 
 		#endregion

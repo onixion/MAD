@@ -166,7 +166,8 @@ namespace MAD.cli
         private JobSystem _js;
         string serviceDescript = "Choose the service to check \n" +
             "        Choose between following: \n" +
-            "           dns\n" +
+            "           dns -> doesn't need any more arguments\n" +
+            "           ftp -> needs -a, -u, -p; leave username and password empty if there is no\n" +
             "           NYI\n";
 
         public JobSystemAddServiceCheckCommand(object[] args)
@@ -176,7 +177,10 @@ namespace MAD.cli
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
             //there will be more, still working
-            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            optionalParameter.Add(new ParameterOption("a", "IPADDRESS", "IP-Address of the server", false, false, new Type[] { typeof(IPAddress) }));
+            optionalParameter.Add(new ParameterOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
+            optionalParameter.Add(new ParameterOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
+            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
         }
 
@@ -188,6 +192,13 @@ namespace MAD.cli
             _job.jobType = Job.JobType.ServiceCheck;
 
             _job.argument = (string)parameters.GetParameter("s").argumentValue[0];
+
+            if (OptionalParameterUsed("a"))
+                _job.targetIP = (IPAddress)parameters.GetParameter("a").argumentValue[0];
+            if (OptionalParameterUsed("u"))
+                _job.username = (string)parameters.GetParameter("u").argumentValue[0];
+            if (OptionalParameterUsed("p"))
+                _job.password = (string)parameters.GetParameter("p").argumentValue[0];
 
             if (OptionalParameterUsed("t"))
             {
