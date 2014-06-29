@@ -33,6 +33,7 @@ namespace MAD.cli
 
         #endregion
 
+        // TODO: if no colortag is given -> make it gray
         public static void WriteToConsole(string data)
         {
             lock (_consoleLock)
@@ -41,18 +42,21 @@ namespace MAD.cli
                 {
                     string[] temp = data.Split(new string[] { colorTag }, StringSplitOptions.None);
 
-                    for (int i = 0; i < temp.Length; i++)
+                    if (temp.Length != 1)
                     {
-                        foreach (object[] buffer in colors)
+                        for (int i = 0; i < temp.Length; i++)
                         {
-                            string color = (string)buffer[0];
-
-                            if (temp[i].StartsWith(color))
+                            foreach (object[] buffer in colors)
                             {
-                                temp[i] = temp[i].Remove(0, color.Length);
-                                Console.ForegroundColor = (ConsoleColor)buffer[1];
-                                Console.Write(temp[i]);
-                                break;
+                                string color = (string)buffer[0];
+
+                                if (temp[i].StartsWith(color))
+                                {
+                                    temp[i] = temp[i].Remove(0, color.Length);
+                                    Console.ForegroundColor = (ConsoleColor)buffer[1];
+                                    Console.Write(temp[i]);
+                                    break;
+                                }
                             }
                         }
                     }
@@ -61,6 +65,19 @@ namespace MAD.cli
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
+        }
+
+        private static bool ColorExist(string color)
+        {
+            foreach (string[] _color in colors)
+            {
+                if (_color[0] == color)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public static string ReadFromConsole()

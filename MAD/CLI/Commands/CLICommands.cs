@@ -207,7 +207,7 @@ namespace MAD.cli
 
         public override string Execute()
         {
-            output += "<color><white>" + CommandIO.colors.Count + " colors available.\n";
+            output += "" + CommandIO.colors.Count + " colors available.\n";
             
             foreach(object[] _temp in CommandIO.colors)
             {

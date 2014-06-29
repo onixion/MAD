@@ -58,7 +58,7 @@
     <Compile Include="CLI\CLI.cs" />
     <Compile Include="CLI\CLIFramework.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
-    <Compile Include="CLI\Command\CommandIO.cs" />
+    <Compile Include="CLI\CommandIO.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Parameter\Parameter.cs" />
     <Compile Include="CLI\Parameter\ParameterInput.cs" />
