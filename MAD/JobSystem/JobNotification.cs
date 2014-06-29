@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Net.Mail;
 using System.Collections.Generic;
 
@@ -8,20 +9,16 @@ namespace MAD.jobSys
     {
         #region members
 
-        public MailAddress[] mailAddresses;
+        public List<MailAddress> mailAddresses = new List<MailAddress>();
         public List<JobNotificationRule> rules = new List<JobNotificationRule>();
 
         #endregion
 
         #region constructors
 
-        public JobNotification()
-        {
-            this.mailAddresses = new MailAddress[0];
-            this.rules = new List<JobNotificationRule>();
-        }
+        public JobNotification() { }
 
-        public JobNotification(MailAddress[] mailAddresses, List<JobNotificationRule> rules)
+        public JobNotification(List<MailAddress> mailAddresses, List<JobNotificationRule> rules)
         {
             this.mailAddresses = mailAddresses;
             this.rules = rules;
@@ -31,12 +28,35 @@ namespace MAD.jobSys
 
         #region methodes
 
-        public static List<JobNotificationRule> ParseNotification(string text)
+        // TODO
+        public static List<JobNotificationRule> ParseNotification(object[] data, List<OutDescriptor> outDescriptors)
         {
+            List<JobNotificationRule> _buffer = new List<JobNotificationRule>();
+
+            return _buffer;
+        }
+
+        // TODO
+        private static void ParseNotificationInput(string data, ref string head, ref char operationTag, ref string value)
+        {
+
+        }
+
+        private static OutDescriptor GetOutDescriptor(List<OutDescriptor> outDescriptors, string name)
+        {
+            foreach (OutDescriptor _temp in outDescriptors)
+            {
+                if (_temp.name == name)
+                {
+                    return _temp;
+                }
+            }
+
             return null;
         }
 
-        public static MailAddress[] ParseMailAddresses(params string[] mailAddresses)
+        // TODO
+        public static List<MailAddress> ParseMailAddresses(params string[] mailAddresses)
         {
             return null;
         }

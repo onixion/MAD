@@ -24,7 +24,7 @@ namespace MAD.jobSys
 
         public DateTime lastStarted;
         public DateTime lastFinished;
-        public TimeSpan deltaTime;
+        public TimeSpan lastTimeSpan;
 
         public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
@@ -86,7 +86,7 @@ namespace MAD.jobSys
 
             lastFinished = DateTime.Now;
 
-            deltaTime = lastStarted.Subtract(lastFinished);
+            lastTimeSpan = lastStarted.Subtract(lastFinished);
         }
 
         public abstract void Execute();
@@ -122,6 +122,7 @@ namespace MAD.jobSys
 
             _temp += "<color><yellow>LAST-STARTTIME: <color><white>" + lastStarted.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             _temp += "<color><yellow>LAST-STOPTIME: <color><white>" + lastFinished.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>LAST-TIMESPAN: <color><white>" + lastTimeSpan.Seconds + "s " + lastTimeSpan.Milliseconds + "ms (" + lastTimeSpan.Ticks + " ticks)\n";
             _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + outState.ToString() +"\n";
 
             return _temp + JobStatus();

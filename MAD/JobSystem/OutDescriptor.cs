@@ -37,6 +37,5 @@ namespace MAD.jobSys
         }
 
         #endregion
-    }
-    
+    }  
 }
