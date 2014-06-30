@@ -1,12 +1,19 @@
 CLI
 
 CLI ist eine Klasse, die eine CLI definiert. Farben usw. werden in der CLI definiert und nicht im Framework,
-da (als Beispiel) die Farbe des Cursors nicht für die Verarbeitung der Eingabe relevant sind.
+da (als Beispiel) die Farbe des Cursors nicht für die Verarbeitung der Eingabe relevant ist.
 
 
 CLISession
 
 Die CLISession ist genau das gleiche wie die CLI-Klasse, nur das sie für den CLIServer angepasst ist.
+
+
+CLIServer
+
+Sie ist für die CLISessions zuständig. Das Verarbeiten der Clients ist die Hauptaufgabe dieser Klasse.
+Sobald ein Client sich korrekt authentifiziert hat, wird eine CLISession gestartet. Und die CLISession
+kommuniziert mit dem Client.
 
 
 CLIFramework
@@ -18,4 +25,5 @@ Alle Methoden, die zur Verarbeitung der CLI-Eingabe benötigt werden, sind im Fra
 Command
 
 Die Command-Klasse ist ein sehr wichtige Grund-Klasse der CLI. Die Command-Klasse ist eine abstrakte Klasse.
-Alle Methoden, die zur Verarbeitung der CLI-Eingabe benötigt werden, sind in ihr eingebetet.
+Alle Methoden, die zur Verarbeitung der CLI-Eingabe benötigt werden, sind in ihr eingebetet. Die Command-Klasse
+und das CLI-Framework arbeiten eng zusammen (Überprüfen der Parameter, Erstellen des Command-Objectes etc.).
