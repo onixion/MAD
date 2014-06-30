@@ -4,15 +4,23 @@ namespace MAD
 {
     public class ConsoleTable
     {
+        #region members
+
         private string[] _columnesTitles;
         private int _columneWidth;
         public string splitline = "".PadRight(Console.BufferWidth, '_');
+
+        #endregion
+
+        #region constructor
 
         public ConsoleTable(string[] columnesTitles, int consoleWidth)
         {
             _columnesTitles = columnesTitles;
             _columneWidth = consoleWidth / columnesTitles.Length - 1;
         }
+
+        #endregion
 
         #region methodes
 

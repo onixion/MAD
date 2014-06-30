@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace MAD.cli
 {
-    public static class CommandIO
+    public static class ConsoleIO
     {
         private static object _consoleLock = new object();
 
@@ -33,7 +33,6 @@ namespace MAD.cli
 
         #endregion
 
-        // TODO: if no colortag is given -> make it gray
         public static void WriteToConsole(string data)
         {
             lock (_consoleLock)
@@ -41,11 +40,14 @@ namespace MAD.cli
                 if (data != "")
                 {
                     string[] temp = data.Split(new string[] { colorTag }, StringSplitOptions.None);
+                    bool _colorTagFound;
 
                     if (temp.Length != 1)
                     {
                         for (int i = 0; i < temp.Length; i++)
                         {
+                            _colorTagFound = false;
+
                             foreach (object[] buffer in colors)
                             {
                                 string color = (string)buffer[0];
@@ -53,38 +55,32 @@ namespace MAD.cli
                                 if (temp[i].StartsWith(color))
                                 {
                                     temp[i] = temp[i].Remove(0, color.Length);
+
                                     Console.ForegroundColor = (ConsoleColor)buffer[1];
                                     Console.Write(temp[i]);
+
+                                    _colorTagFound = true;
                                     break;
                                 }
                             }
+
+                            // If no color-tag was found, write it in gray.
+                            if (!_colorTagFound)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Gray;
+                                Console.Write(temp[i]);
+                            }
                         }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.Write(data);
                     }
 
                     Console.Write("\n");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
-            }
-        }
-
-        private static bool ColorExist(string color)
-        {
-            foreach (string[] _color in colors)
-            {
-                if (_color[0] == color)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static string ReadFromConsole()
-        {
-            lock (_consoleLock)
-            {
-                return Console.ReadLine();
             }
         }
     }

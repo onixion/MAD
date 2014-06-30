@@ -17,6 +17,8 @@ namespace MAD.jobSys
 
         #endregion
 
+        #region constructor
+
         public JobPing()
             : base("NULL", JobType.Ping, new JobTime())
         {
@@ -32,6 +34,8 @@ namespace MAD.jobSys
             this.ttl = ttl;
             this.dontFragment = true;
         }
+
+        #endregion
 
         #region methodes
 

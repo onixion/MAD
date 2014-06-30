@@ -66,7 +66,7 @@ namespace MAD.cli
 
         public void Start()
         {
-            CommandIO.WriteToConsole(GetBanner());
+            ConsoleIO.WriteToConsole(GetBanner());
 
             while (true)
             {
@@ -92,15 +92,38 @@ namespace MAD.cli
                             break;
 
                         // Write command ouput to console.
-                        CommandIO.WriteToConsole(response);
+                        ConsoleIO.WriteToConsole(response);
                     }
                     else
                     {
                         // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
-                        CommandIO.WriteToConsole(response);
+                        ConsoleIO.WriteToConsole(response);
                     }
                 }
             }
+        }
+
+        private void WriteCursor()
+        {
+            Console.ForegroundColor = _cursorColor;
+            Console.Write(_cursor);
+            Console.ForegroundColor = _inputColor;
+        }
+
+        #region input reading
+
+        private string GetBanner()
+        {
+            string _buffer = "";
+
+            _buffer += @"<color><cyan> ___  ___  ___ ______ " + "\n";
+            _buffer += @"<color><cyan> |  \/  | / _ \|  _  \" + "\n";
+            _buffer += @"<color><cyan> |      |/ /_\ \ | | |" + "\n";
+            _buffer += @"<color><cyan> | |\/| ||  _  | | | | <color><yellow>VERSION <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
+            _buffer += @"<color><cyan> | |  | || | | | |_/ | <color><yellow>TIME: <color><white>" + DateTime.Now.ToString("HH:mm:ss") + " <color><yellow>DATE: <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
+            _buffer += @"<color><cyan> \_|  |_/\_| |_/_____/_________________________________" + "\n";
+
+            return _buffer;
         }
 
         private string ReadInput()
@@ -241,25 +264,6 @@ namespace MAD.cli
             Console.SetCursorPosition(Console.CursorLeft + 1, Console.CursorTop);
         }
 
-        private void WriteCursor()
-        {
-            Console.ForegroundColor = _cursorColor;
-            Console.Write(_cursor);
-            Console.ForegroundColor = _inputColor;
-        }
-
-        private string GetBanner()
-        {
-            string _buffer = "";
-
-            _buffer += @"<color><cyan> ___  ___  ___ ______ " + "\n";
-            _buffer += @"<color><cyan> |  \/  | / _ \|  _  \" + "\n";
-            _buffer += @"<color><cyan> |      |/ /_\ \ | | |" + "\n";
-            _buffer += @"<color><cyan> | |\/| ||  _  | | | | <color><yellow>VERSION <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
-            _buffer += @"<color><cyan> | |  | || | | | |_/ | <color><yellow>TIME: <color><white>" + DateTime.Now.ToString("HH:mm:ss") + " <color><yellow>DATE: <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
-            _buffer += @"<color><cyan> \_|  |_/\_| |_/_____/_________________________________" + "\n";
-
-            return _buffer;
-        }
+        #endregion
     }
 }
