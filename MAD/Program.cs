@@ -3,12 +3,13 @@ using System.Windows.Forms;
 
 using MAD.jobSys;
 using MAD.cli;
+using nc;
 
 namespace MAD
 {
     class Program
     {
-        /* MAD - Network Monitoring v0.0.3.2 */
+        /* MAD - Network Monitoring v0.0.3.3 */
 
         private const string dataPath = "data";
 

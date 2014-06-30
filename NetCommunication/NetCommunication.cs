@@ -50,7 +50,7 @@ namespace nc
             return DecryptAES(_reader.ReadString(), pass, GetKeySize(keySize));
         }
 
-        private static string EncryptAES(string data, string pass, int keySize)
+        public static string EncryptAES(string data, string pass, int keySize)
         {
             byte[] _pass = Encoding.UTF8.GetBytes(pass);
             byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
@@ -82,7 +82,7 @@ namespace nc
             return Convert.ToBase64String(_clipherText);
         }
 
-        private static string DecryptAES(string clipherText, string pass, int keySize)
+        public static string DecryptAES(string clipherText, string pass, int keySize)
         {
             byte[] _pass = Encoding.UTF8.GetBytes(pass);
             byte[] _salt = Encoding.ASCII.GetBytes("Kosher");
