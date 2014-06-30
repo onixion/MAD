@@ -17,6 +17,7 @@ namespace MAD
         static int Main(string[] args)
         {
             JobSystem js = new JobSystem(dataPath);
+
             CLIServer cliServer = new CLIServer(999, "data", js);
             CLI cli = new CLI(dataPath, js, cliServer);
             
