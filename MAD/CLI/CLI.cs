@@ -8,19 +8,23 @@ namespace MAD.cli
 {
     public class CLI : CLIFramework
     {
-        private Version _version = new Version(1, 6);
-        public Version version { get { return _version; } }
+        #region members
 
-        private int _maxHistoryEntries = 5;
-        private string _cursor = "=> ";
         private ConsoleColor _cursorColor = ConsoleColor.Cyan;
         private ConsoleColor _inputColor = ConsoleColor.White;
 
+        private string _cursor = "=> ";
+
         private List<string> _cliHistory = new List<string>();
+        private int _maxHistoryEntries = 5;
 
         private string _dataPath;
         private JobSystem _js;
         private CLIServer _cliServer;
+
+        #endregion
+
+        #region constructor
 
         public CLI(string dataPath, JobSystem js, CLIServer cliServer)
             :base()
@@ -31,6 +35,10 @@ namespace MAD.cli
 
             InitCommands();
         }
+
+        #endregion
+
+        #region methodes
 
         private void InitCommands()
         {
@@ -58,6 +66,7 @@ namespace MAD.cli
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { _cliServer }));
             commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { _cliServer }));
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { _cliServer }));
+            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { _cliServer }));
 
             // NOTIFICATION COMMANDS
 
@@ -109,8 +118,6 @@ namespace MAD.cli
             Console.Write(_cursor);
             Console.ForegroundColor = _inputColor;
         }
-
-        #region input reading
 
         private string GetBanner()
         {

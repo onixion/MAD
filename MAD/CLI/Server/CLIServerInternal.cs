@@ -10,14 +10,15 @@ namespace MAD.cli
     {
         # region member
 
-        public Version internalVersion = new Version(0, 2);
-
         private Thread _listenThread;
         private SmartThreadPool _threadPool = new SmartThreadPool();
 
         private bool _listenThreadRunning = false;
         private object _lock = new object();
-        public bool listening { get { return _listenThreadRunning; } }
+
+        public bool IsListening { get { return _listenThreadRunning; } }
+
+        public int serverPort = 0;
 
         #endregion
 

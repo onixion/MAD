@@ -30,8 +30,7 @@ namespace MAD.cli
         public CLIServer(string dataPath, int port)
         {
             _dataPath = dataPath;
-
-            _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, port));
+            serverPort = port;
 
             // TODO: Load users out of the database.
             _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
@@ -45,6 +44,7 @@ namespace MAD.cli
         {
             try
             {
+                _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, serverPort));
                 _serverListener.Start();
                 return true;
             }
@@ -57,6 +57,18 @@ namespace MAD.cli
         protected override void StopListener()
         {
             _serverListener.Stop();
+        }
+
+        public void ChangePort(int newPort)
+        {
+            if (!IsListening)
+            {
+                serverPort = newPort;
+            }
+            else
+            {
+                throw new Exception("Server running!");
+            }
         }
 
         protected override object GetClient()
@@ -74,20 +86,22 @@ namespace MAD.cli
 
             try
             {
-                // send server info
+                // First send server informations to client.
                 NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
                 /* TODO: asymmetric handshake and then AES encryption. */
 
-                // receive login data
+                // Receive the login-data.
                 string loginData = NetCom.ReceiveString(_clientStream);
 
-                // check login data and load cliuser
+                // Checl the login-data.
                 CLIUser _user = Login(loginData);
 
                 if (_user != null)
                 {
                     NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
+
+                    // Start CLISession for client.
                     _sessions.Add(new CLISession(_client, _user));
                 }
                 else
@@ -97,11 +111,11 @@ namespace MAD.cli
             }
             catch (Exception)
             {
-                // client lost connection
+                // Client lost connection or disconnected.
                 Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") lost connection to server.");
             }
 
-            // client disconnected
+            // Client disconnected.
             Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") disconnected.");
 
             _client.Close();

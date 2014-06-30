@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
-using System.Security.Cryptography;
+using nc;
 
 namespace CLIClient
 {
@@ -20,12 +20,16 @@ namespace CLIClient
 
         #endregion
 
+        #region constructor
+
         public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
         {
             _serverEndPoint = serverEndPoint;
             _username = username;
             _passwordMD5 = passwordMD5;
         }
+
+        #endregion
 
         #region methodes
 
@@ -42,6 +46,7 @@ namespace CLIClient
                 _stream = _client.GetStream();
 
                 CLIConnection(_stream);
+
                 _stream.Close();
 
                 Console.WriteLine("Disconnected.");
@@ -56,13 +61,13 @@ namespace CLIClient
 
         private void CLIConnection(NetworkStream _stream)
         {
-            Console.WriteLine("SERVER-INFO: " + NetCommunication.ReceiveString(_stream));
-            NetCommunication.SendString(_stream, _username + "<seperator>" + _passwordMD5, true);
+            Console.WriteLine("SERVER-INFO: " + NetCom.ReceiveString(_stream));
+            NetCom.SendString(_stream, _username + "<seperator>" + _passwordMD5, true);
 
-            switch (NetCommunication.ReceiveString(_stream))
+            switch (NetCom.ReceiveString(_stream))
             { 
                 case "ACCESS GRANTED":
-                    RemoteConsole(_stream);
+                    StartVirtualConsole(_stream);
                     break;
                 case "ACCESS DENIED":
                     Console.WriteLine("Server denied access!");
@@ -73,17 +78,17 @@ namespace CLIClient
             }
         }
 
-        private void RemoteConsole(NetworkStream stream)
+        private void StartVirtualConsole(NetworkStream stream)
         {
-            Console.Write(NetCommunication.ReceiveString(stream));
+            Console.Write(NetCom.ReceiveString(stream));
 
             while (true)
             {
                 cliInput = Console.ReadLine();
 
-                NetCommunication.SendString(stream, cliInput, true);
+                NetCom.SendString(stream, cliInput, true);
 
-                ConsoleWriter.WriteToConsole(NetCommunication.ReceiveString(stream));
+                ConsoleWriter.WriteToConsole(NetCom.ReceiveString(stream));
             }
         }
 

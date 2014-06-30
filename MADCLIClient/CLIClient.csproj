@@ -39,13 +39,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLIClient\ConsoleWriter.cs" />
-    <Compile Include="CLIClient\NetCommunication.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CLIClient\CLIClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetCommunication\NetCommunication.csproj">
+      <Project>{E7664DE4-32D2-4CE1-8630-902B81E69D0E}</Project>
+      <Name>NetCommunication</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
