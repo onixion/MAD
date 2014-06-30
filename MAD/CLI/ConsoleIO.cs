@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace MAD.cli
 {
     public static class ConsoleIO
     {
-        private static object _consoleLock = new object();
+        #region members
 
-        #region Colors
+        public static object _consoleLock = new object();
 
         private const string colorTag = "<color>";
 
@@ -32,6 +31,8 @@ namespace MAD.cli
         };
 
         #endregion
+
+        #region methodes
 
         public static void WriteToConsole(string data)
         {
@@ -83,5 +84,7 @@ namespace MAD.cli
                 }
             }
         }
+
+        #endregion
     }
 }

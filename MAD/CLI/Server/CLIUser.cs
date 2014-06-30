@@ -7,7 +7,7 @@ namespace MAD.cli
         public string username;
         public string passwordMD5;
 
-        // TODO: Do we really want groups?
+        // TODO: Do we really want groups? Are CLIUsers really necessary?
 
         public Group group;
         public enum Group { root,jobs,clis }

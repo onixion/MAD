@@ -8,7 +8,7 @@ namespace MAD.cli
         public ExitCommand()
             : base()
         {
-            description = "This command exits the program.";
+            description = "This command exits the cli.";
         }
 
         public override string Execute()
@@ -27,7 +27,7 @@ namespace MAD.cli
             _commands = (List<CommandOptions>)commands[0];
 
             optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID for the specific command." , false, false, new Type[] { typeof(int) }));
-            description = "This command shows information about other available commands.";
+            description = "This command shows information about available commands.";
         }
 
         public override string Execute()
@@ -207,7 +207,7 @@ namespace MAD.cli
 
         public override string Execute()
         {
-            output += "" + ConsoleIO.colors.Count + " colors available.\n";
+            output += "<color><white>" + ConsoleIO.colors.Count + " colors available.\n";
 
             foreach (object[] _temp in ConsoleIO.colors)
             {

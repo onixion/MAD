@@ -8,9 +8,6 @@ namespace MAD.cli
     {
         #region member
 
-        private Version _version = new Version(1,7);
-        public Version versionFramework { get { return _version; } }
-
         protected List<CommandOptions> commands = new List<CommandOptions>();
 
         #endregion
@@ -23,7 +20,8 @@ namespace MAD.cli
          * 
          * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
          * If the parameter are not valid it returns the error text, which get displayed onto
-         * the CLI. */
+         * the CLI. When the parsing was successful, the Command-Object will be set and be ready
+         * for execution. */
         protected string AnalyseInput(string cliInput, ref Command command)
         {
             // First get the command-name.

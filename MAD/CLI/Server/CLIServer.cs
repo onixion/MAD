@@ -25,6 +25,8 @@ namespace MAD.cli
 
         #endregion
 
+        #region constructor
+
         public CLIServer(string dataPath, int port)
         {
             _dataPath = dataPath;
@@ -34,6 +36,8 @@ namespace MAD.cli
             // TODO: Load users out of the database.
             _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
         }
+
+        #endregion
 
         #region methodes
 
@@ -71,24 +75,24 @@ namespace MAD.cli
             try
             {
                 // send server info
-                nc.NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
+                NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
                 /* TODO: asymmetric handshake and then AES encryption. */
 
                 // receive login data
-                string loginData = nc.NetCom.ReceiveString(_clientStream);
+                string loginData = NetCom.ReceiveString(_clientStream);
 
                 // check login data and load cliuser
                 CLIUser _user = Login(loginData);
 
                 if (_user != null)
                 {
-                    nc.NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
+                    NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
                     _sessions.Add(new CLISession(_client, _user));
                 }
                 else
                 {
-                    nc.NetCom.SendString(_clientStream, "ACCESS DENIED", true);
+                    NetCom.SendString(_clientStream, "ACCESS DENIED", true);
                 }
             }
             catch (Exception)
