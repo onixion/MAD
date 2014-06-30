@@ -38,7 +38,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLIClient\ConsoleWriter.cs" />
+    <Compile Include="CLIClient\ConsoleIO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CLIClient\CLIClient.cs" />

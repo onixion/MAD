@@ -1,8 +1,9 @@
 JOBSYSTEM
 
 Das JobSystem hat die Aufgabe alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
-Es ist ein geschlossenes System und regelt den Zugriff auf die Jobs. 
-Das JobSystem kann die Jobs in einer JobTable speichern und diese zu einen anderen Zeitpunkt wieder hereinladen.
+Es ist ein geschlossenes System und regelt den Zugriff auf die Jobs.
+
+Das JobSystem kann die Jobs in einer JobTable speichern und diese zu einen anderen Zeitpunkt wieder laden.
 
 
 JOBSCEDULE
@@ -13,7 +14,7 @@ gibt, kann der Scedule den Job in einem Pool aus Threads starten (SmartThreadPoo
 
 Der Zugriff auf die JobTime-Klasse und die Verarbeitung der JobTime-Klasse ist einer der Hauptaufgaben des JobScedules.
 Die Verwaltung der NotificationRules ist die zweite Hauptaufgabe des JobScedules. Die JobNotification-Klasse muss nach
-dem Ausführen überprüft werden.
+dem Ausführen überprüft werden und falls nötig, sorgt die JobNotifcation-Klasse für eine Benachrichtigung.
 
 
 JOBTIME

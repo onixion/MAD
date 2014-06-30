@@ -6,6 +6,9 @@ using System.Net.Sockets;
 using System.Text;
 using nc;
 
+using MAD.jobSys;
+
+
 namespace MAD.cli
 {
     public class CLISession : CLIFramework
@@ -27,7 +30,7 @@ namespace MAD.cli
         #endregion
 
         public CLISession(TcpClient client, CLIUser user)
-            :base()
+            : base()
         {
             lock (_sessionInitLock)
             {
@@ -38,38 +41,16 @@ namespace MAD.cli
             _client = client;
             _clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
             _user = user;
-
-            InitCLI();
-            this.Start();
         }
 
         #region methodes
 
-        private void InitCLI()
-        {
-            // GENERAL
-            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
-            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-            //commands.Add(new CommandOptions("test", typeof(TestCommand), null));
-
-            // JOBSYSTEM
-            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), null));
-            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), null));
-            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), null));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), null));
-            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), null));
-            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), null));
-            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), null));
-            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), null));
-        }
-
-        private void Start()
+        public void Start()
         {
             NetworkStream _stream = _client.GetStream();
             Command _command = null;
 
-            nc.NetCom.SendString(_stream, _cursor, true);
+            NetCom.SendString(_stream, _cursor, true);
 
             while (true)
             {

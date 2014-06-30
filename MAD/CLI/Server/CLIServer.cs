@@ -6,16 +6,18 @@ using System.Text;
 using System.IO;
 using nc;
 
+using MAD.jobSys;
+
 namespace MAD.cli
 {
     public class CLIServer : CLIServerInternal
     {
         #region members
 
-        private Version _version = new Version(1,0);
+        private Version _version = new Version(1, 5);
         public string version { get { return _version.ToString(); } }
 
-        private readonly string _dataPath;
+        private string _dataPath;
         private const string _logFilename = "log.txt";
 
         private TcpListener _serverListener;
@@ -23,14 +25,18 @@ namespace MAD.cli
         private List<CLIUser> _users = new List<CLIUser>();
         private List<CLISession> _sessions = new List<CLISession>();
 
+        private JobSystem _js;
+
         #endregion
 
         #region constructor
 
-        public CLIServer(string dataPath, int port)
+        public CLIServer(int port, string dataPath, JobSystem js)
         {
-            _dataPath = dataPath;
             serverPort = port;
+            _dataPath = dataPath;
+
+            _js = js;
 
             // TODO: Load users out of the database.
             _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
@@ -57,18 +63,6 @@ namespace MAD.cli
         protected override void StopListener()
         {
             _serverListener.Stop();
-        }
-
-        public void ChangePort(int newPort)
-        {
-            if (!IsListening)
-            {
-                serverPort = newPort;
-            }
-            else
-            {
-                throw new Exception("Server running!");
-            }
         }
 
         protected override object GetClient()
@@ -101,8 +95,20 @@ namespace MAD.cli
                 {
                     NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
 
-                    // Start CLISession for client.
-                    _sessions.Add(new CLISession(_client, _user));
+                    // Init CLISession for client.
+                    CLISession _session = new CLISession(_client, _user);
+
+                    // Set objects for commands.
+                    _session.SetWorkObjects(_js, null);
+
+                    // Add commands to this session.
+                    _session.AddToCommands(CLIFramework.CommandGroup.Gereral, CLIFramework.CommandGroup.JobSystem);
+
+                    // Add session to list.
+                    _sessions.Add(_session);
+
+                    // Start session in own thread from SmartThreadPool
+                    _session.Start();
                 }
                 else
                 {
@@ -121,6 +127,18 @@ namespace MAD.cli
             _client.Close();
 
             return null;
+        }
+
+        public void ChangePort(int newPort)
+        {
+            if (!IsListening)
+            {
+                serverPort = newPort;
+            }
+            else
+            {
+                throw new Exception("Server running!");
+            }
         }
 
         private CLIUser Login(string loginData)

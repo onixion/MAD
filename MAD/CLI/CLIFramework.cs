@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Collections.Generic;
 
+using MAD.jobSys;
+
 namespace MAD.cli
 {
     public abstract class CLIFramework
@@ -9,15 +11,24 @@ namespace MAD.cli
         #region member
 
         protected List<CommandOptions> commands = new List<CommandOptions>();
+        public enum CommandGroup { Gereral, JobSystem, CLIServer}
+
+        private JobSystem _js;
+        private CLIServer _cliServer;
 
         #endregion
 
         #region methodes
 
+        public void SetWorkObjects(JobSystem js, CLIServer cliServer)
+        {
+            _js = js;
+            _cliServer = cliServer;
+        }
+
         /*
          * This method checks the parameters and arguments of their validity.
          * If everything is alright, the command object will be set.
-         * 
          * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
          * If the parameter are not valid it returns the error text, which get displayed onto
          * the CLI. When the parsing was successful, the Command-Object will be set and be ready
@@ -154,6 +165,61 @@ namespace MAD.cli
             }
 
             return null;
+        }
+
+        protected void ClearCommands()
+        {
+            commands.Clear();
+        }
+
+        public void AddToCommands(params CommandGroup[] groups)
+        {
+            foreach (CommandGroup group in groups)
+            {
+                switch (group)
+                { 
+                    case CommandGroup.Gereral:
+
+                        commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
+                        commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+                        commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+                        commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+
+                        break;
+
+                    case CommandGroup.JobSystem:
+
+                        if (_js != null)
+                        {
+                            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
+                            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
+                        }
+
+                        break;
+
+                    case CommandGroup.CLIServer:
+
+                        if (_cliServer != null)
+                        {
+                            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { _cliServer }));
+                            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { _cliServer }));
+                            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { _cliServer }));
+                            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { _cliServer }));
+                        }
+
+                        break;
+                }
+            }
         }
 
         #endregion

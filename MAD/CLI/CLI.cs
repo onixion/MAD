@@ -18,10 +18,6 @@ namespace MAD.cli
         private List<string> _cliHistory = new List<string>();
         private int _maxHistoryEntries = 5;
 
-        private string _dataPath;
-        private JobSystem _js;
-        private CLIServer _cliServer;
-
         #endregion
 
         #region constructor
@@ -29,49 +25,16 @@ namespace MAD.cli
         public CLI(string dataPath, JobSystem js, CLIServer cliServer)
             :base()
         {
-            _dataPath = dataPath;
-            _js = js;
-            _cliServer = cliServer;
+            // Set the objects needed for the definition of the commands.
+            SetWorkObjects(js, cliServer);
 
-            InitCommands();
+            // Add commands to this cli.
+            AddToCommands(CommandGroup.Gereral, CommandGroup.JobSystem, CommandGroup.CLIServer);
         }
 
         #endregion
 
         #region methodes
-
-        private void InitCommands()
-        {
-            // GENERAL COMMANDS
-            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
-            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
-            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-
-            // JOBSYSTEM COMMANDS
-            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
-
-            // CLISERVER COMMANDS
-            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { _cliServer }));
-            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { _cliServer }));
-            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { _cliServer }));
-            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { _cliServer }));
-
-            // NOTIFICATION COMMANDS
-
-            // OTHER
-        }
 
         public void Start()
         {

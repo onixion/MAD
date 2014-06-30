@@ -80,15 +80,25 @@ namespace CLIClient
 
         private void StartVirtualConsole(NetworkStream stream)
         {
+            string _serverResponse;
+
             Console.Write(NetCom.ReceiveString(stream));
 
             while (true)
             {
+                // TODO: own CLI-Read method
                 cliInput = Console.ReadLine();
 
                 NetCom.SendString(stream, cliInput, true);
 
-                ConsoleWriter.WriteToConsole(NetCom.ReceiveString(stream));
+                _serverResponse = NetCom.ReceiveString(stream);
+
+                if (_serverResponse == "EXIT_CLI")
+                {
+                    break;
+                }
+
+                ConsoleIO.WriteToConsole(_serverResponse);
             }
         }
 
