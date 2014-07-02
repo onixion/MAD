@@ -203,4 +203,11 @@ Neue Aufgabenverteilung:
 \chapter{Anmerkungen des Betreures}
 Vergangene wichtige Events wie ausfall eines Servers oder vll des gesamten Netzwerkes sollen mitgeteilt werden. retroperspektiv.\\
 Ausformulierung der Arbeit.\\
+\chapter{Protokoll vom 2.6.2014}
+Auf anraten des Betreuers betreffend der Aufgabenstellung wurde ein erneutes Gespräch abgehalten bei welchen Probleme die uns nicht auffielen, und Tipps betreffend der Datenbank diskutiert. Hier werden nun die neuen Erkenntnisse und Planänderungen festgehalten:
+\begin{itemize}
+\item Das Jobsystem wird überarbeitet so dass es eher Host Orientiert arbeitet und anstatt voneinander Unabhängige Jobs zu haben werden diese in einer abzuarbeitenden Liste zusammengefasst. Dies erlaubt geordneten Zugriff auf die Datenbank und bessere Übersichtlichkeit. Man verliert dadurch jedoch einen Teil der Freiheit die Jobs eigenständig zu managen. 
+\item Die Möglichkeit eine HTTP Seite zur Überprüfung zu Verwenden wurde wieder aufgenommen und wird Singh Manpreet zugewiesen. 
+\item Die Datenbank wird Hostorientiert angelegt. Dies beinhaltet eine eigene Tabelle für jeden Host. Diese Tabellen werden dann intern nach Datum der Abfrage sortiert. Spalten werden sich nach den angebotenen Jobs richten. So werden auch nicht alle Tabellen die gleichen Spalten haben sondern auf die Bedürfnisse des Users angepasst. 
+\end{itemize}
 \end{document}
