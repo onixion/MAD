@@ -76,7 +76,7 @@ namespace MAD.cli
             IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
             NetworkStream _clientStream = _client.GetStream();
 
-            Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") connected.");
+            // LOG
 
             try
             {
@@ -117,11 +117,11 @@ namespace MAD.cli
             catch (Exception)
             {
                 // Client lost connection or disconnected.
-                Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") lost connection to server.");
+                // LOG
             }
 
             // Client disconnected.
-            Log("Client (" + _clientEndpoint.Address + ":" + _clientEndpoint.Port + ") disconnected.");
+            // LOG
 
             _client.Close();
 
@@ -203,29 +203,6 @@ namespace MAD.cli
             }
 
             return null;
-        }
-
-        #endregion
-
-        #region Logger
-
-        private void CreateLogDir()
-        {
-            if (!Directory.Exists(_dataPath))
-            {
-                Directory.CreateDirectory(_dataPath);
-            }
-       }
-
-        private void Log(string data)
-        {
-            CreateLogDir();
-
-            using(FileStream stream = new FileStream(Path.Combine(_dataPath, _logFilename), FileMode.Append, FileAccess.Write, FileShare.Read))
-            using (StreamWriter writer = new StreamWriter(stream))
-            {
-                //writer.WriteLine("[ " + nc.NetCom.DateStamp() + " | " + nc.NetCom.TimeStamp() + " ] " + data);
-            }
         }
 
         #endregion

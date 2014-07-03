@@ -47,7 +47,7 @@ namespace MAD.cli
         public void Start()
         {
             NetworkStream _stream = _client.GetStream();
-            Command _command = null;
+            //Command _command = null;
 
             //NetCom.SendString(_stream, _cursor, true);
 
