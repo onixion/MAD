@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Windows.Forms;
 
-using MAD.jobSys;
-using MAD.cli;
+using MAD.JobSystemCore;
+using MAD.CLICore;
+using MAD.CLIServerCore;
 
 namespace MAD
 {

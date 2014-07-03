@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     public abstract class Job
     {

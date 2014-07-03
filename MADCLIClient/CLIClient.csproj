@@ -47,9 +47,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetCommunication\NetCommunication.csproj">
-      <Project>{E7664DE4-32D2-4CE1-8630-902B81E69D0E}</Project>
-      <Name>NetCommunication</Name>
+    <ProjectReference Include="..\NetIO\NetIO.csproj">
+      <Project>{543FF0AA-C17C-478E-8FFE-FB63C3842131}</Project>
+      <Name>NetIO</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.cli
+namespace MAD.CLIIO
 {
     public static class ConsoleIO
     {
@@ -84,10 +84,6 @@ namespace MAD.cli
                 }
             }
         }
-
-
-
-
         #endregion
     }
 }

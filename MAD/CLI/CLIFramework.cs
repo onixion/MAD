@@ -2,9 +2,10 @@
 using System.Reflection;
 using System.Collections.Generic;
 
-using MAD.jobSys;
+using MAD.CLIServerCore;
+using MAD.JobSystemCore;
 
-namespace MAD.cli
+namespace MAD.CLICore
 {
     public abstract class CLIFramework
     {

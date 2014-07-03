@@ -1,6 +1,8 @@
 ﻿using System;
 
-namespace MAD.cli
+using MAD.CLIServerCore;
+
+namespace MAD.CLICore
 {
     public class CLIServerInfo : Command
     {

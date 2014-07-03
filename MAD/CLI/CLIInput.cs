@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.cli
+namespace MAD.CLIIO
 {
     public class CLIInput
     {

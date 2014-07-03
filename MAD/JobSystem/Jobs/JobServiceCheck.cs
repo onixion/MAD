@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 using System.Net;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     class JobServiceCheck : Job
     {

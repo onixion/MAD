@@ -3,7 +3,6 @@ using System.Net;
 using System.Text;
 using System.IO;
 
-using nc;
 
 namespace CLIClient
 {
@@ -93,7 +92,7 @@ namespace CLIClient
                     }
                 }
 
-                passwordMD5 = NetCom.GetHash(passwordMD5);
+                //passwordMD5 = NetCom.GetHash(passwordMD5);
 
                 Console.WriteLine("\n\nConnect to '" + serverAddress + ":" + serverPort + "' with the username '" + username + "'?");
                 Console.WriteLine("Sure about that? Y/N");

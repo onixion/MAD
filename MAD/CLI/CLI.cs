@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 
-using MAD.jobSys;
+using MAD.JobSystemCore;
+using MAD.CLIServerCore;
+using MAD.CLIIO;
 
-namespace MAD.cli
+namespace MAD.CLICore
 {
     public class CLI : CLIFramework
     {

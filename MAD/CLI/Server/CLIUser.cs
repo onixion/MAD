@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD.cli
+namespace MAD.CLIServerCore
 {
     public class CLIUser
     {

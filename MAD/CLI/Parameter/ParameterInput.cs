@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.cli
+namespace MAD.CLICore
 {
     /* This object contains all parameter of the input. */
     public class ParameterInput

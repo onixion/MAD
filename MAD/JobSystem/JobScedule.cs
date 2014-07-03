@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using Amib.Threading;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     public class JobScedule
     {

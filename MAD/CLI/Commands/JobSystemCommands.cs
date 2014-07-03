@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Net;
-using MAD.jobSys;
 
-namespace MAD.cli
+using MAD.JobSystemCore;
+
+namespace MAD.CLICore
 {
     public class JobSystemStatusCommand : Command
     {

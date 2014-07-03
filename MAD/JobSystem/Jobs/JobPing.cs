@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     public class JobPing : Job
     {

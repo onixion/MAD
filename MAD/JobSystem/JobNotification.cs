@@ -3,7 +3,7 @@ using System.Text;
 using System.Net.Mail;
 using System.Collections.Generic;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     public class JobNotification
     {

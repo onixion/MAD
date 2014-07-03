@@ -6,9 +6,10 @@ using System.Text;
 using System.IO;
 
 using MAD.NetIO;
-using MAD.jobSys;
+using MAD.JobSystemCore;
+using MAD.CLICore;
 
-namespace MAD.cli
+namespace MAD.CLIServerCore
 {
     public class CLIServer : CLIServerInternal
     {
@@ -80,19 +81,18 @@ namespace MAD.cli
 
             try
             {
-                /*
                 // First send server informations to client.
-                NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
+                NetCom.SendStringUnicode(_clientStream, "Mad CLI-Server <" + version + ">", true);
 
                 // Receive the login-data.
-                string loginData = NetCom.ReceiveString(_clientStream);
+                string loginData = NetCom.ReceiveStringUnicode(_clientStream);
 
-                // Checl the login-data.
+                // Check the login-data.
                 CLIUser _user = Login(loginData);
 
                 if (_user != null)
                 {
-                    //NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
+                    NetCom.SendStringUnicode(_clientStream, "ACCESS GRANTED", true);
 
                     // Init CLISession for client.
                     CLISession _session = new CLISession(_client, _user);
@@ -111,8 +111,8 @@ namespace MAD.cli
                 }
                 else
                 {
-                    //NetCom.SendString(_clientStream, "ACCESS DENIED", true);
-                }*/
+                    NetCom.SendStringUnicode(_clientStream, "ACCESS DENIED", true);
+                }
             }
             catch (Exception)
             {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     public class JobNotificationRuleINT : JobNotificationRule
     {

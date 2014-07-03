@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
-using nc;
+using MAD.NetIO;
 
 namespace CLIClient
 {
@@ -61,10 +61,10 @@ namespace CLIClient
 
         private void CLIConnection(NetworkStream _stream)
         {
-            Console.WriteLine("SERVER-INFO: " + NetCom.ReceiveString(_stream));
-            NetCom.SendString(_stream, _username + "<seperator>" + _passwordMD5, true);
+            Console.WriteLine("SERVER-INFO: " + NetCom.ReceiveStringUnicode(_stream));
+            NetCom.SendStringUnicode(_stream, _username + "<seperator>" + _passwordMD5, true);
 
-            switch (NetCom.ReceiveString(_stream))
+            switch (NetCom.ReceiveStringUnicode(_stream))
             { 
                 case "ACCESS GRANTED":
                     StartVirtualConsole(_stream);
@@ -82,18 +82,18 @@ namespace CLIClient
         {
             string _serverResponse;
 
-            Console.Write(NetCom.ReceiveString(stream));
+            Console.Write(NetCom.ReceiveStringUnicode(stream));
 
             while (true)
             {
                 // TODO: own CLI-Read method
                 cliInput = Console.ReadLine();
 
-                NetCom.SendString(stream, cliInput, true);
+                NetCom.SendStringUnicode(stream, cliInput, true);
 
-                _serverResponse = NetCom.ReceiveString(stream);
+                _serverResponse = NetCom.ReceiveStringUnicode(stream);
 
-                if (_serverResponse == "EXIT_CLI")
+                if (_serverResponse.Contains("EXIT_CLI"))
                 {
                     break;
                 }

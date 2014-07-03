@@ -7,7 +7,7 @@ using System.Net.NetworkInformation;
 
 using MAD.HostDetect;
 
-namespace MAD.jobSys
+namespace MAD.JobSystemCore
 {
     class JobHostDetect : Job                                                                           //This job is for detecting existing hosts in a network
     {                                                                                                   //Further commenting will happen if someone can't read my code.. i am to lazy to do it now..

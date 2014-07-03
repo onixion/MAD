@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MAD.cli
+namespace MAD.CLICore
 {
     /* This object defines one parameter for a command. */
     public class ParameterOption
