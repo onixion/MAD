@@ -4,8 +4,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
-using nc;
 
+using MAD.NetIO;
 using MAD.jobSys;
 
 namespace MAD.cli
@@ -39,7 +39,7 @@ namespace MAD.cli
             _js = js;
 
             // TODO: Load users out of the database.
-            _users.Add(new CLIUser("root", nc.NetCom.GetHash("123"), CLIUser.Group.root));
+            _users.Add(new CLIUser("root", "123", CLIUser.Group.root));
         }
 
         #endregion
@@ -80,10 +80,9 @@ namespace MAD.cli
 
             try
             {
+                /*
                 // First send server informations to client.
                 NetCom.SendString(_clientStream, "Mad CLI-Server <" + version + ">", true);
-
-                /* TODO: asymmetric handshake and then AES encryption. */
 
                 // Receive the login-data.
                 string loginData = NetCom.ReceiveString(_clientStream);
@@ -93,7 +92,7 @@ namespace MAD.cli
 
                 if (_user != null)
                 {
-                    NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
+                    //NetCom.SendString(_clientStream, "ACCESS GRANTED", true);
 
                     // Init CLISession for client.
                     CLISession _session = new CLISession(_client, _user);
@@ -112,8 +111,8 @@ namespace MAD.cli
                 }
                 else
                 {
-                    NetCom.SendString(_clientStream, "ACCESS DENIED", true);
-                }
+                    //NetCom.SendString(_clientStream, "ACCESS DENIED", true);
+                }*/
             }
             catch (Exception)
             {
@@ -225,7 +224,7 @@ namespace MAD.cli
             using(FileStream stream = new FileStream(Path.Combine(_dataPath, _logFilename), FileMode.Append, FileAccess.Write, FileShare.Read))
             using (StreamWriter writer = new StreamWriter(stream))
             {
-                writer.WriteLine("[ " + nc.NetCom.DateStamp() + " | " + nc.NetCom.TimeStamp() + " ] " + data);
+                //writer.WriteLine("[ " + nc.NetCom.DateStamp() + " | " + nc.NetCom.TimeStamp() + " ] " + data);
             }
         }
 
