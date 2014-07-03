@@ -12,9 +12,6 @@ namespace MAD.CLICore
     {
         #region members
 
-        private ConsoleColor _cursorColor = ConsoleColor.Cyan;
-        private ConsoleColor _inputColor = ConsoleColor.White;
-
         private CLIInput _input = new CLIInput();
 
         #endregion
@@ -43,7 +40,7 @@ namespace MAD.CLICore
             {
                 Command _command = null;
 
-                WriteCursor();
+                _input.WriteCursor();
 
                 //string _cliInput = Console.ReadLine();
                 string _cliInput = _input.ReadInput();
@@ -72,13 +69,6 @@ namespace MAD.CLICore
                     }
                 }
             }
-        }
-
-        private void WriteCursor()
-        {
-            Console.ForegroundColor = _cursorColor;
-            Console.Write(_input.cursor);
-            Console.ForegroundColor = _inputColor;
         }
 
         private string GetBanner()

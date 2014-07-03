@@ -5,130 +5,164 @@ namespace MAD.CLIIO
 {
     public class CLIInput
     {
+        private ConsoleColor _cursorColor = ConsoleColor.Cyan;
+        private ConsoleColor _inputColor = ConsoleColor.White;
+
         public string cursor = "=> ";
-        private string _cliInput = "";
-        private int _inputPos = 0;
+
+        private string _cliInput;
+
+        private int _inputPosReal;
+        private int _inputPosVirtual;
+        private int _inputPosMIN;
+        private int _inputPosMAX;
 
         private List<string> _cliHistory = new List<string>();
         private int _maxHistoryEntries = 5;
-        private int _historyPointer = -1;
+        private int _historyPointer;
+
+        public void WriteCursor()
+        {
+            Console.ForegroundColor = _cursorColor;
+            Console.Write(cursor);
+        }
 
         public string ReadInput()
         {
-            _cliInput = "";
-            _historyPointer = -1;
-
-            while (true)
+            lock (cursor)
             {
-                ConsoleKeyInfo _key = Console.ReadKey();
-                _inputPos = Console.CursorLeft;
+                Console.ForegroundColor = _inputColor;
 
-                if (_key.Key == ConsoleKey.Enter)
-                {
-                    // Add cli-input to history.
-                    AddToHistory(_cliInput);
+                _cliInput = "";
+                _historyPointer = -1;
 
-                    // Return cli-input.
-                    break;
-                }
-                else if (_key.Key == ConsoleKey.Tab)
-                {
-                   // TODO
-                }
-                else if (_key.Key == ConsoleKey.Escape)
-                {
-                    // Clear cli-input.
-                    ClearInput(_cliInput.Length + 1);
-                    _cliInput = "";
+                _inputPosReal = cursor.Length;
+                _inputPosVirtual = cursor.Length;
 
-                    // Set cursor new.
-                    SetCursor(cursor.Length);
-                }
-                else if (_key.Key == ConsoleKey.Backspace)
+                _inputPosMIN = cursor.Length + 1;
+
+                Console.SetCursorPosition(_inputPosReal, Console.CursorTop);
+
+                while (true)
                 {
-                    if (_inputPos == cursor.Length - 1)
+                    ConsoleKeyInfo _key = Console.ReadKey();
+
+                    _inputPosReal = Console.CursorLeft;
+                    _inputPosMAX = cursor.Length + _cliInput.Length + 2;
+                    // HERE
+                    if (_key.Key == ConsoleKey.Enter)
                     {
-                        Console.Write(" ");
+                        // Add cli-input to history.
+                        AddToHistory(_cliInput);
+                        break;
                     }
-                    else
+                    else if (_key.Key == ConsoleKey.Tab)
                     {
-                        if (_cliInput.Length >= 1)
+                        // TODO
+                    }
+                    else if (_key.Key == ConsoleKey.Escape)
+                    {
+                        // Clear cli-input.
+                        ClearInput(_cliInput.Length + 1);
+                        _cliInput = "";
+
+                        // Set cursor new.
+                        SetCursor(cursor.Length);
+                    }
+                    else if (_key.Key == ConsoleKey.Backspace)
+                    {
+                        if (_inputPos == _inputPosMIN)
+                        {
+                            Console.Write(" ");
+                        }
+                        else
                         {
                             int _cliInputOldLength = _cliInput.Length;
                             _cliInput = _cliInput.Remove(_inputPos - cursor.Length, 1);
 
                             ClearInput(_cliInputOldLength);
+
                             SetCursor(cursor.Length);
                             Console.Write(_cliInput);
 
                             SetCursor(_inputPos);
                         }
                     }
-                }
-                else if (_key.Key == ConsoleKey.LeftArrow)
-                {
-                    ClearInput(_cliInput.Length);
-                    SetCursor(cursor.Length);
-                    Console.Write(_cliInput);
-
-                    if (_inputPos != cursor.Length + 1)
+                    else if (_key.Key == ConsoleKey.LeftArrow)
                     {
-                        SetCursor(_inputPos - 2);
+                        ClearInput(_cliInput.Length);
+
+                        SetCursor(cursor.Length);
+                        Console.Write(_cliInput);
+
+                        if (_inputPos != _inputPosMIN)
+                        {
+                            SetCursor(_inputPos - 2);
+                        }
+                        else
+                        {
+                            SetCursor(_inputPos - 1);
+                        }
                     }
-                }
-                else if (_key.Key == ConsoleKey.RightArrow)
-                {
-                    ClearInput(_cliInput.Length);
-                    SetCursor(cursor.Length);
-                    Console.Write(_cliInput);
-
-                    if (_inputPos < _cliInput.Length + 1)
+                    else if (_key.Key == ConsoleKey.RightArrow)
                     {
+                        ClearInput(_cliInput.Length);
+
+                        SetCursor(cursor.Length);
+                        Console.Write(_cliInput);
+
+                        if (_inputPos != _inputPosMAX)
+                        {
+                            
+                        }
+                        else
+                        {
+                            SetCursor(_inputPos - 1);
+                        }
+                    }
+                    else if (_key.Key == ConsoleKey.UpArrow)
+                    {
+                        Console.Write(" \b");
+
+                        if (_cliHistory.Count - 1 > _historyPointer)
+                        {
+                            _historyPointer++;
+                        }
+
+                        string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                        ClearInput(_cliInput.Length);
+                        SetCursor(cursor.Length);
+                        Console.Write(_lastInput);
+
+                        _cliInput = _lastInput;
+                    }
+                    else if (_key.Key == ConsoleKey.DownArrow)
+                    {
+                        Console.Write(" \b");
+
+                        if (0 < _historyPointer)
+                        {
+                            _historyPointer--;
+                        }
+
+                        string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                        ClearInput(_cliInput.Length);
+                        SetCursor(cursor.Length);
+                        Console.Write(_lastInput);
+
+                        _cliInput = _lastInput;
+                    }
+                    else
+                    {
+                        _cliInput = _cliInput.Insert(_inputPos - (cursor.Length + 1), _key.KeyChar.ToString());
+
+                        ClearInput(cursor.Length);
+                        SetCursor(cursor.Length);
+                        Console.Write(_cliInput);
                         SetCursor(_inputPos);
                     }
-                }
-                else if (_key.Key == ConsoleKey.UpArrow)
-                {
-                    Console.Write(" \b");
-
-                    if (_cliHistory.Count - 1 > _historyPointer)
-                    {
-                        _historyPointer++;
-                    }
-
-                    string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                    ClearInput(_cliInput.Length);
-                    SetCursor(cursor.Length);
-                    Console.Write(_lastInput);
-
-                    _cliInput = _lastInput;
-                }
-                else if (_key.Key == ConsoleKey.DownArrow)
-                {
-                    Console.Write(" \b");
-
-                    if (0 < _historyPointer)
-                    {
-                        _historyPointer--;
-                    }
-
-                    string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                    ClearInput(_cliInput.Length);
-                    SetCursor(cursor.Length);
-                    Console.Write(_lastInput);
-
-                    _cliInput = _lastInput;
-                }
-                else
-                {
-                    _cliInput = _cliInput.Insert(_inputPos - (cursor.Length + 1), _key.KeyChar.ToString());
-
-                    ClearInput(cursor.Length);
-                    SetCursor(cursor.Length);
-                    Console.Write(_cliInput);
-                    SetCursor(_inputPos);
                 }
             }
 
