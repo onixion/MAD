@@ -2,7 +2,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace MAD
+namespace MAD.CLIServerCore
 {
     public static class MD5Hashing
     {

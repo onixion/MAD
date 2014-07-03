@@ -40,7 +40,7 @@ namespace MAD.CLIServerCore
             _js = js;
 
             // TODO: Load users out of the database.
-            _users.Add(new CLIUser("root", "123", CLIUser.Group.root));
+            _users.Add(new CLIUser("root", MD5Hashing.ToMD5("123"), CLIUser.Group.root));
         }
 
         #endregion
