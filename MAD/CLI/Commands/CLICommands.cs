@@ -54,7 +54,7 @@ namespace MAD.CLICore
             }
             else
             {
-                int commandIndex = (int)parameters.GetParameter("id").argumentValue[0];
+                int commandIndex = (int)parameters.GetParameter("id").argumentValues[0];
 
                 try
                 {

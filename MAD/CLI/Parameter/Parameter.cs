@@ -6,12 +6,12 @@ namespace MAD.CLICore
     public class Parameter
     {
         public string parameter;
-        public object[] argumentValue;
+        public object[] argumentValues;
 
-        public Parameter(string parameter, object[] argumentValue)
+        public Parameter(string parameter, object[] argumentValues)
         {
             this.parameter = parameter;
-            this.argumentValue = argumentValue;
+            this.argumentValues = argumentValues;
         }
     }
 }

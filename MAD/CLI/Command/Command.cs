@@ -65,7 +65,7 @@ namespace MAD.CLICore
                 if (_parOptions.argumentEmpty)
                 {
                     // Check if the argument is not null.
-                    if (_temp.argumentValue != null)
+                    if (_temp.argumentValues != null)
                     {
                         return "<color><red>Value of parameter '-" + _temp.parameter + "' must be null!";
                     }
@@ -73,7 +73,7 @@ namespace MAD.CLICore
                 else
                 {
                     // Check if argument is null
-                    if (_temp.argumentValue == null)
+                    if (_temp.argumentValues == null)
                     {
                         return "<color><red>Value of parameter '-" + _temp.parameter + "' can't be null!";
                     }
@@ -82,7 +82,7 @@ namespace MAD.CLICore
                     if (!_parOptions.multiArguments)
                     {
                         // Check if more than one arg is given.
-                        if (_temp.argumentValue.Length > 1)
+                        if (_temp.argumentValues.Length > 1)
                         {
                             return "<color><red>The parameter '-" + _temp.parameter + "' can't have multiple arguments!";
                         }
@@ -91,16 +91,16 @@ namespace MAD.CLICore
                     /* Try to convert the given args into the specific types.
                      * If it cannot convert all args into ONE type, it will fail. */
 
-                    object[] _arguments = new object[_temp.argumentValue.Length];
+                    object[] _arguments = new object[_temp.argumentValues.Length];
                     bool _allArgsConverted = false;
 
                     foreach (Type _type in GetAcceptedArgumentTypes(_temp.parameter))
                     {
                         int _argsConverted = 0;
 
-                        for (int i2 = 0; i2 < _temp.argumentValue.Length; i2++)
+                        for (int i2 = 0; i2 < _temp.argumentValues.Length; i2++)
                         {
-                            _arguments[i2] = Convert((string)_temp.argumentValue[i2], _type);
+                            _arguments[i2] = Convert((string)_temp.argumentValues[i2], _type);
 
                             if (_arguments[i2] != null)
                             {
@@ -124,7 +124,7 @@ namespace MAD.CLICore
                         return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
                     }
                     
-                    _temp.argumentValue = _arguments;
+                    _temp.argumentValues = _arguments;
                 }
             }
 
@@ -276,7 +276,7 @@ namespace MAD.CLICore
             {
                 if (_temp.parameter == parameter)
                 {
-                    return _temp.argumentValue[0].GetType();
+                    return _temp.argumentValues[0].GetType();
                 }
             }
 

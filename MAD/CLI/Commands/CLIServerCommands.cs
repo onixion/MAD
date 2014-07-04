@@ -96,7 +96,7 @@ namespace MAD.CLICore
         {
             try
             {
-                int _port = (int)parameters.GetParameter("p").argumentValue[0];
+                int _port = (int)parameters.GetParameter("p").argumentValues[0];
 
                 _cliServer.ChangePort(_port);
 

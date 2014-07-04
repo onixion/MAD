@@ -133,7 +133,7 @@ namespace MAD.CLICore
         {
             if (OptionalParameterUsed("id"))
             {
-                Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValue[0]);
+                Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
 
                 if (_job != null)
                 {
@@ -189,17 +189,17 @@ namespace MAD.CLICore
         {
             JobServiceCheck _job = new JobServiceCheck();
 
-            _job.jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            _job.jobName = (string)parameters.GetParameter("n").argumentValues[0];
             _job.jobType = Job.JobType.ServiceCheck;
 
-            _job.argument = (string)parameters.GetParameter("s").argumentValue[0];
+            _job.argument = (string)parameters.GetParameter("s").argumentValues[0];
 
             if (OptionalParameterUsed("a"))
-                _job.targetIP = (IPAddress)parameters.GetParameter("a").argumentValue[0];
+                _job.targetIP = (IPAddress)parameters.GetParameter("a").argumentValues[0];
             if (OptionalParameterUsed("u"))
-                _job.username = (string)parameters.GetParameter("u").argumentValue[0];
+                _job.username = (string)parameters.GetParameter("u").argumentValues[0];
             if (OptionalParameterUsed("p"))
-                _job.password = (string)parameters.GetParameter("p").argumentValue[0];
+                _job.password = (string)parameters.GetParameter("p").argumentValues[0];
 
             if (OptionalParameterUsed("t"))
             {
@@ -208,7 +208,7 @@ namespace MAD.CLICore
                 if (_argumentType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
@@ -216,7 +216,7 @@ namespace MAD.CLICore
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
                     }
                     catch (Exception e)
                     {
@@ -255,11 +255,11 @@ namespace MAD.CLICore
         {
             JobHostDetect _job = new JobHostDetect();
 
-            _job.jobName = (string)parameters.GetParameter("n").argumentValue[0];
+            _job.jobName = (string)parameters.GetParameter("n").argumentValues[0];
             _job.jobType = Job.JobType.HostDetect;
 
-            _job.Net = (IPAddress)parameters.GetParameter("a").argumentValue[0];
-            _job.Subnetmask = (IPAddress)parameters.GetParameter("m").argumentValue[0];
+            _job.Net = (IPAddress)parameters.GetParameter("a").argumentValues[0];
+            _job.Subnetmask = (IPAddress)parameters.GetParameter("m").argumentValues[0];
 
             if (OptionalParameterUsed("t"))
             {
@@ -268,7 +268,7 @@ namespace MAD.CLICore
                 if (_argumentType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
@@ -276,7 +276,7 @@ namespace MAD.CLICore
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
                     }
                     catch (Exception e)
                     {
@@ -315,8 +315,8 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
+            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
 
             JobPing _job = new JobPing();
             _job.jobName = jobName;
@@ -330,7 +330,7 @@ namespace MAD.CLICore
                 if (_argumentType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
@@ -338,7 +338,7 @@ namespace MAD.CLICore
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
                     }
                     catch (Exception e)
                     {
@@ -354,7 +354,7 @@ namespace MAD.CLICore
 
             if (OptionalParameterUsed("ttl"))
             {
-                _job.ttl = (int)parameters.GetParameter("ttl").argumentValue[0];
+                _job.ttl = (int)parameters.GetParameter("ttl").argumentValues[0];
             }
 
             try
@@ -386,8 +386,8 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
+            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
 
             JobHttp _job = new JobHttp();
 
@@ -402,7 +402,7 @@ namespace MAD.CLICore
                 if (_argumentType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
@@ -410,7 +410,7 @@ namespace MAD.CLICore
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
                     }
                     catch (Exception e)
                     {
@@ -426,7 +426,7 @@ namespace MAD.CLICore
 
             if (OptionalParameterUsed("p"))
             {
-                _job.port = (int)parameters.GetParameter("p").argumentValue[0];
+                _job.port = (int)parameters.GetParameter("p").argumentValues[0];
             }
 
             try
@@ -458,9 +458,9 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValue[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValue[0];
-            int port = (int)parameters.GetParameter("p").argumentValue[0];
+            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
+            int port = (int)parameters.GetParameter("p").argumentValues[0];
 
             JobPort _job = new JobPort();
 
@@ -476,7 +476,7 @@ namespace MAD.CLICore
                 if (_argumentType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValue[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
                 }
                 else if (_argumentType == typeof(string))
                 {
@@ -484,7 +484,7 @@ namespace MAD.CLICore
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValue);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
                     }
                     catch (Exception e)
                     {
@@ -524,7 +524,7 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").argumentValue[0];
+            int id = (int)parameters.GetParameter("id").argumentValues[0];
 
             try
             {
@@ -553,7 +553,7 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").argumentValue[0];
+            int id = (int)parameters.GetParameter("id").argumentValues[0];
 
             try
             {
@@ -582,7 +582,7 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            int id = (int)parameters.GetParameter("id").argumentValue[0];
+            int id = (int)parameters.GetParameter("id").argumentValues[0];
 
             try
             {
