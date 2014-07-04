@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MAD.CLIIO
 {
-    public static class ConsoleIO
+    public static class CLIOutput
     {
         #region members
 
@@ -84,6 +84,7 @@ namespace MAD.CLIIO
                 }
             }
         }
+
         #endregion
     }
 }

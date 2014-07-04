@@ -45,6 +45,8 @@ namespace MAD.CLIServerCore
 
         #region methodes
 
+        
+
         public void Start()
         {
             NetworkStream _stream = _client.GetStream();
@@ -55,7 +57,7 @@ namespace MAD.CLIServerCore
             while (true)
             {
                 string _cliInput = NetCom.ReceiveStringUnicode(_stream);
-                string _response = AnalyseInput(_cliInput, ref _command);
+                string _response = AnalyseInput(ref _command, _cliInput);
 
                 if (_response == "VALID_PARAMETER")
                 {

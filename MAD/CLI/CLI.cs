@@ -13,6 +13,8 @@ namespace MAD.CLICore
         #region members
 
         private CLIInput _input = new CLIInput();
+        
+        private string _dataPath;
 
         #endregion
 
@@ -21,11 +23,35 @@ namespace MAD.CLICore
         public CLI(string dataPath, JobSystem js, CLIServer cliServer)
             :base()
         {
-            // Set the objects needed for the definition of the commands.
-            SetWorkObjects(js, cliServer);
+            _dataPath = dataPath;
 
-            // Add commands to this cli.
-            AddToCommands(CommandGroup.Gereral, CommandGroup.JobSystem, CommandGroup.CLIServer);
+            // !! INIT COMMANDS !!
+
+            // general purpose
+            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
+            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+
+            // JobSystem
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { js }));
+            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { js }));
+
+            // CLIServer
+            commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
+            commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
+            commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
+            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
         }
 
         #endregion
@@ -34,7 +60,7 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            ConsoleIO.WriteToConsole(GetBanner());
+            CLIOutput.WriteToConsole(GetBanner());
 
             while (true)
             {
@@ -47,7 +73,7 @@ namespace MAD.CLICore
 
                 if (_cliInput != "")
                 {
-                    string response = AnalyseInput(_cliInput, ref _command);
+                    string response = AnalyseInput(ref _command, _cliInput);
 
                     // Check if the parameter and arguments are valid.
                     if (response == "VALID_PARAMETER")
@@ -60,12 +86,12 @@ namespace MAD.CLICore
                             break;
 
                         // Write command ouput to console.
-                        ConsoleIO.WriteToConsole(response);
+                        CLIOutput.WriteToConsole(response);
                     }
                     else
                     {
                         // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
-                        ConsoleIO.WriteToConsole(response);
+                        CLIOutput.WriteToConsole(response);
                     }
                 }
             }

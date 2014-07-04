@@ -209,9 +209,9 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            output += "<color><white>" + ConsoleIO.colors.Count + " colors available.\n";
+            output += "<color><white>" + CLIOutput.colors.Count + " colors available.\n";
 
-            foreach (object[] _temp in ConsoleIO.colors)
+            foreach (object[] _temp in CLIOutput.colors)
             {
                 output += "<color>" + (string) _temp[0] + (string) _temp[0] + "\n";
             }

@@ -97,12 +97,6 @@ namespace MAD.CLIServerCore
                     // Init CLISession for client.
                     CLISession _session = new CLISession(_client, _user);
 
-                    // Set objects for commands.
-                    _session.SetWorkObjects(_js, null);
-
-                    // Add commands to this session.
-                    _session.AddToCommands(CLIFramework.CommandGroup.Gereral, CLIFramework.CommandGroup.JobSystem);
-
                     // Add session to list.
                     _sessions.Add(_session);
 
@@ -126,6 +120,35 @@ namespace MAD.CLIServerCore
             _client.Close();
 
             return null;
+        }
+
+        private void InitSessionCommands(CLISession session, CLIUser user)
+        {
+            List<CommandOptions> commands = session.commands;
+
+            // For now, all user get the same commands.
+
+            // !! INIT COMMANDS !!
+
+            // general purpose
+            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
+            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+
+            // JobSystem
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { _js }));
         }
 
         public void ChangePort(int newPort)
