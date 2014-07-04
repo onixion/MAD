@@ -2,7 +2,9 @@ JOBSYSTEM
 
 Das JobSystem hat die Aufgabe alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
 Es ist ein geschlossenes System und regelt den Zugriff auf die Jobs.
-Das JobSystem kann die Jobs in einer JobTable speichern und diese zu einen anderen Zeitpunkt wieder laden.
+
+Das JobSystem arbeitet mit sogenannten JobNode-Objekte. Diese Objekte beschreiben die Jobs, die für einen Client,
+ausgeführt werden sollen. Es können beliebig viele Jobs für jede JobNode erstellt werden.
 
 
 JOBSCEDULE
