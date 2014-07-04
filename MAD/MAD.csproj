@@ -55,11 +55,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLI\CLI.cs" />
-    <Compile Include="CLI\CLIFramework.cs" />
-    <Compile Include="CLI\CLIInput.cs" />
+    <Compile Include="CLI\Core\CLI.cs" />
+    <Compile Include="CLI\Core\CLIFramework.cs" />
+    <Compile Include="CLI\Core\CLIInput.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
-    <Compile Include="CLI\CLIOutput.cs" />
+    <Compile Include="CLI\Core\CLIOutput.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Core\Parameter.cs" />
     <Compile Include="CLI\Core\ParameterInput.cs" />
@@ -71,21 +71,21 @@
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="Helper\HostDetectBACKUP.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
-    <Compile Include="JobSystem\Job.cs" />
-    <Compile Include="JobSystem\JobNode.cs" />
-    <Compile Include="JobSystem\JobNotification.cs" />
+    <Compile Include="JobSystem\Core\Job.cs" />
+    <Compile Include="JobSystem\Core\JobNode.cs" />
+    <Compile Include="JobSystem\Core\JobNotification.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRule.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleSTRING.cs" />
-    <Compile Include="JobSystem\JobScedule.cs" />
+    <Compile Include="JobSystem\Core\JobScedule.cs" />
     <Compile Include="JobSystem\Jobs\JobServiceCheck.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
-    <Compile Include="JobSystem\OutDescriptor.cs" />
+    <Compile Include="JobSystem\Core\OutDescriptor.cs" />
     <Compile Include="JobSystem\Jobs\JobPing.cs" />
     <Compile Include="JobSystem\Jobs\JobPort.cs" />
-    <Compile Include="JobSystem\JobTime.cs" />
-    <Compile Include="JobSystem\JobSystem.cs" />
+    <Compile Include="JobSystem\Core\JobTime.cs" />
+    <Compile Include="JobSystem\Core\JobSystem.cs" />
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\Server\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
