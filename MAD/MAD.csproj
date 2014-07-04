@@ -72,6 +72,7 @@
     <Compile Include="Helper\HostDetectBACKUP.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobNode.cs" />
     <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRule.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
