@@ -8,8 +8,14 @@ namespace MAD.JobSystemCore
     public class JobNode
     {
         private static int _idCount = 0;
-        private int _id;
         private object _initIDLock = new object();
+
+        private int _id;
+        public int nodeID { get { return _id; } }
+
+        public enum State { Active, Inactive, Exception }
+        private State _state = State.Inactive;
+        public State state { get { return _state; } } 
 
         private PhysicalAddress _macAddress;
         private IPAddress _ipAddress;

@@ -9,11 +9,11 @@ namespace MAD.JobSystemCore
 
         private string _dataPath;
 
-        public List<Job> jobs = new List<Job>();
-        public Object jobsLock = new Object();
+        public List<JobNode> nodes = new List<JobNode>();
+        public Object nodesLock = new Object();
 
-        private int _maxJobs = 100;
-        public int maxJobs { get { return _maxJobs; } }
+        private int _maxNodes = 100;
+        public int maxNodes { get { return _maxNodes; } }
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
@@ -25,8 +25,7 @@ namespace MAD.JobSystemCore
         public JobSystem(string dataPath)
         {
             _dataPath = dataPath;
-
-            _scedule = new JobScedule(jobs, jobsLock);
+            _scedule = new JobScedule(nodes, nodesLock);
         }
 
         #endregion
@@ -43,13 +42,77 @@ namespace MAD.JobSystemCore
             _scedule.Stop();
         }
 
+        public void StartNode(int nodeID)
+        {
+            JobNode _node = GetNode(nodeID);
+
+            if (_node != null)
+            {
+                // Check if node is already active or not.
+
+                // Set node state to 'running'.
+            }
+            else
+            {
+                throw new Exception("Node does not exist!");
+            }
+        }
+
+        public void StopNode(int nodeID)
+        {
+            JobNode _node = GetNode(nodeID);
+
+            if (_node != null)
+            {
+                // Same like start a node.
+            }
+            else
+            {
+                throw new Exception("Node does not exist!");
+            }
+        }
+
+        public void AddNode(JobNode node)
+        {
+            if (_maxNodes > nodes.Count)
+            {
+                nodes.Add(node);
+            }
+            else
+            {
+                throw new Exception("Node could not be added, because the jobsystem has reached its max numbers of nodes.");
+            }
+        }
+
+        public void RemoveNode(int nodeID)
+        {
+            lock (nodesLock)
+            {
+                JobNode _node = GetNode(nodeID);
+
+                if (_node != null)
+                {
+                    // TODO:
+                    //  Stop all jobs.
+                    //  Remove node.
+                }
+                else
+                {
+                    throw new Exception("Node does not exist!");
+                }
+            }
+        }
+
         public bool JobExist(int jobID)
         {
-            foreach (Job _temp in jobs)
+            foreach (JobNode _node in nodes)
             {
-                if (_temp.jobID == jobID)
+                foreach (Job _temp in _node._jobs)
                 {
-                    return true;
+                    if (_temp.jobID == jobID)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -58,140 +121,74 @@ namespace MAD.JobSystemCore
 
         public Job GetJob(int jobID)
         {
-            foreach (Job _job in jobs)
+            foreach (JobNode _node in nodes)
             {
-                if (jobID == _job.jobID)
+                foreach (Job _job in _node._jobs)
                 {
-                    return _job;
+                    if (jobID == _job.jobID)
+                    {
+                        return _job;
+                    }
                 }
             }
 
             return null;
         }
 
-        public void CreateJob(Job job)
+        public JobNode GetNode(int nodeID)
         {
-            if (_maxJobs > jobs.Count)
+            foreach (JobNode _node in nodes)
             {
-                jobs.Add(job);
-            }
-            else
-            {
-                throw new Exception("Job could not be added, because the jobsystem has reached its max numbers of jobs.");
-            }
-        }
-
-        public bool DestroyJob(int jobID)
-        {
-            lock (jobsLock)
-            {
-                for(int i = 0; i < jobs.Count; i++)
-                {
-                    if (jobs[i].jobID == jobID)
+                    if (_node.nodeID == nodeID)
                     {
-                        jobs.RemoveAt(i);
-                        return true;
+                        return _node;
                     }
-                }
-
-                return false;
             }
+
+            return null;
         }
 
-        public void DestroyAllJobs()
-        {
-            int _jobsCount = jobs.Count;
-
-            for (int i = 0; i < jobs.Count; i++)
-            {
-                DestroyJob(jobs[i].jobID);
-            }
-        }
-
-        public void StartJob(int jobID)
-        {
-            Job _job = GetJob(jobID);
-
-            if (_job != null)
-            {
-                if (!_job.Start())
-                {
-                    throw new Exception("Job is already running!");
-                }
-            }
-            else
-            {
-                throw new Exception("Job does not exist!");
-            }
-        }
-
-        public void StopJob(int jobID)
-        {
-            Job _job = GetJob(jobID);
-
-            if (_job != null)
-            {
-                if (!_job.Stop())
-                {
-                    throw new Exception("Job is already stopped!");
-                }
-            }
-            else
-            {
-                throw new Exception("Job does not exist!");
-            }
-        }
-
-        public int JobsRunning()
-        {
-            int _count = 0;
-
-            lock (jobsLock)
-            {
-                for (int i = 0; i < jobs.Count; i++)
-                {
-                    if (jobs[i].jobState == Job.JobState.Running)
-                    {
-                        _count++;
-                    }
-                }
-            }
-
-            return _count;
-        }
-
-        public int JobsStopped()
-        {
-            int _count = 0;
-
-            lock (jobsLock)
-            {
-                for (int i = 0; i < jobs.Count; i++)
-                {
-                    if (jobs[i].jobState == Job.JobState.Stopped)
-                    {
-                        _count++;
-                    }
-                }
-            }
-
-            return _count;
-        }
-
-        public void ClearJobTable()
-        {
-            lock (jobsLock)
-            {
-                jobs.Clear();
-            }
-        }
-
-        public void SaveJobTable(string path)
+        public void RemoveAllNodes()
         {
             // TODO
         }
 
-        public void LoadJobTable(string path)
+        public int NodesActive()
+        {
+            int _count = 0;
+
+            lock (nodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    // check if node state is on running and increase _count.
+                }
+            }
+
+            return _count;
+        }
+
+        public int NodesInactive()
+        {
+            int _count = 0;
+
+            lock (nodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    // same like above
+                }
+            }
+
+            return _count;
+        }
+
+        public void SaveNodes(string path)
+        {
+            // TODO
+        }
+
+        public void LoadNodes(string path)
         { 
             // TODO
         }

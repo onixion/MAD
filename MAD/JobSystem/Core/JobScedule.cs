@@ -10,8 +10,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private List<Job> _jobs;
-        private Object _jobsLock;
+        private List<JobNode> _jobNodes;
+        private Object _nodesLock;
 
         private Thread _cycleThread;
         private object _cycleThreadLock = new object();
@@ -28,10 +28,10 @@ namespace MAD.JobSystemCore
 
         #region constructor
 
-        public JobScedule(List<Job> jobs, Object jobsLock)
+        public JobScedule(List<JobNode> jobNodes, object nodesLock)
         {
-            _jobs = jobs;
-            _jobsLock = jobsLock;
+            _jobNodes = jobNodes;
+            _nodesLock = nodesLock;
 
             _workerPool = new SmartThreadPool(2000, _maxThreads);
         }
@@ -73,35 +73,38 @@ namespace MAD.JobSystemCore
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
 
-                lock (_jobsLock)
+                lock (_nodesLock)
                 {
-                    foreach (Job _job in _jobs)
+                    foreach (JobNode _node in _jobNodes)
                     {
-                        if (_job.jobState == Job.JobState.Waiting)
+                        foreach(Job _job in _node._jobs)
                         {
-                            if (CheckJobTime(_job.jobTime, _time))
+                            if (_job.jobState == Job.JobState.Waiting)
                             {
-                                if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                if (CheckJobTime(_job.jobTime, _time))
                                 {
-                                    _job.jobTime.jobDelay.Reset();
-                                    JobThreadStart(_job);
-                                }
-                                else if (_job.jobTime.type == JobTime.TimeType.Absolute)
-                                {
-                                    JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
-                                    
-                                    if (!_handler.IsBlocked(_time))
+                                    if (_job.jobTime.type == JobTime.TimeType.Relative)
                                     {
-                                        _handler.minuteAtBlock = _time.Minute;
+                                        _job.jobTime.jobDelay.Reset();
                                         JobThreadStart(_job);
                                     }
+                                    else if (_job.jobTime.type == JobTime.TimeType.Absolute)
+                                    {
+                                        JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
+
+                                        if (!_handler.IsBlocked(_time))
+                                        {
+                                            _handler.minuteAtBlock = _time.Minute;
+                                            JobThreadStart(_job);
+                                        }
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                else
                                 {
-                                    _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                    if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                    {
+                                        _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                    }
                                 }
                             }
                         }
