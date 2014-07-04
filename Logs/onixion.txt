@@ -40,8 +40,10 @@ Now using the TcpListener and TcpClient)
 [20.06.2014][17:00-20:00][3h][72h] Removed singleton. Clean Coding..
 [27.06.2014][18:00-20:00][3h][75h] Removed JobOptions and JobOutput.
 [28.06.2014][18:30-19:30][1h][76h] Fixed some CLI-Mistakes and made some tests with the jobsystem. Seems to work properly...
-[03.07.2014][16:00-20:30][4,5h] [80,5h] CleanCoding CLI-Input. Added AESEncryption and StreamIO.
-[04.07.2014][14:00-16:00][2h] [82,5h] Fixing some bugs.
+[03.07.2014][16:00-20:30][4,5h][80,5h] CleanCoding CLI-Input. Added AESEncryption and StreamIO.
+[04.07.2014][14:00-16:00][2h][82,5h] Fixing some bugs.
 
 (NOTE: JobSystem need to be rewritten)
+
+[04.07.2014][18:00-21:00][3h][85,5h] Started working on JobNodes and JobSytem...
 
