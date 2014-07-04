@@ -9,11 +9,9 @@ namespace MAD.CLIIO
         private ConsoleColor _inputColor = ConsoleColor.White;
 
         public string cursor = "=> ";
-
         private string _cliInput;
 
-        private int _inputPosReal;
-        private int _inputPosVirtual;
+        private int _inputPos;
         private int _inputPosMIN;
         private int _inputPosMAX;
 
@@ -29,140 +27,108 @@ namespace MAD.CLIIO
 
         public string ReadInput()
         {
-            lock (cursor)
+            Console.ForegroundColor = _inputColor;
+
+            _cliInput = "";
+            _historyPointer = -1;
+
+            _inputPos = cursor.Length;
+            _inputPosMIN = cursor.Length;
+
+            Console.SetCursorPosition(_inputPos, Console.CursorTop);
+
+            while (true)
             {
-                Console.ForegroundColor = _inputColor;
+                ConsoleKeyInfo _key = Console.ReadKey(true);
 
-                _cliInput = "";
-                _historyPointer = -1;
+                _inputPos = Console.CursorLeft;
+                _inputPosMAX = cursor.Length + _cliInput.Length;
 
-                _inputPosReal = cursor.Length;
-                _inputPosVirtual = cursor.Length;
-
-                _inputPosMIN = cursor.Length + 1;
-
-                Console.SetCursorPosition(_inputPosReal, Console.CursorTop);
-
-                while (true)
+                if (_key.Key == ConsoleKey.Enter)
                 {
-                    ConsoleKeyInfo _key = Console.ReadKey();
+                    // Add cli-input to history.
+                    AddToHistory(_cliInput);
+                    break;
+                }
+                else if (_key.Key == ConsoleKey.Tab)
+                {
+                    // Tab does nothing.
+                }
+                else if (_key.Key == ConsoleKey.Escape)
+                {
+                    // Clear cli-input.
+                    ClearInput(_cliInput.Length + 1);
+                    _cliInput = "";
 
-                    _inputPosReal = Console.CursorLeft;
-                    _inputPosMAX = cursor.Length + _cliInput.Length + 2;
-                    // HERE
-                    if (_key.Key == ConsoleKey.Enter)
-                    {
-                        // Add cli-input to history.
-                        AddToHistory(_cliInput);
-                        break;
-                    }
-                    else if (_key.Key == ConsoleKey.Tab)
-                    {
-                        // TODO
-                    }
-                    else if (_key.Key == ConsoleKey.Escape)
-                    {
-                        // Clear cli-input.
-                        ClearInput(_cliInput.Length + 1);
-                        _cliInput = "";
-
-                        // Set cursor new.
-                        SetCursor(cursor.Length);
-                    }
-                    else if (_key.Key == ConsoleKey.Backspace)
-                    {
-                        if (_inputPos == _inputPosMIN)
-                        {
-                            Console.Write(" ");
-                        }
-                        else
-                        {
-                            int _cliInputOldLength = _cliInput.Length;
-                            _cliInput = _cliInput.Remove(_inputPos - cursor.Length, 1);
-
-                            ClearInput(_cliInputOldLength);
-
-                            SetCursor(cursor.Length);
-                            Console.Write(_cliInput);
-
-                            SetCursor(_inputPos);
-                        }
-                    }
-                    else if (_key.Key == ConsoleKey.LeftArrow)
+                    // Set cursor new.
+                    SetCursor(cursor.Length);
+                }
+                else if (_key.Key == ConsoleKey.Backspace)
+                {
+                    if (_inputPos > _inputPosMIN)
                     {
                         ClearInput(_cliInput.Length);
-
+                        _cliInput = _cliInput.Remove(_inputPos - cursor.Length - 1, 1);
+                        
                         SetCursor(cursor.Length);
                         Console.Write(_cliInput);
-
-                        if (_inputPos != _inputPosMIN)
-                        {
-                            SetCursor(_inputPos - 2);
-                        }
-                        else
-                        {
-                            SetCursor(_inputPos - 1);
-                        }
+                        SetCursor(_inputPos - 1);
                     }
-                    else if (_key.Key == ConsoleKey.RightArrow)
+                }
+                else if (_key.Key == ConsoleKey.LeftArrow)
+                {
+                    if (_inputPos > _inputPosMIN)
                     {
-                        ClearInput(_cliInput.Length);
-
-                        SetCursor(cursor.Length);
-                        Console.Write(_cliInput);
-
-                        if (_inputPos != _inputPosMAX)
-                        {
-                            
-                        }
-                        else
-                        {
-                            SetCursor(_inputPos - 1);
-                        }
+                        SetCursor(_inputPos - 1);
                     }
-                    else if (_key.Key == ConsoleKey.UpArrow)
+                }
+                else if (_key.Key == ConsoleKey.RightArrow)
+                {
+                    if (_inputPos < _inputPosMAX)
                     {
-                        Console.Write(" \b");
-
-                        if (_cliHistory.Count - 1 > _historyPointer)
-                        {
-                            _historyPointer++;
-                        }
-
-                        string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                        ClearInput(_cliInput.Length);
-                        SetCursor(cursor.Length);
-                        Console.Write(_lastInput);
-
-                        _cliInput = _lastInput;
+                        SetCursor(_inputPos + 1);
                     }
-                    else if (_key.Key == ConsoleKey.DownArrow)
+                }
+                else if (_key.Key == ConsoleKey.UpArrow)
+                {
+                    if (_cliHistory.Count - 1 > _historyPointer)
                     {
-                        Console.Write(" \b");
-
-                        if (0 < _historyPointer)
-                        {
-                            _historyPointer--;
-                        }
-
-                        string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                        ClearInput(_cliInput.Length);
-                        SetCursor(cursor.Length);
-                        Console.Write(_lastInput);
-
-                        _cliInput = _lastInput;
+                        _historyPointer++;
                     }
-                    else
+
+                    string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                    ClearInput(_cliInput.Length);
+                    SetCursor(cursor.Length);
+                    Console.Write(_lastInput);
+
+                    _cliInput = _lastInput;
+                }
+                else if (_key.Key == ConsoleKey.DownArrow)
+                {
+                    if (0 < _historyPointer)
                     {
-                        _cliInput = _cliInput.Insert(_inputPos - (cursor.Length + 1), _key.KeyChar.ToString());
-
-                        ClearInput(cursor.Length);
-                        SetCursor(cursor.Length);
-                        Console.Write(_cliInput);
-                        SetCursor(_inputPos);
+                        _historyPointer--;
                     }
+
+                    string _lastInput = GetLastHistoryEntry(_historyPointer);
+
+                    ClearInput(_cliInput.Length);
+                    SetCursor(cursor.Length);
+                    Console.Write(_lastInput);
+
+                    _cliInput = _lastInput;
+                }
+                else
+                {
+                    _cliInput = _cliInput.Insert(_inputPos - cursor.Length, _key.KeyChar.ToString());
+
+                    // Update cli-input.
+                    ClearInput(_cliInput.Length);
+                    SetCursor(cursor.Length);
+
+                    Console.Write(_cliInput);
+                    SetCursor(_inputPos + 1);
                 }
             }
 
