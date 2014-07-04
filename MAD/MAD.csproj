@@ -61,12 +61,12 @@
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
     <Compile Include="CLI\CLIOutput.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
-    <Compile Include="CLI\Parameter\Parameter.cs" />
-    <Compile Include="CLI\Parameter\ParameterInput.cs" />
-    <Compile Include="CLI\Parameter\ParameterOption.cs" />
+    <Compile Include="CLI\Core\Parameter.cs" />
+    <Compile Include="CLI\Core\ParameterInput.cs" />
+    <Compile Include="CLI\Core\ParameterOption.cs" />
     <Compile Include="CLI\Server\CLIUser.cs" />
-    <Compile Include="CLI\Command\Command.cs" />
-    <Compile Include="CLI\Command\CommandOptions.cs" />
+    <Compile Include="CLI\Core\Command.cs" />
+    <Compile Include="CLI\Core\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="Helper\HostDetectBACKUP.cs" />
