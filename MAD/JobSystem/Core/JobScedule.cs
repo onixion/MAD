@@ -77,33 +77,39 @@ namespace MAD.JobSystemCore
                 {
                     foreach (JobNode _node in _jobNodes)
                     {
-                        foreach(Job _job in _node._jobs)
+                        if (_node.state == JobNode.State.Active)
                         {
-                            if (_job.jobState == Job.JobState.Waiting)
+                            foreach (Job _job in _node._jobs)
                             {
-                                if (CheckJobTime(_job.jobTime, _time))
+                                if (!_job.jobLocked)
                                 {
-                                    if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                    if (_job.jobState == Job.JobState.Waiting)
                                     {
-                                        _job.jobTime.jobDelay.Reset();
-                                        JobThreadStart(_job);
-                                    }
-                                    else if (_job.jobTime.type == JobTime.TimeType.Absolute)
-                                    {
-                                        JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
-
-                                        if (!_handler.IsBlocked(_time))
+                                        if (CheckJobTime(_job.jobTime, _time))
                                         {
-                                            _handler.minuteAtBlock = _time.Minute;
-                                            JobThreadStart(_job);
+                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                            {
+                                                _job.jobTime.jobDelay.Reset();
+                                                JobThreadStart(_job);
+                                            }
+                                            else if (_job.jobTime.type == JobTime.TimeType.Absolute)
+                                            {
+                                                JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
+
+                                                if (!_handler.IsBlocked(_time))
+                                                {
+                                                    _handler.minuteAtBlock = _time.Minute;
+                                                    JobThreadStart(_job);
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                                else
-                                {
-                                    if (_job.jobTime.type == JobTime.TimeType.Relative)
-                                    {
-                                        _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                        else
+                                        {
+                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                            {
+                                                _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                            }
+                                        }
                                     }
                                 }
                             }

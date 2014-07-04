@@ -22,6 +22,8 @@ namespace MAD.JobSystemCore
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;
 
+        public bool jobLocked = false;
+
         public DateTime lastStarted;
         public DateTime lastFinished;
         public TimeSpan lastTimeSpan;

@@ -15,12 +15,13 @@ namespace MAD.JobSystemCore
 
         public enum State { Active, Inactive, Exception }
         private State _state = State.Inactive;
-        public State state { get { return _state; } } 
+        public State state { get { return _state; } }
 
         private PhysicalAddress _macAddress;
         private IPAddress _ipAddress;
 
         public List<Job> _jobs;
+        public object jobsLock = new object();
 
         private void InitID()
         {
@@ -28,6 +29,27 @@ namespace MAD.JobSystemCore
             {
                 _id = _idCount;
                 _idCount++;
+            }
+        }
+
+        public void InvokeJobs()
+        {
+            lock (jobsLock)
+            {
+                foreach (Job _job in _jobs)
+                {
+                    if (!_job.jobLocked)
+                    {
+                        if (_job.jobState == Job.JobState.Waiting)
+                        {
+                            _job.jobState = Job.JobState.Running;
+
+                            _job.LaunchJob();
+
+                            _job.jobState = Job.JobState.Stopped;
+                        }
+                    }
+                }
             }
         }
     }
