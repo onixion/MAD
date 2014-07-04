@@ -15,6 +15,9 @@ namespace MAD.JobSystemCore
         private int _maxNodes = 100;
         public int maxNodes { get { return _maxNodes; } }
 
+        private int _maxJobs = 100;
+        public List<Job> cachedJobs = new List<Job>();
+
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
@@ -181,6 +184,37 @@ namespace MAD.JobSystemCore
             }
 
             return _count;
+        }
+
+        public void AddToCache(Job job)
+        {
+            if (cachedJobs.Count <= _maxJobs)
+            {
+                cachedJobs.Add(job);
+            }
+            else
+            {
+                throw new Exception("Job cache limit reached!");
+            }
+        }
+        // HERE I WAS
+        public void RemoveFromCache(int jobID)
+        {
+            bool _removed = false;
+
+            for (int i = 0; i < cachedJobs.Count; i++)
+            {
+                if (cachedJobs[i].jobID == jobID)
+                {
+                    cachedJobs.RemoveAt(i);
+                    _removed = true;
+                }
+            }
+
+            if (!_removed)
+            {
+                throw new Exception("Job does not exits!");
+            }
         }
 
         public void SaveNodes(string path)

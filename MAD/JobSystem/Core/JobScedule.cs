@@ -11,7 +11,7 @@ namespace MAD.JobSystemCore
         #region members
 
         private List<JobNode> _jobNodes;
-        private Object _nodesLock;
+        private object _nodeLock;
 
         private Thread _cycleThread;
         private object _cycleThreadLock = new object();
@@ -28,10 +28,10 @@ namespace MAD.JobSystemCore
 
         #region constructor
 
-        public JobScedule(List<JobNode> jobNodes, object nodesLock)
+        public JobScedule(List<JobNode> jobNodes, object nodeLock)
         {
             _jobNodes = jobNodes;
-            _nodesLock = nodesLock;
+            _nodeLock = nodeLock;
 
             _workerPool = new SmartThreadPool(2000, _maxThreads);
         }
@@ -73,7 +73,7 @@ namespace MAD.JobSystemCore
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
 
-                lock (_nodesLock)
+                lock (_nodeLock)
                 {
                     foreach (JobNode _node in _jobNodes)
                     {

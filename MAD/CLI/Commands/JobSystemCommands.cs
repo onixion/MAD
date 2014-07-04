@@ -14,12 +14,12 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            description = "This command prints a table with all jobs.";
+            description = "This command prints a table with all nodes.";
         }
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Time-Type", "Time-Value(s)", "Job-State", "Out-State" };
+            string[] tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow>\n";
@@ -36,46 +36,27 @@ namespace MAD.CLICore
 
             output += "\n\n";
 
-            output += "Jobs max:         " + _js.maxJobs + "\n";
-            output += "Jobs initialized: " + _js.jobs.Count + "\n";
-            output += "Jobs running:     " + _js.JobsRunning() + "\n";
-            output += "Jobs stopped:     " + _js.JobsStopped() + "\n\n";
+            output += "Nodes max:         " + _js.maxNodes + "\n";
+            output += "Nodes initialized: " + _js.nodes.Count + "\n";
+            output += "Nodes active:      " + _js.NodesActive() + "\n";
+            output += "Nodes inactive:    " + _js.NodesInactive() + "\n\n";
 
             output += _jobTable.splitline + "\n";
             output += _jobTable.FormatStringArray(tableRow) + "\n";
             output += _jobTable.splitline + "\n";
             output += "<color><white>";
 
-            lock (_js.jobsLock)
+            lock (_js.nodesLock)
             {
-                foreach (Job _temp in _js.jobs)
+                foreach (JobNode _temp in _js.nodes)
                 {
-                    tableRow[0] = _temp.jobID.ToString();
-                    tableRow[1] = _temp.jobName;
-                    tableRow[2] = _temp.jobType.ToString();
-                    tableRow[3] = _temp.jobTime.type.ToString();
-
-                    if (_temp.jobTime.type == JobTime.TimeType.Relative)
-                    {
-                        tableRow[4] = _temp.jobTime.jobDelay.delayTime.ToString();
-                    }
-                    else if (_temp.jobTime.type == JobTime.TimeType.Absolute)
-                    {
-                        tableRow[4] = "";
-
-                        foreach (JobTimeHandler _temp2 in _temp.jobTime.jobTimes)
-                        {
-                            tableRow[4] += _temp2.JobTimeStatus() + " ";
-                        }
-                    }
-                    else
-                    {
-                        tableRow[4] = "NULL";
-                    }
-
-                    tableRow[5] = _temp.jobState.ToString();
-                    tableRow[6] = _temp.outState.ToString();
-
+                    tableRow[0] = _temp.nodeID.ToString();
+                    tableRow[1] = _temp.nodeName;
+                    tableRow[2] = _temp.state.ToString();
+                    tableRow[3] = _temp.macAddress;
+                    tableRow[4] = _temp.ipAddress;
+                    tableRow[5] = _temp._jobs.Count.ToString();
+                   
                     output += _jobTable.FormatStringArray(tableRow) + "\n";
                 }
             }
@@ -126,34 +107,40 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            optionalParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute()
         {
             if (OptionalParameterUsed("id"))
             {
-                Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+                lock (_js.nodesLock)
+                {
+                    Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
 
-                if (_job != null)
-                {
-                    output = _job.Status();
-                }
-                else
-                {
-                    output = "<color><red>Job does not exist!";
+                    if (_job != null)
+                    {
+                        output = _job.Status();
+                    }
+                    else
+                    {
+                        output = "<color><red>Job does not exist!";
+                    }
                 }
 
                 return output;
             }
-
             else
             {
-                output += "<color><yellow>Jobs initialized: " + _js.jobs.Count + "\n\n";
-
-                foreach (Job _job in _js.jobs)
+                lock (_js.nodesLock)
                 {
-                    output += _job.Status() + "\n";
+                    foreach (JobNode _node in _js.nodes)
+                    {
+                        foreach (Job _job in _node._jobs)
+                        {
+                            output += _job.Status() + "\n";
+                        }
+                    }
                 }
             }
 
@@ -230,7 +217,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            _js.CreateJob(_job);
+            //_js.CreateJob(_job);
 
             return output;
         }
@@ -290,7 +277,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            _js.CreateJob(_job);
+            //_js.CreateJob(_job);
 
             return output;
         }
@@ -431,7 +418,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.CreateJob(_job);
+                //_js.CreateJob(_job);
             }
             catch (Exception e)
             {
@@ -500,7 +487,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.CreateJob(_job);
+                //_js.CreateJob(_job);
             }
             catch (Exception e)
             {
@@ -528,7 +515,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.DestroyJob(id);
+                //_js.DestroyJob(id);
                 output += "<color><green>Job destroyed.";
             }
             catch (Exception e)
@@ -557,7 +544,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.StartJob(id);
+                //_js.StartJob(id);
                 output = "<color><green>Job started.";
             }
             catch (Exception e)
@@ -586,7 +573,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.StopJob(id);
+                //_js.StopJob(id);
                 output = "<color><green>Job stopped.";
             }
             catch (Exception e)
