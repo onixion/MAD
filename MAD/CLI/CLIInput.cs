@@ -3,12 +3,19 @@ using System.Collections.Generic;
 
 namespace MAD.CLIIO
 {
+    /*
+     * This class is responsible for the input of the cli.
+     * It defines what happend when keys are pressed. (TAB, ENTER, ...) 
+    */
+
     public class CLIInput
     {
         private ConsoleColor _cursorColor = ConsoleColor.Cyan;
         private ConsoleColor _inputColor = ConsoleColor.White;
 
-        public string cursor = "=> ";
+        private const int INPUT_MAX = 100;
+
+        public string cursor = "MAD> ";
         private string _cliInput;
 
         private int _inputPos;
@@ -121,14 +128,17 @@ namespace MAD.CLIIO
                 }
                 else
                 {
-                    _cliInput = _cliInput.Insert(_inputPos - cursor.Length, _key.KeyChar.ToString());
+                    if (_cliInput.Length < INPUT_MAX)
+                    {
+                        _cliInput = _cliInput.Insert(_inputPos - cursor.Length, _key.KeyChar.ToString());
 
-                    // Update cli-input.
-                    ClearInput(_cliInput.Length);
-                    SetCursor(cursor.Length);
+                        // Update cli-input.
+                        ClearInput(_cliInput.Length);
+                        SetCursor(cursor.Length);
 
-                    Console.Write(_cliInput);
-                    SetCursor(_inputPos + 1);
+                        Console.Write(_cliInput);
+                        SetCursor(_inputPos + 1);
+                    }
                 }
             }
 
