@@ -69,7 +69,7 @@
     <Compile Include="CLI\Core\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
-    <Compile Include="Helper\HostDetectBACKUP.cs" />
+    <Compile Include="DHCPReader\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="JobSystem\Core\Job.cs" />
     <Compile Include="JobSystem\Core\JobNode.cs" />

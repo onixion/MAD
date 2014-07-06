@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 
-using MAD.HostDetect;
+using MAD.Helper;
 
 namespace MAD.JobSystemCore
 {
