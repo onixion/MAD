@@ -46,7 +46,7 @@ namespace MAD.CLICore
             output += _jobTable.splitline + "\n";
             output += "<color><white>";
 
-            lock (_js.nodesLock)
+            lock (_js.jsNodesLock)
             {
                 foreach (JobNode _temp in _js.nodes)
                 {
@@ -54,7 +54,7 @@ namespace MAD.CLICore
                     tableRow[1] = _temp.nodeName;
                     tableRow[2] = _temp.state.ToString();
                     tableRow[3] = _temp.macAddress;
-                    tableRow[4] = _temp.ipAddress;
+                    tableRow[4] = _temp.ipAddress.ToString();
                     tableRow[5] = _temp._jobs.Count.ToString();
                    
                     output += _jobTable.FormatStringArray(tableRow) + "\n";
@@ -114,7 +114,7 @@ namespace MAD.CLICore
         {
             if (OptionalParameterUsed("id"))
             {
-                lock (_js.nodesLock)
+                lock (_js.jsNodesLock)
                 {
                     Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
 
@@ -132,7 +132,7 @@ namespace MAD.CLICore
             }
             else
             {
-                lock (_js.nodesLock)
+                lock (_js.jsNodesLock)
                 {
                     foreach (JobNode _node in _js.nodes)
                     {
@@ -297,7 +297,7 @@ namespace MAD.CLICore
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
 
-            description = "This command adds a job with the jobtype 'PingRequest' to the jobsystem.";
+            description = "This command adds a job with the jobtype 'PingRequest' to the cache of the jobsystem.";
         }
 
         public override string Execute()
@@ -346,7 +346,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.CreateJob(_job);
+                //_js.CreateJob(_job);
             }
             catch (Exception e)
             {

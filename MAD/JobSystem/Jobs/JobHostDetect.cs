@@ -42,7 +42,7 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
-        public override void Execute()
+        public override void Execute(IPAddress targetAddress)
         {
             byte[] _hostBytes = _helper.GetHosts(Subnetmask);
             byte[] _netBytes = Net.GetAddressBytes();

@@ -15,38 +15,44 @@ namespace MAD.JobSystemCore
         public int nodeID { get { return _id; } }
 
         // locks
-        private object _initIDLock = new object();
-        private object _nodeLock;
+        private object _initIDLock = new object(); // really necessesary?
+        private object _jsNodesLock;
 
+        // state
         public enum State { Active, Inactive, Exception }
-        private State _state = State.Inactive;
-        public State state { get { return _state; } }
+        public State state = State.Inactive;
 
+        // jobs
+        public List<Job> _jobs = new List<Job>();
+        private int _maxJobs = 100;
+        public int maxJobs { get { return _maxJobs; } }
+
+        // node-name
         private string _nodeName;
         public string nodeName { get { return _nodeName; } }
 
+        // mac-address
         private PhysicalAddress _macAddress;
         public string macAddress { get { return _macAddress.ToString(); } }
 
+        // ip-address
         private IPAddress _ipAddress;
-        public string ipAddress { get { return _ipAddress.ToString(); } }
-
-        public List<Job> _jobs = new List<Job>();
+        public IPAddress ipAddress { get { return _ipAddress; } }
 
         #endregion
 
         #region constructors
 
-        public JobNode(object nodeLock)
+        public JobNode(object jsNodesLock)
         {
             InitID();
-            _nodeLock = nodeLock;
+            _jsNodesLock = jsNodesLock;
         }
 
-        public JobNode(object nodeLock, string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
+        public JobNode(object jsNodesLock, string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
-            _nodeLock = nodeLock;
+            _jsNodesLock = jsNodesLock;
             _nodeName = nodeName;
             _macAddress = macAddress;
             _ipAddress = ipAddress;
@@ -68,7 +74,7 @@ namespace MAD.JobSystemCore
 
         public void UpdateName(string newName)
         {
-            lock (_nodeLock)
+            lock (_jsNodesLock)
             {
                 _nodeName = newName;
             }
@@ -76,7 +82,7 @@ namespace MAD.JobSystemCore
 
         public void UpdateMAC(PhysicalAddress newMACAddress)
         {
-            lock (_nodeLock)
+            lock (_jsNodesLock)
             {
                 _macAddress = newMACAddress;
             }
@@ -84,15 +90,15 @@ namespace MAD.JobSystemCore
 
         public void UpdateIP(IPAddress newIPAddress)
         {
-            lock (_nodeLock)
+            lock (_jsNodesLock)
             {
                 _ipAddress = newIPAddress;
             }
         }
 
-        public void UpdateJob(int jobID, Job newJob)
+        public bool UpdateJob(int jobID, Job newJob) // return bool is much faster than throwing exceptions ..
         {
-            lock (_nodeLock)
+            lock (_jsNodesLock)
             {
                 Job _job = GetJob(jobID);
 
@@ -100,17 +106,18 @@ namespace MAD.JobSystemCore
                 {
                     // Replace old job.
                     _job = newJob;
+                    return true;
                 }
                 else
                 {
-                    throw new Exception("Job does not exist!");
+                    return false;
                 }
             }
         }
 
         private Job GetJob(int jobID)
         {
-            lock (_nodeLock)
+            lock (_jsNodesLock)
             {
                 foreach (Job _job in _jobs)
                 {

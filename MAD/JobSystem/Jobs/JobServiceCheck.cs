@@ -45,7 +45,7 @@ namespace MAD.JobSystemCore
 
 		#region extern
 
-		public override void Execute ()
+		public override void Execute(IPAddress targetAddress)
 		{
 			switch (argument) 
 			{

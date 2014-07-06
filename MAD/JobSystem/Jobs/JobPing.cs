@@ -39,7 +39,7 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
-        public override void Execute()
+        public override void Execute(IPAddress targetAddress)
         {
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
 

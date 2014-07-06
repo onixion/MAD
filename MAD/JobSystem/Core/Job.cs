@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Collections.Generic;
 
 namespace MAD.JobSystemCore
@@ -11,10 +12,8 @@ namespace MAD.JobSystemCore
         private static object _jobInitLock = new object();
         public int jobID;
 
-        public string jobName;
-
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
-        public JobType jobType;
+        public JobType jobType = JobType.NULL;
 
         public enum JobState { Waiting, Running, Stopped, Exception }
         public JobState jobState = JobState.Stopped;
@@ -22,15 +21,14 @@ namespace MAD.JobSystemCore
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;
 
-        public bool jobLocked = false;
-
         public DateTime lastStarted;
         public DateTime lastFinished;
         public TimeSpan lastTimeSpan;
 
+        public string jobName;
+
         public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
-
         public JobNotification jobNotification = new JobNotification();
 
         #endregion
@@ -80,18 +78,7 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public void LaunchJob()
-        {
-            lastStarted = DateTime.Now;
-
-            Execute();
-
-            lastFinished = DateTime.Now;
-
-            lastTimeSpan = lastStarted.Subtract(lastFinished);
-        }
-
-        public abstract void Execute();
+        public abstract void Execute(IPAddress targetAddress);
 
         #region for CLI only
 
