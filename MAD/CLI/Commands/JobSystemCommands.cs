@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.NetworkInformation;
 
 using MAD.JobSystemCore;
 
@@ -91,7 +92,7 @@ namespace MAD.CLICore
             string[] tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
-            output += "Nodes max:         " + JobSystem.maxNodes + "\n";
+            output += "<color><yellow>Nodes max:         " + JobSystem.maxNodes + "\n";
             output += "Nodes initialized: " + _js.nodes.Count + "\n";
             output += "Nodes active:      " + _js.NodesActive() + "\n";
             output += "Nodes inactive:    " + _js.NodesInactive() + "\n\n";
@@ -108,7 +109,7 @@ namespace MAD.CLICore
                     tableRow[0] = _temp.nodeID.ToString();
                     tableRow[1] = _temp.nodeName;
                     tableRow[2] = _temp.state.ToString();
-                    tableRow[3] = _temp.macAddress;
+                    tableRow[3] = _temp.macAddress.ToString();
                     tableRow[4] = _temp.ipAddress.ToString();
                     tableRow[5] = _temp.jobs.Count.ToString();
 
@@ -193,21 +194,141 @@ namespace MAD.CLICore
         }
     }
 
-    // TODO
     public class JobSystemStartNodeCommand : Command
-    { }
+    {
+        private JobSystem _js;
+
+        public JobSystemStartNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the node-state to active.";
+        }
+
+        public override string Execute()
+        {
+            if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
+            {
+                return "<color><green>Node is active.";
+            }
+            else
+            {
+                return "<color><red>Node does not exist!";
+            }
+        }
+    }
 
     public class JobSystemStopNodeCommand : Command
-    { }
+    { 
+        private JobSystem _js;
+
+        public JobSystemStopNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the node-state to inactive.";
+        }
+
+        public override string Execute()
+        {
+            if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
+            {
+                return "<color><green>Node is inactive.";
+            }
+            else
+            {
+                return "<color><red>Node does not exist!";
+            }
+        }
+    }
 
     public class JobSystemStartJobCommand : Command
-    { }
+    { 
+        private JobSystem _js;
+
+        public JobSystemStartJobCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the job to active.";
+        }
+
+        public override string Execute()
+        {
+            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_job != null)
+            {
+                _job.jobState = Job.JobState.Waiting; // not sure if this works
+
+                return "<color><green>Node is inactive.";
+            }
+            else
+            {
+                return "<color><red>Job does not exist!";
+            }
+        }
+    }
 
     public class JobSystemStopJobCommand : Command
-    { }
+    { 
+        private JobSystem _js;
 
-    public class JobSystemCreateNode : Command
-    { }
+        public JobSystemStopJobCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the job to inactive.";
+        }
+
+        public override string Execute()
+        {
+            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_job != null)
+            {
+                _job.jobState = Job.JobState.Stopped; // not sure if this works
+
+                return "<color><green>Job is inactive.";
+            }
+            else
+            {
+                return "<color><red>Job does not exist!";
+            }
+        }
+    }
+
+    public class JobSystemCreateNodeCommand : Command
+    { 
+        private JobSystem _js;
+
+        public JobSystemCreateNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("n", "<NODE-NAME>", "Name of the node.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("mac", "<MAC-ADDRESS>", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            requiredParameter.Add(new ParameterOption("ip", "<IP-ADDRESS>", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            optionalParameter.Add(new ParameterOption("clear", "", "Flag to clear the cache.", true, false, null));
+            description = "This command creates a node for the cached jobs.";
+        }
+
+        public override string Execute()
+        {
+            JobNode _node = new JobNode(_js.jsNodesLock);
+
+            _node.nodeName = (string)parameters.GetParameter("n").argumentValues[0];
+            _node.macAddress = (PhysicalAddress)parameters.GetParameter("mac").argumentValues[0]; // MAC ADDRESS
+            _node.ipAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
+
+            _node.jobs = _js.cachedJobs;
+
+            // Add node to jobsystem.
+            _js.AddNode(_node);
+            _js.ClearCache();
+
+            return "<color><green>Node created (ID '" + _node.nodeID + "').";
+        }
+    }
 
     #endregion
 

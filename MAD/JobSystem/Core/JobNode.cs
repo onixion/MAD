@@ -27,16 +27,13 @@ namespace MAD.JobSystemCore
         public const int maxJobs = 100;
 
         // node-name
-        private string _nodeName;
-        public string nodeName { get { return _nodeName; } }
+        public string nodeName;
 
         // mac-address
-        private PhysicalAddress _macAddress;
-        public string macAddress { get { return _macAddress.ToString(); } }
+        public PhysicalAddress macAddress;
 
         // ip-address
-        private IPAddress _ipAddress;
-        public IPAddress ipAddress { get { return _ipAddress; } }
+        public IPAddress ipAddress;
 
         #endregion
 
@@ -52,9 +49,9 @@ namespace MAD.JobSystemCore
         {
             InitID();
             _jsNodesLock = jsNodesLock;
-            _nodeName = nodeName;
-            _macAddress = macAddress;
-            _ipAddress = ipAddress;
+            this.nodeName = nodeName;
+            this.macAddress = macAddress;
+            this.ipAddress = ipAddress;
             this.jobs = jobs;
         }
 
@@ -75,7 +72,7 @@ namespace MAD.JobSystemCore
         {
             lock (_jsNodesLock)
             {
-                _nodeName = newName;
+                nodeName = newName;
             }
         }
 
@@ -83,7 +80,7 @@ namespace MAD.JobSystemCore
         {
             lock (_jsNodesLock)
             {
-                _macAddress = newMACAddress;
+                macAddress = newMACAddress;
             }
         }
 
@@ -91,7 +88,7 @@ namespace MAD.JobSystemCore
         {
             lock (_jsNodesLock)
             {
-                _ipAddress = newIPAddress;
+                ipAddress = newIPAddress;
             }
         }
 

@@ -141,9 +141,10 @@ namespace MAD.CLICore
 
         /* The method 'Convert' can only parse object to: 
          * 
-        *  System.Int32
-        *  System.String
-        *  System.Net.IPAddress */
+         *  System.Int32
+         *  System.String
+         *  System.Net.IPAddress
+         *  System.Net.NetworkInformation.PhysicalAddress */
         private object Convert(string value, Type convertType)
         {
             try
@@ -156,6 +157,8 @@ namespace MAD.CLICore
                         return value;
                     case "System.Net.IPAddress":
                         return System.Net.IPAddress.Parse(value);
+                    case "System.Net.NetworkInformation.PhysicalAddress":
+                        return System.Net.NetworkInformation.PhysicalAddress.Parse(value);
                 }
 
                 return null;

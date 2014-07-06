@@ -33,13 +33,24 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
-            // JobSystem
+            // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
+
+            // SCEDULE
             commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { js }));
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
+
+            // NODES
+            commands.Add(new CommandOptions("js node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js node create", typeof(JobSystemCreateNodeCommand), new object[] { js }));
+
+            // JOBS
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js job start", typeof(JobSystemStartJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { js }));
