@@ -5,65 +5,7 @@ using MAD.JobSystemCore;
 
 namespace MAD.CLICore
 {
-    public class JobSystemStatusCommand : Command
-    {
-        JobSystem _js;
-        ConsoleTable _jobTable;
-
-        public JobSystemStatusCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            description = "This command prints a table with all nodes.";
-        }
-
-        public override string Execute()
-        {
-            string[] tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
-            _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
-
-            output += "<color><yellow>\n";
-            output += "Scedule-State: ";
-
-            if (_js.sceduleState == JobScedule.State.Running)
-            {
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-            else
-            {
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-
-            output += "\n\n";
-
-            output += "Nodes max:         " + _js.maxNodes + "\n";
-            output += "Nodes initialized: " + _js.nodes.Count + "\n";
-            output += "Nodes active:      " + _js.NodesActive() + "\n";
-            output += "Nodes inactive:    " + _js.NodesInactive() + "\n\n";
-
-            output += _jobTable.splitline + "\n";
-            output += _jobTable.FormatStringArray(tableRow) + "\n";
-            output += _jobTable.splitline + "\n";
-            output += "<color><white>";
-
-            lock (_js.jsNodesLock)
-            {
-                foreach (JobNode _temp in _js.nodes)
-                {
-                    tableRow[0] = _temp.nodeID.ToString();
-                    tableRow[1] = _temp.nodeName;
-                    tableRow[2] = _temp.state.ToString();
-                    tableRow[3] = _temp.macAddress;
-                    tableRow[4] = _temp.ipAddress.ToString();
-                    tableRow[5] = _temp._jobs.Count.ToString();
-                   
-                    output += _jobTable.FormatStringArray(tableRow) + "\n";
-                }
-            }
-
-            return output;
-        }
-    }
+    #region commands for scedule
 
     public class JobSceduleStartCommand : Command
     {
@@ -98,6 +40,206 @@ namespace MAD.CLICore
             return "<color><green>Scedule stopped.";
         }
     }
+
+    #endregion
+
+    #region commands for jobsystem
+
+    public class JobSystemStatusNodesCommand : Command
+    {
+        JobSystem _js;
+        ConsoleTable _jobTable;
+
+        public JobSystemStatusNodesCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command prints a table with all nodes.";
+        }
+
+        public override string Execute()
+        {
+            string[] tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
+            _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
+
+            output += "<color><yellow>\n";
+            output += "Scedule-State: ";
+
+            if (_js.sceduleState == JobScedule.State.Running)
+            {
+                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+            else
+            {
+                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+
+            output += "\n\n";
+
+            output += "Nodes max:         " + JobSystem.maxNodes + "\n";
+            output += "Nodes initialized: " + _js.nodes.Count + "\n";
+            output += "Nodes active:      " + _js.NodesActive() + "\n";
+            output += "Nodes inactive:    " + _js.NodesInactive() + "\n\n";
+
+            output += _jobTable.splitline + "\n";
+            output += _jobTable.FormatStringArray(tableRow) + "\n";
+            output += _jobTable.splitline + "\n";
+            output += "<color><white>";
+
+            lock (_js.jsNodesLock)
+            {
+                foreach (JobNode _temp in _js.nodes)
+                {
+                    tableRow[0] = _temp.nodeID.ToString();
+                    tableRow[1] = _temp.nodeName;
+                    tableRow[2] = _temp.state.ToString();
+                    tableRow[3] = _temp.macAddress;
+                    tableRow[4] = _temp.ipAddress.ToString();
+                    tableRow[5] = _temp.jobs.Count.ToString();
+
+                    output += _jobTable.FormatStringArray(tableRow) + "\n";
+                }
+            }
+
+            return output;
+        }
+    }
+
+    public class JobSystemStatusJobsCommand : Command
+    {
+        JobSystem _js;
+        ConsoleTable _jobTable;
+
+        public JobSystemStatusJobsCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command prints a table with all jobs.";
+        }
+
+        public override string Execute()
+        {
+            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)"};
+            _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
+
+            output += "\n\n<color><yellow><< JOBS IN NODES >>\n\n";
+
+            output += "Jobs max:             " + JobSystem.maxJobsOverall + "\n";
+            output += "Jobs initialized:     " + _js.NodesJobsInitialized() + "\n";
+            output += "Jobs waiting/running: " + _js.NodesActive() + "\n";
+            output += "Jobs stopped:         " + _js.NodesInactive() + "\n\n";
+
+            output += _jobTable.splitline + "\n";
+            output += _jobTable.FormatStringArray(tableRow) + "\n";
+            output += _jobTable.splitline + "\n";
+            output += "<color><white>";
+
+            lock (_js.jsNodesLock)
+            {
+                foreach (JobNode _temp in _js.nodes)
+                {
+                    foreach (Job _temp2 in _temp.jobs)
+                    {
+                        tableRow[0] = _temp2.jobID.ToString();
+                        tableRow[1] = _temp2.jobName;
+                        tableRow[2] = _temp2.jobType.ToString();
+                        tableRow[3] = _temp2.jobState.ToString();
+                        tableRow[4] = _temp2.jobTime.type.ToString();
+                        tableRow[5] = _temp2.jobTime.Values();
+
+                        output += _jobTable.FormatStringArray(tableRow) + "\n";
+                    }
+                }
+            }
+
+            output += "\n\n<color><yellow><< JOBS IN CACHE >>\n\n";
+
+            output += "Jobs max:             " + JobSystem.maxCachedJobs + "\n";
+            output += "Jobs initialized:     " + _js.cachedJobs.Count + "\n";
+
+            output += _jobTable.splitline + "\n";
+            output += _jobTable.FormatStringArray(tableRow) + "\n";
+            output += _jobTable.splitline + "\n";
+            output += "<color><white>";
+
+            foreach (Job _temp2 in _js.cachedJobs)
+            {
+                tableRow[0] = _temp2.jobID.ToString();
+                tableRow[1] = _temp2.jobName;
+                tableRow[2] = _temp2.jobType.ToString();
+                tableRow[3] = _temp2.jobState.ToString();
+                tableRow[4] = _temp2.jobTime.type.ToString();
+                tableRow[5] = _temp2.jobTime.Values();
+
+                output += _jobTable.FormatStringArray(tableRow) + "\n";
+            }
+
+            return output;
+        }
+    }
+
+    // TODO
+    public class JobSystemStartCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStartCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute()
+        {
+            int id = (int)parameters.GetParameter("id").argumentValues[0];
+
+            try
+            {
+                //_js.StartJob(id);
+                output = "<color><green>Job started.";
+            }
+            catch (Exception e)
+            {
+                output = "<color><red>" + e.Message;
+            }
+
+            return output;
+        }
+    }
+
+    public class JobSystemStopCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStopCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute()
+        {
+            int id = (int)parameters.GetParameter("id").argumentValues[0];
+
+            try
+            {
+                //_js.StopJob(id);
+                output = "<color><green>Job stopped.";
+            }
+            catch (Exception e)
+            {
+                output = "<color><red>FAIL: " + e.Message;
+            }
+
+            return output;
+        }
+    }
+
+    #endregion
+
+    #region commands for jobs (mainly used for cached jobs)
 
     public class JobStatusCommand : Command
     {
@@ -136,7 +278,7 @@ namespace MAD.CLICore
                 {
                     foreach (JobNode _node in _js.nodes)
                     {
-                        foreach (Job _job in _node._jobs)
+                        foreach (Job _job in _node.jobs)
                         {
                             output += _job.Status() + "\n";
                         }
@@ -146,7 +288,6 @@ namespace MAD.CLICore
 
             return output;
         }
-    
     }
 
     public class JobSystemAddServiceCheckCommand : Command
@@ -217,9 +358,14 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            //_js.CreateJob(_job);
-
-            return output;
+            if (_js.AddToCache(_job))
+            {
+                return "<color><green>Job added to cache.";
+            }
+            else
+            {
+                return "<color><red>Cache limit reached!";
+            }
         }
     }
 
@@ -277,9 +423,14 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            //_js.CreateJob(_job);
-
-            return output;
+            if (_js.AddToCache(_job))
+            {
+                return "<color><green>Job added to cache.";
+            }
+            else
+            {
+                return "<color><red>Cache limit reached!";
+            }
         }
     }
 
@@ -344,16 +495,14 @@ namespace MAD.CLICore
                 _job.ttl = (int)parameters.GetParameter("ttl").argumentValues[0];
             }
 
-            try
+            if (_js.AddToCache(_job))
             {
-                //_js.CreateJob(_job);
+                return "<color><green>Job added to cache.";
             }
-            catch (Exception e)
+            else
             {
-                output = "<color><red>" + e.Message;
+                return "<color><red>Cache limit reached!";
             }
-
-            return output;
         }
     }
 
@@ -416,16 +565,14 @@ namespace MAD.CLICore
                 _job.port = (int)parameters.GetParameter("p").argumentValues[0];
             }
 
-            try
+            if (_js.AddToCache(_job))
             {
-                //_js.CreateJob(_job);
+                return "<color><green>Job added to cache.";
             }
-            catch (Exception e)
+            else
             {
-                output = "<color><red>" + e.Message;
+                return "<color><red>Cache limit reached!";
             }
-
-            return output;
         }
     }
 
@@ -485,16 +632,14 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            try
+            if (_js.AddToCache(_job))
             {
-                //_js.CreateJob(_job);
+                return "<color><green>Job added to cache.";
             }
-            catch (Exception e)
+            else
             {
-                output = "<color><red>" + e.Message;
+                return "<color><red>Cache limit reached!";
             }
-
-            return output;
         }
     }
 
@@ -527,61 +672,5 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemStartCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemStartCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValues[0];
-
-            try
-            {
-                //_js.StartJob(id);
-                output = "<color><green>Job started.";
-            }
-            catch (Exception e)
-            {
-                output = "<color><red>" + e.Message;
-            }      
-
-            return output;
-        }
-    }
-
-    public class JobSystemStopCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemStopCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValues[0];
-
-            try
-            {
-                //_js.StopJob(id);
-                output = "<color><green>Job stopped.";
-            }
-            catch (Exception e)
-            {
-                output = "<color><red>FAIL: " + e.Message;
-            }      
-
-            return output;
-        }
-    }
+    #endregion
 }

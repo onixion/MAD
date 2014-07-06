@@ -12,11 +12,11 @@ namespace MAD.JobSystemCore
         public List<JobNode> nodes = new List<JobNode>();
         public object jsNodesLock = new object();
 
-        private int _maxNodes = 100;
-        public int maxNodes { get { return _maxNodes; } }
+        public const int maxNodes = 100;
+        public static int maxJobsOverall { get { return maxNodes * JobNode.maxJobs; } }
 
         public List<Job> cachedJobs = new List<Job>();
-        private int _maxCachedJobs = 100;
+        public static int maxCachedJobs { get { return JobNode.maxJobs; } }
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
@@ -83,7 +83,7 @@ namespace MAD.JobSystemCore
 
         public bool AddNode(JobNode node)
         {
-            if (_maxNodes > nodes.Count)
+            if (maxNodes > nodes.Count)
             {
                 nodes.Add(node);
                 return true;
@@ -172,6 +172,21 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
+        public int NodesJobsInitialized()
+        {
+            int _count = 0;
+
+            lock (jsNodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    _count = _count + nodes[i].jobs.Count;
+                }
+            }
+
+            return _count;
+        }
+
         #endregion
 
         #region job handling
@@ -180,7 +195,7 @@ namespace MAD.JobSystemCore
         {
             foreach (JobNode _node in nodes)
             {
-                foreach (Job _temp in _node._jobs)
+                foreach (Job _temp in _node.jobs)
                 {
                     if (_temp.jobID == jobID)
                     {
@@ -196,7 +211,7 @@ namespace MAD.JobSystemCore
         {
             foreach (JobNode _node in nodes)
             {
-                foreach (Job _job in _node._jobs)
+                foreach (Job _job in _node.jobs)
                 {
                     if (jobID == _job.jobID)
                     {
@@ -210,7 +225,7 @@ namespace MAD.JobSystemCore
 
         public bool AddToCache(Job job)
         {
-            if (cachedJobs.Count <= _maxCachedJobs)
+            if (cachedJobs.Count <= maxCachedJobs)
             {
                 cachedJobs.Add(job);
                 return true;

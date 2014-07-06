@@ -85,7 +85,7 @@ namespace MAD.JobSystemCore
                     {
                         if (_node.state == JobNode.State.Active)
                         {
-                            foreach (Job _job in _node._jobs)
+                            foreach (Job _job in _node.jobs)
                             {
                                 if (_job.jobState == Job.JobState.Waiting)
                                 {

@@ -247,6 +247,29 @@ namespace MAD.JobSystemCore
             }
         }
 
+        public string Values()
+        {
+            if (type == TimeType.Relative)
+            {
+                return jobDelay.delayTime.ToString();
+            }
+            else if (type == TimeType.Absolute)
+            {
+                string _temp = "";
+
+                foreach (JobTimeHandler _buffer in jobTimes)
+                {
+                    _temp += _buffer.JobTimeStatus();
+                }
+
+                return _temp;
+            }
+            else
+            {
+                return "NULL";
+            }
+        }
+
         #endregion
     }
 

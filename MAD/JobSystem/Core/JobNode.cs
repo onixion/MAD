@@ -23,9 +23,8 @@ namespace MAD.JobSystemCore
         public State state = State.Inactive;
 
         // jobs
-        public List<Job> _jobs = new List<Job>();
-        private int _maxJobs = 100;
-        public int maxJobs { get { return _maxJobs; } }
+        public List<Job> jobs = new List<Job>();
+        public const int maxJobs = 100;
 
         // node-name
         private string _nodeName;
@@ -56,7 +55,7 @@ namespace MAD.JobSystemCore
             _nodeName = nodeName;
             _macAddress = macAddress;
             _ipAddress = ipAddress;
-            _jobs = jobs;
+            this.jobs = jobs;
         }
 
         #endregion
@@ -119,7 +118,7 @@ namespace MAD.JobSystemCore
         {
             lock (_jsNodesLock)
             {
-                foreach (Job _job in _jobs)
+                foreach (Job _job in jobs)
                 {
                     if (_job.jobID == jobID)
                     {

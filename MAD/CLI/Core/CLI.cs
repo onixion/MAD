@@ -34,7 +34,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             // JobSystem
-            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
             commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { js }));
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { js }));

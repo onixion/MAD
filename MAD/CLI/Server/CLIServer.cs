@@ -137,7 +137,8 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             // JobSystem
-            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
             commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
