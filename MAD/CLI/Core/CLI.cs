@@ -34,6 +34,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             // JobSystem
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
             commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { js }));
@@ -44,9 +45,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js destroy", typeof(JobSystemRemoveCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js start", typeof(JobSystemStartCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js stop", typeof(JobSystemStopCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { js }));
 
             // CLIServer
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));

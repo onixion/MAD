@@ -45,6 +45,35 @@ namespace MAD.CLICore
 
     #region commands for jobsystem
 
+    public class JobSystemStatusCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStatusCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command shows informations about the jobsystem.";
+        }
+
+        public override string Execute()
+        {
+            output += "<color><yellow>Scedule-State: ";
+
+            if (_js.sceduleState == JobScedule.State.Running)
+            {
+                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+            else
+            {
+                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+            }
+
+            return output;
+        }
+    
+    }
+
     public class JobSystemStatusNodesCommand : Command
     {
         JobSystem _js;
@@ -61,20 +90,6 @@ namespace MAD.CLICore
         {
             string[] tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
-
-            output += "<color><yellow>\n";
-            output += "Scedule-State: ";
-
-            if (_js.sceduleState == JobScedule.State.Running)
-            {
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-            else
-            {
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-
-            output += "\n\n";
 
             output += "Nodes max:         " + JobSystem.maxNodes + "\n";
             output += "Nodes initialized: " + _js.nodes.Count + "\n";
@@ -122,7 +137,7 @@ namespace MAD.CLICore
             string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)"};
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
-            output += "\n\n<color><yellow><< JOBS IN NODES >>\n\n";
+            output += "<color><yellow><< JOBS IN NODES >>\n\n";
 
             output += "Jobs max:             " + JobSystem.maxJobsOverall + "\n";
             output += "Jobs initialized:     " + _js.NodesJobsInitialized() + "\n";
@@ -179,63 +194,20 @@ namespace MAD.CLICore
     }
 
     // TODO
-    public class JobSystemStartCommand : Command
-    {
-        private JobSystem _js;
+    public class JobSystemStartNodeCommand : Command
+    { }
 
-        public JobSystemStartCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
+    public class JobSystemStopNodeCommand : Command
+    { }
 
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValues[0];
+    public class JobSystemStartJobCommand : Command
+    { }
 
-            try
-            {
-                //_js.StartJob(id);
-                output = "<color><green>Job started.";
-            }
-            catch (Exception e)
-            {
-                output = "<color><red>" + e.Message;
-            }
+    public class JobSystemStopJobCommand : Command
+    { }
 
-            return output;
-        }
-    }
-
-    public class JobSystemStopCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemStopCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValues[0];
-
-            try
-            {
-                //_js.StopJob(id);
-                output = "<color><green>Job stopped.";
-            }
-            catch (Exception e)
-            {
-                output = "<color><red>FAIL: " + e.Message;
-            }
-
-            return output;
-        }
-    }
+    public class JobSystemCreateNode : Command
+    { }
 
     #endregion
 
@@ -643,11 +615,11 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemRemoveCommand : Command
+    public class JobSystemRemoveJobCommand : Command
     {
         private JobSystem _js;
 
-        public JobSystemRemoveCommand(object[] args)
+        public JobSystemRemoveJobCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
