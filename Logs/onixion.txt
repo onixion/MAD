@@ -46,4 +46,5 @@ Now using the TcpListener and TcpClient)
 (NOTE: JobSystem need to be rewritten)
 
 [04.07.2014][18:00-21:00][3h][85,5h] Started working on JobNodes and JobSytem...
+[06.07.2014][12:00-16:30][4,5h][90h] JobNodes, JobScedule and JobSystem ready for some tests ... Edited commands. Not tested yet.
 

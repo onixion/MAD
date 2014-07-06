@@ -82,6 +82,8 @@ namespace MAD.CLICore
                 //string _cliInput = Console.ReadLine();
                 string _cliInput = _input.ReadInput();
 
+                _cliInput = _cliInput.Trim();
+
                 if (_cliInput != "")
                 {
                     string response = AnalyseInput(ref _command, _cliInput);

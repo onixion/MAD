@@ -135,7 +135,7 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            string[] tableRow = new string[] { "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)"};
+            string[] tableRow = new string[] {"Node-ID","Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State"};
             _jobTable = new ConsoleTable(tableRow, Console.BufferWidth);
 
             output += "<color><yellow><< JOBS IN NODES >>\n\n";
@@ -156,12 +156,14 @@ namespace MAD.CLICore
                 {
                     foreach (Job _temp2 in _temp.jobs)
                     {
-                        tableRow[0] = _temp2.jobID.ToString();
-                        tableRow[1] = _temp2.jobName;
-                        tableRow[2] = _temp2.jobType.ToString();
-                        tableRow[3] = _temp2.jobState.ToString();
-                        tableRow[4] = _temp2.jobTime.type.ToString();
-                        tableRow[5] = _temp2.jobTime.Values();
+                        tableRow[0] = _temp.nodeID.ToString();
+                        tableRow[1] = _temp2.jobID.ToString();
+                        tableRow[2] = _temp2.jobName;
+                        tableRow[3] = _temp2.jobType.ToString();
+                        tableRow[4] = _temp2.jobState.ToString();
+                        tableRow[5] = _temp2.jobTime.type.ToString();
+                        tableRow[6] = _temp2.jobTime.Values();
+                        tableRow[6] = _temp2.jobState.ToString();
 
                         output += _jobTable.FormatStringArray(tableRow) + "\n";
                     }
@@ -180,12 +182,14 @@ namespace MAD.CLICore
 
             foreach (Job _temp2 in _js.cachedJobs)
             {
-                tableRow[0] = _temp2.jobID.ToString();
-                tableRow[1] = _temp2.jobName;
-                tableRow[2] = _temp2.jobType.ToString();
-                tableRow[3] = _temp2.jobState.ToString();
-                tableRow[4] = _temp2.jobTime.type.ToString();
-                tableRow[5] = _temp2.jobTime.Values();
+                tableRow[0] = "<CACHED>";
+                tableRow[1] = _temp2.jobID.ToString();
+                tableRow[2] = _temp2.jobName;
+                tableRow[3] = _temp2.jobType.ToString();
+                tableRow[4] = _temp2.jobState.ToString();
+                tableRow[5] = _temp2.jobTime.type.ToString();
+                tableRow[6] = _temp2.jobTime.Values();
+                tableRow[6] = _temp2.jobState.ToString();
 
                 output += _jobTable.FormatStringArray(tableRow) + "\n";
             }
@@ -324,6 +328,7 @@ namespace MAD.CLICore
 
             // Add node to jobsystem.
             _js.AddNode(_node);
+            // Clear cache.
             _js.ClearCache();
 
             return "<color><green>Node created (ID '" + _node.nodeID + "').";
