@@ -182,7 +182,7 @@ namespace MAD.CLICore
 
             foreach (Job _temp2 in _js.cachedJobs)
             {
-                tableRow[0] = "<CACHED>";
+                tableRow[0] = "CACHED";
                 tableRow[1] = _temp2.jobID.ToString();
                 tableRow[2] = _temp2.jobName;
                 tableRow[3] = _temp2.jobType.ToString();
