@@ -36,7 +36,7 @@ namespace MAD.CLIIO
 
         #region methodes
 
-        public static void WriteToConsole(string data, int lineWidth)
+        public static void WriteToConsole(string data)
         {
             lock (_consoleLock)
             {
@@ -60,12 +60,7 @@ namespace MAD.CLIIO
                                     temp[i] = temp[i].Remove(0, color.Length);
 
                                     Console.ForegroundColor = (ConsoleColor)buffer[1];
-
-                                    // If lineWidth == 0, text-wraping is disabled.
-                                    if (lineWidth == 0)
-                                        Console.Write(temp[i]);
-                                    else
-                                        CLIOutput.WrapTextToConsole(temp[i], lineWidth);
+                                    Console.Write(temp[i]);
 
                                     _colorTagFound = true;
                                     break;
@@ -76,22 +71,14 @@ namespace MAD.CLIIO
                             if (!_colorTagFound)
                             {
                                 Console.ForegroundColor = ConsoleColor.Gray;
-
-                                if (lineWidth == 0)
-                                    Console.Write(temp[i]);
-                                else
-                                    CLIOutput.WrapTextToConsole(temp[i], lineWidth);
+                                Console.Write(temp[i]);
                             }
                         }
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
-
-                        if (lineWidth == 0)
-                            Console.Write(data);
-                        else
-                            CLIOutput.WrapTextToConsole(data, lineWidth);
+                        Console.Write(data);
                     }
 
                     Console.Write("\n");
@@ -100,6 +87,8 @@ namespace MAD.CLIIO
             }
         }
 
+        // Removed, because it cannot be used in combination with colors ...
+        /*
         public static void WrapTextToConsole(string textToPrint, int lineWidth)
         {
             string[] _words = textToPrint.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
@@ -123,7 +112,7 @@ namespace MAD.CLIIO
                         // Remove last word from buffer.
                         _buffer = _buffer.Remove(_buffer.Length - _words[i].Length - 1);
                         // Write it to console.
-                        Console.WriteLine(_buffer);
+                        Console.Write(_buffer);
                         // Clear buffer.
                         _buffer = null;
                         // Set i one back.
@@ -132,14 +121,14 @@ namespace MAD.CLIIO
                     else
                     { 
                         // If the line has one word and it is to long for the line, than just write it into the console.
-                        Console.WriteLine(_buffer);
+                        Console.Write(_buffer);
                         // Clear buffer.
                         _buffer = null;
                     }
                 }
                 else if (_buffer.Length == lineWidth)
                 {
-                    Console.WriteLine(_buffer);
+                    Console.Write(_buffer);
                     _buffer = null;
                 }
                 else
@@ -147,7 +136,7 @@ namespace MAD.CLIIO
                     // Check if it is the last word.
                     if (_words.Length - 1 == i)
                     {
-                        Console.WriteLine(_buffer);
+                        Console.Write(_buffer);
                         break;
                     }
                     else
@@ -156,7 +145,7 @@ namespace MAD.CLIIO
                     }
                 }
             }
-        }
+        }*/
 
         #endregion
     }

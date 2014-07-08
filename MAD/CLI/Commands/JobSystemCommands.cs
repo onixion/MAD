@@ -165,7 +165,7 @@ namespace MAD.CLICore
                         tableRow[4] = _temp2.jobState.ToString();
                         tableRow[5] = _temp2.jobTime.type.ToString();
                         tableRow[6] = _temp2.jobTime.Values();
-                        tableRow[6] = _temp2.jobState.ToString();
+                        tableRow[7] = _temp2.outState.ToString();
 
                         output += _jobTable.FormatStringArray(tableRow) + "\n";
                     }
@@ -314,7 +314,6 @@ namespace MAD.CLICore
             requiredParameter.Add(new ParameterOption("n", "<NODE-NAME>", "Name of the node.", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("mac", "<MAC-ADDRESS>", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
             requiredParameter.Add(new ParameterOption("ip", "<IP-ADDRESS>", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
-            optionalParameter.Add(new ParameterOption("clear", "", "Flag to clear the cache.", true, false, null));
             description = "This command creates a node for the cached jobs.";
         }
 

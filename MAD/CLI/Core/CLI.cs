@@ -71,7 +71,7 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            CLIOutput.WriteToConsole(GetBanner(), 0);
+            CLIOutput.WriteToConsole(GetBanner());
 
             while (true)
             {
@@ -91,7 +91,7 @@ namespace MAD.CLICore
                     // Check if the parameter and arguments are valid.
                     if (response == "VALID_PARAMETER")
                     {
-                        // Execute command and get response from command.
+                        // Execute command and get response from command. // TODO: pass console width to .Execute()
                         response = _command.Execute();
 
                         // When command response with 'EXIT_CLI' the CLI closes.
@@ -99,12 +99,12 @@ namespace MAD.CLICore
                             break;
 
                         // Write command ouput to console.
-                        CLIOutput.WriteToConsole(response, 0);
+                        CLIOutput.WriteToConsole(response);
                     }
                     else
                     {
                         // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
-                        CLIOutput.WriteToConsole(response, 0);
+                        CLIOutput.WriteToConsole(response);
                     }
                 }
             }
