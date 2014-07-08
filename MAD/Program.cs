@@ -20,7 +20,7 @@ namespace MAD
 
             CLIServer cliServer = new CLIServer(999, "data", js);
             CLI cli = new CLI(dataPath, js, cliServer);
-            
+
             if (args.Length == 0)
             { 
                 // START GUI

@@ -36,7 +36,7 @@ namespace MAD.CLIIO
 
         #region methodes
 
-        public static void WriteToConsole(string data)
+        public static void WriteToConsole(string data, int lineWidth)
         {
             lock (_consoleLock)
             {
@@ -60,7 +60,12 @@ namespace MAD.CLIIO
                                     temp[i] = temp[i].Remove(0, color.Length);
 
                                     Console.ForegroundColor = (ConsoleColor)buffer[1];
-                                    Console.Write(temp[i]);
+
+                                    // If lineWidth == 0, text-wraping is disabled.
+                                    if (lineWidth == 0)
+                                        Console.Write(temp[i]);
+                                    else
+                                        CLIOutput.WrapTextToConsole(temp[i], lineWidth);
 
                                     _colorTagFound = true;
                                     break;
@@ -71,18 +76,84 @@ namespace MAD.CLIIO
                             if (!_colorTagFound)
                             {
                                 Console.ForegroundColor = ConsoleColor.Gray;
-                                Console.Write(temp[i]);
+
+                                if (lineWidth == 0)
+                                    Console.Write(temp[i]);
+                                else
+                                    CLIOutput.WrapTextToConsole(temp[i], lineWidth);
                             }
                         }
                     }
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.Write(data);
+
+                        if (lineWidth == 0)
+                            Console.Write(data);
+                        else
+                            CLIOutput.WrapTextToConsole(data, lineWidth);
                     }
 
                     Console.Write("\n");
                     Console.ForegroundColor = ConsoleColor.White;
+                }
+            }
+        }
+
+        public static void WrapTextToConsole(string textToPrint, int lineWidth)
+        {
+            string[] _words = textToPrint.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            string _buffer = null;
+
+            for (int i = 0; i < _words.Length; i++)
+            {
+                if (_buffer == null)
+                {
+                    _buffer = "";
+                }
+
+                // Add one word to buffer.
+                _buffer += _words[i];
+
+                // Check if the buffer length is equal or bigger than the line width.
+                if (_buffer.Length > lineWidth)
+                {
+                    if (_buffer.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).Length != 1)
+                    {
+                        // Remove last word from buffer.
+                        _buffer = _buffer.Remove(_buffer.Length - _words[i].Length - 1);
+                        // Write it to console.
+                        Console.WriteLine(_buffer);
+                        // Clear buffer.
+                        _buffer = null;
+                        // Set i one back.
+                        i--;
+                    }
+                    else
+                    { 
+                        // If the line has one word and it is to long for the line, than just write it into the console.
+                        Console.WriteLine(_buffer);
+                        // Clear buffer.
+                        _buffer = null;
+                    }
+                }
+                else if (_buffer.Length == lineWidth)
+                {
+                    Console.WriteLine(_buffer);
+                    _buffer = null;
+                }
+                else
+                {
+                    // Check if it is the last word.
+                    if (_words.Length - 1 == i)
+                    {
+                        Console.WriteLine(_buffer);
+                        break;
+                    }
+                    else
+                    {
+                        _buffer += " ";
+                    }
                 }
             }
         }

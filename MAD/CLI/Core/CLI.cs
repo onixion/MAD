@@ -71,7 +71,7 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            CLIOutput.WriteToConsole(GetBanner());
+            CLIOutput.WriteToConsole(GetBanner(), 0);
 
             while (true)
             {
@@ -99,12 +99,12 @@ namespace MAD.CLICore
                             break;
 
                         // Write command ouput to console.
-                        CLIOutput.WriteToConsole(response);
+                        CLIOutput.WriteToConsole(response, 0);
                     }
                     else
                     {
                         // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
-                        CLIOutput.WriteToConsole(response);
+                        CLIOutput.WriteToConsole(response, 0);
                     }
                 }
             }
