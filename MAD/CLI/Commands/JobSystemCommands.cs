@@ -552,12 +552,10 @@ namespace MAD.CLICore
         public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
 
             JobPing _job = new JobPing();
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Ping;
-            _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
             {

@@ -9,7 +9,6 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public IPAddress targetAddress;
         public int ttl;
         public bool dontFragment;
 
@@ -22,15 +21,13 @@ namespace MAD.JobSystemCore
         public JobPing()
             : base("NULL", JobType.Ping, new JobTime())
         {
-            this.targetAddress = IPAddress.Loopback;
             this.ttl = 250;
             this.dontFragment = true;
         }
 
-        public JobPing(string jobName, JobType jobType, JobTime jobTime, IPAddress targetAddress, int ttl)
+        public JobPing(string jobName, JobType jobType, JobTime jobTime, int ttl)
             : base (jobName, jobType, jobTime)
         {
-            this.targetAddress = targetAddress;
             this.ttl = ttl;
             this.dontFragment = true;
         }
@@ -66,7 +63,6 @@ namespace MAD.JobSystemCore
         {
             string _temp = "";
 
-            _temp += "<color><yellow>TARGET-IP: <color><white>" + targetAddress.ToString() + "\n";
             _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
 
             return _temp;
