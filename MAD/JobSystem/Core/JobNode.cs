@@ -10,12 +10,12 @@ namespace MAD.JobSystemCore
         #region member
 
         // id
-        private static int _idCount = 0;
+        private static int _nodesCount = 0;
+        private object _nodeInitLock = new object();
         private int _id;
-        public int nodeID { get { return _id; } }
+        public int id { get { return _id; } }
 
-        // locks
-        private object _initIDLock = new object(); // really necessesary?
+        // lock
         private object _jsNodesLock;
 
         // state
@@ -26,13 +26,8 @@ namespace MAD.JobSystemCore
         public List<Job> jobs = new List<Job>();
         public const int maxJobs = 100;
 
-        // node-name
         public string nodeName;
-
-        // mac-address
         public PhysicalAddress macAddress;
-
-        // ip-address
         public IPAddress ipAddress;
 
         #endregion
@@ -61,10 +56,10 @@ namespace MAD.JobSystemCore
 
         private void InitID()
         {
-            lock (_initIDLock)
+            lock (_nodeInitLock)
             {
-                _id = _idCount;
-                _idCount++;
+                _id = _nodesCount;
+                _id++;
             }
         }
 
@@ -117,7 +112,7 @@ namespace MAD.JobSystemCore
             {
                 foreach (Job _job in jobs)
                 {
-                    if (_job.jobID == jobID)
+                    if (_job.id == jobID)
                     {
                         return _job;
                     }

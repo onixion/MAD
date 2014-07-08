@@ -101,7 +101,7 @@ namespace MAD.JobSystemCore
             {
                 for (int i = 0; i < nodes.Count; i++)
                 {
-                    if (nodes[i].nodeID == nodeID)
+                    if (nodes[i].id == nodeID)
                     {
                         nodes.RemoveAt(i);
                         return true;
@@ -112,13 +112,14 @@ namespace MAD.JobSystemCore
             }
         }
 
+        // What is if the reference disappears?
         public JobNode GetNode(int nodeID)
         {
             lock (jsNodesLock)
             {
                 foreach (JobNode _node in nodes)
                 {
-                    if (_node.nodeID == nodeID)
+                    if (_node.id == nodeID)
                     {
                         return _node;
                     }
@@ -197,7 +198,7 @@ namespace MAD.JobSystemCore
             {
                 foreach (Job _temp in _node.jobs)
                 {
-                    if (_temp.jobID == jobID)
+                    if (_temp.id == jobID)
                     {
                         return true;
                     }
@@ -213,7 +214,7 @@ namespace MAD.JobSystemCore
             {
                 foreach (Job _job in _node.jobs)
                 {
-                    if (jobID == _job.jobID)
+                    if (jobID == _job.id)
                     {
                         return _job;
                     }
@@ -240,7 +241,7 @@ namespace MAD.JobSystemCore
         {
             for (int i = 0; i < cachedJobs.Count; i++)
             {
-                if (cachedJobs[i].jobID == jobID)
+                if (cachedJobs[i].id == jobID)
                 {
                     cachedJobs.RemoveAt(i);
                     return true;

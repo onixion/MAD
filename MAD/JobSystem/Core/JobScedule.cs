@@ -87,7 +87,7 @@ namespace MAD.JobSystemCore
                         {
                             foreach (Job _job in _node.jobs)
                             {
-                                if (_job.jobState == Job.JobState.Waiting)
+                                if (_job.state == Job.JobState.Waiting)
                                 {
                                     if (CheckJobTime(_job.jobTime, _time))
                                     {
@@ -183,7 +183,7 @@ namespace MAD.JobSystemCore
             _job.Execute(_holder.targetAddress);
 
             // Set job-state to wait.
-            _job.jobState = Job.JobState.Waiting;
+            _job.state = Job.JobState.Waiting;
 
             // Set stop-time.
             _job.lastFinished = DateTime.Now;

@@ -108,7 +108,7 @@ namespace MAD.CLICore
             {
                 foreach (JobNode _temp in _js.nodes)
                 {
-                    tableRow[0] = _temp.nodeID.ToString();
+                    tableRow[0] = _temp.id.ToString();
                     tableRow[1] = _temp.nodeName;
                     tableRow[2] = _temp.state.ToString();
                     tableRow[3] = _temp.macAddress.ToString();
@@ -158,11 +158,11 @@ namespace MAD.CLICore
                 {
                     foreach (Job _temp2 in _temp.jobs)
                     {
-                        tableRow[0] = _temp.nodeID.ToString();
-                        tableRow[1] = _temp2.jobID.ToString();
+                        tableRow[0] = _temp.id.ToString();
+                        tableRow[1] = _temp2.id.ToString();
                         tableRow[2] = _temp2.jobName;
                         tableRow[3] = _temp2.jobType.ToString();
-                        tableRow[4] = _temp2.jobState.ToString();
+                        tableRow[4] = _temp2.state.ToString();
                         tableRow[5] = _temp2.jobTime.type.ToString();
                         tableRow[6] = _temp2.jobTime.Values();
                         tableRow[7] = _temp2.outState.ToString();
@@ -175,7 +175,7 @@ namespace MAD.CLICore
             output += "\n\n<color><yellow><< JOBS IN CACHE >>\n\n";
 
             output += "Jobs max:             " + JobSystem.maxCachedJobs + "\n";
-            output += "Jobs initialized:     " + _js.cachedJobs.Count + "\n";
+            output += "Jobs initialized:     " + _js.cachedJobs + "\n";
 
             output += _jobTable.splitline + "\n";
             output += _jobTable.FormatStringArray(tableRow) + "\n";
@@ -185,13 +185,13 @@ namespace MAD.CLICore
             foreach (Job _temp2 in _js.cachedJobs)
             {
                 tableRow[0] = "CACHED";
-                tableRow[1] = _temp2.jobID.ToString();
+                tableRow[1] = _temp2.id.ToString();
                 tableRow[2] = _temp2.jobName;
                 tableRow[3] = _temp2.jobType.ToString();
-                tableRow[4] = _temp2.jobState.ToString();
+                tableRow[4] = _temp2.state.ToString();
                 tableRow[5] = _temp2.jobTime.type.ToString();
                 tableRow[6] = _temp2.jobTime.Values();
-                tableRow[6] = _temp2.jobState.ToString();
+                tableRow[7] = _temp2.state.ToString();
 
                 output += _jobTable.FormatStringArray(tableRow) + "\n";
             }
@@ -265,7 +265,7 @@ namespace MAD.CLICore
 
             if (_job != null)
             {
-                _job.jobState = Job.JobState.Waiting; // not sure if this works
+                _job.state = Job.JobState.Waiting; // not sure if this works
 
                 return "<color><green>Node is inactive.";
             }
@@ -293,7 +293,7 @@ namespace MAD.CLICore
 
             if (_job != null)
             {
-                _job.jobState = Job.JobState.Stopped; // not sure if this works
+                _job.state = Job.JobState.Stopped;
 
                 return "<color><green>Job is inactive.";
             }
@@ -332,7 +332,7 @@ namespace MAD.CLICore
             // Clear cache.
             _js.ClearCache();
 
-            return "<color><green>Node created (ID '" + _node.nodeID + "').";
+            return "<color><green>Node created (ID '" + _node.id + "').";
         }
     }
 
@@ -543,7 +543,6 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
 
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IPAddress of the target-machine.", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
 

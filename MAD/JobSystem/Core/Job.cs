@@ -10,13 +10,14 @@ namespace MAD.JobSystemCore
 
         private static int _jobsCount = 0;
         private static object _jobInitLock = new object();
-        public int jobID;
+        private int _id;
+        public int id { get { return _id; } }
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
         public JobType jobType = JobType.NULL;
 
         public enum JobState { Waiting, Running, Stopped, Exception }
-        public JobState jobState = JobState.Stopped;
+        public JobState state = JobState.Stopped;
 
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;
@@ -26,7 +27,6 @@ namespace MAD.JobSystemCore
         public TimeSpan lastTimeSpan;
 
         public string jobName;
-
         public JobTime jobTime = new JobTime();
         public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
         public JobNotification jobNotification = new JobNotification();
@@ -37,15 +37,15 @@ namespace MAD.JobSystemCore
 
         protected Job(string jobName, JobType jobType, JobTime jobTime)
         {
+            lock (_jobInitLock)
+            {
+                _id = _jobsCount;
+                _jobsCount++;
+            }
+
             this.jobName = jobName;
             this.jobType = jobType;
             this.jobTime = jobTime;
-
-            lock (_jobInitLock)
-            {
-                jobID = _jobsCount;
-                _jobsCount++;
-            }
         }
 
         #endregion
@@ -54,9 +54,9 @@ namespace MAD.JobSystemCore
 
         public bool Start()
         {
-            if (jobState == JobState.Stopped)
+            if (state == JobState.Stopped)
             {
-                jobState = JobState.Waiting;
+                state = JobState.Waiting;
                 return true;
             }
             else
@@ -67,9 +67,9 @@ namespace MAD.JobSystemCore
 
         public bool Stop()
         {
-            if (jobState != JobState.Stopped)
+            if (state != JobState.Stopped)
             {
-                jobState = JobState.Stopped;
+                state = JobState.Stopped;
                 return true;
             }
             else
@@ -86,10 +86,10 @@ namespace MAD.JobSystemCore
         {
             string _temp = "\n";
 
-            _temp += "<color><yellow>ID: <color><white>" + jobID + "\n";
+            _temp += "<color><yellow>ID: <color><white>" + _id + "\n";
             _temp += "<color><yellow>NAME: <color><white>" + jobName + "\n";
             _temp += "<color><yellow>TYPE: <color><white>" + jobType.ToString() + "\n";
-            _temp += "<color><yellow>STATE: <color><white>" + jobState.ToString() + "\n";
+            _temp += "<color><yellow>STATE: <color><white>" + state.ToString() + "\n";
             _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobTime.type.ToString() + "\n";
 
             if (jobTime.type == JobTime.TimeType.Relative)
