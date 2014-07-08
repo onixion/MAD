@@ -13,7 +13,7 @@ CLIServer
 
 Sie ist für die CLISessions zuständig. Das Verarbeiten der Clients ist die Hauptaufgabe dieser Klasse.
 Sobald ein Client sich korrekt authentifiziert hat, wird eine CLISession gestartet. Und die CLISession
-kommuniziert mit dem Client.
+kommuniziert mit dem Client über die NetIO-Libary.
 
 
 CLIFramework

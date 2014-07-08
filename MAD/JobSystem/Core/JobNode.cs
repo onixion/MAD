@@ -9,22 +9,18 @@ namespace MAD.JobSystemCore
     {
         #region member
 
-        // id
         private static int _nodesCount = 0;
         private object _nodeInitLock = new object();
         private int _id;
         public int id { get { return _id; } }
 
-        // lock
-        private object _jsNodesLock;
-
-        // state
         public enum State { Active, Inactive, Exception }
         public State state = State.Inactive;
 
-        // jobs
         public List<Job> jobs = new List<Job>();
         public const int maxJobs = 100;
+
+        private object _jsNodesLock;
 
         public string nodeName;
         public PhysicalAddress macAddress;

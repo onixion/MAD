@@ -1,0 +1,27 @@
+Es ist ein internes Problem aufgetreten.
+
+Und zwar gibt es ein Problem mit dem Aufbau des JobSystems. Es funktioniert zwar, ist aber eine wirklich unschöne Lösung.
+Denn alls JobNodes sind von außen zugreifbar und können während der JobScedule läuft verändert werden (wird zwar mit einer Lock
+geschütz). Dies könnte unerwartete Exceptions werfen, die wiederum das Program abstrützen lassen.
+
+Nehmen wir an, jemand mächte das JobSystem für eigene Zwecke hernehmen, er weiß nichts von einer Node-Lock und möchte auch nichts
+mit dem JobSystem-Internen zu tun haben. Hier würde das JobSystem einfach nicht funktionieren. Man kann natürlich auch damit
+argumentieren, dass wenn man es verwenden möchte, man auch das "Interne" kennen oder wenigstens verstehen sollte.
+
+Das JobSystem soll ein "System" sein, sprich ein GESCHLOSSENES System, das von außen durch vordefinierte Schnittstellen verwaltet werden
+kann.
+
+Jedoch erweißt sich das als schwierig, da (bis jetzt) die Commands direkt (über Referezen) mit den JobNodes und Jobs arbeitet (da dies sehr
+viel einfacher ist). Vielmehr sollte das JobSystem Schnittstellen festlegen über die die Commands usw. auf die Komponenten zugreifen können.
+
+Soll eine Referenz auf die Komponenten ausgegeben werden oder sollen sie "nachgebildet" (gecloned) werden? Bei größeren Objekt-Strukuren
+können solche "Nachbildungen" rechenintensiv werden (z.B. Liste mit 100 Jobs soll nachgebildet werden). Der Vorteil mit Referenzen ist, dass
+man direkt am Objekt arbeiten kann (keine Nachbildungen) und diese ändern kann. Bei eine "Kopie" ist das mit dem "Verändern" ein sehr großes 
+Problem .. da ja nur die Kopie verändert wird ...
+
+Also ist die sinnvollste Lösung mit Referenzen zu arbeiten (in diesem Fall).
+
+Derzeit gibt es eine Job-Liste, die als Notlösung für die CLI dient. Denn der Command für das Erzeugen einer JobNode ist sehr schwierig.
+Und um diese Problem zu umgehen, werden die Jobs geparst und in einer "Cache"-Liste gespeichert und beim Erzeugen einer Node übergeben. Das ist
+sehr unschön und wird in baldiger Zukunft geändert werden.
+
