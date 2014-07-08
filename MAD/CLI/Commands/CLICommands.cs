@@ -28,7 +28,7 @@ namespace MAD.CLICore
         {
             _commands = (List<CommandOptions>)commands[0];
 
-            optionalParameter.Add(new ParameterOption("id", "COMMAND-ID", "ID for the specific command." , false, false, new Type[] { typeof(int) }));
+            optionalParameter.Add(new ParameterOption("id", "<COMMAND-ID>", "ID of the specific command." , false, false, new Type[] { typeof(int) }));
             description = "This command shows information about available commands.";
         }
 
@@ -36,17 +36,16 @@ namespace MAD.CLICore
         {
             if (!OptionalParameterUsed("id"))
             {
-                output += "<color><yellow>Type 'help -id <COMMAND_ID>' to get more information about a command.\n";
+                output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
-                output += "<color><white>";
 
                 for (int i = 0; i < _commands.Count; i++)
                 {
-                    output += _commands[i].command + "<color><darkyellow> [" + i + "]<color><white>";
+                    output += "<color><white>" + _commands[i].command + "<color><darkyellow> [" + i + "]";
 
                     if (i != _commands.Count - 1)
                     {
-                        output += ", ";
+                        output += "<color><white>, ";
                     }
                 }
 

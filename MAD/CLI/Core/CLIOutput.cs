@@ -5,6 +5,8 @@ namespace MAD.CLIIO
 {
     public static class CLIOutput
     {
+        // TODO: text wraping
+
         #region members
 
         public static object _consoleLock = new object();
