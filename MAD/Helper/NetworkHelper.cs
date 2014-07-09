@@ -10,7 +10,7 @@ namespace MAD.Helper
         public const uint DHCP_SERVER_PORT = 67;                                    //Port on which a DHCP Server listens; for catching DHCP Requests you will need this 
         public const uint DHCP_CLIENT_PORT = 68;                                    //Port on which a DHCP Client listens
 
-        private const uint _magicCookiePosition = 236;                              //Position of magic dhcp cookie in the udp datagramm
+        public const uint _magicCookiePosition = 236;                               //Position of magic dhcp cookie in the udp datagramm
 
         public const uint MAGIC_COOKIE_VALUE = 1669485411;                          //Value of the four byte magic dhcp cookie
         public const byte COOKIE_BYTE0_VALUE = 99;                                  //Value of first byte of the four byte magic dhcp cookie
