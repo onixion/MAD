@@ -143,11 +143,11 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+            /*commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { _js }));*/
         }
 
         public void ChangePort(int newPort)

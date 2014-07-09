@@ -85,41 +85,44 @@ namespace MAD.JobSystemCore
                     {
                         if (_node.state == JobNode.State.Active)
                         {
-                            foreach (Job _job in _node.jobs)
+                            lock(_node.jobsLock)
                             {
-                                if (_job.state == Job.JobState.Waiting)
+                                foreach (Job _job in _node.jobs)
                                 {
-                                    if (CheckJobTime(_job.jobTime, _time))
+                                    if (_job.state == Job.JobState.Waiting)
                                     {
-                                        if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                        if (CheckJobTime(_job.jobTime, _time))
                                         {
-                                            _job.jobTime.jobDelay.Reset();
-
-                                            _holder.job = _job;
-                                            _holder.targetAddress = _node.ipAddress;
-
-                                            JobThreadStart(_holder);
-                                        }
-                                        else if (_job.jobTime.type == JobTime.TimeType.Absolute)
-                                        {
-                                            JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
-
-                                            if (!_handler.IsBlocked(_time))
+                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
                                             {
-                                                _handler.minuteAtBlock = _time.Minute;
+                                                _job.jobTime.jobDelay.Reset();
 
                                                 _holder.job = _job;
                                                 _holder.targetAddress = _node.ipAddress;
 
                                                 JobThreadStart(_holder);
                                             }
+                                            else if (_job.jobTime.type == JobTime.TimeType.Absolute)
+                                            {
+                                                JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
+
+                                                if (!_handler.IsBlocked(_time))
+                                                {
+                                                    _handler.minuteAtBlock = _time.Minute;
+
+                                                    _holder.job = _job;
+                                                    _holder.targetAddress = _node.ipAddress;
+
+                                                    JobThreadStart(_holder);
+                                                }
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                        else
                                         {
-                                            _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                            {
+                                                _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                            }
                                         }
                                     }
                                 }

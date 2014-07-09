@@ -43,20 +43,24 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
 
             // NODES
+            commands.Add(new CommandOptions("js add node", typeof(JobSystemAddNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js remove node", typeof(JobSystemRemoveNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("js node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("js node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js node create", typeof(JobSystemCreateNodeCommand), new object[] { js }));
 
             // JOBS
             commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { js }));
             commands.Add(new CommandOptions("js job start", typeof(JobSystemStartJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("js job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { js }));
+
             commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
+            /*commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { js }));
+            
+             */
 
             // CLIServer
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));

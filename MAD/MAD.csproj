@@ -71,9 +71,11 @@
     <Compile Include="CLI\Server\CLIServerInternal.cs" />
     <Compile Include="Helper\HostDetectBACKUP.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
+    <Compile Include="CLI\Core\CLIError.cs" />
     <Compile Include="JobSystem\Core\Job.cs" />
     <Compile Include="JobSystem\Core\JobNode.cs" />
     <Compile Include="JobSystem\Core\JobNotification.cs" />
+    <Compile Include="JobSystem\Core\JobSystemError.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRule.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleSTRING.cs" />

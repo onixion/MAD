@@ -7,19 +7,23 @@ namespace MAD.JobSystemCore
     {
         #region member
 
-        private string _dataPath;
+        private Version _version = new Version(2, 0);
+        public Version version { get { return _version; } }
 
+        // Nodes
         public List<JobNode> nodes = new List<JobNode>();
         public object jsNodesLock = new object();
-
         public const int maxNodes = 100;
-        public static int maxJobsOverall { get { return maxNodes * JobNode.maxJobs; } }
+        public int nodesCount { get { return nodes.Count; } }
 
-        public List<Job> cachedJobs = new List<Job>();
-        public static int maxCachedJobs { get { return JobNode.maxJobs; } }
+        // Jobs
+        public readonly int maxJobsPossible = JobSystem.maxNodes * JobNode.maxJobs;
 
+        // Scedule
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
+
+        private string _dataPath;
 
         #endregion
 
@@ -112,7 +116,14 @@ namespace MAD.JobSystemCore
             }
         }
 
-        // What is if the reference disappears?
+        public void RemoveAllNodes()
+        {
+            lock (jsNodesLock)
+            {
+                nodes.Clear();
+            }
+        }
+
         public JobNode GetNode(int nodeID)
         {
             lock (jsNodesLock)
@@ -129,11 +140,19 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public void RemoveAllNodes()
+        public bool UpdateJob(int jobID, Job newJob)
         {
-            lock(jsNodesLock)
+            Job _job = GetJob(jobID);
+
+            if (_job != null)
             {
-                nodes.Clear();
+                // TODO
+                throw new NotImplementedException();
+                //return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -173,7 +192,7 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
-        public int NodesJobsInitialized()
+        public int JobsInitialized()
         {
             int _count = 0;
 
@@ -188,9 +207,47 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
-        #endregion
+        public bool AddJobToNode(int nodeID, Job jobToAdd)
+        {
+            JobNode _node = GetNode(nodeID);
 
-        #region job handling
+            if (_node != null)
+            {
+                lock (jsNodesLock)
+                {
+                    _node.jobs.Add(jobToAdd);
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveJob(int jobID)
+        {
+            lock (jsNodesLock)
+            {
+                foreach (JobNode _node in nodes)
+                {
+                    lock (_node.jobsLock)
+                    {
+                        for(int i = 0; i < _node.jobs.Count; i++)
+                        {
+                            if (_node.jobs[i].id == jobID)
+                            {
+                                _node.jobs.RemoveAt(i);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
 
         public bool JobExist(int jobID)
         {
@@ -222,38 +279,6 @@ namespace MAD.JobSystemCore
             }
 
             return null;
-        }
-
-        public bool AddToCache(Job job)
-        {
-            if (cachedJobs.Count <= maxCachedJobs)
-            {
-                cachedJobs.Add(job);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool RemoveFromCache(int jobID)
-        {
-            for (int i = 0; i < cachedJobs.Count; i++)
-            {
-                if (cachedJobs[i].id == jobID)
-                {
-                    cachedJobs.RemoveAt(i);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void ClearCache()
-        {
-            cachedJobs.Clear();
         }
 
         #endregion

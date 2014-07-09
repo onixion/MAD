@@ -17,7 +17,7 @@ viel einfacher ist). Vielmehr sollte das JobSystem Schnittstellen festlegen über
 Soll eine Referenz auf die Komponenten ausgegeben werden oder sollen sie "nachgebildet" (gecloned) werden? Bei größeren Objekt-Strukuren
 können solche "Nachbildungen" rechenintensiv werden (z.B. Liste mit 100 Jobs soll nachgebildet werden). Der Vorteil mit Referenzen ist, dass
 man direkt am Objekt arbeiten kann (keine Nachbildungen) und diese ändern kann. Bei eine "Kopie" ist das mit dem "Verändern" ein sehr großes 
-Problem .. da ja nur die Kopie verändert wird ...
+Problem .. da ja nur die Kopien verändert werden ...
 
 Also ist die sinnvollste Lösung mit Referenzen zu arbeiten (in diesem Fall).
 

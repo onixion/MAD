@@ -8,7 +8,41 @@ namespace MAD.CLICore
 {
     // TODO: string Execute(int consoleWidth)
 
-    #region commands for scedule
+    #region commands for JOBSYSTEM
+
+    public class JobSystemStatusCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStatusCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command shows informations about the jobsystem.";
+        }
+
+        public override string Execute()
+        {
+            output += "<color><yellow>JOBSYSTEM version " + _js.version + "\n\n";
+
+            output += " Nodes stored in RAM: <color><white>" + _js.nodesCount + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
+            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobNode.maxJobs + ")\n";
+
+            output += "\n\n Scedule-State: ";
+
+            if (_js.sceduleState == JobScedule.State.Running)
+                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            else
+                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+
+            return output;
+        }
+
+    }
+
+    #endregion
+
+    #region commands for SCEUDLE
 
     public class JobSceduleStartCommand : Command
     {
@@ -46,36 +80,7 @@ namespace MAD.CLICore
 
     #endregion
 
-    #region commands for jobsystem
-
-    public class JobSystemStatusCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemStatusCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            description = "This command shows informations about the jobsystem.";
-        }
-
-        public override string Execute()
-        {
-            output += "<color><yellow>Scedule-State: ";
-
-            if (_js.sceduleState == JobScedule.State.Running)
-            {
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-            else
-            {
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            }
-
-            return output;
-        }
-    
-    }
+    #region commands for NODES
 
     public class JobSystemStatusNodesCommand : Command
     {
@@ -93,14 +98,15 @@ namespace MAD.CLICore
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             ConsoleTable _jobTable = new ConsoleTable(_tableRow, Console.BufferWidth);
 
-            output += "<color><yellow>";
-            output += "Nodes max:         " + JobSystem.maxNodes + "\n";
-            output += "Nodes initialized: " + _js.nodes.Count + "\n";
-            output += "Nodes active:      " + _js.NodesActive() + "\n";
-            output += "Nodes inactive:    " + _js.NodesInactive() + "\n\n";
+            output += "\n";
+
+            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.maxNodes + "\n";
+            output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodes.Count + "\n";
+            output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
+            output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
 
             output += _jobTable.splitline + "\n";
-            output += _jobTable.FormatStringArray(_tableRow) + "\n";
+            output += "<color><yellow>" + _jobTable.FormatStringArray(_tableRow) + "<color><white>";
             output += _jobTable.splitline + "\n";
 
             output += "<color><white>";
@@ -115,85 +121,8 @@ namespace MAD.CLICore
                     _tableRow[4] = _temp.ipAddress.ToString();
                     _tableRow[5] = _temp.jobs.Count.ToString();
 
-                    output += _jobTable.FormatStringArray(_tableRow) + "\n";
+                    output += _jobTable.FormatStringArray(_tableRow);
                 }
-            }
-
-            return output;
-        }
-    }
-
-    public class JobSystemStatusJobsCommand : Command
-    {
-        JobSystem _js;
-
-        public JobSystemStatusJobsCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            description = "This command prints a table with all jobs.";
-        }
-
-        public override string Execute()
-        {
-            string[] _tableRow = new string[] {"Node-ID","Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State"};
-            ConsoleTable _jobTable = new ConsoleTable(_tableRow, Console.BufferWidth);
-
-            output += "<color><yellow><< JOBS IN NODES >>\n\n";
-
-            output += "Jobs max:             " + JobSystem.maxJobsOverall + "\n";
-            output += "Jobs initialized:     " + _js.NodesJobsInitialized() + "\n";
-            output += "Jobs waiting/running: " + _js.NodesActive() + "\n";
-            output += "Jobs stopped:         " + _js.NodesInactive() + "\n\n";
-
-            output += _jobTable.splitline + "\n";
-            output += _jobTable.FormatStringArray(_tableRow) + "\n";
-            output += _jobTable.splitline + "\n";
-
-            output += "<color><white>";
-            lock (_js.jsNodesLock)
-            {
-                foreach (JobNode _temp in _js.nodes)
-                {
-                    foreach (Job _temp2 in _temp.jobs)
-                    {
-                        _tableRow[0] = _temp.id.ToString();
-                        _tableRow[1] = _temp2.id.ToString();
-                        _tableRow[2] = _temp2.jobName;
-                        _tableRow[3] = _temp2.jobType.ToString();
-                        _tableRow[4] = _temp2.state.ToString();
-                        _tableRow[5] = _temp2.jobTime.type.ToString();
-                        _tableRow[6] = _temp2.jobTime.Values();
-                        _tableRow[7] = _temp2.outState.ToString();
-
-                        output += _jobTable.FormatStringArray(_tableRow) + "\n";
-                    }
-                }
-            }
-
-            _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-            output += "\n\n<color><yellow><< JOBS IN CACHE >>\n\n";
-
-            output += "Jobs max:             " + JobSystem.maxCachedJobs + "\n";
-            output += "Jobs initialized:     " + _js.cachedJobs.Count + "\n";
-
-            output += _jobTable.splitline + "\n";
-            output += _jobTable.FormatStringArray(_tableRow) + "\n";
-            output += _jobTable.splitline + "\n";
-
-            output += "<color><white>";
-            foreach (Job _temp2 in _js.cachedJobs)
-            {
-                _tableRow[0] = "CACHED";
-                _tableRow[1] = _temp2.id.ToString();
-                _tableRow[2] = _temp2.jobName;
-                _tableRow[3] = _temp2.jobType.ToString();
-                _tableRow[4] = _temp2.state.ToString();
-                _tableRow[5] = _temp2.jobTime.type.ToString();
-                _tableRow[6] = _temp2.jobTime.Values();
-                _tableRow[7] = _temp2.state.ToString();
-
-                output += _jobTable.FormatStringArray(_tableRow) + "\n";
             }
 
             return output;
@@ -248,95 +177,116 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemStartJobCommand : Command
+    public class JobSystemAddNodeCommand : Command
     { 
         private JobSystem _js;
 
-        public JobSystemStartJobCommand(object[] args)
+        public JobSystemAddNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
-            description = "This command sets the job to active.";
-        }
+            requiredParameter.Add(new ParameterOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
 
-        public override string Execute()
-        {
-            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+            // If there is enough time, this can be added. So jobs can be parsed directly from command.
+            //requiredParameter.Add(new ParameterOption("jobs", "<JOB-OBJECTS>", "", false, false, new Type[] { typeof(IPAddress) }));
 
-            if (_job != null)
-            {
-                _job.state = Job.JobState.Waiting; // not sure if this works
-
-                return "<color><green>Node is inactive.";
-            }
-            else
-            {
-                return "<color><red>Job does not exist!";
-            }
-        }
-    }
-
-    public class JobSystemStopJobCommand : Command
-    { 
-        private JobSystem _js;
-
-        public JobSystemStopJobCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
-            description = "This command sets the job to inactive.";
-        }
-
-        public override string Execute()
-        {
-            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
-
-            if (_job != null)
-            {
-                _job.state = Job.JobState.Stopped;
-
-                return "<color><green>Job is inactive.";
-            }
-            else
-            {
-                return "<color><red>Job does not exist!";
-            }
-        }
-    }
-
-    public class JobSystemCreateNodeCommand : Command
-    { 
-        private JobSystem _js;
-
-        public JobSystemCreateNodeCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("n", "<NODE-NAME>", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("mac", "<MAC-ADDRESS>", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
-            requiredParameter.Add(new ParameterOption("ip", "<IP-ADDRESS>", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
             description = "This command creates a node for the cached jobs.";
         }
 
         public override string Execute()
         {
-            JobNode _node = new JobNode(_js.jsNodesLock);
+            JobNode _node = new JobNode();
 
             _node.nodeName = (string)parameters.GetParameter("n").argumentValues[0];
             _node.macAddress = (PhysicalAddress)parameters.GetParameter("mac").argumentValues[0]; // MAC ADDRESS
             _node.ipAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
 
-            _node.jobs = _js.cachedJobs;
-
-            // Add node to jobsystem.
             _js.AddNode(_node);
 
-            return "<color><green>Node created (ID '" + _node.id + "').";
+            return "<color><green>Node created (ID " + _node.id + ").";
+        }
+    }
+
+    public class JobSystemRemoveNodeCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemRemoveNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node.", false, false, new Type[] { typeof(int) }));
+            description = "This command removes a node.";
+        }
+
+        public override string Execute()
+        {
+            if (_js.RemoveNode((int)parameters.GetParameter("id").argumentValues[0]))
+            {
+                return "<color><green>Node removed.";
+            }
+            else
+            {
+                return JSError.Error(JSError.Type.NodeNotExist, null, true);
+            }
         }
     }
 
     #endregion
 
-    #region commands for jobs (mainly used for cached jobs)
+    #region commands for jobs
+
+    public class JobSystemStatusJobsCommand : Command
+    {
+        JobSystem _js;
+
+        public JobSystemStatusJobsCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command prints a table with all initialized jobs.";
+        }
+
+        public override string Execute()
+        {
+            string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
+            ConsoleTable _jobTable = new ConsoleTable(_tableRow, Console.BufferWidth);
+
+            output += "\n";
+
+            output += " <color><yellow>Jobs max:             <color><white>" + _js.maxJobsPossible + "\n";
+            output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
+            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
+            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
+
+            output += _jobTable.splitline + "\n";
+            output += "<color><yellow>" + _jobTable.FormatStringArray(_tableRow) + "<color><white>";
+            output += _jobTable.splitline + "\n";
+
+            output += "<color><white>";
+            lock (_js.jsNodesLock)
+            {
+                foreach (JobNode _temp in _js.nodes)
+                {
+                    foreach (Job _temp2 in _temp.jobs)
+                    {
+                        _tableRow[0] = _temp.id.ToString();
+                        _tableRow[1] = _temp2.id.ToString();
+                        _tableRow[2] = _temp2.jobName;
+                        _tableRow[3] = _temp2.jobType.ToString();
+                        _tableRow[4] = _temp2.state.ToString();
+                        _tableRow[5] = _temp2.jobTime.type.ToString();
+                        _tableRow[6] = _temp2.jobTime.Values();
+                        _tableRow[7] = _temp2.outState.ToString();
+
+                        output += _jobTable.FormatStringArray(_tableRow) + "\n";
+                    }
+                }
+            }
+
+            return output;
+        }
+    }
 
     public class JobStatusCommand : Command
     {
@@ -387,6 +337,85 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemStartJobCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStartJobCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the job to active.";
+        }
+
+        public override string Execute()
+        {
+            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_job != null)
+            {
+                _job.state = Job.JobState.Waiting; // not sure if this works
+
+                return "<color><green>Node is inactive.";
+            }
+            else
+            {
+                return "<color><red>Job does not exist!";
+            }
+        }
+    }
+
+    public class JobSystemStopJobCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemStopJobCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command sets the job to inactive.";
+        }
+
+        public override string Execute()
+        {
+            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_job != null)
+            {
+                _job.state = Job.JobState.Stopped;
+
+                return "<color><green>Job is inactive.";
+            }
+            else
+            {
+                return "<color><red>Job does not exist!";
+            }
+        }
+    }
+
+    public class JobSystemRemoveJobCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemRemoveJobCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute()
+        {
+            if (_js.RemoveJob((int)parameters.GetParameter("id").argumentValues[0]))
+                return "<color><green>Job removed.";
+            else
+                return JSError.Error(JSError.Type.JobNotExist, null, true);
+        }
+    }
+
+    #region commands for adding jobs
+
+    /* TODO
     public class JobSystemAddServiceCheckCommand : Command
     {
         private JobSystem _js;
@@ -455,14 +484,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (_js.AddToCache(_job))
-            {
-                return "<color><green>Job added to cache.";
-            }
-            else
-            {
-                return "<color><red>Cache limit reached!";
-            }
+            return "";
         }
     }
 
@@ -530,7 +552,7 @@ namespace MAD.CLICore
             }
         }
     }
-
+    */
     public class JobSystemAddPingCommand : Command
     {
         private JobSystem _js;
@@ -541,10 +563,11 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
 
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
 
-            description = "This command adds a job with the jobtype 'PingRequest' to the cache of the jobsystem.";
+            description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
         }
 
         public override string Execute()
@@ -589,17 +612,28 @@ namespace MAD.CLICore
                 _job.ttl = (int)parameters.GetParameter("ttl").argumentValues[0];
             }
 
-            if (_js.AddToCache(_job))
+            // So now the JobPing is finished and set properly. 
+            
+            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if(_node != null)
             {
-                return "<color><green>Job added to cache.";
+                // Use lock. Because if the scedule is working on those jobs, it will fail.
+                lock(_node.jobsLock)
+                {
+                    _node.jobs.Add(_job);
+                }
+
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
             {
-                return "<color><red>Cache limit reached!";
+                // JobSystemError.
+                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
             }
         }
     }
-
+    /* TODO!
     public class JobSystemAddHttpCommand : Command
     {
         private JobSystem _js;
@@ -736,35 +770,9 @@ namespace MAD.CLICore
             }
         }
     }
+    */
 
-    public class JobSystemRemoveJobCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobSystemRemoveJobCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute()
-        {
-            int id = (int)parameters.GetParameter("id").argumentValues[0];
-
-            try
-            {
-                //_js.DestroyJob(id);
-                output += "<color><green>Job destroyed.";
-            }
-            catch (Exception e)
-            {
-                output += "<color><red>" + e.Message;
-            }
-
-            return output;
-        }
-    }
+    #endregion
 
     #endregion
 }

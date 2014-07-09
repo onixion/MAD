@@ -9,18 +9,20 @@ namespace MAD.JobSystemCore
     {
         #region member
 
+        // id
         private static int _nodesCount = 0;
         private object _nodeInitLock = new object();
         private int _id;
         public int id { get { return _id; } }
 
+        // state
         public enum State { Active, Inactive, Exception }
         public State state = State.Inactive;
 
+        // jobs
         public List<Job> jobs = new List<Job>();
+        public object jobsLock = new object();
         public const int maxJobs = 100;
-
-        private object _jsNodesLock;
 
         public string nodeName;
         public PhysicalAddress macAddress;
@@ -30,16 +32,14 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        public JobNode(object jsNodesLock)
+        public JobNode()
         {
             InitID();
-            _jsNodesLock = jsNodesLock;
         }
 
-        public JobNode(object jsNodesLock, string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
+        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
-            _jsNodesLock = jsNodesLock;
             this.nodeName = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
@@ -55,56 +55,13 @@ namespace MAD.JobSystemCore
             lock (_nodeInitLock)
             {
                 _id = _nodesCount;
-                _id++;
-            }
-        }
-
-        public void UpdateName(string newName)
-        {
-            lock (_jsNodesLock)
-            {
-                nodeName = newName;
-            }
-        }
-
-        public void UpdateMAC(PhysicalAddress newMACAddress)
-        {
-            lock (_jsNodesLock)
-            {
-                macAddress = newMACAddress;
-            }
-        }
-
-        public void UpdateIP(IPAddress newIPAddress)
-        {
-            lock (_jsNodesLock)
-            {
-                ipAddress = newIPAddress;
-            }
-        }
-
-        public bool UpdateJob(int jobID, Job newJob) // return bool is much faster than throwing exceptions ..
-        {
-            lock (_jsNodesLock)
-            {
-                Job _job = GetJob(jobID);
-
-                if (_job != null)
-                {
-                    // Replace old job.
-                    _job = newJob;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                _nodesCount++;
             }
         }
 
         private Job GetJob(int jobID)
         {
-            lock (_jsNodesLock)
+            lock (jobsLock)
             {
                 foreach (Job _job in jobs)
                 {
