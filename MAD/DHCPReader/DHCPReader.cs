@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.Helper;
@@ -16,12 +18,20 @@ namespace MAD.DHCPReader
         private uint hostCnt = 0;
         private byte[] data;
         //private uint maxThreads = 100;
-
-        public ModelHost[] dummy;
+        private bool acknowledge; 
+        private bool addressGiven;
+        private bool nameGiven = false;
+        private IPAddress ip;
+        private string hostName = "";
+        public List<ModelHost> dummyList; 
         
         public void Execute()
         {
-            
+            while (true)
+            {
+                CatchDHCP();
+                StartThread();
+            }
         }
 
         private void CatchDHCP()
@@ -53,34 +63,79 @@ namespace MAD.DHCPReader
                 
                 for (uint i = NetworkHelper._magicCookiePosition; i < data.Length; i++)
                 {
-                    bool name = false;
+                    
                     switch (Convert.ToUInt16(data[i]))
                     {
                         case 50:
                             byte[] ipBytes = new byte[4];
-                            for (int ii = 0; ii < 4; ii++)
+                            for (uint ii = 0; ii < 4; ii++)
                             {
                                 ipBytes[ii] = data[i + 2 + ii];
                             }
-                            bool address = true;
-                            IPAddress ip = new IPAddress(ipBytes);
+                            addressGiven = true;
+                            ip = new IPAddress(ipBytes);
                             continue;
                         case 12:
-                            string hostName = "";
+                            
                             byte nameLength = data[i + 1];
-                            if (!name)
+                            if (!nameGiven)
                             {
-                                for (int iii = 1; iii <= nameLength; iii++)
+                                try
                                 {
-                                    hostName += (char)data[i + 1 + iii];
+                                    for (uint iii = 1; iii <= nameLength; iii++)
+                                    {
+                                        hostName += (char)data[i + 1 + iii];
+                                        nameGiven = true; 
+                                    }
+                                }
+                                catch
+                                {
+                                    nameGiven = false; 
                                 }
                             }
-                            name = true; 
                             continue;
                         default: 
                             break;
                     }
-                    //TODO Check if host is realy there or false requestet ip 
+                    if(addressGiven)
+                    {
+                        Thread.Sleep(3000);
+                        try
+                        {
+                            Ping _ping = new Ping();
+                            PingReply _reply = _ping.Send(ip);
+
+                            if (_reply.Status == IPStatus.Success)
+                                acknowledge = true;
+                            else
+                                acknowledge = false;
+                        }
+                        catch
+                        {
+                            acknowledge = false;
+                        }
+                    }
+
+                    if (addressGiven && acknowledge && nameGiven)
+                    {
+                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
+                        dummyList.Add(new ModelHost(hexString, ip, hostName));
+                    }
+                    else if (addressGiven && acknowledge && !nameGiven)
+                    {
+                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
+                        dummyList.Add(new ModelHost(hexString, ip));
+                    }
+                    else if (!addressGiven || !acknowledge && nameGiven)
+                    {
+                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
+                        dummyList.Add(new ModelHost(hexString, hostName));
+                    }
+                    else if (!addressGiven || !acknowledge && !nameGiven)
+                    {
+                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
+                        dummyList.Add(new ModelHost(hexString));
+                    }
                     //TODO CleanCoding the shit out of it
                 }
             }

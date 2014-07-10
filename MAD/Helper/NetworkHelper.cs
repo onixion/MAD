@@ -67,13 +67,40 @@ namespace MAD.Helper
     }
 
 
-    struct ModelHost                                                                //A struct which provides all importand information for a host - feel free to put more in it!
+    public struct ModelHost                                                                //A struct which provides all importand information for a host - feel free to put more in it!
     {
-        IPAddress hostIP;
+        public IPAddress hostIP;
         
-        string hostName;
+        public string hostName;
 
-        string hostMac;
+        public string hostMac;
 
+        public ModelHost(string MAC)
+        {
+            hostMac = MAC;
+            hostName = null;
+            hostIP = null; 
+        }
+
+        public ModelHost(string MAC, IPAddress address)
+        {
+            hostMac = MAC;
+            hostIP = address; 
+            hostName = null;
+        }
+
+        public ModelHost(string MAC, string name)
+        {
+            hostMac = MAC;
+            hostName = name;
+            hostIP = null;
+        }
+
+        public ModelHost(string MAC, IPAddress address, string name)
+        {
+            hostMac = MAC;
+            hostIP = address;
+            hostName = name; 
+        }
     }
 }
