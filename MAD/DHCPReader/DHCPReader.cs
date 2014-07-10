@@ -12,19 +12,26 @@ namespace MAD.DHCPReader
 {
     public class DHCPReader
     {
-        private static NetworkHelper helper = new NetworkHelper();
-        private IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, 67);
-        //private uint threadCnt = 0;
-        private uint hostCnt = 0;
-        private byte[] data;
-        //private uint maxThreads = 100;
-        private bool acknowledge; 
-        private bool addressGiven;
-        private bool nameGiven = false;
-        private IPAddress ip;
-        private string hostName = "";
-        public List<ModelHost> dummyList; 
-        
+        #region member
+
+        private static NetworkHelper _helper = new NetworkHelper();
+        private IPEndPoint _groupEP = new IPEndPoint(IPAddress.Any, 67);
+
+        private byte[] _data;
+
+        private bool _acknowledge; 
+        private bool _addressGiven;
+        private bool _nameGiven = false;
+
+        private string _hostName = "";
+        private IPAddress _requestedIP;
+
+        public List<ModelHost> _dummyList;
+
+        #endregion 
+
+        #region Methods
+
         public void Execute()
         {
             while (true)
@@ -36,9 +43,9 @@ namespace MAD.DHCPReader
 
         private void CatchDHCP()
         {
-            UdpClient listener = new UdpClient(67);
-            data = listener.Receive(ref groupEP);
-            listener.Close();
+            UdpClient _listener = new UdpClient(67);
+            _data = _listener.Receive(ref _groupEP);
+            _listener.Close();
         }
 
         private void StartThread()
@@ -48,97 +55,115 @@ namespace MAD.DHCPReader
 
         private void ProcessData(Object stateInfo)
         {
-            if (helper.IsDhcp(data) && helper.IsDhcpRequest(data))
+
+            if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
             {
-                byte[] hexNumber = new byte[6];
-                string hexString = "";
+                string _macAddress = _helper.getMacString(_data);
                 
-                for (uint i = 28; i < (28 + 6); i++)
-                {
-                    hexNumber[i - 28] = data[i];
-                    hexString += String.Format("{0:X02}", hexNumber[i - 28]);
-                    if (i < (28 + 5))
-                        hexString += ":";
-                }
-                
-                for (uint i = NetworkHelper._magicCookiePosition; i < data.Length; i++)
-                {
-                    
-                    switch (Convert.ToUInt16(data[i]))
+                for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
+                {                   
+                    switch (Convert.ToUInt16(_data[i]))
                     {
                         case 50:
-                            byte[] ipBytes = new byte[4];
+                            byte[] _ipBytes = new byte[4];
+                            
                             for (uint ii = 0; ii < 4; ii++)
                             {
-                                ipBytes[ii] = data[i + 2 + ii];
+                                _ipBytes[ii] = _data[i + 2 + ii];
                             }
-                            addressGiven = true;
-                            ip = new IPAddress(ipBytes);
-                            continue;
-                        case 12:
                             
-                            byte nameLength = data[i + 1];
-                            if (!nameGiven)
+                            _addressGiven = true;
+                            _requestedIP = new IPAddress(_ipBytes);
+                            
+                            continue;
+                        
+                        case 12:                           
+                            byte _nameLength = _data[i + 1];
+                            
+                            if (!_nameGiven)                                                                                     //Awaiting instuctions by Instructor about frequency of not use of hostname
                             {
                                 try
                                 {
-                                    for (uint iii = 1; iii <= nameLength; iii++)
+                                    for (uint iii = 1; iii <= _nameLength; iii++)
                                     {
-                                        hostName += (char)data[i + 1 + iii];
-                                        nameGiven = true; 
+                                        _hostName += (char)_data[i + 1 + iii];
+                                        _nameGiven = true; 
                                     }
                                 }
                                 catch
                                 {
-                                    nameGiven = false; 
+                                    _nameGiven = false; 
                                 }
                             }
+                            
                             continue;
+                        
                         default: 
+                            
                             break;
                     }
-                    if(addressGiven)
+
+                    if (_addressGiven)
                     {
                         Thread.Sleep(3000);
                         try
                         {
                             Ping _ping = new Ping();
-                            PingReply _reply = _ping.Send(ip);
+                            PingReply _reply = _ping.Send(_requestedIP);
 
                             if (_reply.Status == IPStatus.Success)
-                                acknowledge = true;
+                                _acknowledge = true;
                             else
-                                acknowledge = false;
+                                _acknowledge = false;
                         }
                         catch
                         {
-                            acknowledge = false;
+                            _acknowledge = false;
                         }
                     }
+                }
 
-                    if (addressGiven && acknowledge && nameGiven)
+                if (_addressGiven)
+                {
+                    Thread.Sleep(3000);
+                    try
                     {
-                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
-                        dummyList.Add(new ModelHost(hexString, ip, hostName));
+                        Ping _ping = new Ping();
+                        PingReply _reply = _ping.Send(_requestedIP);
+
+                        if (_reply.Status == IPStatus.Success)
+                            _acknowledge = true;
+                        else
+                            _acknowledge = false;
                     }
-                    else if (addressGiven && acknowledge && !nameGiven)
+                    catch
                     {
-                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
-                        dummyList.Add(new ModelHost(hexString, ip));
+                        _acknowledge = false;
                     }
-                    else if (!addressGiven || !acknowledge && nameGiven)
-                    {
-                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
-                        dummyList.Add(new ModelHost(hexString, hostName));
-                    }
-                    else if (!addressGiven || !acknowledge && !nameGiven)
-                    {
-                        dummyList.Remove(dummyList.Find(x => x.hostMac.Contains(hexString)));
-                        dummyList.Add(new ModelHost(hexString));
-                    }
-                    //TODO CleanCoding the shit out of it
+                }
+
+                if (_addressGiven && _acknowledge && _nameGiven)
+                {
+                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                    _dummyList.Add(new ModelHost(_macAddress, _requestedIP, _hostName));
+                }
+                else if (_addressGiven && _acknowledge && !_nameGiven)
+                {
+                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                    _dummyList.Add(new ModelHost(_macAddress, _requestedIP));
+                }
+                else if (!_addressGiven || !_acknowledge && _nameGiven)
+                {
+                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                    _dummyList.Add(new ModelHost(_macAddress, _hostName));
+                }
+                else if (!_addressGiven || !_acknowledge && !_nameGiven)
+                {
+                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                    _dummyList.Add(new ModelHost(_macAddress));
                 }
             }
         }
+        #endregion
     }
 }
