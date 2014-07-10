@@ -2,46 +2,40 @@
 
 namespace MAD
 {
-    public class ConsoleTable
+    public static class ConsoleTable
     {
         #region members
 
-        private string[] _columnesTitles;
-        private int _columneWidth;
-        public string splitline = "".PadRight(Console.BufferWidth, '_');
-
-        #endregion
-
-        #region constructor
-
-        public ConsoleTable(string[] columnesTitles, int consoleWidth)
-        {
-            _columnesTitles = columnesTitles;
-            _columneWidth = consoleWidth / columnesTitles.Length - 1;
-        }
+        public static string splitline = "".PadRight(Console.BufferWidth, '_');
 
         #endregion
 
         #region methodes
 
-        public string FormatStringArray(string[] data)
+        public static string FormatStringArray(int consoleWidth, params string[] data)
         {
-            for (int i = 0; i < _columnesTitles.Length; i++)
+            int _columneWidth = consoleWidth / data.Length;
+
+            if (_columneWidth < 3)
+                return "Columne-width to small!";
+
+            for (int i = 0; i < data.Length; i++)
             {
                 if (data[i].Length > _columneWidth)
                 {
-                    data[i] = data[i].Remove(_columneWidth);
+                    data[i] = data[i].Remove(_columneWidth - 2);
+                    data[i] += ".";
                 }
                 else
                 {
-                    data[i] = data[i].PadRight(_columneWidth);
+                    data[i] = data[i].PadRight(_columneWidth - 1);
                 }
             }
 
-            return AppendColumnes(data);
+            return AppendColumnes(consoleWidth, data);
         }
 
-        private string AppendColumnes(string[] data)
+        private static string AppendColumnes(int consoleWidth, string[] data)
         {
             string _buffer = "";
 
@@ -50,6 +44,9 @@ namespace MAD
                 _buffer += _temp;
                 _buffer += " ";
             }
+
+            if (_buffer.Length < consoleWidth)
+                _buffer = _buffer.PadRight(consoleWidth);
 
             return _buffer;
         }

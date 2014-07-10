@@ -24,7 +24,7 @@ namespace MAD
                 // START GUI
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
-
+                
                 CLI cli = new CLI(dataPath, js, cliServer);
                 cli.Start();
             }

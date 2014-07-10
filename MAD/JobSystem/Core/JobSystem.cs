@@ -22,7 +22,7 @@ namespace MAD.JobSystemCore
         public int nodesCount { get { return nodes.Count; } }
 
         // Jobs
-        public readonly int maxJobsPossible = JobSystem.maxNodes * JobNode.maxJobs;
+        public static int maxJobsPossible = JobSystem.maxNodes * JobNode.maxJobs;
         public int jobsCount { get { return JobsInitialized(); } }
 
         // Other
