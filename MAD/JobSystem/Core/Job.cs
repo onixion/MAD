@@ -27,9 +27,10 @@ namespace MAD.JobSystemCore
         public TimeSpan lastTimeSpan;
 
         public string jobName;
+
         public JobTime jobTime = new JobTime();
-        public List<OutDescriptor> outDescriptors = new List<OutDescriptor>();
-        public JobNotification jobNotification = new JobNotification();
+        public List<OutDescriptor> outDesc = new List<OutDescriptor>();
+        public JobNotification jobNoti = new JobNotification();
 
         #endregion
 

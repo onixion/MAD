@@ -65,16 +65,11 @@ namespace MAD.CLICore
                 command = (Command)_cInfo.Invoke(new object[] { _commandObjects });
             }
 
-            // Check if the parameters and arguments are valid.
-            string _parameterValid = command.ValidParameters(_parameterInput);
+            // Set parameters and arguments of the command.
+            command.parameters = _parameterInput;
 
-            /* If the parameters and arguments are valid then '_parameterValid' is
-             * equal to 'VALID_PARAMETERS'. */
-            if (_parameterValid == "VALID_PARAMETER")
-            {
-                // Set parameters and arguments of the command.
-                command.SetParameters(_parameterInput);
-            }
+            // Check if the parameters and arguments are valid.
+            string _parameterValid = CChecker.ValidParameters(command, _parameterInput);
 
             return _parameterValid;
         }
