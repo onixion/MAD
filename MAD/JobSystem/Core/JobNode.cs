@@ -59,22 +59,6 @@ namespace MAD.JobSystemCore
             }
         }
 
-        private Job GetJob(int jobID)
-        {
-            lock (jobsLock)
-            {
-                foreach (Job _job in jobs)
-                {
-                    if (_job.id == jobID)
-                    {
-                        return _job;
-                    }
-                }
-
-                return null;
-            }
-        }
-
         #endregion
     }
 }

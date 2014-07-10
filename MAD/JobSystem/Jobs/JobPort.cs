@@ -8,7 +8,6 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public IPAddress targetAddress { get; set; }
         public int port { get; set; }
 
         #endregion
@@ -18,14 +17,12 @@ namespace MAD.JobSystemCore
         public JobPort()
             : base("NULL", JobType.PortScan, new JobTime())
         {
-            this.targetAddress = IPAddress.Loopback;
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, IPAddress targetAddress, int port)
+        public JobPort(string jobName, JobType jobType, JobTime jobTime, int port)
             : base(jobName, jobType, jobTime)
         {
-            this.targetAddress = targetAddress;
             this.port = port;
         }
 
@@ -54,7 +51,6 @@ namespace MAD.JobSystemCore
         {
             string _temp = "";
 
-            _temp += "<color><yellow>TARGET-IP: <color><white>" + targetAddress.ToString() + "\n";
             _temp += "<color><yellow>TARGET-PORT: <color><white>" + port.ToString() +"\n";
 
             return _temp;

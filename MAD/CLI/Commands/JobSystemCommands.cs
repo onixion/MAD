@@ -415,7 +415,6 @@ namespace MAD.CLICore
 
     #region commands for adding jobs
 
-    /* TODO
     public class JobSystemAddServiceCheckCommand : Command
     {
         private JobSystem _js;
@@ -429,10 +428,10 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
             requiredParameter.Add(new ParameterOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
             //there will be more, still working
-            optionalParameter.Add(new ParameterOption("a", "IPADDRESS", "IP-Address of the server", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
             optionalParameter.Add(new ParameterOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed", false, true, new Type[] { typeof(Int32), typeof(string) }));
@@ -448,8 +447,6 @@ namespace MAD.CLICore
 
             _job.argument = (string)parameters.GetParameter("s").argumentValues[0];
 
-            if (OptionalParameterUsed("a"))
-                _job.targetIP = (IPAddress)parameters.GetParameter("a").argumentValues[0];
             if (OptionalParameterUsed("u"))
                 _job.username = (string)parameters.GetParameter("u").argumentValues[0];
             if (OptionalParameterUsed("p"))
@@ -484,7 +481,21 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            return "";
+            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_node != null)
+            {
+                lock (_node.jobsLock)
+                {
+                    _node.jobs.Add(_job);
+                }
+
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+            }
+            else
+            {
+                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
+            }
         }
     }
 
@@ -497,7 +508,8 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            //requiredParameter.Add(new ParameterOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
             requiredParameter.Add(new ParameterOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
             optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
@@ -510,7 +522,7 @@ namespace MAD.CLICore
             _job.jobName = (string)parameters.GetParameter("n").argumentValues[0];
             _job.jobType = Job.JobType.HostDetect;
 
-            _job.Net = (IPAddress)parameters.GetParameter("a").argumentValues[0];
+            //_job. = (IPAddress)parameters.GetParameter("a").argumentValues[0]; Not necessary anymore
             _job.Subnetmask = (IPAddress)parameters.GetParameter("m").argumentValues[0];
 
             if (OptionalParameterUsed("t"))
@@ -542,17 +554,24 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (_js.AddToCache(_job))
+            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_node != null)
             {
-                return "<color><green>Job added to cache.";
+                lock (_node.jobsLock)
+                {
+                    _node.jobs.Add(_job);
+                }
+
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
             {
-                return "<color><red>Cache limit reached!";
+                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
             }
         }
     }
-    */
+
     public class JobSystemAddPingCommand : Command
     {
         private JobSystem _js;
@@ -633,7 +652,7 @@ namespace MAD.CLICore
             }
         }
     }
-    /* TODO!
+
     public class JobSystemAddHttpCommand : Command
     {
         private JobSystem _js;
@@ -643,7 +662,7 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
             optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
@@ -651,13 +670,11 @@ namespace MAD.CLICore
         public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
 
             JobHttp _job = new JobHttp();
 
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Http;
-            _job.targetAddress = targetAddress;
 
             if (OptionalParameterUsed("t"))
             {
@@ -693,13 +710,22 @@ namespace MAD.CLICore
                 _job.port = (int)parameters.GetParameter("p").argumentValues[0];
             }
 
-            if (_js.AddToCache(_job))
+            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if(_node != null)
             {
-                return "<color><green>Job added to cache.";
+                // Use lock. Because if the scedule is working on those jobs, it will fail.
+                lock(_node.jobsLock)
+                {
+                    _node.jobs.Add(_job);
+                }
+
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
             {
-                return "<color><red>Cache limit reached!";
+                // JobSystemError.
+                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
             }
         }
     }
@@ -713,7 +739,7 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IpAddres of the target.", false, true, new Type[] { typeof(IPAddress) }));
+            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             requiredParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
             optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
         }
@@ -721,14 +747,12 @@ namespace MAD.CLICore
         public override string Execute()
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
-            IPAddress targetAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
             int port = (int)parameters.GetParameter("p").argumentValues[0];
 
             JobPort _job = new JobPort();
 
             _job.jobName = jobName;
             _job.jobType = Job.JobType.PortScan;
-            _job.targetAddress = targetAddress;
             _job.port = port;
 
             if (OptionalParameterUsed("t"))
@@ -760,17 +784,23 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (_js.AddToCache(_job))
+            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+
+            if (_node != null)
             {
-                return "<color><green>Job added to cache.";
+                lock (_node.jobsLock)
+                {
+                    _node.jobs.Add(_job);
+                }
+
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
             {
-                return "<color><red>Cache limit reached!";
+                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
             }
         }
     }
-    */
 
     #endregion
 

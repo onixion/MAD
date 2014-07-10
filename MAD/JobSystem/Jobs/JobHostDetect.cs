@@ -12,8 +12,7 @@ namespace MAD.JobSystemCore
     class JobHostDetect : Job                                                                           //This job is for detecting existing hosts in a network
     {                                                                                                   //Further commenting will happen if someone can't read my code.. i am to lazy to do it now..
         #region members
-
-        public IPAddress Net;                                                                          
+                                                                        
         public IPAddress Subnetmask;                                                                    
 
         private List<IPAddress> _hostAddresses = new List<IPAddress>();
@@ -27,14 +26,13 @@ namespace MAD.JobSystemCore
         public JobHostDetect()
             : base("NULL", JobType.HostDetect, new JobTime())
         {
-            this.Net = IPAddress.Parse("192.168.0.0");
+            //this.Net = IPAddress.Parse("192.168.0.0"); <- This need to be implemented in the execute-method.
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
         }
 
-        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, IPAddress Net, IPAddress Subnetmask)
+        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, IPAddress Subnetmask)
             : base(jobName, jobType, jobTime)
         {
-            this.Net = Net;
             this.Subnetmask = Subnetmask;
         }
 
@@ -45,7 +43,8 @@ namespace MAD.JobSystemCore
         public override void Execute(IPAddress targetAddress)
         {
             byte[] _hostBytes = _helper.GetHosts(Subnetmask);
-            byte[] _netBytes = Net.GetAddressBytes();
+            //byte[] _netBytes = Net.GetAddressBytes();
+            byte[] _netBytes = targetAddress.GetAddressBytes();
 
             if (BitConverter.IsLittleEndian)
             {

@@ -17,9 +17,7 @@ namespace MAD
         static int Main(string[] args)
         {
             JobSystem js = new JobSystem(dataPath);
-
-            CLIServer cliServer = new CLIServer(999, "data", js);
-            CLI cli = new CLI(dataPath, js, cliServer);
+            CLIServer cliServer = new CLIServer(999, dataPath, js);
 
             if (args.Length == 0)
             { 
@@ -27,6 +25,7 @@ namespace MAD
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
 
+                CLI cli = new CLI(dataPath, js, cliServer);
                 cli.Start();
             }
             else if (args.Length == 1)
@@ -34,6 +33,7 @@ namespace MAD
                 switch (args[0])
                 {
                     case "-console":
+                        CLI cli = new CLI(dataPath, js, cliServer);
                         cli.Start();
                         break;
                     default:

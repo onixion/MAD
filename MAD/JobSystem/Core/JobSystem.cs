@@ -53,6 +53,61 @@ namespace MAD.JobSystemCore
 
         #endregion
 
+        #region nodes/jobs informations
+
+        public int NodesActive()
+        {
+            int _count = 0;
+
+            lock (jsNodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if (nodes[i].state == JobNode.State.Active)
+                    {
+                        _count++;
+                    }
+                }
+            }
+
+            return _count;
+        }
+
+        public int NodesInactive()
+        {
+            int _count = 0;
+
+            lock (jsNodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    if (nodes[i].state == JobNode.State.Inactive)
+                    {
+                        _count++;
+                    }
+                }
+            }
+
+            return _count;
+        }
+
+        public int JobsInitialized()
+        {
+            int _count = 0;
+
+            lock (jsNodesLock)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    _count = _count + nodes[i].jobs.Count;
+                }
+            }
+
+            return _count;
+        }
+
+        #endregion
+
         #region nodes handling
 
         public bool StartNode(int nodeID)
@@ -140,15 +195,25 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public bool UpdateJob(int jobID, Job newJob)
+        #endregion
+
+        #region jobs handling
+
+        public bool StartJob(int jobID)
         {
             Job _job = GetJob(jobID);
 
             if (_job != null)
             {
-                // TODO
-                throw new NotImplementedException();
-                //return true;
+                if (_job.state != Job.JobState.Running)
+                {
+                    _job.state = Job.JobState.Waiting;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
@@ -156,55 +221,26 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public int NodesActive()
+        public bool StopJob(int jobID)
         {
-            int _count = 0;
+            Job _job = GetJob(jobID);
 
-            lock (jsNodesLock)
+            if (_job != null)
             {
-                for (int i = 0; i < nodes.Count; i++)
+                if (_job.state != Job.JobState.Stopped)
                 {
-                    if(nodes[i].state == JobNode.State.Active)
-                    {
-                        _count++;
-                    }
+                    _job.state = Job.JobState.Stopped;
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
-
-            return _count;
-        }
-
-        public int NodesInactive()
-        {
-            int _count = 0;
-
-            lock (jsNodesLock)
+            else
             {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    if(nodes[i].state == JobNode.State.Inactive)
-                    {
-                        _count++;
-                    }
-                }
+                return false;
             }
-
-            return _count;
-        }
-
-        public int JobsInitialized()
-        {
-            int _count = 0;
-
-            lock (jsNodesLock)
-            {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    _count = _count + nodes[i].jobs.Count;
-                }
-            }
-
-            return _count;
         }
 
         public bool AddJobToNode(int nodeID, Job jobToAdd)
@@ -247,6 +283,22 @@ namespace MAD.JobSystemCore
             }
 
             return false;
+        }
+
+        public bool UpdateJob(int jobID, Job newJob)
+        {
+            Job _job = GetJob(jobID);
+
+            if (_job != null)
+            {
+                // TODO
+                throw new NotImplementedException();
+                //return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool JobExist(int jobID)

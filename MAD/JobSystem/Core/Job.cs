@@ -52,32 +52,6 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
-        public bool Start()
-        {
-            if (state == JobState.Stopped)
-            {
-                state = JobState.Waiting;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool Stop()
-        {
-            if (state != JobState.Stopped)
-            {
-                state = JobState.Stopped;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public abstract void Execute(IPAddress targetAddress);
 
         #region for CLI only

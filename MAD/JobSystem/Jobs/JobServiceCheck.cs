@@ -13,7 +13,6 @@ namespace MAD.JobSystemCore
 		public string argument;
         public string username;
         public string password;
-        public IPAddress targetIP;
         
         private bool working; 
 
@@ -27,16 +26,15 @@ namespace MAD.JobSystemCore
             this.argument = "";
             this.username = "";
             this.password = "";
-            this.targetIP = IPAddress.Parse("127.0.0.1");
+            //this.targetIP = IPAddress.Parse("127.0.0.1");
         }
 
-        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument, IPAddress targetIP, string username, string password)
+        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument, string username, string password)
             : base(jobName, jobType, jobTime)
         {
             this.argument = argument;
             this.username = username;
             this.password = password;
-            this.targetIP = targetIP;
         }
 
         #endregion
@@ -95,6 +93,9 @@ namespace MAD.JobSystemCore
 
         private void ftpCheck()
         {
+            // You need to pass ftpCheck the IP-Address to work.
+
+            /*
             FtpWebRequest requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://"+targetIP.ToString()));
             requestDir.Credentials = new NetworkCredential(username, password);
             requestDir.Method = WebRequestMethods.Ftp.PrintWorkingDirectory;
@@ -109,6 +110,7 @@ namespace MAD.JobSystemCore
             {
                 working = false;
             }
+             * */
         }
 		#endregion 
 
