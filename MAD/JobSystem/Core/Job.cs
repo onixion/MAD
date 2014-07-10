@@ -16,8 +16,8 @@ namespace MAD.JobSystemCore
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
         public JobType jobType = JobType.NULL;
 
-        public enum JobState { Waiting, Running, Stopped, Exception }
-        public JobState state = JobState.Stopped;
+        public enum JobState { NULL, Inactive, Waiting, Working, Exception }
+        public JobState state = JobState.Inactive;
 
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;

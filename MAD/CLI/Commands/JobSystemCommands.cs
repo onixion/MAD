@@ -350,13 +350,11 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
 
-            if (_job != null)
+            if (_js.StartJob(_jobID))
             {
-                _job.state = Job.JobState.Waiting; // not sure if this works
-
-                return "<color><green>Node is inactive.";
+                return "<color><green>Job is active.";
             }
             else
             {
@@ -378,12 +376,10 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
 
-            if (_job != null)
+            if (_js.StopJob(_jobID))
             {
-                _job.state = Job.JobState.Stopped;
-
                 return "<color><green>Job is inactive.";
             }
             else
@@ -406,7 +402,9 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            if (_js.RemoveJob((int)parameters.GetParameter("id").argumentValues[0]))
+            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
+
+            if (_js.RemoveJob(_jobID))
                 return "<color><green>Job removed.";
             else
                 return JSError.Error(JSError.Type.JobNotExist, null, true);
@@ -648,7 +646,7 @@ namespace MAD.CLICore
             else
             {
                 // JobSystemError.
-                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
+                return JSError.Error(JSError.Type.NodeNotExist, null, true);
             }
         }
     }

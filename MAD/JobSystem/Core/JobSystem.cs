@@ -5,10 +5,15 @@ namespace MAD.JobSystemCore
 {
     public class JobSystem
     {
-        #region member
+        #region members
 
+        // Version
         private Version _version = new Version(2, 0);
         public Version version { get { return _version; } }
+
+        // Scedule
+        private JobScedule _scedule;
+        public JobScedule.State sceduleState { get { return _scedule.state; } }
 
         // Nodes
         public List<JobNode> nodes = new List<JobNode>();
@@ -18,11 +23,9 @@ namespace MAD.JobSystemCore
 
         // Jobs
         public readonly int maxJobsPossible = JobSystem.maxNodes * JobNode.maxJobs;
+        public int jobsCount { get { return JobsInitialized(); } }
 
-        // Scedule
-        private JobScedule _scedule;
-        public JobScedule.State sceduleState { get { return _scedule.state; } }
-
+        // Other
         private string _dataPath;
 
         #endregion
@@ -205,7 +208,7 @@ namespace MAD.JobSystemCore
 
             if (_job != null)
             {
-                if (_job.state != Job.JobState.Running)
+                if (_job.state == Job.JobState.Inactive)
                 {
                     _job.state = Job.JobState.Waiting;
                     return true;
@@ -227,9 +230,9 @@ namespace MAD.JobSystemCore
 
             if (_job != null)
             {
-                if (_job.state != Job.JobState.Stopped)
+                if (_job.state == Job.JobState.Waiting)
                 {
-                    _job.state = Job.JobState.Stopped;
+                    _job.state = Job.JobState.Inactive;
                     return true;
                 }
                 else
@@ -335,7 +338,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        // TODO______________________________
+        #region save/load nodes from file
 
         public void SaveNodes(string path)
         {
@@ -346,6 +349,8 @@ namespace MAD.JobSystemCore
         { 
             // TODO
         }
+
+        #endregion
 
         #endregion
     }

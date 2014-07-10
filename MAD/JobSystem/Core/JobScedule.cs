@@ -89,8 +89,12 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
+                                    /* Scedule execute only these jobs, which states are equal to 'Waiting'. */
                                     if (_job.state == Job.JobState.Waiting)
                                     {
+                                        // Set job-state to working.
+                                        _job.state = Job.JobState.Working;
+
                                         if (CheckJobTime(_job.jobTime, _time))
                                         {
                                             if (_job.jobTime.type == JobTime.TimeType.Relative)
@@ -124,6 +128,9 @@ namespace MAD.JobSystemCore
                                                 _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
                                             }
                                         }
+
+                                        // Set job-state to waiting.
+                                        _job.state = Job.JobState.Waiting;
                                     }
                                 }
                             }
@@ -185,9 +192,6 @@ namespace MAD.JobSystemCore
             // Execute job.
             _job.Execute(_holder.targetAddress);
 
-            // Set job-state to wait.
-            _job.state = Job.JobState.Waiting;
-
             // Set stop-time.
             _job.lastFinished = DateTime.Now;
 
@@ -202,7 +206,7 @@ namespace MAD.JobSystemCore
             {
                 // Query to NotificationSystem.
             }
- 
+
             return null;
         }
 
