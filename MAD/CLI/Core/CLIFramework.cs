@@ -154,8 +154,6 @@ namespace MAD.CLICore
             return null;
         }
 
-        #endregion
-
         public static string ValidParameters(Command command, ParameterInput parameters)
         {
             List<ParameterOption> _requiredParameter = command.requiredParameter;
@@ -390,5 +388,7 @@ namespace MAD.CLICore
 
             return false;
         }
+
+        #endregion
     }
 }
