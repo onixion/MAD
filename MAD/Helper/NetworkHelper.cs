@@ -90,32 +90,44 @@ namespace MAD.Helper
 
         public string hostMac;
 
+        public uint ID;
+
+        private static uint _count = 0; 
+
         public ModelHost(string MAC)
         {
+            ID = _count;
             hostMac = MAC;
             hostName = null;
-            hostIP = null; 
+            hostIP = null;
+            _count++;
         }
 
         public ModelHost(string MAC, IPAddress address)
         {
+            ID = _count;
             hostMac = MAC;
             hostIP = address; 
             hostName = null;
+            _count++;
         }
 
         public ModelHost(string MAC, string name)
         {
+            ID = _count;
             hostMac = MAC;
             hostName = name;
             hostIP = null;
+            _count++;
         }
 
         public ModelHost(string MAC, IPAddress address, string name)
         {
+            ID = _count;
             hostMac = MAC;
             hostIP = address;
-            hostName = name; 
+            hostName = name;
+            _count++;
         }
     }
 }

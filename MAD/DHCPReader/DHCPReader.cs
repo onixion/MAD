@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.Helper;
+using MAD.JobSystemCore;
 
 namespace MAD.DHCPReader
 {
@@ -34,6 +35,7 @@ namespace MAD.DHCPReader
 
         public void Execute()
         {
+            //Threadcall of Function for keppeing up do date <- here
             while (true)
             {
                 CatchDHCP();
@@ -161,6 +163,40 @@ namespace MAD.DHCPReader
                 {
                     _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
                     _dummyList.Add(new ModelHost(_macAddress));
+                }
+            }
+        }
+
+        private void UpdateNodes(uint milsecs)
+        {
+            Thread.Sleep((int)milsecs);
+            bool _active; 
+
+            foreach (ModelHost _dummy in _dummyList)
+            {
+                Ping _ping = new Ping();
+
+                try
+                {
+                    PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                    if (_reply.Status == IPStatus.Success)
+                    {
+                        _active = true;
+                    }
+                    else
+                    {
+                        _active = false;
+                    }
+                }
+                catch
+                {
+                    _active = false; 
+                }
+
+                if (!_active)
+                {
+                    _dummyList.Remove(_dummy);
                 }
             }
         }
