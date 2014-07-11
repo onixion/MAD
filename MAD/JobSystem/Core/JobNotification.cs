@@ -29,7 +29,7 @@ namespace MAD.JobSystemCore
         #region methodes
 
         // TODO
-        public static List<JobNotificationRule> ParseNotification(object[] data, List<OutDescriptor> outDescriptors)
+        public static List<JobNotificationRule> ParseJobNotification(List<OutDescriptor> outDesc, object[] data)
         {
             List<JobNotificationRule> _buffer = new List<JobNotificationRule>();
 
@@ -37,14 +37,17 @@ namespace MAD.JobSystemCore
         }
 
         // TODO
-        private static void ParseNotificationInput(string data, ref string head, ref char operationTag, ref string value)
+        private static JobNotificationRule ParseJobNotificationInput(List<OutDescriptor> outDesc, string data)
         {
+            /* Syntax: <head><operationTag><value>
+             * E.G.  : TTLLeft==20 */
 
+            return null;
         }
 
-        private static OutDescriptor GetOutDescriptor(List<OutDescriptor> outDescriptors, string name)
+        private static OutDescriptor GetOutDescriptor(List<OutDescriptor> outDesc, string name)
         {
-            foreach (OutDescriptor _temp in outDescriptors)
+            foreach (OutDescriptor _temp in outDesc)
             {
                 if (_temp.name == name)
                 {
@@ -55,19 +58,13 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        // TODO
-        public static List<MailAddress> ParseMailAddresses(params string[] mailAddresses)
-        {
-            return null;
-        }
-
-        public List<JobNotificationRule> GetValidityRules()
+        public List<JobNotificationRule> GetBrokenRules()
         {
             List<JobNotificationRule> _buffer = new List<JobNotificationRule>();
 
             for(int i = 0; i < rules.Count; i++)
             {
-                if (rules[i].CheckRuleValidity())
+                if (!rules[i].CheckRuleValidity())
                 {
                     _buffer.Add(rules[i]);
                 }

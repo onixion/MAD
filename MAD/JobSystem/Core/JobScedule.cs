@@ -199,10 +199,10 @@ namespace MAD.JobSystemCore
             _job.lastTimeSpan = _job.lastStarted.Subtract(_job.lastFinished);
 
             // Get Notificationrules which are validity.
-            List<JobNotificationRule> _rules = _job.jobNotification.GetValidityRules();
+            List<JobNotificationRule> _brokenRules = _job.jobNoti.GetBrokenRules();
 
             // If necessary make a query to the NotificationSystem.
-            if (_rules.Count != 0)
+            if (_brokenRules.Count != 0)
             {
                 // Query to NotificationSystem.
             }

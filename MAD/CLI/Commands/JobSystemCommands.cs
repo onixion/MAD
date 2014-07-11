@@ -6,8 +6,6 @@ using MAD.JobSystemCore;
 
 namespace MAD.CLICore
 {
-    // TODO: string Execute(int consoleWidth)
-
     #region commands for JOBSYSTEM
 
     public class JobSystemStatusCommand : Command
@@ -23,10 +21,10 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            output += "<color><yellow>JOBSYSTEM version " + _js.version + "\n\n";
+            output += "<color><yellow>\nJOBSYSTEM version " + _js.version + "\n\n";
 
             output += " Nodes stored in RAM: <color><white>" + _js.nodesCount + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobNode.maxJobs + ")\n";
+            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxJobsPossible + ")\n";
 
             output += "\n\n Scedule-State: ";
 
@@ -34,6 +32,8 @@ namespace MAD.CLICore
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
             else
                 output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+
+            output += "\n\n";
 
             return output;
         }
@@ -96,7 +96,6 @@ namespace MAD.CLICore
         public override string Execute()
         {
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
-            ConsoleTable _jobTable = new ConsoleTable(_tableRow, Console.BufferWidth);
 
             output += "\n";
 
@@ -105,9 +104,9 @@ namespace MAD.CLICore
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
 
-            output += _jobTable.splitline + "\n";
-            output += "<color><yellow>" + _jobTable.FormatStringArray(_tableRow) + "<color><white>";
-            output += _jobTable.splitline + "\n";
+            output += "<color><yellow>" + ConsoleTable.splitline;
+            output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+            output += ConsoleTable.splitline;
 
             output += "<color><white>";
             lock (_js.jsNodesLock)
@@ -121,7 +120,7 @@ namespace MAD.CLICore
                     _tableRow[4] = _temp.ipAddress.ToString();
                     _tableRow[5] = _temp.jobs.Count.ToString();
 
-                    output += _jobTable.FormatStringArray(_tableRow);
+                    output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                 }
             }
 
@@ -250,18 +249,17 @@ namespace MAD.CLICore
         public override string Execute()
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-            ConsoleTable _jobTable = new ConsoleTable(_tableRow, Console.BufferWidth);
 
             output += "\n";
 
-            output += " <color><yellow>Jobs max:             <color><white>" + _js.maxJobsPossible + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.maxJobsPossible + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
 
-            output += _jobTable.splitline + "\n";
-            output += "<color><yellow>" + _jobTable.FormatStringArray(_tableRow) + "<color><white>";
-            output += _jobTable.splitline + "\n";
+            output += "<color><yellow>" + ConsoleTable.splitline;
+            output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+            output += ConsoleTable.splitline;
 
             output += "<color><white>";
             lock (_js.jsNodesLock)
@@ -279,7 +277,7 @@ namespace MAD.CLICore
                         _tableRow[6] = _temp2.jobTime.Values();
                         _tableRow[7] = _temp2.outState.ToString();
 
-                        output += _jobTable.FormatStringArray(_tableRow) + "\n";
+                        output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                     }
                 }
             }
