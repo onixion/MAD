@@ -31,6 +31,27 @@ namespace MAD.NetIO
             }
         }
 
+        public static void SendUShort(NetworkStream stream, ushort data, bool flush)
+        {
+            using (StreamIO _stream = new StreamIO(stream))
+            {
+                _stream.Write(BitConverter.GetBytes(data), true);
+
+                if (flush)
+                {
+                    _stream.Flush();
+                }
+            }
+        }
+
+        public static ushort ReceiveUShort(NetworkStream stream)
+        {
+            using (StreamIO _stream = new StreamIO(stream))
+            {
+                return _stream.ReadUShort();
+            }
+        }
+
         #endregion
 
         #region sending / receiving WITH AES encryption (symmetric) (encoding UNICODE)
