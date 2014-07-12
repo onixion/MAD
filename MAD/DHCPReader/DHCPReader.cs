@@ -20,6 +20,8 @@ namespace MAD.DHCPReader
 
         private byte[] _data;
 
+        uint _sleepFor;
+
         private bool _acknowledge; 
         private bool _addressGiven;
         private bool _nameGiven = false;
@@ -31,11 +33,27 @@ namespace MAD.DHCPReader
 
         #endregion 
 
+        #region Constructor
+
+        public DHCPReader()
+        {
+            _sleepFor = 25000;
+        }
+
+        public DHCPReader(uint time)
+        {
+            _sleepFor = time;
+        }
+
+        #endregion
+
         #region Methods
 
         public void Execute()
         {
-            //Threadcall of Function for keppeing up do date <- here
+            Thread check = new Thread(UpdateLists);
+            check.Start();
+        
             while (true)
             {
                 CatchDHCP();
@@ -167,39 +185,42 @@ namespace MAD.DHCPReader
             }
         }
 
-        private void UpdateNodes(uint milsecs)
+        private void UpdateLists()
         {
-            Thread.Sleep((int)milsecs);
-            bool _active; 
-
-            foreach (ModelHost _dummy in _dummyList)
+            while (true)
             {
-                Ping _ping = new Ping();
+                Thread.Sleep((int)_sleepFor);
+                bool _active;
 
-                try
+                foreach (ModelHost _dummy in _dummyList)
                 {
-                    PingReply _reply = _ping.Send(_dummy.hostIP);
+                    Ping _ping = new Ping();
 
-                    if (_reply.Status == IPStatus.Success)
+                    try
                     {
-                        _active = true;
+                        PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                        if (_reply.Status == IPStatus.Success)
+                        {
+                            _active = true;
+                        }
+                        else
+                        {
+                            _active = false;
+                        }
                     }
-                    else
+                    catch
                     {
                         _active = false;
                     }
-                }
-                catch
-                {
-                    _active = false; 
-                }
 
-                if (!_active)
-                {
-                    _dummyList.Remove(_dummy);
+                    if (!_active)
+                    {
+                        _dummyList.Remove(_dummy);
+                    }
                 }
             }
-        }
+        }      
         #endregion
     }
 }
