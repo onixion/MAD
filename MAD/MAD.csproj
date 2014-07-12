@@ -61,9 +61,9 @@
   <ItemGroup>
     <Compile Include="CLI\Core\CLI.cs" />
     <Compile Include="CLI\Core\CLIFramework.cs" />
-    <Compile Include="CLI\Core\CLIInput.cs" />
+    <Compile Include="CLI\CLIIO\CLIInput.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
-    <Compile Include="CLI\Core\CLIOutput.cs" />
+    <Compile Include="CLI\CLIIO\CLIOutput.cs" />
     <Compile Include="CLI\Server\CLIServer.cs" />
     <Compile Include="CLI\Core\Parameter.cs" />
     <Compile Include="CLI\Core\ParameterInput.cs" />

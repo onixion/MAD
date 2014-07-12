@@ -12,8 +12,6 @@ namespace MAD.CLICore
     {
         #region members
 
-        private CLIInput _input = new CLIInput();
-        
         private string _dataPath;
 
         #endregion
@@ -79,10 +77,10 @@ namespace MAD.CLICore
             {
                 Command _command = null;
 
-                _input.WriteCursor();
+                CLIInput.WriteCursor();
 
-                //string _cliInput = Console.ReadLine();
-                string _cliInput = _input.ReadInput();
+                //string _cliInput = Console.ReadLine(); -> OLD
+                string _cliInput = CLIInput.ReadInput(); // <- using own read method (for input-history ..)
 
                 _cliInput = _cliInput.Trim();
 

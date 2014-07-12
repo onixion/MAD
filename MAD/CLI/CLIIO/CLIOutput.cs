@@ -7,10 +7,9 @@ namespace MAD.CLIIO
     {
         #region members
 
-        public static object _consoleLock = new object();
+        public static object _outputLock = new object();
 
         private const string colorTag = "<color>";
-
         public static List<object[]> colors = new List<object[]>()
         {
             new object[] { "<blue>" , ConsoleColor.Blue },
@@ -36,7 +35,7 @@ namespace MAD.CLIIO
 
         public static void WriteToConsole(string data)
         {
-            lock (_consoleLock)
+            lock (_outputLock)
             {
                 if (data != "")
                 {
@@ -85,7 +84,9 @@ namespace MAD.CLIIO
             }
         }
 
-        // Removed, because it cannot be used in combination with colors ...
+        // Wanted to add text-wraping, so words won't be cut into two pieces at the end of lines.
+        // But it can't be used in combination with those color-codes ...
+        // Maybe it can be implemented somehow ... but for now I won't spend more time working on it.
         /*
         public static void WrapTextToConsole(string textToPrint, int lineWidth)
         {

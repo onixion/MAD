@@ -1,12 +1,14 @@
 ﻿using System;
 
-namespace MAD
+namespace MAD.CLICore
 {
     public static class ConsoleTable
     {
         #region members
 
         public static string splitline = "".PadRight(Console.BufferWidth, '_');
+        public static string splitline2 = "".PadRight(Console.BufferWidth, '-');
+        public static string splitline3 = "".PadRight(Console.BufferWidth, '.');
 
         #endregion
 

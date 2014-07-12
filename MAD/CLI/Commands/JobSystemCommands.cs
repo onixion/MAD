@@ -104,7 +104,7 @@ namespace MAD.CLICore
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
 
-            output += "<color><yellow>" + ConsoleTable.splitline;
+            output += "<color><yellow>" + ConsoleTable.splitline; 
             output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
             output += ConsoleTable.splitline;
 
