@@ -19,7 +19,7 @@ namespace MAD.CLICore
             description = "This command shows informations about the jobsystem.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             output += "<color><yellow>\nJOBSYSTEM version " + _js.version + "\n\n";
 
@@ -54,7 +54,7 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             _js.StartScedule();
             return "<color><green>Scedule started.";
@@ -71,7 +71,7 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             _js.StopScedule();
             return "<color><green>Scedule stopped.";
@@ -93,7 +93,7 @@ namespace MAD.CLICore
             description = "This command prints a table with all nodes.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
 
@@ -139,7 +139,7 @@ namespace MAD.CLICore
             description = "This command sets the node-state to active.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
             {
@@ -163,7 +163,7 @@ namespace MAD.CLICore
             description = "This command sets the node-state to inactive.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
             {
@@ -193,7 +193,7 @@ namespace MAD.CLICore
             description = "This command creates a node for the cached jobs.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             JobNode _node = new JobNode();
 
@@ -218,7 +218,7 @@ namespace MAD.CLICore
             description = "This command removes a node.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             if (_js.RemoveNode((int)parameters.GetParameter("id").argumentValues[0]))
             {
@@ -246,7 +246,7 @@ namespace MAD.CLICore
             description = "This command prints a table with all initialized jobs.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
 
@@ -297,7 +297,7 @@ namespace MAD.CLICore
             optionalParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             if (OptionalParameterUsed("id"))
             {
@@ -346,7 +346,7 @@ namespace MAD.CLICore
             description = "This command sets the job to active.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
 
@@ -372,7 +372,7 @@ namespace MAD.CLICore
             description = "This command sets the job to inactive.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
 
@@ -398,7 +398,7 @@ namespace MAD.CLICore
             requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
 
@@ -434,7 +434,7 @@ namespace MAD.CLICore
             description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             JobServiceCheck _job = new JobServiceCheck();
 
@@ -511,7 +511,7 @@ namespace MAD.CLICore
             description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             JobHostDetect _job = new JobHostDetect();
 
@@ -585,7 +585,7 @@ namespace MAD.CLICore
             description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
 
@@ -663,7 +663,7 @@ namespace MAD.CLICore
             optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
 
@@ -740,7 +740,7 @@ namespace MAD.CLICore
             optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string jobName = (string)parameters.GetParameter("n").argumentValues[0];
             int port = (int)parameters.GetParameter("p").argumentValues[0];

@@ -59,7 +59,6 @@ namespace MAD.CLIServerCore
 
             while (true)
             {
-                // HERE
                 _consoleWidth = NetCom.ReceiveUShort(_stream);
 
                 _response = NetCom.ReceiveStringUnicode(_stream);
@@ -67,7 +66,7 @@ namespace MAD.CLIServerCore
 
                 if (_response == "VALID_PARAMETER")
                 {
-                    NetCom.SendStringUnicode(_stream, _command.Execute() + "\n<color><gray>" + _cursor, true);
+                    NetCom.SendStringUnicode(_stream, _command.Execute(_consoleWidth) + "\n<color><gray>" + _cursor, true);
                 }
                 else
                 {

@@ -13,7 +13,7 @@ namespace MAD.CLICore
             description = "This command exits the cli.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             return "EXIT_CLI";
         }
@@ -32,7 +32,7 @@ namespace MAD.CLICore
             description = "This command shows information about available commands.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             if (!OptionalParameterUsed("id"))
             {
@@ -183,7 +183,7 @@ namespace MAD.CLICore
             description = "This command shows informations about the program.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
             output += "<color><yellow>Program written by: \n";
@@ -206,7 +206,7 @@ namespace MAD.CLICore
             description = "This command prints all supported colors to the console.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             output += "<color><white>" + CLIOutput.colors.Count + " colors available.\n";
 

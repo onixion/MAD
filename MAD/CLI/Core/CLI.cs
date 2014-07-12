@@ -94,7 +94,7 @@ namespace MAD.CLICore
                     if (response == "VALID_PARAMETER")
                     {
                         // Execute command and get response from command. // TODO: pass console width to .Execute()
-                        response = _command.Execute();
+                        response = _command.Execute(Console.BufferWidth);
 
                         // When command response with 'EXIT_CLI' the CLI closes.
                         if (response == "EXIT_CLI")
