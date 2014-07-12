@@ -9,9 +9,11 @@ using System.Threading;
 using MAD.Helper;
 using MAD.JobSystemCore;
 
+using Amib.Threading; 
+
 namespace MAD.DHCPReader
 {
-    public class DHCPReader
+    public class MACFeeder                                                          //need to do something about that name.. 
     {
         #region member
 
@@ -22,6 +24,7 @@ namespace MAD.DHCPReader
 
         uint _sleepFor;
 
+        private bool _running = false;
         private bool _acknowledge; 
         private bool _addressGiven;
         private bool _nameGiven = false;
@@ -31,34 +34,45 @@ namespace MAD.DHCPReader
 
         public List<ModelHost> _dummyList;
 
+        private Thread _check;
+        private SmartThreadPool _pool;
+
         #endregion 
 
         #region Constructor
 
-        public DHCPReader()
+        public MACFeeder()
         {
-            _sleepFor = 25000;
-        }
-
-        public DHCPReader(uint time)
-        {
-            _sleepFor = time;
+            _sleepFor = 25000;                                                      //default value will be changeable
         }
 
         #endregion
 
         #region Methods
 
-        public void Execute()
+        public void Start()
         {
-            Thread check = new Thread(UpdateLists);
-            check.Start();
+            _running = true;
+            _check = new Thread(UpdateLists);
+            _check.Start();
         
-            while (true)
+            while (_running)
             {
                 CatchDHCP();
                 StartThread();
             }
+        }
+
+        public void Stop()
+        {
+            _running = false;
+            _pool.Join();
+            _check.Join();
+        }
+
+        public void ChangeCheckIntervall(uint time)
+        {
+            _sleepFor = time; 
         }
 
         private void CatchDHCP()
@@ -70,10 +84,11 @@ namespace MAD.DHCPReader
 
         private void StartThread()
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(ProcessData));
+            _pool = new SmartThreadPool();
+            _pool.QueueWorkItem(ProcessData);
         }
 
-        private void ProcessData(Object stateInfo)
+        private object ProcessData(Object stateInfo)
         {
 
             if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
@@ -183,6 +198,7 @@ namespace MAD.DHCPReader
                     _dummyList.Add(new ModelHost(_macAddress));
                 }
             }
+            return null;
         }
 
         private void UpdateLists()
