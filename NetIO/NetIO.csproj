@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AESCryptography.cs" />
+    <Compile Include="MD5Hashing.cs" />
     <Compile Include="NetCommunication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

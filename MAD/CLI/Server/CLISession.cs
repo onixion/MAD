@@ -30,7 +30,7 @@ namespace MAD.CLIServerCore
         private Command _command;
         private string _response;
 
-        private ushort _consoleWidth = 0;
+        private int _consoleWidth = 0;
 
         #endregion
 
@@ -59,8 +59,14 @@ namespace MAD.CLIServerCore
 
             while (true)
             {
-                _consoleWidth = NetCom.ReceiveUShort(_stream);
+                // First receive console-width.
+                try { _consoleWidth = System.Convert.ToInt32(NetCom.ReceiveStringUnicode(_stream)); }
+                catch (Exception)
+                {
+                    _consoleWidth = 50;
+                }
 
+                // Then cli-input of the client.
                 _response = NetCom.ReceiveStringUnicode(_stream);
                 _response = AnalyseInput(ref _command, _response);
 

@@ -31,7 +31,7 @@ namespace MAD.NetIO
             }
         }
 
-        public static void SendUShort(NetworkStream stream, ushort data, bool flush)
+        public static void SendInt(NetworkStream stream, int data, bool flush)
         {
             using (StreamIO _stream = new StreamIO(stream))
             {
@@ -44,11 +44,11 @@ namespace MAD.NetIO
             }
         }
 
-        public static ushort ReceiveUShort(NetworkStream stream)
+        public static int ReceiveInt(NetworkStream stream)
         {
             using (StreamIO _stream = new StreamIO(stream))
             {
-                return _stream.ReadUShort();
+                return _stream.ReadInt();
             }
         }
 

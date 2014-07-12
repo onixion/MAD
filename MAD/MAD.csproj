@@ -95,8 +95,7 @@
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\Server\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
-    <Compile Include="CLI\Server\MD5Hashing.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Mad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
