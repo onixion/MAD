@@ -33,7 +33,7 @@ namespace MAD.CLICore
 
         #region methodes
 
-        public abstract string Execute();
+        public abstract string Execute(int consoleWidth);
 
         public Type GetArgumentType(string parameter)
         {

@@ -7,9 +7,9 @@ using MAD.CLIServerCore;
 
 namespace MAD
 {
-    class Program
+    class Mad
     {
-        /* MAD - Network Monitoring v0.0.3.6 */
+        /* MAD - Network Monitoring v0.0.3.7 */
 
         private const string dataPath = "data";
 
@@ -21,7 +21,8 @@ namespace MAD
 
             if (args.Length == 0)
             { 
-                // START GUI
+                // No arguments -> start gui.
+
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
                 

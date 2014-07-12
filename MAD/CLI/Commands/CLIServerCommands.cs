@@ -15,7 +15,7 @@ namespace MAD.CLICore
             description = "This command shows informations about the CLIServer.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             output += "<color><white>Listening: " + _cliServer.IsListening + "\n";
             output += "Port: " + _cliServer.serverPort + "\n";
@@ -35,7 +35,7 @@ namespace MAD.CLICore
             description = "This command starts the CLIServer.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace MAD.CLICore
             description = "This command stops the CLIServer.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             try
             {
@@ -92,7 +92,7 @@ namespace MAD.CLICore
             description = "This command changes the port on which the server listens.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             try
             {

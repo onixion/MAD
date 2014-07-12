@@ -12,8 +12,6 @@ namespace MAD.CLICore
     {
         #region members
 
-        private CLIInput _input = new CLIInput();
-        
         private string _dataPath;
 
         #endregion
@@ -79,10 +77,10 @@ namespace MAD.CLICore
             {
                 Command _command = null;
 
-                _input.WriteCursor();
+                CLIInput.WriteCursor();
 
-                //string _cliInput = Console.ReadLine();
-                string _cliInput = _input.ReadInput();
+                //string _cliInput = Console.ReadLine(); -> OLD
+                string _cliInput = CLIInput.ReadInput(); // <- using own read method (for input-history ..)
 
                 _cliInput = _cliInput.Trim();
 
@@ -94,7 +92,7 @@ namespace MAD.CLICore
                     if (response == "VALID_PARAMETER")
                     {
                         // Execute command and get response from command. // TODO: pass console width to .Execute()
-                        response = _command.Execute();
+                        response = _command.Execute(Console.BufferWidth);
 
                         // When command response with 'EXIT_CLI' the CLI closes.
                         if (response == "EXIT_CLI")

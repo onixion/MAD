@@ -2,11 +2,11 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace MAD.CLIServerCore
+namespace MAD.NetIO
 {
     public static class MD5Hashing
     {
-        public static string ToMD5(string data)
+        public static string GetHash(string data)
         {
             MD5 _m = new MD5CryptoServiceProvider();
             byte[] _data = Encoding.Unicode.GetBytes(data);

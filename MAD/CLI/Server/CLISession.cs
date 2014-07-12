@@ -15,9 +15,9 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private static int _sessionsCount = 0;
-        private int _sessionID;
-        public int sessionID { get { return _sessionID; } }
+        private static uint _sessionsCount = 0;
+        private uint _sessionID;
+        public uint sessionID { get { return _sessionID; } }
 
         private object _sessionInitLock = new object();
 
@@ -26,6 +26,11 @@ namespace MAD.CLIServerCore
         private CLIUser _user;
 
         private string _cursor = "=> ";
+
+        private Command _command;
+        private string _response;
+
+        private int _consoleWidth = 0;
 
         #endregion
 
@@ -45,23 +50,29 @@ namespace MAD.CLIServerCore
 
         #region methodes
 
-        
-
         public void Start()
         {
             NetworkStream _stream = _client.GetStream();
-            Command _command = null;
 
+            // Send first cursor.
             NetCom.SendStringUnicode(_stream, _cursor, true);
 
             while (true)
             {
-                string _cliInput = NetCom.ReceiveStringUnicode(_stream);
-                string _response = AnalyseInput(ref _command, _cliInput);
+                // First receive console-width.
+                try { _consoleWidth = System.Convert.ToInt32(NetCom.ReceiveStringUnicode(_stream)); }
+                catch (Exception)
+                {
+                    _consoleWidth = 50;
+                }
+
+                // Then cli-input of the client.
+                _response = NetCom.ReceiveStringUnicode(_stream);
+                _response = AnalyseInput(ref _command, _response);
 
                 if (_response == "VALID_PARAMETER")
                 {
-                    NetCom.SendStringUnicode(_stream, _command.Execute() + "\n<color><gray>" + _cursor, true);
+                    NetCom.SendStringUnicode(_stream, _command.Execute(_consoleWidth) + "\n<color><gray>" + _cursor, true);
                 }
                 else
                 {

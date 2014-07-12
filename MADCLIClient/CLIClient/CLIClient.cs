@@ -16,8 +16,6 @@ namespace CLIClient
         private string _username;
         private string _passwordMD5;
 
-        private string cliInput;
-
         #endregion
 
         #region constructor
@@ -80,8 +78,10 @@ namespace CLIClient
 
         private void StartVirtualConsole(NetworkStream stream)
         {
+            string cliInput;
             string _serverResponse;
 
+            // Receive first cursor.
             Console.Write(NetCom.ReceiveStringUnicode(stream));
 
             while (true)
@@ -89,6 +89,7 @@ namespace CLIClient
                 // TODO: own CLI-Read method
                 cliInput = Console.ReadLine();
 
+                NetCom.SendStringUnicode(stream, Convert.ToString(Console.BufferWidth), true);
                 NetCom.SendStringUnicode(stream, cliInput, true);
 
                 _serverResponse = NetCom.ReceiveStringUnicode(stream);
