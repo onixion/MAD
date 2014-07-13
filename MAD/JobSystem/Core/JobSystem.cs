@@ -218,7 +218,10 @@ namespace MAD.JobSystemCore
         {
             List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
 
+            if (_buffer == null)
+                return false;
 
+            nodes.AddRange(_buffer);
             return true;
         }
 
@@ -358,20 +361,6 @@ namespace MAD.JobSystemCore
             }
 
             return null;
-        }
-
-        #endregion
-
-        #region save/load nodes from file
-
-        public void SaveNodes(string path)
-        {
-            // TODO
-        }
-
-        public void LoadNodes(string path)
-        { 
-            // TODO
         }
 
         #endregion

@@ -54,7 +54,7 @@ namespace MAD.JobSystemCore
             macAddress = PhysicalAddress.Parse((string)info.GetValue("SER_NODE_MAC", typeof(string)));
             ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
 
-            //jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
+            jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
         }
 
         #endregion
