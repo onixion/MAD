@@ -36,7 +36,11 @@ namespace MAD.DHCPReader
 
         private Thread _check;
         private Thread _start;
-        private SmartThreadPool _pool;
+        private Thread _pool;
+
+        private UdpClient _listener;
+
+        private IPEndPoint _groupEP = new IPEndPoint(IPAddress.Any, 67);
 
         #endregion 
 
@@ -54,18 +58,34 @@ namespace MAD.DHCPReader
         public void Start()
         {
             _running = true;
-            _pool = new SmartThreadPool();
+            _pool = new Thread(ProcessData);
             _check = new Thread(UpdateLists);
             _start = new Thread(Prog);
             _check.Start();
             _start.Start();
         }
 
-        public void Stop()
+        public void Stop()                                                                                              //Strange bugs with exit.. 
+
         {
             _running = false;
-            _pool.Join();
-            _check.Join();
+            if (_pool.ThreadState != ThreadState.Unstarted)
+                _pool.Join(TimeSpan.FromSeconds(3));
+            else
+                _pool.Abort();
+
+            if (_check.ThreadState != ThreadState.Unstarted)
+                _check.Join(TimeSpan.FromSeconds(3));
+            else
+                _check.Abort();
+
+            if (_start.ThreadState != ThreadState.Unstarted)
+                _start.Join(TimeSpan.FromSeconds(3));
+            else
+                _start.Abort();
+
+            _listener.Close();
+            
         }
 
         public void ChangeCheckIntervall(uint time)
@@ -85,62 +105,85 @@ namespace MAD.DHCPReader
 
         private void CatchDHCP()
         {
-            
+            _listener = new UdpClient(67);
+            _data = _listener.Receive(ref _groupEP);                                                                //problems .. nothing but problems
+            _listener.Close();
         }
 
         private void StartThread()
         {
-            _pool.QueueWorkItem(ProcessData);
+            _pool.Start();
         }
 
-        private object ProcessData(Object stateInfo)
+        private void ProcessData()
         {
-
-            if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
+            try
             {
-                string _macAddress = _helper.getMacString(_data);
-                
-                for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
-                {                   
-                    switch (Convert.ToUInt16(_data[i]))
+                if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
+                {
+                    string _macAddress = _helper.getMacString(_data);
+
+                    for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
                     {
-                        case 50:
-                            byte[] _ipBytes = new byte[4];
-                            
-                            for (uint ii = 0; ii < 4; ii++)
-                            {
-                                _ipBytes[ii] = _data[i + 2 + ii];
-                            }
-                            
-                            _addressGiven = true;
-                            _requestedIP = new IPAddress(_ipBytes);
-                            
-                            continue;
-                        
-                        case 12:                           
-                            byte _nameLength = _data[i + 1];
-                            
-                            if (!_nameGiven)                                                                                     //Awaiting instuctions by Instructor about frequency of not use of hostname
-                            {
-                                try
+                        switch (Convert.ToUInt16(_data[i]))
+                        {
+                            case 50:
+                                byte[] _ipBytes = new byte[4];
+
+                                for (uint ii = 0; ii < 4; ii++)
                                 {
-                                    for (uint iii = 1; iii <= _nameLength; iii++)
+                                    _ipBytes[ii] = _data[i + 2 + ii];
+                                }
+
+                                _addressGiven = true;
+                                _requestedIP = new IPAddress(_ipBytes);
+
+                                continue;
+
+                            case 12:
+                                byte _nameLength = _data[i + 1];
+
+                                if (!_nameGiven)                                                                                     //Awaiting instuctions by Instructor about frequency of not use of hostname
+                                {
+                                    try
                                     {
-                                        _hostName += (char)_data[i + 1 + iii];
-                                        _nameGiven = true; 
+                                        for (uint iii = 1; iii <= _nameLength; iii++)
+                                        {
+                                            _hostName += (char)_data[i + 1 + iii];
+                                            _nameGiven = true;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        _nameGiven = false;
                                     }
                                 }
-                                catch
-                                {
-                                    _nameGiven = false; 
-                                }
+
+                                continue;
+
+                            default:
+
+                                break;
+                        }
+
+                        if (_addressGiven)
+                        {
+                            Thread.Sleep(3000);
+                            try
+                            {
+                                Ping _ping = new Ping();
+                                PingReply _reply = _ping.Send(_requestedIP);
+
+                                if (_reply.Status == IPStatus.Success)
+                                    _acknowledge = true;
+                                else
+                                    _acknowledge = false;
                             }
-                            
-                            continue;
-                        
-                        default: 
-                            
-                            break;
+                            catch
+                            {
+                                _acknowledge = false;
+                            }
+                        }
                     }
 
                     if (_addressGiven)
@@ -161,49 +204,33 @@ namespace MAD.DHCPReader
                             _acknowledge = false;
                         }
                     }
-                }
 
-                if (_addressGiven)
-                {
-                    Thread.Sleep(3000);
-                    try
+                    if (_addressGiven && _acknowledge && _nameGiven)
                     {
-                        Ping _ping = new Ping();
-                        PingReply _reply = _ping.Send(_requestedIP);
-
-                        if (_reply.Status == IPStatus.Success)
-                            _acknowledge = true;
-                        else
-                            _acknowledge = false;
+                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                        _dummyList.Add(new ModelHost(_macAddress, _requestedIP, _hostName));
                     }
-                    catch
+                    else if (_addressGiven && _acknowledge && !_nameGiven)
                     {
-                        _acknowledge = false;
+                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                        _dummyList.Add(new ModelHost(_macAddress, _requestedIP));
                     }
-                }
-
-                if (_addressGiven && _acknowledge && _nameGiven)
-                {
-                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
-                    _dummyList.Add(new ModelHost(_macAddress, _requestedIP, _hostName));
-                }
-                else if (_addressGiven && _acknowledge && !_nameGiven)
-                {
-                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
-                    _dummyList.Add(new ModelHost(_macAddress, _requestedIP));
-                }
-                else if (!_addressGiven || !_acknowledge && _nameGiven)
-                {
-                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
-                    _dummyList.Add(new ModelHost(_macAddress, _hostName));
-                }
-                else if (!_addressGiven || !_acknowledge && !_nameGiven)
-                {
-                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
-                    _dummyList.Add(new ModelHost(_macAddress));
+                    else if (!_addressGiven || !_acknowledge && _nameGiven)
+                    {
+                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                        _dummyList.Add(new ModelHost(_macAddress, _hostName));
+                    }
+                    else if (!_addressGiven || !_acknowledge && !_nameGiven)
+                    {
+                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                        _dummyList.Add(new ModelHost(_macAddress));
+                    }
                 }
             }
-            return null;
+            catch
+            {
+                
+            }
         }
 
         private void UpdateLists()
