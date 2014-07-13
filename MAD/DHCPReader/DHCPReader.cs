@@ -18,7 +18,7 @@ namespace MAD.DHCPReader
         #region member
 
         private static NetworkHelper _helper = new NetworkHelper();
-        private IPEndPoint _groupEP = new IPEndPoint(IPAddress.Any, 67);
+        
 
         private byte[] _data;
 
@@ -35,6 +35,7 @@ namespace MAD.DHCPReader
         public List<ModelHost> _dummyList;
 
         private Thread _check;
+        private Thread _start;
         private SmartThreadPool _pool;
 
         #endregion 
@@ -53,14 +54,11 @@ namespace MAD.DHCPReader
         public void Start()
         {
             _running = true;
+            _pool = new SmartThreadPool();
             _check = new Thread(UpdateLists);
+            _start = new Thread(Prog);
             _check.Start();
-        
-            while (_running)
-            {
-                CatchDHCP();
-                StartThread();
-            }
+            _start.Start();
         }
 
         public void Stop()
@@ -75,16 +73,23 @@ namespace MAD.DHCPReader
             _sleepFor = time; 
         }
 
+        private void Prog()
+        {
+
+            while (_running)
+            {
+                CatchDHCP();
+                StartThread();
+            }
+        }
+
         private void CatchDHCP()
         {
-            UdpClient _listener = new UdpClient(67);
-            _data = _listener.Receive(ref _groupEP);
-            _listener.Close();
+            
         }
 
         private void StartThread()
         {
-            _pool = new SmartThreadPool();
             _pool.QueueWorkItem(ProcessData);
         }
 
@@ -208,31 +213,34 @@ namespace MAD.DHCPReader
                 Thread.Sleep((int)_sleepFor);
                 bool _active;
 
-                foreach (ModelHost _dummy in _dummyList)
+                if (_dummyList != null)
                 {
-                    Ping _ping = new Ping();
-
-                    try
+                    foreach (ModelHost _dummy in _dummyList)
                     {
-                        PingReply _reply = _ping.Send(_dummy.hostIP);
+                        Ping _ping = new Ping();
 
-                        if (_reply.Status == IPStatus.Success)
+                        try
                         {
-                            _active = true;
+                            PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                            if (_reply.Status == IPStatus.Success)
+                            {
+                                _active = true;
+                            }
+                            else
+                            {
+                                _active = false;
+                            }
                         }
-                        else
+                        catch
                         {
                             _active = false;
                         }
-                    }
-                    catch
-                    {
-                        _active = false;
-                    }
 
-                    if (!_active)
-                    {
-                        _dummyList.Remove(_dummy);
+                        if (!_active)
+                        {
+                            _dummyList.Remove(_dummy);
+                        }
                     }
                 }
             }
