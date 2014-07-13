@@ -353,7 +353,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (oParUsed("id"))
+            if (OParUsed("id"))
             {
                 lock (_js.jsNodesLock)
                 {
@@ -497,14 +497,14 @@ namespace MAD.CLICore
 
             _job.arg = (string)pars.GetPar("s").argValues[0];
 
-            if (oParUsed("u"))
+            if (OParUsed("u"))
                 _job.username = (string)pars.GetPar("u").argValues[0];
-            if (oParUsed("p"))
+            if (OParUsed("p"))
                 _job.password = (string)pars.GetPar("p").argValues[0];
 
-            if (oParUsed("t"))
+            if (OParUsed("t"))
             {
-                Type _argType = GetargType("t");
+                Type _argType = GetArgType("t");
 
                 if (_argType == typeof(int))
                 {
@@ -575,9 +575,9 @@ namespace MAD.CLICore
             //_job. = (IPAddress)pars.GetPar("a").argValues[0]; Not necessary anymore
             _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
 
-            if (oParUsed("t"))
+            if (OParUsed("t"))
             {
-                Type _argType = GetargType("t");
+                Type _argType = GetArgType("t");
 
                 if (_argType == typeof(int))
                 {
@@ -647,9 +647,9 @@ namespace MAD.CLICore
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Ping;
 
-            if (oParUsed("t"))
+            if (OParUsed("t"))
             {
-                Type _argType = GetargType("t");
+                Type _argType = GetArgType("t");
 
                 if (_argType == typeof(int))
                 {
@@ -676,7 +676,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (oParUsed("ttl"))
+            if (OParUsed("ttl"))
             {
                 _job.ttl = (int)pars.GetPar("ttl").argValues[0];
             }
@@ -726,9 +726,9 @@ namespace MAD.CLICore
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Http;
 
-            if (oParUsed("t"))
+            if (OParUsed("t"))
             {
-                Type _argType = GetargType("t");
+                Type _argType = GetArgType("t");
 
                 if (_argType == typeof(int))
                 {
@@ -755,7 +755,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (oParUsed("p"))
+            if (OParUsed("p"))
             {
                 _job.port = (int)pars.GetPar("p").argValues[0];
             }
@@ -805,9 +805,9 @@ namespace MAD.CLICore
             _job.jobType = Job.JobType.PortScan;
             _job.port = port;
 
-            if (oParUsed("t"))
+            if (OParUsed("t"))
             {
-                Type _argType = GetargType("t");
+                Type _argType = GetArgType("t");
 
                 if (_argType == typeof(int))
                 {

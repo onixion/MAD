@@ -35,7 +35,7 @@ namespace MAD.CLICore
 
         public abstract string Execute(int consoleWidth);
 
-        public Type GetargType(string par)
+        public Type GetArgType(string par)
         {
             foreach (Parameter _temp in pars.pars)
             {
@@ -48,7 +48,7 @@ namespace MAD.CLICore
             return null;
         }
 
-        protected bool oParUsed(string par)
+        protected bool OParUsed(string par)
         {
             foreach (Parameter _temp in pars.pars)
             {

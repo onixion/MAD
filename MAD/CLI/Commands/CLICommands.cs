@@ -34,7 +34,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (!oParUsed("id"))
+            if (!OParUsed("id"))
             {
                 output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
@@ -189,9 +189,9 @@ namespace MAD.CLICore
             output += "<color><yellow>Program written by: \n";
             output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
 
-            if (oParUsed("hack"))
+            if (OParUsed("hack"))
             {
-                output += "<color><red>\n\nBe careful, Jack may be listening ...";
+                EGG.EasterEgg();
             }
 
             return output;
