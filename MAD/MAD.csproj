@@ -80,6 +80,7 @@
     <Compile Include="JobSystem\Core\JobNode.cs" />
     <Compile Include="JobSystem\Core\JobNotification.cs" />
     <Compile Include="JobSystem\Core\JSError.cs" />
+    <Compile Include="JobSystem\Core\JSSerializer.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRule.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleINT.cs" />
     <Compile Include="JobSystem\JobNotificationRules\JobNotificationRuleSTRING.cs" />

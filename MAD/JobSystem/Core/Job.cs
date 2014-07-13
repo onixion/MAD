@@ -2,9 +2,12 @@
 using System.Net;
 using System.Collections.Generic;
 
+using System.Runtime.Serialization;
+
 namespace MAD.JobSystemCore
 {
-    public abstract class Job
+    [Serializable]
+    public abstract class Job : ISerializable
     {
         #region members
 
@@ -38,20 +41,33 @@ namespace MAD.JobSystemCore
 
         protected Job(string jobName, JobType jobType, JobTime jobTime)
         {
-            lock (_jobInitLock)
-            {
-                _id = _jobsCount;
-                _jobsCount++;
-            }
-
+            InitJob();
             this.jobName = jobName;
             this.jobType = jobType;
             this.jobTime = jobTime;
         }
 
+        // for serialization
+        protected Job(SerializationInfo info, StreamingContext context)
+        {
+            InitJob();
+            this.jobName = (string) info.GetValue("SER_JOB_NAME", typeof(string));
+            this.jobType = (JobType)info.GetValue("SER_JOB_TYPE", typeof(JobType));
+            this.jobTime = (JobTime)info.GetValue("SER_JOB_TIME", typeof(JobTime));
+        }
+
         #endregion
 
         #region methodes
+
+        private void InitJob()
+        {
+            lock (_jobInitLock)
+            {
+                _id = _jobsCount;
+                _jobsCount++;
+            }
+        }
 
         public abstract void Execute(IPAddress targetAddress);
 
@@ -93,6 +109,22 @@ namespace MAD.JobSystemCore
         }
 
         protected abstract string JobStatus();
+
+        #endregion
+
+        #region for serialization
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_NAME", jobName);
+            info.AddValue("SER_JOB_TYPE", jobType);
+            info.AddValue("SER_JOB_TIME", jobTime);
+
+            GetObjectDataJobSpecific(info, context);
+        }
+
+        // serialization for job-specific members
+        public abstract void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context);
 
         #endregion
 

@@ -54,3 +54,4 @@ Now using the TcpListener and TcpClient)
 the commands, so they can work with it (for console-tables). Not working yet.
 [12.07.2014][20:00-21:00][1h][103h] Rewritten CLIInput and CLIOutput. Both are now static classes. And I moved them into a own folder. The CLIClient
 need to have those two files as well, so it can parse the color-tags and have a command histroy and those things ..
+[13.07.2014][12:00-15:00][3h][106h] Working on serialization for the JobNodes so they can be saved as a file.

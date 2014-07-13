@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    public class JobNode
+    [Serializable]
+    public class JobNode : ISerializable
     {
         #region member
 
@@ -46,6 +48,15 @@ namespace MAD.JobSystemCore
             this.jobs = jobs;
         }
 
+        public JobNode(SerializationInfo info, StreamingContext context)
+        {
+            nodeName = (string)info.GetValue("SER_NODE_NAME", typeof(string));
+            macAddress = PhysicalAddress.Parse((string)info.GetValue("SER_NODE_MAC", typeof(string)));
+            ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
+
+            //jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
+        }
+
         #endregion
 
         #region methodes
@@ -57,6 +68,16 @@ namespace MAD.JobSystemCore
                 _id = _nodesCount;
                 _nodesCount++;
             }
+        }
+
+        // This is need for serialization.
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_NODE_NAME", nodeName);
+            info.AddValue("SER_NODE_MAC", macAddress.ToString());
+            info.AddValue("SER_NODE_IP", ipAddress.ToString());
+
+            //info.AddValue("SER_NODE_JOBS", jobs);
         }
 
         #endregion

@@ -200,6 +200,30 @@ namespace MAD.JobSystemCore
 
         #endregion
 
+        #region nodes serialization
+
+        public bool SaveNode(string fileName)
+        {
+            if (JSSerializer.Serialize(fileName, nodes))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool LoadNode(string fileName)
+        {
+            List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
+
+
+            return true;
+        }
+
+        #endregion
+
         #region jobs handling
 
         public bool StartJob(int jobID)

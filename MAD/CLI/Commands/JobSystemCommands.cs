@@ -231,6 +231,54 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemSaveNodeCommand : Command
+    { 
+        private JobSystem _js;
+
+        public JobSystemSaveNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
+            description = "This command save a node.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            if (_js.SaveNode((string)parameters.GetParameter("file").argumentValues[0]))
+            {
+                return "<color><green>Node saved.";
+            }
+            else
+            {
+                return "<color><red>Could not save node!"; // maybe use exception for more informations
+            }
+        }
+    }
+
+    public class JobSystemLoadNodeCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemLoadNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            requiredParameter.Add(new ParameterOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
+            description = "This command loads nodes.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            if (_js.LoadNode((string)parameters.GetParameter("file").argumentValues[0]))
+            {
+                return "<color><green>Node(s) loaded.";
+            }
+            else
+            {
+                return "<color><red>Could not load any nodes!"; // maybe use exception for more informations
+            }
+        }
+    }
+
     #endregion
 
     #region commands for jobs
