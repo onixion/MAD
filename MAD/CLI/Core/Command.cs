@@ -7,17 +7,17 @@ namespace MAD.CLICore
     {
         #region members
 
-        private List<ParameterOption> _requiredParameter;
-        public List<ParameterOption> requiredParameter { get { return _requiredParameter; } }
+        private List<ParOption> _rPar;
+        public List<ParOption> rPar { get { return _rPar; } }
        
-        private List<ParameterOption> _optionalParameter;
-        public List<ParameterOption> optionalParameter { get { return _optionalParameter; } }
+        private List<ParOption> _oPar;
+        public List<ParOption> oPar { get { return _oPar; } }
 
         public string description { get; set; }
         protected string output = "";
 
-        // This object contains all parameters given by the cli.
-        public ParameterInput parameters = new ParameterInput();
+        // This object contains all pars given by the cli.
+        public ParInput pars = new ParInput();
 
         #endregion
 
@@ -25,8 +25,8 @@ namespace MAD.CLICore
 
         protected Command()
         {
-            _requiredParameter = new List<ParameterOption>();
-            _optionalParameter = new List<ParameterOption>();
+            _rPar = new List<ParOption>();
+            _oPar = new List<ParOption>();
         }
 
         #endregion
@@ -35,24 +35,24 @@ namespace MAD.CLICore
 
         public abstract string Execute(int consoleWidth);
 
-        public Type GetArgumentType(string parameter)
+        public Type GetargType(string par)
         {
-            foreach (Parameter _temp in parameters.parameters)
+            foreach (Parameter _temp in pars.pars)
             {
-                if (_temp.parameter == parameter)
+                if (_temp.par == par)
                 {
-                    return _temp.argumentValues[0].GetType();
+                    return _temp.argValues[0].GetType();
                 }
             }
 
             return null;
         }
 
-        protected bool OptionalParameterUsed(string parameter)
+        protected bool oParUsed(string par)
         {
-            foreach (Parameter _temp in parameters.parameters)
+            foreach (Parameter _temp in pars.pars)
             {
-                if ((string)_temp.parameter == parameter)
+                if ((string)_temp.par == par)
                 {
                     return true;
                 }

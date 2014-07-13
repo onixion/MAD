@@ -87,7 +87,7 @@ namespace MAD.CLICore
         {
             _cliServer = (CLIServer)args[0];
 
-            requiredParameter.Add(new ParameterOption("p", "<PORT>", "The specific port.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("p", "<PORT>", "The specific port.", false, false, new Type[] { typeof(int) }));
 
             description = "This command changes the port on which the server listens.";
         }
@@ -96,7 +96,7 @@ namespace MAD.CLICore
         {
             try
             {
-                int _port = (int)parameters.GetParameter("p").argumentValues[0];
+                int _port = (int)pars.GetPar("p").argValues[0];
 
                 _cliServer.ChangePort(_port);
 

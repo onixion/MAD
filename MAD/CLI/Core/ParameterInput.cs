@@ -3,16 +3,15 @@ using System.Collections.Generic;
 
 namespace MAD.CLICore
 {
-    /* This object contains all parameter of the input. */
-    public class ParameterInput
+    /* This object contains all parameters of the input. */
+    public class ParInput
     {
-        public List<Parameter> parameters = new List<Parameter>();
-
-        public Parameter GetParameter(string parameter)
+        public List<Parameter> pars = new List<Parameter>();
+        public Parameter GetPar(string par)
         {
-            foreach (Parameter temp in parameters)
+            foreach (Parameter temp in pars)
             {
-                if (temp.parameter == parameter)
+                if (temp.par == par)
                 {
                     return temp;
                 }

@@ -131,7 +131,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_hour <= 23 && _hour >= 0)
@@ -171,7 +171,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -196,7 +196,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -230,7 +230,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)

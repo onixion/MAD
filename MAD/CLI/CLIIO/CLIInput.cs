@@ -10,6 +10,8 @@ namespace MAD.CLIIO
 
     public static class CLIInput
     {
+        #region members
+
         private static object _inputLock = new object();
 
         private static ConsoleColor _cursorColor = ConsoleColor.Cyan;
@@ -26,6 +28,10 @@ namespace MAD.CLIIO
         private static List<string> _cliHistory = new List<string>();
         private const int _maxHistoryEntries = 5;
         private static int _historyPointer;
+
+        #endregion
+
+        #region methodes
 
         public static void WriteCursor()
         {
@@ -188,5 +194,7 @@ namespace MAD.CLIIO
         {
             Console.SetCursorPosition(pos, Console.CursorTop);
         }
+
+        #endregion
     }
 }

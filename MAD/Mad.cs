@@ -21,7 +21,7 @@ namespace MAD
 
             if (args.Length == 0)
             { 
-                // No arguments -> start gui.
+                // No args -> start gui.
 
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
@@ -38,14 +38,14 @@ namespace MAD
                         cli.Start();
                         break;
                     default:
-                        Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");
+                        Console.WriteLine("ERROR! arg '" + args[0] + "' not known!\nPress any key to close ...");
                         Console.ReadKey();
                         return 1;
                 }
             }
             else
             {
-                Console.WriteLine("ERROR! Too many arguments!\nPress any key to close ...");
+                Console.WriteLine("ERROR! Too many args!\nPress any key to close ...");
                 Console.ReadKey();
                 return 1;
             }

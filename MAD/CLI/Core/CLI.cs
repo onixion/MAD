@@ -90,10 +90,10 @@ namespace MAD.CLICore
                 {
                     string response = AnalyseInput(ref _command, _cliInput);
 
-                    // Check if the parameter and arguments are valid.
-                    if (response == "VALID_PARAMETER")
+                    // Check if the par and args are valid.
+                    if (response == "VALID_PARAMETERS")
                     {
-                        // Execute command and get response from command. // TODO: pass console width to .Execute()
+                        // Execute command and get response from command.
                         response = _command.Execute(Console.BufferWidth);
 
                         // When command response with 'EXIT_CLI' the CLI closes.
@@ -105,7 +105,7 @@ namespace MAD.CLICore
                     }
                     else
                     {
-                        // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
+                        // Something must be wrong with the input (par does not exist, to many args, ..).
                         CLIOutput.WriteToConsole(response);
                     }
                 }

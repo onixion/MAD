@@ -37,7 +37,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region constructor
+        #region constructors
 
         protected Job(string jobName, JobType jobType, JobTime jobTime)
         {
@@ -70,8 +70,6 @@ namespace MAD.JobSystemCore
         }
 
         public abstract void Execute(IPAddress targetAddress);
-
-        #region for CLI only
 
         public string Status()
         {
@@ -109,8 +107,6 @@ namespace MAD.JobSystemCore
         }
 
         protected abstract string JobStatus();
-
-        #endregion
 
         #region for serialization
 

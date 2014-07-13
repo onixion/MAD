@@ -28,13 +28,13 @@ namespace MAD.CLICore
         {
             _commands = (List<CommandOptions>)commands[0];
 
-            optionalParameter.Add(new ParameterOption("id", "<COMMAND-ID>", "ID of the specific command." , false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("id", "<COMMAND-ID>", "ID of the specific command." , false, false, new Type[] { typeof(int) }));
             description = "This command shows information about available commands.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            if (!OptionalParameterUsed("id"))
+            if (!oParUsed("id"))
             {
                 output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
@@ -53,7 +53,7 @@ namespace MAD.CLICore
             }
             else
             {
-                int commandIndex = (int)parameters.GetParameter("id").argumentValues[0];
+                int commandIndex = (int)pars.GetPar("id").argValues[0];
 
                 try
                 {
@@ -76,27 +76,27 @@ namespace MAD.CLICore
                     output += "<color><yellow>COMMAND     <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
                     output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
                     output += "<color><yellow>USAGE       <color><white>" + GenUsageText(tempCommand, commandOptions) + "\n";
-                    output += "<color><yellow>PARAMETER\n";
+                    output += "<color><yellow>par\n";
 
-                    if (!(tempCommand.requiredParameter.Count == 0 && tempCommand.optionalParameter.Count == 0))
+                    if (!(tempCommand.rPar.Count == 0 && tempCommand.oPar.Count == 0))
                     {
-                        if (tempCommand.requiredParameter.Count != 0)
+                        if (tempCommand.rPar.Count != 0)
                         {
-                            output += "\t<color><yellow>REQUIRED PARAMETER\n\n";
+                            output += "\t<color><yellow>REQUIRED par\n\n";
 
-                            foreach (ParameterOption _temp in tempCommand.requiredParameter)
+                            foreach (ParOption _temp in tempCommand.rPar)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.parameter + " <color><white>";
+                                output += "\t<color><darkyellow>-" + _temp.par + " <color><white>";
 
-                                if (_temp.multiArguments)
+                                if (_temp.multiargs)
                                 {
-                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...";
+                                    output += "<arg_1> <arg_2> ...";
                                 }
                                 else
                                 {
-                                    if (!_temp.argumentEmpty)
+                                    if (!_temp.argEmpty)
                                     {
-                                        output += "<ARGUMENT>";
+                                        output += "<arg>";
                                     }
                                 }
 
@@ -105,23 +105,23 @@ namespace MAD.CLICore
                             }
                         }
 
-                        if (tempCommand.optionalParameter.Count != 0)
+                        if (tempCommand.oPar.Count != 0)
                         {
-                            output += "\t<color><yellow>OPTIONAL PARAMETER\n\n";
+                            output += "\t<color><yellow>OPTIONAL par\n\n";
 
-                            foreach (ParameterOption _temp in tempCommand.optionalParameter)
+                            foreach (ParOption _temp in tempCommand.oPar)
                             {
-                                output += "\t<color><darkyellow>-" + _temp.parameter + " <color><white>";
+                                output += "\t<color><darkyellow>-" + _temp.par + " <color><white>";
 
-                                if (_temp.multiArguments)
+                                if (_temp.multiargs)
                                 {
-                                    output += "<ARGUMENT_1> <ARGUMENT_2> ...";
+                                    output += "<arg_1> <arg_2> ...";
                                 }
                                 else
                                 {
-                                    if (!_temp.argumentEmpty)
+                                    if (!_temp.argEmpty)
                                     {
-                                        output += "<ARGUMENT>";
+                                        output += "<arg>";
                                     }
                                 }
 
@@ -132,7 +132,7 @@ namespace MAD.CLICore
                     }
                     else
                     {
-                        output += "\n\t<color><gray>(command does not use any parameter)\n";
+                        output += "\n\t<color><gray>(command does not use any par)\n";
                     }
                 }
                 catch (Exception)
@@ -148,23 +148,23 @@ namespace MAD.CLICore
         {
             string _buffer = _commandOptions.command;
 
-            foreach (ParameterOption _temp in _command.requiredParameter)
+            foreach (ParOption _temp in _command.rPar)
             {
-                _buffer += " -" + _temp.parameter;
+                _buffer += " -" + _temp.par;
 
-                if (!_temp.argumentEmpty)
+                if (!_temp.argEmpty)
                 {
-                    _buffer += " <" + _temp.parameterInfo + ">";
+                    _buffer += " <" + _temp.parInfo + ">";
                 }
             }
 
-            foreach (ParameterOption _temp in _command.optionalParameter)
+            foreach (ParOption _temp in _command.oPar)
             {
-                _buffer += " [-" + _temp.parameter;
+                _buffer += " [-" + _temp.par;
 
-                if (!_temp.argumentEmpty)
+                if (!_temp.argEmpty)
                 { 
-                    _buffer += " <" + _temp.parameterInfo + ">";
+                    _buffer += " <" + _temp.parInfo + ">";
                 }
 
                 _buffer += "]";
@@ -179,7 +179,7 @@ namespace MAD.CLICore
         public InfoCommand()
             :base()
         {
-            optionalParameter.Add(new ParameterOption("hack", null, null, true, false, null));
+            oPar.Add(new ParOption("hack", null, null, true, false, null));
             description = "This command shows informations about the program.";
         }
 
@@ -189,7 +189,7 @@ namespace MAD.CLICore
             output += "<color><yellow>Program written by: \n";
             output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
 
-            if (OptionalParameterUsed("hack"))
+            if (oParUsed("hack"))
             {
                 output += "<color><red>\n\nBe careful, Jack may be listening ...";
             }

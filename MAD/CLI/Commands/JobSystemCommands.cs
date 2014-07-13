@@ -135,13 +135,13 @@ namespace MAD.CLICore
         public JobSystemStartNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
             description = "This command sets the node-state to active.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
+            if (_js.StartNode((int)pars.GetPar("id").argValues[0]))
             {
                 return "<color><green>Node is active.";
             }
@@ -159,13 +159,13 @@ namespace MAD.CLICore
         public JobSystemStopNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "<NODE-ID>", "Id of the node.", false, false, new Type[] { typeof(int) }));
             description = "This command sets the node-state to inactive.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.StartNode((int)parameters.GetParameter("id").argumentValues[0]))
+            if (_js.StartNode((int)pars.GetPar("id").argValues[0]))
             {
                 return "<color><green>Node is inactive.";
             }
@@ -183,12 +183,12 @@ namespace MAD.CLICore
         public JobSystemAddNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
-            requiredParameter.Add(new ParameterOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
 
             // If there is enough time, this can be added. So jobs can be parsed directly from command.
-            //requiredParameter.Add(new ParameterOption("jobs", "<JOB-OBJECTS>", "", false, false, new Type[] { typeof(IPAddress) }));
+            //rPar.Add(new ParOption("jobs", "<JOB-OBJECTS>", "", false, false, new Type[] { typeof(IPAddress) }));
 
             description = "This command creates a node for the cached jobs.";
         }
@@ -197,9 +197,9 @@ namespace MAD.CLICore
         {
             JobNode _node = new JobNode();
 
-            _node.nodeName = (string)parameters.GetParameter("n").argumentValues[0];
-            _node.macAddress = (PhysicalAddress)parameters.GetParameter("mac").argumentValues[0]; // MAC ADDRESS
-            _node.ipAddress = (IPAddress)parameters.GetParameter("ip").argumentValues[0];
+            _node.nodeName = (string)pars.GetPar("n").argValues[0];
+            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0]; // MAC ADDRESS
+            _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
 
             _js.AddNode(_node);
 
@@ -214,13 +214,13 @@ namespace MAD.CLICore
         public JobSystemRemoveNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node.", false, false, new Type[] { typeof(int) }));
             description = "This command removes a node.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.RemoveNode((int)parameters.GetParameter("id").argumentValues[0]))
+            if (_js.RemoveNode((int)pars.GetPar("id").argValues[0]))
             {
                 return "<color><green>Node removed.";
             }
@@ -238,13 +238,13 @@ namespace MAD.CLICore
         public JobSystemSaveNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
             description = "This command save a node.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            string _fileName = (string)parameters.GetParameter("file").argumentValues[0];
+            string _fileName = (string)pars.GetPar("file").argValues[0];
 
             try
             {
@@ -265,13 +265,13 @@ namespace MAD.CLICore
         public JobSystemLoadNodeCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
             description = "This command loads nodes.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            string _fileName = (string)parameters.GetParameter("file").argumentValues[0];
+            string _fileName = (string)pars.GetPar("file").argValues[0];
 
             try
             {
@@ -348,16 +348,16 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            optionalParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            if (OptionalParameterUsed("id"))
+            if (oParUsed("id"))
             {
                 lock (_js.jsNodesLock)
                 {
-                    Job _job = _js.GetJob((int)parameters.GetParameter("id").argumentValues[0]);
+                    Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
 
                     if (_job != null)
                     {
@@ -396,13 +396,13 @@ namespace MAD.CLICore
         public JobSystemStartJobCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
             description = "This command sets the job to active.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
+            int _jobID = (int)pars.GetPar("id").argValues[0];
 
             if (_js.StartJob(_jobID))
             {
@@ -422,13 +422,13 @@ namespace MAD.CLICore
         public JobSystemStopJobCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
             description = "This command sets the job to inactive.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
+            int _jobID = (int)pars.GetPar("id").argValues[0];
 
             if (_js.StopJob(_jobID))
             {
@@ -449,12 +449,12 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, true, new Type[] { typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)parameters.GetParameter("id").argumentValues[0];
+            int _jobID = (int)pars.GetPar("id").argValues[0];
 
             if (_js.RemoveJob(_jobID))
                 return "<color><green>Job removed.";
@@ -470,7 +470,7 @@ namespace MAD.CLICore
         private JobSystem _js;
         string serviceDescript = "Choose the service to check \n" +
             "        Choose between following: \n" +
-            "           dns -> doesn't need any more arguments\n" +
+            "           dns -> doesn't need any more args\n" +
             "           ftp -> needs -a, -u, -p; leave username and password empty if there is no\n" +
             "           NYI\n";
 
@@ -478,13 +478,13 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
             //there will be more, still working
-            optionalParameter.Add(new ParameterOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
-            optionalParameter.Add(new ParameterOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
-            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            oPar.Add(new ParOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on with the job should be executed", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
         }
 
@@ -492,32 +492,32 @@ namespace MAD.CLICore
         {
             JobServiceCheck _job = new JobServiceCheck();
 
-            _job.jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            _job.jobName = (string)pars.GetPar("n").argValues[0];
             _job.jobType = Job.JobType.ServiceCheck;
 
-            _job.argument = (string)parameters.GetParameter("s").argumentValues[0];
+            _job.arg = (string)pars.GetPar("s").argValues[0];
 
-            if (OptionalParameterUsed("u"))
-                _job.username = (string)parameters.GetParameter("u").argumentValues[0];
-            if (OptionalParameterUsed("p"))
-                _job.password = (string)parameters.GetParameter("p").argumentValues[0];
+            if (oParUsed("u"))
+                _job.username = (string)pars.GetPar("u").argValues[0];
+            if (oParUsed("p"))
+                _job.password = (string)pars.GetPar("p").argValues[0];
 
-            if (OptionalParameterUsed("t"))
+            if (oParUsed("t"))
             {
-                Type _argumentType = GetArgumentType("t");
+                Type _argType = GetargType("t");
 
-                if (_argumentType == typeof(int))
+                if (_argType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
-                else if (_argumentType == typeof(string))
+                else if (_argType == typeof(string))
                 {
                     _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
                     }
                     catch (Exception e)
                     {
@@ -531,7 +531,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if (_node != null)
             {
@@ -557,11 +557,11 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            //requiredParameter.Add(new ParameterOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
-            requiredParameter.Add(new ParameterOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
-            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            //rPar.Add(new ParOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
         }
 
@@ -569,28 +569,28 @@ namespace MAD.CLICore
         {
             JobHostDetect _job = new JobHostDetect();
 
-            _job.jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            _job.jobName = (string)pars.GetPar("n").argValues[0];
             _job.jobType = Job.JobType.HostDetect;
 
-            //_job. = (IPAddress)parameters.GetParameter("a").argumentValues[0]; Not necessary anymore
-            _job.Subnetmask = (IPAddress)parameters.GetParameter("m").argumentValues[0];
+            //_job. = (IPAddress)pars.GetPar("a").argValues[0]; Not necessary anymore
+            _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
 
-            if (OptionalParameterUsed("t"))
+            if (oParUsed("t"))
             {
-                Type _argumentType = GetArgumentType("t");
+                Type _argType = GetargType("t");
 
-                if (_argumentType == typeof(int))
+                if (_argType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
-                else if (_argumentType == typeof(string))
+                else if (_argType == typeof(string))
                 {
                     _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
                     }
                     catch (Exception e)
                     {
@@ -604,7 +604,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if (_node != null)
             {
@@ -631,38 +631,38 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
 
-            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            optionalParameter.Add(new ParameterOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
-            optionalParameter.Add(new ParameterOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
+            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
 
             description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            string jobName = (string)pars.GetPar("n").argValues[0];
 
             JobPing _job = new JobPing();
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Ping;
 
-            if (OptionalParameterUsed("t"))
+            if (oParUsed("t"))
             {
-                Type _argumentType = GetArgumentType("t");
+                Type _argType = GetargType("t");
 
-                if (_argumentType == typeof(int))
+                if (_argType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
-                else if (_argumentType == typeof(string))
+                else if (_argType == typeof(string))
                 {
                     _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
                     }
                     catch (Exception e)
                     {
@@ -676,14 +676,14 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (OptionalParameterUsed("ttl"))
+            if (oParUsed("ttl"))
             {
-                _job.ttl = (int)parameters.GetParameter("ttl").argumentValues[0];
+                _job.ttl = (int)pars.GetPar("ttl").argValues[0];
             }
 
             // So now the JobPing is finished and set properly. 
             
-            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if(_node != null)
             {
@@ -711,37 +711,37 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
-            optionalParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
+            oPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
+            string jobName = (string)pars.GetPar("n").argValues[0];
 
             JobHttp _job = new JobHttp();
 
             _job.jobName = jobName;
             _job.jobType = Job.JobType.Http;
 
-            if (OptionalParameterUsed("t"))
+            if (oParUsed("t"))
             {
-                Type _argumentType = GetArgumentType("t");
+                Type _argType = GetargType("t");
 
-                if (_argumentType == typeof(int))
+                if (_argType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
-                else if (_argumentType == typeof(string))
+                else if (_argType == typeof(string))
                 {
                     _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
                     }
                     catch (Exception e)
                     {
@@ -755,12 +755,12 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            if (OptionalParameterUsed("p"))
+            if (oParUsed("p"))
             {
-                _job.port = (int)parameters.GetParameter("p").argumentValues[0];
+                _job.port = (int)pars.GetPar("p").argValues[0];
             }
 
-            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if(_node != null)
             {
@@ -788,16 +788,16 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            requiredParameter.Add(new ParameterOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            requiredParameter.Add(new ParameterOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            requiredParameter.Add(new ParameterOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
-            optionalParameter.Add(new ParameterOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
+            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)parameters.GetParameter("n").argumentValues[0];
-            int port = (int)parameters.GetParameter("p").argumentValues[0];
+            string jobName = (string)pars.GetPar("n").argValues[0];
+            int port = (int)pars.GetPar("p").argValues[0];
 
             JobPort _job = new JobPort();
 
@@ -805,22 +805,22 @@ namespace MAD.CLICore
             _job.jobType = Job.JobType.PortScan;
             _job.port = port;
 
-            if (OptionalParameterUsed("t"))
+            if (oParUsed("t"))
             {
-                Type _argumentType = GetArgumentType("t");
+                Type _argType = GetargType("t");
 
-                if (_argumentType == typeof(int))
+                if (_argType == typeof(int))
                 {
                     _job.jobTime.type = JobTime.TimeType.Relative;
-                    _job.jobTime.jobDelay = new JobDelayHandler((int)parameters.GetParameter("t").argumentValues[0]);
+                    _job.jobTime.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
-                else if (_argumentType == typeof(string))
+                else if (_argType == typeof(string))
                 {
                     _job.jobTime.type = JobTime.TimeType.Absolute;
 
                     try
                     {
-                        _job.jobTime.jobTimes = JobTime.ParseStringArray(parameters.GetParameter("t").argumentValues);
+                        _job.jobTime.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
                     }
                     catch (Exception e)
                     {
@@ -834,7 +834,7 @@ namespace MAD.CLICore
                 _job.jobTime.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)parameters.GetParameter("id").argumentValues[0]);
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if (_node != null)
             {
