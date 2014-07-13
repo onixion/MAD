@@ -32,8 +32,8 @@ namespace MAD.JobSystemCore
         public string jobName;
 
         public JobTime jobTime = new JobTime();
-        public List<OutDescriptor> outDesc = new List<OutDescriptor>();
-        public JobNotification jobNoti = new JobNotification();
+        public List<OutDescriptor> outDesc = new List<OutDescriptor>(); // NOT SERIALIZED YET!
+        public JobNotification jobNoti = new JobNotification(); // NOT SERIALIZED YET!
 
         #endregion
 

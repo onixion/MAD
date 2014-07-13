@@ -76,8 +76,7 @@ namespace MAD.JobSystemCore
             info.AddValue("SER_NODE_NAME", nodeName);
             info.AddValue("SER_NODE_MAC", macAddress.ToString());
             info.AddValue("SER_NODE_IP", ipAddress.ToString());
-
-            //info.AddValue("SER_NODE_JOBS", jobs);
+            info.AddValue("SER_NODE_JOBS", jobs);
         }
 
         #endregion

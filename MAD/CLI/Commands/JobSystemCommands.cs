@@ -322,7 +322,7 @@ namespace MAD.CLICore
                         _tableRow[3] = _temp2.jobType.ToString();
                         _tableRow[4] = _temp2.state.ToString();
                         _tableRow[5] = _temp2.jobTime.type.ToString();
-                        _tableRow[6] = _temp2.jobTime.Values();
+                        _tableRow[6] = _temp2.jobTime.GetValues();
                         _tableRow[7] = _temp2.outState.ToString();
 
                         output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);

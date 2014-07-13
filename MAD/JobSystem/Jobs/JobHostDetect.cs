@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.Serialization;
 
 using System.Net;
 using System.Net.NetworkInformation;
@@ -9,7 +10,8 @@ using MAD.Helper;
 
 namespace MAD.JobSystemCore
 {
-    class JobHostDetect : Job                                                                           //This job is for detecting existing hosts in a network
+    [Serializable]
+    public class JobHostDetect : Job                                                                           //This job is for detecting existing hosts in a network
     {                                                                                                   //Further commenting will happen if someone can't read my code.. i am to lazy to do it now..
         #region members
                                                                         
@@ -34,6 +36,12 @@ namespace MAD.JobSystemCore
             : base(jobName, jobType, jobTime)
         {
             this.Subnetmask = Subnetmask;
+        }
+
+        public JobHostDetect(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            throw new NotImplementedException(); // this job is not ready for this
         }
 
         #endregion
@@ -103,6 +111,15 @@ namespace MAD.JobSystemCore
             _tmp += "IP: " + _tmpAdr.ToString() + "\n";
             //jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("Host", typeof(IPAddress), _tmpAdr));
         }
+
+        #region for serialization
+
+        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
 
         #endregion
     }

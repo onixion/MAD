@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
+using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    class JobServiceCheck : Job
+    [Serializable]
+    public class JobServiceCheck : Job
     {
         #region members
 
@@ -35,6 +36,15 @@ namespace MAD.JobSystemCore
             this.argument = argument;
             this.username = username;
             this.password = password;
+        }
+
+        // for serialization
+        public JobServiceCheck(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.argument = (string)info.GetValue("SER_JOB_SERVICECHECK_ARG", typeof(string));
+            this.username = (string)info.GetValue("SER_JOB_SERVICECHECK_USERNAME", typeof(string));
+            this.password = (string)info.GetValue("SER_JOB_SERVICECHECK_PASSWORD", typeof(string));
         }
 
         #endregion
@@ -114,6 +124,17 @@ namespace MAD.JobSystemCore
         }
 		#endregion 
 
-		#endregion
+        #region for serialization
+
+        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_SERVICECHECK_ARG", this.argument);
+            info.AddValue("SER_JOB_SERVICECHECK_USERNAME", this.username);
+            info.AddValue("SER_JOB_SERVICECHECK_PASSWORD", this.password);
+        }
+
+        #endregion
+
+        #endregion
     }
 }
