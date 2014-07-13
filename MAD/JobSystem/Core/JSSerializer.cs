@@ -11,37 +11,21 @@ namespace MAD.JobSystemCore
 
     public static class JSSerializer
     {
-        public static bool Serialize(string fileName, object objectToSave)
+        public static void Serialize(string fileName, object objectToSave)
         {
-            try
+            using (FileStream _stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
             {
-                using (FileStream _stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    BinaryFormatter _bf = new BinaryFormatter();
-                    _bf.Serialize(_stream, objectToSave);
-
-                    return true;
-                }
-            }
-            catch (Exception)
-            {
-                return false;
+                BinaryFormatter _bf = new BinaryFormatter();
+                _bf.Serialize(_stream, objectToSave);
             }
         }
 
         public static object Deserialize(string fileName)
         {
-            try
+            using (FileStream _stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None))
             {
-                using (FileStream _stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    BinaryFormatter _bf = new BinaryFormatter();
-                    return _bf.Deserialize(_stream);
-                }
-            }
-            catch (Exception)
-            {
-                return null;
+                BinaryFormatter _bf = new BinaryFormatter();
+                return _bf.Deserialize(_stream);
             }
         }
     }

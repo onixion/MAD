@@ -9,7 +9,7 @@ namespace MAD.CLICore
         public Type commandType;
         public object[] commandObjects;
 
-        public CommandOptions(string command, Type commandType, object[] commandObjects)
+        public CommandOptions(string command, Type commandType, params object[] commandObjects)
         {
             this.command = command;
             this.commandType = commandType;

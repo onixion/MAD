@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.IO; 
 
 using MAD.JobSystemCore;
 
@@ -37,7 +38,6 @@ namespace MAD.CLICore
 
             return output;
         }
-
     }
 
     #endregion
@@ -244,13 +244,16 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.SaveNode((string)parameters.GetParameter("file").argumentValues[0]))
+            string _fileName = (string)parameters.GetParameter("file").argumentValues[0];
+
+            try
             {
-                return "<color><green>Node saved.";
+                _js.SaveNode(_fileName);
+                return "<color><green>Nodes saved.";
             }
-            else
+            catch(Exception e)
             {
-                return "<color><red>Could not save node!"; // maybe use exception for more informations
+                return "<color><red>EXCEPTION: " + e.Message;
             }
         }
     }
@@ -268,13 +271,16 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.LoadNode((string)parameters.GetParameter("file").argumentValues[0]))
+            string _fileName = (string)parameters.GetParameter("file").argumentValues[0];
+
+            try
             {
-                return "<color><green>Node(s) loaded.";
+                _js.LoadNode(_fileName);
+                return "<color><green>Nodes loaded.";
             }
-            else
+            catch(Exception e)
             {
-                return "<color><red>Could not load any nodes!"; // maybe use exception for more informations
+                return "<color><red>EXCEPTION: " + e.Message;
             }
         }
     }
