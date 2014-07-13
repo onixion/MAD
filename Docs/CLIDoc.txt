@@ -1,7 +1,22 @@
 CLI
 
-CLI ist eine Klasse, die eine CLI definiert. Farben usw. werden in der CLI definiert und nicht im Framework,
-da (als Beispiel) die Farbe des Cursors nicht für die Verarbeitung der Eingabe relevant ist.
+CLI ist eine Klasse, die eine CLI definiert (erbt von CLIFramework). Ihre Aufgabe ist es, alle Objekte, die mit der CLI zu tun haben,
+zu verwalten.
+
+CLIFramework
+
+Das CLIFramework ist eine abstrakte Klasse und vererbt Methoden und Variablen an die CLI bzw. CLISession.
+Alle Methoden, die zur Verarbeitung der CLI-Eingabe benötigt werden, sind im Framework eingebetet.
+
+CLIInput
+
+Diese statische Klasse hat die Aufgabe die Eingabe zu lesen und die Pfeiltasten, Enter, Return usw. zu verarbeiten.
+Die CLI-History (also eine History für die eingegeben Befehle) wird von der CLIInput verwaltet.
+
+CLIOutput
+
+Diese statische Klasse hat die Aufgabe die Ausgabe der Commands auf die Console auszugeben. Diese Klasse erkennt Color-Tags
+und gibt die Ausgabe, entsprechend den Color-Tags, auf die Console aus.
 
 
 CLISession
@@ -16,10 +31,6 @@ Sobald ein Client sich korrekt authentifiziert hat, wird eine CLISession gestart
 kommuniziert mit dem Client über die NetIO-Libary.
 
 
-CLIFramework
-
-Das CLIFramework ist eine abstrakte Klasse und vererbt Methoden und Variablen an die CLI bzw. CLISession.
-Alle Methoden, die zur Verarbeitung der CLI-Eingabe benötigt werden, sind im Framework eingebetet.
 
 
 Command
