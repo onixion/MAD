@@ -36,7 +36,7 @@ namespace MAD.CLICore
             // Check if the command exist.
             if (_commandOptions == null)
             {
-                return "<color><red>Command '" + _commandInput + "' unknown! Type 'help' for more information.";
+                return CLIError.Error(CLIError.ErrorType.CommandError, "Command not know!", true);
             }
 
             // Get the parameters and arguments from input.
@@ -168,9 +168,7 @@ namespace MAD.CLICore
 
                 // Check if the parameter is known.
                 if (!ParameterExists(_requiredParameter, _optionalParameter, _temp))
-                {
-                    return "<color><red>Parameter '-" + _temp.parameter + "' does not exist for this command!";
-                }
+                    return CLIError.Error(CLIError.ErrorType.ParameterError, "Parameter '" + _temp.parameter + "' does not exist for this command!", true);
 
                 // If it is a required parameter, increase _requiredArgsFound.
                 // If _requiredArgsFound is equal to the lengh of the _requiredParamters,
@@ -186,7 +184,7 @@ namespace MAD.CLICore
                     // Check if the argument is not null.
                     if (_temp.argumentValues != null)
                     {
-                        return "<color><red>Value of parameter '-" + _temp.parameter + "' must be null!";
+                        return CLIError.Error(CLIError.ErrorType.ArgumentError, "The parameter '" + _temp.parameter + "' does not need any arguments!", true);
                     }
                 }
                 else
@@ -194,7 +192,7 @@ namespace MAD.CLICore
                     // Check if argument is null
                     if (_temp.argumentValues == null)
                     {
-                        return "<color><red>Value of parameter '-" + _temp.parameter + "' can't be null!";
+                        return CLIError.Error(CLIError.ErrorType.ArgumentError, "The parameter '" + _temp.parameter + "' needs one or more arguments!", true);
                     }
 
                     // Check if multiple args are supported for this parameter
@@ -203,7 +201,7 @@ namespace MAD.CLICore
                         // Check if more than one arg is given.
                         if (_temp.argumentValues.Length > 1)
                         {
-                            return "<color><red>The parameter '-" + _temp.parameter + "' can't have multiple arguments!";
+                            return CLIError.Error(CLIError.ErrorType.ArgumentError, "The parameter '" + _temp.parameter + "' can't have multiple arguments!", true);
                         }
                     }
 
@@ -240,7 +238,7 @@ namespace MAD.CLICore
 
                     if (!_allArgsConverted)
                     {
-                        return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
+                        return CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "The argument of the parameter '" + _temp.parameter + "' could not be parsed!", true);
                     }
 
                     _temp.argumentValues = _arguments;
