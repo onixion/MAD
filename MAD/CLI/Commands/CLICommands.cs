@@ -275,4 +275,23 @@ namespace MAD.CLICore
             return "<color><blue>Changed";
         }
     }
+
+    public class CatchBasicInfoPrintHostsCommand : Command
+    {
+        private MACFeeder _feeder;
+
+        public CatchBasicInfoPrintHostsCommand(object[] args)
+            : base()
+        {
+            _feeder = (MACFeeder)args[0];
+            description = "Prints all hosts which are currently in the List";
+        }
+
+        public override string Execute()
+        {
+            string _tmp = _feeder.PrintLists();
+
+            return "<color><blue>" + _tmp;
+        }
+    }
 }
