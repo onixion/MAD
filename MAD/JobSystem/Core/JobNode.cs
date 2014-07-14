@@ -13,7 +13,7 @@ namespace MAD.JobSystemCore
 
         // id
         private static int _nodesCount = 0;
-        private object _nodeInitLock = new object();
+        private static object _nodeInitLock = new object();
         private int _id;
         public int id { get { return _id; } }
 
@@ -50,11 +50,11 @@ namespace MAD.JobSystemCore
 
         public JobNode(SerializationInfo info, StreamingContext context)
         {
-            nodeName = (string)info.GetValue("SER_NODE_NAME", typeof(string));
-            macAddress = PhysicalAddress.Parse((string)info.GetValue("SER_NODE_MAC", typeof(string)));
-            ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
-
-            jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
+            InitID();
+            this.nodeName = (string)info.GetValue("SER_NODE_NAME", typeof(string));
+            this.macAddress = PhysicalAddress.Parse((string)info.GetValue("SER_NODE_MAC", typeof(string)));
+            this.ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
+            this.jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
         }
 
         #endregion

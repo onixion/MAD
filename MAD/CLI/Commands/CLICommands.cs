@@ -191,7 +191,7 @@ namespace MAD.CLICore
 
             if (OParUsed("hack"))
             {
-                EGG.EasterEgg();
+ 
             }
 
             return output;
