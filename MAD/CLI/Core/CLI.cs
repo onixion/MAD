@@ -10,19 +10,11 @@ namespace MAD.CLICore
 {
     public class CLI : CLIFramework
     {
-        #region members
-
-        private string _dataPath;
-
-        #endregion
-
         #region constructor
 
-        public CLI(string dataPath, JobSystem js, CLIServer cliServer)
+        public CLI(JobSystem js, CLIServer cliServer)
             :base()
         {
-            _dataPath = dataPath;
-
             // !! INIT COMMANDS !!
 
             // general purpose

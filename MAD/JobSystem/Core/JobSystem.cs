@@ -7,34 +7,22 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        // Version
-        private Version _version = new Version(2, 0);
+        private Version _version = new Version(2, 2);
         public Version version { get { return _version; } }
 
-        // Scedule
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
-        // Nodes
         public List<JobNode> nodes = new List<JobNode>();
         public object jsNodesLock = new object();
         public const int maxNodes = 100;
-        public int nodesCount { get { return nodes.Count; } }
-
-        // Jobs
-        public static int maxJobsPossible = JobSystem.maxNodes * JobNode.maxJobs;
-        public int jobsCount { get { return JobsInitialized(); } }
-
-        // Other
-        private string _dataPath;
 
         #endregion
 
         #region constructor
 
-        public JobSystem(string dataPath)
+        public JobSystem()
         {
-            _dataPath = dataPath;
             _scedule = new JobScedule(nodes, jsNodesLock);
         }
 
@@ -160,41 +148,27 @@ namespace MAD.JobSystemCore
         public bool RemoveNode(int nodeID)
         {
             lock (jsNodesLock)
-            {
                 for (int i = 0; i < nodes.Count; i++)
-                {
                     if (nodes[i].id == nodeID)
                     {
                         nodes.RemoveAt(i);
                         return true;
                     }
-                }
-
                 return false;
-            }
         }
 
         public void RemoveAllNodes()
         {
             lock (jsNodesLock)
-            {
                 nodes.Clear();
-            }
         }
 
         public JobNode GetNode(int nodeID)
         {
             lock (jsNodesLock)
-            {
                 foreach (JobNode _node in nodes)
-                {
                     if (_node.id == nodeID)
-                    {
                         return _node;
-                    }
-                }
-            }
-
             return null;
         }
 
@@ -219,7 +193,7 @@ namespace MAD.JobSystemCore
         #endregion
 
         #region jobs handling
-
+        // HERE
         public bool StartJob(int jobID)
         {
             Job _job = GetJob(jobID);

@@ -24,8 +24,8 @@ namespace MAD.CLICore
         {
             output += "<color><yellow>\nJOBSYSTEM version " + _js.version + "\n\n";
 
-            output += " Nodes stored in RAM: <color><white>" + _js.nodesCount + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxJobsPossible + ")\n";
+            output += " Nodes stored in RAM: <color><white>" + _js.nodes.Count + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
+            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes * JobNode.maxJobs + ")\n";
 
             output += "\n\n Scedule-State: ";
 
@@ -306,7 +306,7 @@ namespace MAD.CLICore
 
             output += "\n";
 
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.maxJobsPossible + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.maxNodes * JobNode.maxJobs + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
