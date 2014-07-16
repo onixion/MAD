@@ -26,7 +26,7 @@ namespace MAD.DHCPReader
 
         private bool _running = false;
         private bool _acknowledge; 
-        private bool _addressGiven;
+        private bool _addressGiven = false;
         private bool _nameGiven = false;
 
         private string _hostName = "";
@@ -145,8 +145,6 @@ namespace MAD.DHCPReader
                             case 12:
                                 byte _nameLength = _data[i + 1];
 
-                                if (!_nameGiven)                                                                                     //Awaiting instuctions by Instructor about frequency of not use of hostname
-                                {
                                     try
                                     {
                                         for (uint iii = 1; iii <= _nameLength; iii++)
@@ -157,9 +155,9 @@ namespace MAD.DHCPReader
                                     }
                                     catch
                                     {
-                                        _nameGiven = false;
+                                       
                                     }
-                                }
+                                
 
                                 continue;
 
@@ -248,8 +246,9 @@ namespace MAD.DHCPReader
 
                 if (_dummyList != null)
                 {
-                    foreach (ModelHost _dummy in _dummyList)                                                        //bug after deleting nonexisting host
+                    for (int i = 0; i < _dummyList.Count; i++)
                     {
+                        ModelHost _dummy = _dummyList[i];
                         if (_dummy.hostIP != null)
                         {
                             Ping _ping = new Ping();
@@ -278,6 +277,36 @@ namespace MAD.DHCPReader
                             }
                         }
                     }
+                   /* foreach (ModelHost _dummy in _dummyList)                                                        //bug after deleting nonexisting host
+                    {
+                        if (_dummy.hostIP != null)
+                        {
+                            Ping _ping = new Ping();
+
+                            try
+                            {
+                                PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                                if (_reply.Status == IPStatus.Success)
+                                {
+                                    _active = true;
+                                }
+                                else
+                                {
+                                    _active = false;
+                                }
+                            }
+                            catch
+                            {
+                                _active = false;
+                            }
+
+                            if (!_active)
+                            {
+                                _dummyList.Remove(_dummy);
+                            }
+                        }
+                    }*/
                 }
             }
         }
