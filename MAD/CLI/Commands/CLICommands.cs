@@ -265,13 +265,15 @@ namespace MAD.CLICore
             : base()
         {
             _feeder = (MACFeeder)args[0];
-            requiredParameter.Add(new ParameterOption("t", "INTERVALL-TIME IN SECONDS", paramDescripe , false, false, new Type[] { typeof(uint) }));
+            requiredParameter.Add(new ParameterOption("t", "INTERVALL-TIME IN SECONDS", paramDescripe , false, false, new Type[] { typeof(int) }));
             description = "Sets the time intevall in which the programm checks if the MACs still have the assigned IP or if they changed.";  
         }
 
         public override string Execute()
         {
-            _feeder.Stop();
+            int _time = 1000 * (int)parameters.GetParameter("t").argumentValues[0];
+            uint _utime = Convert.ToUInt32(_time);
+            _feeder.ChangeCheckIntervall(_utime);
             return "<color><blue>Changed";
         }
     }

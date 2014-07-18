@@ -26,11 +26,6 @@ namespace MAD.DHCPReader
 
         private bool _running = false;
         private bool _acknowledge; 
-        private bool _addressGiven = false;
-        private bool _nameGiven = false;
-
-        private string _hostName = "";
-        private IPAddress _requestedIP;
 
         public List<ModelHost> _dummyList = new List<ModelHost>();
 
@@ -123,7 +118,9 @@ namespace MAD.DHCPReader
             {
                 if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
                 {
-                    string _macAddress = _helper.getMacString(_data);
+                    ModelHost _tmpModel = new ModelHost();
+                    _tmpModel.hostMac = _helper.getMacString(_data);
+                    bool noName = false; 
 
                     for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
                     {
@@ -137,27 +134,34 @@ namespace MAD.DHCPReader
                                     _ipBytes[ii] = _data[i + 2 + ii];
                                 }
 
-                                _addressGiven = true;
-                                _requestedIP = new IPAddress(_ipBytes);
+                                _tmpModel.ipGiven = true;
+                                _tmpModel.hostIP = new IPAddress(_ipBytes);
+
+                                continue;
+
+                            case 55:
+                                noName = true;
 
                                 continue;
 
                             case 12:
-                                byte _nameLength = _data[i + 1];
-
+                                if (!noName)
+                                {
+                                    byte _nameLength = _data[i + 1];
+                                    _tmpModel.hostName = "";
                                     try
                                     {
                                         for (uint iii = 1; iii <= _nameLength; iii++)
                                         {
-                                            _hostName += (char)_data[i + 1 + iii];
-                                            _nameGiven = true;
+                                            _tmpModel.hostName += (char)_data[i + 1 + iii];
+                                            _tmpModel.nameGiven = true;
                                         }
                                     }
                                     catch
                                     {
-                                       
+
                                     }
-                                
+                                }
 
                                 continue;
 
@@ -165,34 +169,15 @@ namespace MAD.DHCPReader
 
                                 break;
                         }
-                        /*
-                        if (_addressGiven)
-                        {
-                            Thread.Sleep(3000);
-                            try
-                            {
-                                Ping _ping = new Ping();
-                                PingReply _reply = _ping.Send(_requestedIP);
-
-                                if (_reply.Status == IPStatus.Success)
-                                    _acknowledge = true;
-                                else
-                                    _acknowledge = false;
-                            }
-                            catch
-                            {
-                                _acknowledge = false;
-                            }
-                        }*/
                     }
 
-                    if (_addressGiven)
+                    if (_tmpModel.ipGiven)
                     {
                         Thread.Sleep(3000);
                         try
                         {
                             Ping _ping = new Ping();
-                            PingReply _reply = _ping.Send(_requestedIP);
+                            PingReply _reply = _ping.Send(_tmpModel.hostIP);
 
                             if (_reply.Status == IPStatus.Success)
                                 _acknowledge = true;
@@ -205,30 +190,36 @@ namespace MAD.DHCPReader
                         }
                     }
 
-                    if (_addressGiven && _acknowledge && _nameGiven)
+                    _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
+                    _dummyList.Add(_tmpModel);
+                    _tmpModel.ManuallyIncreaseCount();
+
+                    /*
+                    if (_tmpModel.ipGiven && _acknowledge && _tmpModel.nameGiven)
                     {
                         if(_dummyList != null)
-                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
                         _dummyList.Add(new ModelHost(_macAddress, _requestedIP, _hostName));
                     }
-                    else if (_addressGiven && _acknowledge && !_nameGiven)
+                    else if (_tmpModel.ipGiven && _acknowledge && !_tmpModel.nameGiven)
                     {
                         if(_dummyList != null)
-                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
                         _dummyList.Add(new ModelHost(_macAddress, _requestedIP));
                     }
-                    else if (!_addressGiven || !_acknowledge && _nameGiven)
+                    else if (!_tmpModel.ipGiven || !_acknowledge && _tmpModel.nameGiven)
                     {
                         if(_dummyList != null)
-                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
+                            _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
                         _dummyList.Add(new ModelHost(_macAddress, _hostName));
                     }
-                    else if (!_addressGiven || !_acknowledge && !_nameGiven)
+                    else if (!_tmpModel.ipGiven || !_acknowledge && !_tmpModel.nameGiven)
                     {
                         if(_dummyList != null)
                             _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_macAddress)));
                         _dummyList.Add(new ModelHost(_macAddress));
                     }
+                    */
                 }
             }
             catch
@@ -274,39 +265,10 @@ namespace MAD.DHCPReader
                             if (!_active)
                             {
                                 _dummyList.Remove(_dummy);
+                                _dummy.ManuallyDecreaseCount();
                             }
                         }
                     }
-                   /* foreach (ModelHost _dummy in _dummyList)                                                        //bug after deleting nonexisting host
-                    {
-                        if (_dummy.hostIP != null)
-                        {
-                            Ping _ping = new Ping();
-
-                            try
-                            {
-                                PingReply _reply = _ping.Send(_dummy.hostIP);
-
-                                if (_reply.Status == IPStatus.Success)
-                                {
-                                    _active = true;
-                                }
-                                else
-                                {
-                                    _active = false;
-                                }
-                            }
-                            catch
-                            {
-                                _active = false;
-                            }
-
-                            if (!_active)
-                            {
-                                _dummyList.Remove(_dummy);
-                            }
-                        }
-                    }*/
                 }
             }
         }

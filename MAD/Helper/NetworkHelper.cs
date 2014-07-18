@@ -82,52 +82,97 @@ namespace MAD.Helper
     }
 
 
-    public struct ModelHost                                                         //A struct which provides all importand information for a host - feel free to put more in it!
+    public class ModelHost                                                         //A struct which provides all importand information for a host - feel free to put more in it!
     {
-        public IPAddress hostIP;
-        
-        public string hostName;
-
-        public string hostMac;
-
         public uint ID;
 
-        private static uint _count = 0; 
+        public IPAddress hostIP;
+        public string hostName;
+        public string hostMac;
+
+        public bool nameGiven, macGiven, ipGiven;
+
+        private static uint _count = 0;
+
+        public ModelHost()
+        {
+            macGiven = ipGiven = nameGiven = false;
+
+            ID = _count;
+
+            hostMac = null;
+            hostName = null;
+            hostIP = null;
+
+        }
 
         public ModelHost(string MAC)
         {
+            macGiven = true;
+            ipGiven = nameGiven = false;
+
             ID = _count;
+
             hostMac = MAC;
             hostName = null;
             hostIP = null;
+
             _count++;
         }
 
         public ModelHost(string MAC, IPAddress address)
         {
+            macGiven = ipGiven = true;
+            nameGiven = false;
+
             ID = _count;
+
             hostMac = MAC;
             hostIP = address; 
             hostName = null;
+
             _count++;
         }
 
         public ModelHost(string MAC, string name)
         {
+            nameGiven = macGiven = true;
+            ipGiven = false;
+
             ID = _count;
+
             hostMac = MAC;
             hostName = name;
             hostIP = null;
+
             _count++;
         }
 
         public ModelHost(string MAC, IPAddress address, string name)
         {
+            nameGiven = ipGiven = macGiven = true;
+
             ID = _count;
+
             hostMac = MAC;
             hostIP = address;
             hostName = name;
+
             _count++;
+        }
+
+        public void ManuallyIncreaseCount()
+        {
+            _count++;
+        }
+
+        public void ManuallyDecreaseCount()
+        {
+            _count--;
+        }
+        ~ModelHost()
+        {
+            _count--;
         }
     }
 }
