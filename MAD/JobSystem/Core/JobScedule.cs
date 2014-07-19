@@ -95,20 +95,20 @@ namespace MAD.JobSystemCore
                                         // Set job-state to working.
                                         _job.state = Job.JobState.Working;
 
-                                        if (CheckJobTime(_job.jobTime, _time))
+                                        if (CheckJobTime(_job.time, _time))
                                         {
-                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                            if (_job.time.type == JobTime.TimeType.Relative)
                                             {
-                                                _job.jobTime.jobDelay.Reset();
+                                                _job.time.jobDelay.Reset();
 
                                                 _holder.job = _job;
                                                 _holder.targetAddress = _node.ipAddress;
 
                                                 JobThreadStart(_holder);
                                             }
-                                            else if (_job.jobTime.type == JobTime.TimeType.Absolute)
+                                            else if (_job.time.type == JobTime.TimeType.Absolute)
                                             {
-                                                JobTimeHandler _handler = _job.jobTime.GetJobTimeHandler(_time);
+                                                JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
 
                                                 if (!_handler.IsBlocked(_time))
                                                 {
@@ -123,14 +123,11 @@ namespace MAD.JobSystemCore
                                         }
                                         else
                                         {
-                                            if (_job.jobTime.type == JobTime.TimeType.Relative)
+                                            if (_job.time.type == JobTime.TimeType.Relative)
                                             {
-                                                _job.jobTime.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                                _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                             }
                                         }
-
-                                        // Set job-state to waiting.
-                                        _job.state = Job.JobState.Waiting;
                                     }
                                 }
                             }
@@ -199,13 +196,15 @@ namespace MAD.JobSystemCore
             _job.lastTimeSpan = _job.lastStarted.Subtract(_job.lastFinished);
 
             // Get Notificationrules which are validity.
-            List<JobNotificationRule> _brokenRules = _job.jobNoti.GetBrokenRules();
+            List<JobNotificationRule> _brokenRules = _job.notification.GetBrokenRules();
 
             // If necessary make a query to the NotificationSystem.
             if (_brokenRules.Count != 0)
             {
                 // Query to NotificationSystem.
             }
+
+            _job.state = Job.JobState.Waiting;
 
             return null;
         }
