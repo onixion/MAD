@@ -233,8 +233,11 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            _feeder.Start();
-            return "<color><blue>Start listening for Information";
+            string _tmp = _feeder.Start();
+            if (_tmp != null)
+                return "<color><red>" + _tmp;
+            else
+                return "<color><blue>Start listening for Information";
         }
     }
 
@@ -251,8 +254,11 @@ namespace MAD.CLICore
 
         public override string Execute()
         {
-            _feeder.Stop();
-            return "<color><blue>Ends";
+            string _tmp = _feeder.Stop();
+            if (_tmp == null)
+                return "<color><blue>Ends";
+            else
+                return "<color><red>" + _tmp;
         }
     }
 

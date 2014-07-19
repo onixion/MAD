@@ -170,6 +170,7 @@ namespace MAD.Helper
         {
             _count--;
         }
+
         ~ModelHost()
         {
             _count--;
