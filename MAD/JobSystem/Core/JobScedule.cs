@@ -26,6 +26,8 @@ namespace MAD.JobSystemCore
 
         // nodes
         private List<JobNode> _jobNodes;
+
+        // lock
         private object _jsNodesLock;
 
         #endregion

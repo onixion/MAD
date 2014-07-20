@@ -5,7 +5,7 @@ using System.Net.NetworkInformation;
 
 namespace MAD.JobSystemCore
 {
-    public struct JobNodeInfo
+    public class JobNodeInfo
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -14,12 +14,12 @@ namespace MAD.JobSystemCore
         public List<JobInfo> jobs { get; set; }
     }
 
-    public struct JobInfo
+    public class JobInfo
     {
         public int id { get; set; }
         public string name { get; set; }
         public Job.JobType type { get; set; }
         public Job.JobState state { get; set; }
-        public Job.OutState outpute { get; set; }
+        public Job.OutState outState { get; set; }
     }
 }

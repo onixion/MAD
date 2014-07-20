@@ -114,7 +114,7 @@ namespace MAD.CLICore
                 foreach (JobNode _temp in _js.nodes)
                 {
                     _tableRow[0] = _temp.id.ToString();
-                    _tableRow[1] = _temp.nodeName;
+                    _tableRow[1] = _temp.name;
                     _tableRow[2] = _temp.state.ToString();
                     _tableRow[3] = _temp.macAddress.ToString();
                     _tableRow[4] = _temp.ipAddress.ToString();
@@ -197,7 +197,7 @@ namespace MAD.CLICore
         {
             JobNode _node = new JobNode();
 
-            _node.nodeName = (string)pars.GetPar("n").argValues[0];
+            _node.name = (string)pars.GetPar("n").argValues[0];
             _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0]; // MAC ADDRESS
             _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
 

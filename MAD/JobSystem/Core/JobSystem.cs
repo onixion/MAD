@@ -14,8 +14,9 @@ namespace MAD.JobSystemCore
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
         public List<JobNode> nodes = new List<JobNode>();
-        public object jsNodesLock = new object();
         public const int maxNodes = 100;
+
+        public object jsNodesLock = new object();
 
         #endregion
 
@@ -163,12 +164,17 @@ namespace MAD.JobSystemCore
                 nodes.Clear();
         }
 
-        public JobNode GetNode(int nodeID)
+        private JobNode GetNode(int nodeID)
         {
-            lock (jsNodesLock)
-                foreach (JobNode _node in nodes)
-                    if (_node.id == nodeID)
-                        return _node;
+            foreach (JobNode _node in nodes)
+                if (_node.id == nodeID)
+                    return _node;
+            return null;
+        }
+
+        public JobNodeInfo GetNodeInfo(int nodeID)
+        {
+            // WORKIN ON THIS!
             return null;
         }
 
@@ -193,7 +199,7 @@ namespace MAD.JobSystemCore
         #endregion
 
         #region jobs handling
-        // HERE
+
         public bool StartJob(int jobID)
         {
             Job _job = GetJob(jobID);
@@ -312,7 +318,7 @@ namespace MAD.JobSystemCore
             return false;
         }
 
-        public Job GetJob(int jobID)
+        private Job GetJob(int jobID)
         {
             foreach (JobNode _node in nodes)
             {
@@ -326,6 +332,25 @@ namespace MAD.JobSystemCore
             }
 
             return null;
+        }
+
+        public JobInfo GetJobInfo(int jobID)
+        {
+            lock (jsNodesLock)
+            {
+                Job _temp = GetJob(jobID);
+
+                if (_temp == null)
+                    return null;
+
+                JobInfo _info = new JobInfo();
+                _info.id = _temp.id;
+                _info.name = _temp.name;
+                _info.state = _temp.state;
+                _info.outState = _temp.outState;
+
+                return _info;
+            }
         }
 
         #endregion

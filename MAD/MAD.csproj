@@ -78,7 +78,7 @@
     <Compile Include="CLI\Core\CLIError.cs" />
     <Compile Include="JobSystem\Core\Job.cs" />
     <Compile Include="JobSystem\Core\JobNode.cs" />
-    <Compile Include="JobSystem\Core\JobNodeInfo.cs" />
+    <Compile Include="JobSystem\Core\JobInfo.cs" />
     <Compile Include="JobSystem\Core\JobNotification.cs" />
     <Compile Include="JobSystem\Core\JSError.cs" />
     <Compile Include="JobSystem\Core\JSSerializer.cs" />
