@@ -141,8 +141,6 @@ namespace MAD.DHCPReader
                     _tmpModel.hostMac = _helper.getMacString(_data);
                     _tmpModel.macGiven = true;
 
-                    bool noName = false; 
-
                     for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
                     {
                         switch (Convert.ToUInt16(_data[i]))
@@ -161,29 +159,26 @@ namespace MAD.DHCPReader
                                 continue;
 
                             case 55:
-                                noName = true;
+                                i = 1 + i + _data[i + 1];
 
                                 continue;
 
                             case 12:
-                                if (!noName)
-                                {
-                                    byte _nameLength = _data[i + 1];
-                                    _tmpModel.hostName = "";
-                                    try
-                                    {
-                                        for (uint iii = 1; iii <= _nameLength; iii++)
-                                        {
-                                            _tmpModel.hostName += (char)_data[i + 1 + iii];
-                                            _tmpModel.nameGiven = true;
-                                        }
-                                    }
-                                    catch
-                                    {
 
+                                byte _nameLength = _data[i + 1];
+                                _tmpModel.hostName = "";
+                                try
+                                {
+                                    for (uint iii = 1; iii <= _nameLength; iii++)
+                                    {
+                                        _tmpModel.hostName += (char)_data[i + 1 + iii];
+                                        _tmpModel.nameGiven = true;
                                     }
                                 }
+                                catch
+                                {
 
+                                }
                                 continue;
 
                             default:
