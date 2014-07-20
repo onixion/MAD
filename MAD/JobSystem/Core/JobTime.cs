@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    public class JobTime
+    [Serializable]
+    public class JobTime : ISerializable
     {
         #region members
 
@@ -24,7 +26,7 @@ namespace MAD.JobSystemCore
 
         public JobTime(List<JobTimeHandler> jobTimes)
         {
-            type = TimeType.Absolute;
+            this.type = TimeType.Absolute;
             this.jobTimes = jobTimes;
         }
 
@@ -32,6 +34,14 @@ namespace MAD.JobSystemCore
         {
             type = TimeType.Relative;
             this.jobDelay = jobDelay;
+        }
+
+        // for serialization
+        public JobTime(SerializationInfo info, StreamingContext context)
+        {
+            this.type = (TimeType)info.GetValue("SER_JOB_TIME_TYPE", typeof(TimeType));
+            this.jobDelay = (JobDelayHandler)info.GetValue("SER_JOB_TIME_DELAY", typeof(JobDelayHandler));
+            this.jobTimes = (List<JobTimeHandler>)info.GetValue("SER_JOB_TIME_TIMES", typeof(List<JobTimeHandler>));
         }
 
         #endregion
@@ -121,7 +131,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_hour <= 23 && _hour >= 0)
@@ -161,7 +171,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -186,7 +196,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -220,7 +230,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception)
                 {
-                    throw new Exception("Could not parse time argument(s)!");
+                    throw new Exception("Could not parse time arg(s)!");
                 }
 
                 if (_day <= 31 && _day >= 1)
@@ -247,7 +257,7 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public string Values()
+        public string GetValues()
         {
             if (type == TimeType.Relative)
             {
@@ -270,10 +280,22 @@ namespace MAD.JobSystemCore
             }
         }
 
+        #region for serialization
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_TIME_TYPE", type);
+            info.AddValue("SER_JOB_TIME_DELAY", jobDelay);
+            info.AddValue("SER_JOB_TIME_TIMES", jobTimes);
+        }
+
+        #endregion
+
         #endregion
     }
 
-    public class JobTimeHandler
+    [Serializable]
+    public class JobTimeHandler : ISerializable
     {
         #region members
 
@@ -326,6 +348,18 @@ namespace MAD.JobSystemCore
             this.month = month;
             this.year = year;
             this.type = Type.Unique;
+        }
+
+        // for serialization
+        public JobTimeHandler(SerializationInfo info, StreamingContext context)
+        {
+            this.type = (Type)info.GetValue("SER_JOB_TIME_TYPE", typeof(Type));
+
+            this.year = (int)info.GetValue("SER_JOB_TIME_YEAR", typeof(int));
+            this.month = (int)info.GetValue("SER_JOB_TIME_MONTH", typeof(int));
+            this.day = (int)info.GetValue("SER_JOB_TIME_DAY", typeof(int));
+            this.hour = (int)info.GetValue("SER_JOB_TIME_HOUR", typeof(int));
+            this.minute = (int)info.GetValue("SER_JOB_TIME_MINUTE", typeof(int));
         }
 
         #endregion
@@ -397,6 +431,8 @@ namespace MAD.JobSystemCore
             }
         }
 
+        #region for cli only
+
         public string JobTimeStatus()
         { 
             switch(type)
@@ -417,9 +453,27 @@ namespace MAD.JobSystemCore
         }
 
         #endregion
+
+        #region for serialization
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_TIME_TYPE", type);
+
+            info.AddValue("SER_JOB_TIME_YEAR", year);
+            info.AddValue("SER_JOB_TIME_MONTH", month);
+            info.AddValue("SER_JOB_TIME_DAY", day);
+            info.AddValue("SER_JOB_TIME_HOUR", hour);
+            info.AddValue("SER_JOB_TIME_MINUTE", minute);
+        }
+
+        #endregion
+
+        #endregion
     }
 
-    public class JobDelayHandler
+    [Serializable]
+    public class JobDelayHandler : ISerializable
     {
         #region members
 
@@ -436,6 +490,13 @@ namespace MAD.JobSystemCore
         public JobDelayHandler(int delayTime)
         {
             _delayTime = delayTime;
+            _delayTimeRemaining = delayTime;
+        }
+
+        // for serialization
+        public JobDelayHandler(SerializationInfo info, StreamingContext context)
+        {
+            _delayTime = (int)info.GetValue("SER_JOB_DELAY_DELAYTIME", typeof(int));
             _delayTimeRemaining = delayTime;
         }
 
@@ -464,6 +525,15 @@ namespace MAD.JobSystemCore
         {
             _delayTimeRemaining = _delayTimeRemaining - deltaTime;
         }
+
+        #region for serialization
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_DELAY_DELAYTIME", _delayTime);
+        }
+
+        #endregion
 
         #endregion
     }

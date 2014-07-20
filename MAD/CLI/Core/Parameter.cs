@@ -2,16 +2,17 @@
 
 namespace MAD.CLICore
 {
-    /* This object defines a parameter. */
+    /* This object defines a par. */
     public class Parameter
     {
-        public string parameter;
-        public object[] argumentValues;
+        public string par;
+        public object[] argValues;
 
-        public Parameter(string parameter, object[] argumentValues)
+
+        public Parameter(string par, object[] argValues)
         {
-            this.parameter = parameter;
-            this.argumentValues = argumentValues;
+            this.par = par;
+            this.argValues = argValues;
         }
     }
 }

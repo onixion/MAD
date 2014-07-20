@@ -5,7 +5,7 @@ namespace MAD.JobSystemCore
     public class JobNotificationRuleINT : JobNotificationRule
     {
         public Operation operation;
-        public enum Operation { Equal, NotEqual, BiggerThan, SmallerThan }
+        public enum Operation { Equal, NotEqual, BiggerThan, SmallerThan };
 
         public int trackObject;
         public int operationValue;

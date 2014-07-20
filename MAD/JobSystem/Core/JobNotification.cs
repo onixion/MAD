@@ -29,32 +29,36 @@ namespace MAD.JobSystemCore
         #region methodes
 
         // TODO
-        public static List<JobNotificationRule> ParseJobNotification(List<OutDescriptor> outDesc, object[] data)
+        public static List<JobNotificationRule> ParseJobNotiRules(List<OutputDesc> outputDesc, object[] data)
         {
             List<JobNotificationRule> _buffer = new List<JobNotificationRule>();
+
+
 
             return _buffer;
         }
 
         // TODO
-        private static JobNotificationRule ParseJobNotificationInput(List<OutDescriptor> outDesc, string data)
+        private static JobNotificationRule ParseJobNotificationInput(List<OutputDesc> outputDesc, string data)
         {
             /* Syntax: <head><operationTag><value>
              * E.G.  : TTLLeft==20 */
 
+            for (int i = 0; i < outputDesc.Count; i++)
+            { 
+                
+            
+            }
+
+
             return null;
         }
 
-        private static OutDescriptor GetOutDescriptor(List<OutDescriptor> outDesc, string name)
+        private static OutputDesc GetOutDescriptor(List<OutputDesc> outputDesc, string name)
         {
-            foreach (OutDescriptor _temp in outDesc)
-            {
+            foreach (OutputDesc _temp in outputDesc)
                 if (_temp.name == name)
-                {
                     return _temp;
-                }
-            }
-
             return null;
         }
 
@@ -63,13 +67,8 @@ namespace MAD.JobSystemCore
             List<JobNotificationRule> _buffer = new List<JobNotificationRule>();
 
             for(int i = 0; i < rules.Count; i++)
-            {
                 if (!rules[i].CheckRuleValidity())
-                {
                     _buffer.Add(rules[i]);
-                }
-            }
-
             return _buffer;
         }
 

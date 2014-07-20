@@ -10,24 +10,26 @@ namespace MAD
 {
     class Mad
     {
-        /* MAD - Network Monitoring v0.0.3.7 */
+        /* MAD - Network Monitoring v0.0.4.0 RC1 */
 
-        private const string dataPath = "data";
+        private static string dataPath = "data";
 
         [STAThread]
         static int Main(string[] args)
         {
-            JobSystem js = new JobSystem(dataPath);
-            CLIServer cliServer = new CLIServer(999, dataPath, js);
+            // warning
+            Console.WriteLine("WARNING! This software is still under development!");
+
+            JobSystem js = new JobSystem();
+            CLIServer cliServer = new CLIServer(999, js);
             MACFeeder macFeeder = new MACFeeder();
 
             if (args.Length == 0)
             { 
-                // No arguments -> start gui.
-
+                // No args -> start gui.
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
-                
+
                 CLI cli = new CLI(dataPath, js, cliServer, macFeeder);
                 cli.Start();
             }

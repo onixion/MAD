@@ -50,7 +50,7 @@ Now using the TcpListener and TcpClient)
 [08.07.2014][18:00-22:00][4h][94h] JobNodes, Jobsystem
 [10.07.2014][10:00-13:00][3h][97h] CleanCoding ... tested JobSystem / JobScedule , fixed some bugs ...
 [10.07.2014][20:00-23:00][3h][100h] ConsoleTable issue fixed. Working on better performance for cli and bug-fixes.
-[12.07.2014][12:00-14:00][2h][102h] Working on CliServer / CliClient. CliClient need to send consoleWidth and server need to pass it to
-the commands, so they can work with it (for console-tables). Not working yet.
-[12.07.2014][20:00-21:00][1h][103h] Rewritten CLIInput and CLIOutput. Both are now static classes. And I moved them into a own folder. The CLIClient
-need to have those two files as well, so it can parse the color-tags and have a command histroy and those things ..
+[12.07.2014][12:00-14:00][2h][102h] Working on CliServer / CliClient. CliClient need to send consoleWidth and server need to pass it to the commands, so they can work with it (for console-tables). Not working yet.
+[12.07.2014][20:00-21:00][1h][103h] Rewritten CLIInput and CLIOutput. Both are now static classes. And I moved them into a own folder. The CLIClient need to have those two files as well, so it can parse the color-tags and have a command histroy and those things ..
+[13.07.2014][12:00-15:00][3h][106h] Working on serialization for the JobNodes so they can be saved as a file.
+[13.07.2014][15:00-16:30][1,5h][107,5h] Added Serialization to all Jobs. NOT TESTED YET!

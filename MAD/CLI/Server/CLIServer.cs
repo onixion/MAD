@@ -15,12 +15,6 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private Version _version = new Version(1, 5);
-        public string version { get { return _version.ToString(); } }
-
-        private string _dataPath;
-        private const string _logFilename = "log.txt";
-
         private TcpListener _serverListener;
 
         private List<CLIUser> _users = new List<CLIUser>();
@@ -32,11 +26,9 @@ namespace MAD.CLIServerCore
 
         #region constructor
 
-        public CLIServer(int port, string dataPath, JobSystem js)
+        public CLIServer(int port, JobSystem js)
         {
             serverPort = port;
-            _dataPath = dataPath;
-
             _js = js;
 
             // TODO: Load users out of the database.
@@ -82,7 +74,7 @@ namespace MAD.CLIServerCore
             try
             {
                 // First send server informations to client.
-                NetCom.SendStringUnicode(_clientStream, "Mad CLI-Server <" + version + ">", true);
+                NetCom.SendStringUnicode(_clientStream, "Mad CLI-Server", true);
 
                 // Receive the login-data.
                 string loginData = NetCom.ReceiveStringUnicode(_clientStream);

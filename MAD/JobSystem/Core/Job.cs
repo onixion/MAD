@@ -2,19 +2,22 @@
 using System.Net;
 using System.Collections.Generic;
 
+using System.Runtime.Serialization;
+
 namespace MAD.JobSystemCore
 {
-    public abstract class Job
+    [Serializable]
+    public abstract class Job : ISerializable
     {
         #region members
 
         private static int _jobsCount = 0;
-        private static object _jobInitLock = new object();
+        private static object _idLock = new object();
         private int _id;
         public int id { get { return _id; } }
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
-        public JobType jobType = JobType.NULL;
+        public JobType type = JobType.NULL;
 
         public enum JobState { NULL, Inactive, Waiting, Working, Exception }
         public JobState state = JobState.Inactive;
@@ -26,57 +29,67 @@ namespace MAD.JobSystemCore
         public DateTime lastFinished;
         public TimeSpan lastTimeSpan;
 
-        public string jobName;
-
-        public JobTime jobTime = new JobTime();
-        public List<OutDescriptor> outDesc = new List<OutDescriptor>();
-        public JobNotification jobNoti = new JobNotification();
+        public string name;
+        public JobTime time = new JobTime();
+        public List<OutputDesc> outDesc = new List<OutputDesc>(); // NOT SERIALIZED YET!
+        public JobNotification notification = new JobNotification(); // NOT SERIALIZED YET!
 
         #endregion
 
-        #region constructor
+        #region constructors
 
-        protected Job(string jobName, JobType jobType, JobTime jobTime)
+        protected Job(string name, JobType type, JobTime time)
         {
-            lock (_jobInitLock)
-            {
-                _id = _jobsCount;
-                _jobsCount++;
-            }
+            InitJob();
+            this.name = name;
+            this.type = type;
+            this.time = time;
+        }
 
-            this.jobName = jobName;
-            this.jobType = jobType;
-            this.jobTime = jobTime;
+        // for serialization
+        protected Job(SerializationInfo info, StreamingContext context)
+        {
+            InitJob();
+            this.name = (string) info.GetValue("SER_JOB_NAME", typeof(string));
+            this.type = (JobType)info.GetValue("SER_JOB_TYPE", typeof(JobType));
+            this.time = (JobTime)info.GetValue("SER_JOB_TIME", typeof(JobTime));
         }
 
         #endregion
 
         #region methodes
 
-        public abstract void Execute(IPAddress targetAddress);
+        private void InitJob()
+        {
+            lock (_idLock)
+            {
+                _id = _jobsCount;
+                _jobsCount++;
+            }
+        }
 
-        #region for CLI only
+        public abstract void Execute(IPAddress targetAddress);
 
         public string Status()
         {
             string _temp = "\n";
 
             _temp += "<color><yellow>ID: <color><white>" + _id + "\n";
-            _temp += "<color><yellow>NAME: <color><white>" + jobName + "\n";
-            _temp += "<color><yellow>TYPE: <color><white>" + jobType.ToString() + "\n";
+            _temp += "<color><yellow>NAME: <color><white>" + name + "\n";
+            _temp += "<color><yellow>TYPE: <color><white>" + type.ToString() + "\n";
             _temp += "<color><yellow>STATE: <color><white>" + state.ToString() + "\n";
-            _temp += "<color><yellow>TIME-TYPE: <color><white>" + jobTime.type.ToString() + "\n";
+            _temp += "<color><yellow>TIME-TYPE: <color><white>" + time.type.ToString() + "\n";
 
-            if (jobTime.type == JobTime.TimeType.Relative)
+            if (time.type == JobTime.TimeType.Relative)
             {
-                _temp += "<color><yellow>DELAY-TIME: <color><white>" + jobTime.jobDelay.delayTime + "\n";
-                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + jobTime.jobDelay.delayTimeRemaining + "\n";
+                _temp += "<color><yellow>DELAY-TIME: <color><white>" + time.jobDelay.delayTime + "\n";
+                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + time.jobDelay.delayTimeRemaining + "\n";
             }
-            else if (jobTime.type == JobTime.TimeType.Absolute)
+            else if (time.type == JobTime.TimeType.Absolute)
             {
                 _temp += "<color><yellow>TIMES: <color><white>";
 
-                foreach (JobTimeHandler _buffer in jobTime.jobTimes)
+                foreach (JobTimeHandler _buffer in time.jobTimes)
                 {
                     _temp += _buffer.JobTimeStatus() + " ";
                 }
@@ -93,6 +106,20 @@ namespace MAD.JobSystemCore
         }
 
         protected abstract string JobStatus();
+
+        #region for serialization
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_NAME", name);
+            info.AddValue("SER_JOB_TYPE", type);
+            info.AddValue("SER_JOB_TIME", time);
+
+            GetObjectDataJobSpecific(info, context);
+        }
+
+        // serialization for job-specific members
+        public abstract void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context);
 
         #endregion
 

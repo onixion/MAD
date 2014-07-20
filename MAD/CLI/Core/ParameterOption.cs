@@ -3,23 +3,32 @@
 namespace MAD.CLICore
 {
     /* This object defines one parameter for a command. */
-    public class ParameterOption
-    {
-        public string parameter;
-        public string parameterInfo;
-        public string description;
-        public bool argumentEmpty;
-        public bool multiArguments;
-        public Type[] argumentTypes;
 
-        public ParameterOption(string parameter, string parameterInfo, string description, bool argumentEmpty, bool multiArguments, Type[] argumentTypes)
+    public class ParOption
+    {
+        public string par;
+        public string parInfo;
+        public string description;
+        public bool argEmpty;
+        public bool multiargs;
+        public Type[] argTypes;
+
+        private bool _used = false;
+        public bool IsUsed { get { return _used; } }
+
+        public ParOption(string par, string parInfo, string description, bool argEmpty, bool multiargs, Type[] argTypes)
         {
-            this.parameter = parameter;
-            this.parameterInfo = parameterInfo;
+            this.par = par;
+            this.parInfo = parInfo;
             this.description = description;
-            this.argumentEmpty = argumentEmpty;
-            this.multiArguments = multiArguments;
-            this.argumentTypes = argumentTypes;
+            this.argEmpty = argEmpty;
+            this.multiargs = multiargs;
+            this.argTypes = argTypes;
+        }
+
+        public void SetUsedFlag()
+        {
+            _used = true;
         }
     }
 }

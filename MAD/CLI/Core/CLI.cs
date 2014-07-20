@@ -11,19 +11,11 @@ namespace MAD.CLICore
 {
     public class CLI : CLIFramework
     {
-        #region members
-
-        private string _dataPath;
-
-        #endregion
-
         #region constructor
 
         public CLI(string dataPath, JobSystem js, CLIServer cliServer, MACFeeder macFeeder)
             :base()
         {
-            _dataPath = dataPath;
-
             // !! INIT COMMANDS !!
 
             // general purpose
@@ -48,22 +40,24 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
 
             // NODES
-            commands.Add(new CommandOptions("js add node", typeof(JobSystemAddNodeCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js remove node", typeof(JobSystemRemoveNodeCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { js }));
 
             // JOBS
-            commands.Add(new CommandOptions("js job status", typeof(JobStatusCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js job start", typeof(JobSystemStartJobCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
 
-            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
-            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
 
             // CLIServer
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
@@ -95,10 +89,10 @@ namespace MAD.CLICore
                 {
                     string response = AnalyseInput(ref _command, _cliInput);
 
-                    // Check if the parameter and arguments are valid.
-                    if (response == "VALID_PARAMETER")
+                    // Check if the par and args are valid.
+                    if (response == "VALID_PARAMETERS")
                     {
-                        // Execute command and get response from command. // TODO: pass console width to .Execute()
+                        // Execute command and get response from command.
                         response = _command.Execute(Console.BufferWidth);
 
                         // When command response with 'EXIT_CLI' the CLI closes.
@@ -110,7 +104,7 @@ namespace MAD.CLICore
                     }
                     else
                     {
-                        // Something must be wrong with the input (parameter does not exist, to many arguments, ..).
+                        // Something must be wrong with the input (par does not exist, to many args, ..).
                         CLIOutput.WriteToConsole(response);
                     }
                 }

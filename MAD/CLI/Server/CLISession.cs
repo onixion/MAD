@@ -70,7 +70,7 @@ namespace MAD.CLIServerCore
                 _response = NetCom.ReceiveStringUnicode(_stream);
                 _response = AnalyseInput(ref _command, _response);
 
-                if (_response == "VALID_PARAMETER")
+                if (_response == "VALID_par")
                 {
                     NetCom.SendStringUnicode(_stream, _command.Execute(_consoleWidth) + "\n<color><gray>" + _cursor, true);
                 }

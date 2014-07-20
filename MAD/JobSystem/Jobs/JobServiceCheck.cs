@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
+using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    class JobServiceCheck : Job
+    [Serializable]
+    public class JobServiceCheck : Job
     {
         #region members
 
-		public string argument;
+		public string arg;
         public string username;
         public string password;
         
@@ -23,18 +24,27 @@ namespace MAD.JobSystemCore
         public JobServiceCheck()
             : base("NULL", JobType.ServiceCheck, new JobTime())
         {
-            this.argument = "";
+            this.arg = "";
             this.username = "";
             this.password = "";
             //this.targetIP = IPAddress.Parse("127.0.0.1");
         }
 
-        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string argument, string username, string password)
+        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string arg, string username, string password)
             : base(jobName, jobType, jobTime)
         {
-            this.argument = argument;
+            this.arg = arg;
             this.username = username;
             this.password = password;
+        }
+
+        // for serialization
+        public JobServiceCheck(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.arg = (string)info.GetValue("SER_JOB_SERVICECHECK_ARG", typeof(string));
+            this.username = (string)info.GetValue("SER_JOB_SERVICECHECK_USERNAME", typeof(string));
+            this.password = (string)info.GetValue("SER_JOB_SERVICECHECK_PASSWORD", typeof(string));
         }
 
         #endregion
@@ -45,7 +55,7 @@ namespace MAD.JobSystemCore
 
 		public override void Execute(IPAddress targetAddress)
 		{
-			switch (argument) 
+			switch (arg) 
 			{
 			case "dns":
 				dnsCheck ();
@@ -114,6 +124,17 @@ namespace MAD.JobSystemCore
         }
 		#endregion 
 
-		#endregion
+        #region for serialization
+
+        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_SERVICECHECK_ARG", this.arg);
+            info.AddValue("SER_JOB_SERVICECHECK_USERNAME", this.username);
+            info.AddValue("SER_JOB_SERVICECHECK_PASSWORD", this.password);
+        }
+
+        #endregion
+
+        #endregion
     }
 }

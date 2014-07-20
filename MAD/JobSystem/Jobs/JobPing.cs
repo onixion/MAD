@@ -2,15 +2,17 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
+    [Serializable]
     public class JobPing : Job
     {
         #region members
 
         public int ttl;
-        public bool dontFragment;
+        public bool dontFragment = true;
 
         private Ping _ping = new Ping();
 
@@ -22,14 +24,18 @@ namespace MAD.JobSystemCore
             : base("NULL", JobType.Ping, new JobTime())
         {
             this.ttl = 250;
-            this.dontFragment = true;
         }
 
         public JobPing(string jobName, JobType jobType, JobTime jobTime, int ttl)
             : base (jobName, jobType, jobTime)
         {
             this.ttl = ttl;
-            this.dontFragment = true;
+        }
+
+        public JobPing(SerializationInfo info, StreamingContext context)
+            : base (info, context)
+        {
+            this.ttl = (int)info.GetValue("SER_JOB_PING_TTL", typeof(int));
         }
 
         #endregion
@@ -67,6 +73,15 @@ namespace MAD.JobSystemCore
 
             return _temp;
         }
+
+        #region for serialization
+
+        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("SER_JOB_PING_TTL", this.ttl);
+        }
+
+        #endregion
 
         #endregion
     }

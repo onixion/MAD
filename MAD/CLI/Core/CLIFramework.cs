@@ -19,10 +19,10 @@ namespace MAD.CLICore
         #region methodes
 
         /*
-         * This method checks the parameters and arguments of their validity.
+         * This method checks the pars and args of their validity.
          * If everything is alright, the command object will be set.
-         * It returns the string "VALID_PARAMETER" when the parameters and arguments are valid.
-         * If the parameter are not valid it returns the error text, which get displayed onto
+         * It returns the string 'VALID_PARAMETERS' when the pars and args are valid.
+         * If the par are not valid it returns the error text, which get displayed onto
          * the CLI. When the parsing was successful, the Command-Object will be set and be ready
          * for execution. */
         protected string AnalyseInput(ref Command command, string cliInput)
@@ -30,27 +30,24 @@ namespace MAD.CLICore
             // First get the command-name.
             string _commandInput = GetCommandName(cliInput);
 
-            // Get the configuration of the command.
+            // Get the configuration for the command.
             CommandOptions _commandOptions = GetCommandOptions(_commandInput);
 
             // Check if the command exist.
             if (_commandOptions == null)
-            {
-                return "<color><red>Command '" + _commandInput + "' unknown! Type 'help' for more information.";
-            }
+                return CLIError.Error(CLIError.ErrorType.CommandError, "Command not know!", true);
 
-            // Get the parameters and arguments from input.
-            ParameterInput _parameterInput = GetParamtersFromInput(cliInput);
+            // Get the pars and args from input.
+            ParInput _parInput = GetParamtersFromInput(cliInput);
+
             // Get the command-type.
             Type _commandType = _commandOptions.commandType;
-            // Get the needed objects for the constructor of the command.
-            object[] _commandObjects = _commandOptions.commandObjects;
 
             // Constructor of the command.
             ConstructorInfo _cInfo;
 
             // Check if the command need any objects.
-            if (_commandObjects == null)
+            if (_commandOptions.commandObjects == null)
             {
                 // Command does not need any objects for its constructor.
                 _cInfo = _commandType.GetConstructor(new Type[0]);
@@ -62,16 +59,14 @@ namespace MAD.CLICore
                 // Command need some objects for its constructor.
                 _cInfo = _commandType.GetConstructor(new Type[1] { typeof(object[]) });
                 // Invoke the constructor.
-                command = (Command)_cInfo.Invoke(new object[] { _commandObjects });
+                command = (Command)_cInfo.Invoke(new object[] { _commandOptions.commandObjects });
             }
 
-            // Set parameters and arguments of the command.
-            command.parameters = _parameterInput;
+            // Set pars and args of the command.
+            command.pars = _parInput;
 
-            // Check if the parameters and arguments are valid.
-            string _parameterValid = CLIFramework.ValidParameters(command, _parameterInput);
-
-            return _parameterValid;
+            // Check if the pars and args are valid.
+            return CLIFramework.ValidPar(command, _parInput);
         }
 
         private string GetCommandName(string input)
@@ -95,50 +90,46 @@ namespace MAD.CLICore
             }
         }
 
-        private ParameterInput GetParamtersFromInput(string input)
+        private ParInput GetParamtersFromInput(string input)
         {
-            ParameterInput _parameterTemp = new ParameterInput();
+            ParInput _temp = new ParInput();
+            string[] _buffer = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
 
-            string[] _temp = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            // Remove unnecessary spaces.
+            for (int i = 1; i < _buffer.Length; i++)
+                _buffer[i] = _buffer[i].Trim();
 
-            for (int i = 1; i < _temp.Length; i++)
+            for (int i = 1; i < _buffer.Length; i++)
             {
-                _temp[i] = _temp[i].Trim();
-            }
+                string[] _buffer2 = _buffer[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-            for (int i = 1; i < _temp.Length; i++)
-            {
-                string[] _temp2 = _temp[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (_temp2.Length == 1)
+                if (_buffer2.Length == 1)
                 {
-                    // parameter arguments are null
-                    _parameterTemp.parameters.Add(new Parameter(_temp2[0], null));
+                    // no args
+                    _temp.pars.Add(new Parameter(_buffer2[0], null));
                 }
                 else
                 {
-                    // one or multiple arguments
-                    if (_temp2.Length == 2)
+                    // one or multiple args
+                    if (_buffer2.Length == 2)
                     {
-                        // one argument
-                        _parameterTemp.parameters.Add(new Parameter(_temp2[0], new object[] { _temp2[1] }));
+                        // one arg
+                        _temp.pars.Add(new Parameter(_buffer2[0], new object[] { _buffer2[1] }));
                     }
                     else
-                    { 
-                        //multiple arguments
-                        object[] _buffer = new object[_temp2.Length-1];
-                        
-                        for(int i2 = 1; i2 < _temp2.Length; i2++)
-                        {
-                            _buffer[i2-1] = _temp2[i2];
-                        }
+                    {
+                        //multiple args
+                        object[] _buffer3 = new object[_buffer2.Length - 1];
 
-                        _parameterTemp.parameters.Add(new Parameter(_temp2[0], _buffer));
+                        for (int i2 = 1; i2 < _buffer2.Length; i2++)
+                            _buffer3[i2 - 1] = _buffer2[i2];
+
+                        _temp.pars.Add(new Parameter(_buffer2[0], _buffer));
                     }
                 }
             }
 
-            return _parameterTemp;
+            return _temp;
         }
 
         private CommandOptions GetCommandOptions(string command)
@@ -154,74 +145,75 @@ namespace MAD.CLICore
             return null;
         }
 
-        public static string ValidParameters(Command command, ParameterInput parameters)
+        public static string ValidPar(Command command, ParInput pars)
         {
-            List<ParameterOption> _requiredParameter = command.requiredParameter;
-            List<ParameterOption> _optionalParameter = command.optionalParameter;
+            List<ParOption> _rPar = command.rPar;
+            List<ParOption> _oPar = command.oPar;
+
+            Parameter _temp;
+            ParOption _tempOptions;
 
             int _requiredArgsFound = 0;
 
-            for (int i = 0; i < command.parameters.parameters.Count; i++)
+            // Check every parameter.
+            for (int i = 0; i < command.pars.pars.Count; i++)
             {
-                Parameter _temp = parameters.parameters[i];
-                ParameterOption _parOptions = CLIFramework.GetParameterOptions(_requiredParameter, _optionalParameter, _temp.parameter);
+                _temp = pars.pars[i];
+                _tempOptions = CLIFramework.GetParOptions(_rPar, _oPar, _temp.par);
 
                 // Check if the parameter is known.
-                if (!ParameterExists(_requiredParameter, _optionalParameter, _temp))
-                {
-                    return "<color><red>Parameter '-" + _temp.parameter + "' does not exist for this command!";
-                }
+                if(_tempOptions == null)
+                    return CLIError.Error(CLIError.ErrorType.parError, "Parameter '" + _temp.par + "' does not exist for this command!", true);
+
+                // Check if parameter has been used befor.
+                if(_tempOptions.IsUsed)
+                    return CLIError.Error(CLIError.ErrorType.parError, "Parameter '" + _temp.par + "' used multiple times!", true);
+
+                // Mark the parameter as 'used'.
+                _tempOptions.SetUsedFlag();
 
                 // If it is a required parameter, increase _requiredArgsFound.
                 // If _requiredArgsFound is equal to the lengh of the _requiredParamters,
-                // all required parameter are given.
-                if (RequiredParameterExist(_requiredParameter, _temp))
-                {
+                // all required parameter has been found in the input of the cli.
+                if (IsRequiredPar(_rPar, _temp))
                     _requiredArgsFound++;
-                }
 
                 // Check if the given parameter can have a value or not.
-                if (_parOptions.argumentEmpty)
+                if (_tempOptions.argEmpty)
                 {
-                    // Check if the argument is not null.
-                    if (_temp.argumentValues != null)
-                    {
-                        return "<color><red>Value of parameter '-" + _temp.parameter + "' must be null!";
-                    }
+                    // Check if the arg is not null.
+                    if (_temp.argValues != null)
+                        return CLIError.Error(CLIError.ErrorType.argError, "The parameter '" + _temp.par + "' does not need any args!", true);
                 }
                 else
                 {
-                    // Check if argument is null
-                    if (_temp.argumentValues == null)
-                    {
-                        return "<color><red>Value of parameter '-" + _temp.parameter + "' can't be null!";
-                    }
+                    // Check if arg is null
+                    if (_temp.argValues == null)
+                        return CLIError.Error(CLIError.ErrorType.argError, "The par '" + _temp.par + "' needs one or more args!", true);
 
-                    // Check if multiple args are supported for this parameter
-                    if (!_parOptions.multiArguments)
+                    // Check if multiple args are supported for this par
+                    if (!_tempOptions.multiargs)
                     {
                         // Check if more than one arg is given.
-                        if (_temp.argumentValues.Length > 1)
-                        {
-                            return "<color><red>The parameter '-" + _temp.parameter + "' can't have multiple arguments!";
-                        }
+                        if (_temp.argValues.Length > 1)
+                            return CLIError.Error(CLIError.ErrorType.argError, "The par '" + _temp.par + "' can't have multiple args!", true);
                     }
 
                     /* Try to convert the given args into the specific types.
                      * If it cannot convert all args into ONE type, it will fail. */
 
-                    object[] _arguments = new object[_temp.argumentValues.Length];
+                    object[] _args = new object[_temp.argValues.Length];
                     bool _allArgsConverted = false;
 
-                    foreach (Type _type in CLIFramework.GetAcceptedArgumentTypes(_requiredParameter, _optionalParameter, _temp.parameter))
+                    foreach (Type _type in _tempOptions.argTypes)
                     {
                         int _argsConverted = 0;
 
-                        for (int i2 = 0; i2 < _temp.argumentValues.Length; i2++)
+                        for (int i2 = 0; i2 < _temp.argValues.Length; i2++)
                         {
-                            _arguments[i2] = CLIFramework.Convert((string)_temp.argumentValues[i2], _type);
+                            _args[i2] = CLIFramework.Convert((string)_temp.argValues[i2], _type);
 
-                            if (_arguments[i2] != null)
+                            if (_args[i2] != null)
                             {
                                 _argsConverted++;
                             }
@@ -231,7 +223,7 @@ namespace MAD.CLICore
                             }
                         }
 
-                        if (_argsConverted == _arguments.Length)
+                        if (_argsConverted == _args.Length)
                         {
                             _allArgsConverted = true;
                             break;
@@ -240,20 +232,18 @@ namespace MAD.CLICore
 
                     if (!_allArgsConverted)
                     {
-                        return "<color><red>Some of the arguments of the parameter '-" + _temp.parameter + "' could not be parsed!";
+                        return CLIError.Error(CLIError.ErrorType.argTypeError, "The arg of the par '" + _temp.par + "' could not be parsed!", true);
                     }
 
-                    _temp.argumentValues = _arguments;
+                    _temp.argValues = _args;
                 }
             }
 
-            // Check if all required parameters has been found.
-            if (_requiredParameter.Count != _requiredArgsFound)
-            {
-                return "<color><red>Some required parameters are missing! Type help for view full commands.";
-            }
+            // Check if all required pars has been found.
+            if (_rPar.Count != _requiredArgsFound)
+                return CLIError.Error(CLIError.ErrorType.parError, "Some required parameters are missing!", true);
 
-            return "VALID_PARAMETER";
+            return "VALID_PARAMETERS";
         }
 
         /* The method 'Convert' can only parse object to: 
@@ -285,19 +275,19 @@ namespace MAD.CLICore
             }
         }
 
-        public static ParameterOption GetParameterOptions(List<ParameterOption> requiredParameter, List<ParameterOption> optionalParameter, string parameter)
+        public static ParOption GetParOptions(List<ParOption> rPar, List<ParOption> oPar, string par)
         {
-            foreach (ParameterOption _temp in requiredParameter)
+            foreach (ParOption _temp in rPar)
             {
-                if (_temp.parameter == parameter)
+                if (_temp.par == par)
                 {
                     return _temp;
                 }
             }
 
-            foreach (ParameterOption _temp in optionalParameter)
+            foreach (ParOption _temp in oPar)
             {
-                if (_temp.parameter == parameter)
+                if (_temp.par == par)
                 {
                     return _temp;
                 }
@@ -306,81 +296,11 @@ namespace MAD.CLICore
             return null;
         }
 
-        public static Type[] GetAcceptedArgumentTypes(List<ParameterOption> requiredParameter, List<ParameterOption> optionalParameter, string parameter)
+        public static bool IsRequiredPar(List<ParOption> rPar, Parameter par)
         {
-            foreach (ParameterOption _temp in requiredParameter)
+            foreach (ParOption _temp in rPar)
             {
-                if (_temp.parameter == parameter)
-                {
-                    return _temp.argumentTypes;
-                }
-            }
-
-            foreach (ParameterOption _temp in optionalParameter)
-            {
-                if (_temp.parameter == parameter)
-                {
-                    return _temp.argumentTypes;
-                }
-            }
-
-            return null;
-        }
-
-        public static Type GetArgumentType(ParameterInput parameters, string parameter)
-        {
-            foreach (Parameter _temp in parameters.parameters)
-            {
-                if (_temp.parameter == parameter)
-                {
-                    return _temp.argumentValues[0].GetType();
-                }
-            }
-
-            return null;
-        }
-
-        public static bool ParameterExists(List<ParameterOption> requiredParameter, List<ParameterOption> optionalParameter, Parameter parameter)
-        {
-            // required parameter
-            foreach (ParameterOption _temp in requiredParameter)
-            {
-                if (_temp.parameter == parameter.parameter)
-                {
-                    return true;
-                }
-            }
-
-            // optional parameter
-            foreach (ParameterOption _temp in optionalParameter)
-            {
-                if (_temp.parameter == parameter.parameter)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static bool RequiredParameterExist(List<ParameterOption> requiredParameter, Parameter parameter)
-        {
-            foreach (ParameterOption _temp in requiredParameter)
-            {
-                if (_temp.parameter == parameter.parameter)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public static bool OptionalParameterExist(List<ParameterOption> optionalParameter, Parameter parameter)
-        {
-            foreach (ParameterOption _temp in optionalParameter)
-            {
-                if (_temp.parameter == parameter.parameter)
+                if (_temp.par == par.par)
                 {
                     return true;
                 }
