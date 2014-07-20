@@ -5,6 +5,7 @@ using System.IO;
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
 using MAD.CLIIO;
+using MAD.DHCPReader;
 
 namespace MAD.CLICore
 {
@@ -18,7 +19,7 @@ namespace MAD.CLICore
 
         #region constructor
 
-        public CLI(string dataPath, JobSystem js, CLIServer cliServer)
+        public CLI(string dataPath, JobSystem js, CLIServer cliServer, MACFeeder macFeeder)
             :base()
         {
             _dataPath = dataPath;
@@ -30,6 +31,12 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+
+            // MAC AND IP READER
+            commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));

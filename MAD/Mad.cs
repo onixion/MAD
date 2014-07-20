@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using MAD.JobSystemCore;
 using MAD.CLICore;
 using MAD.CLIServerCore;
+using MAD.DHCPReader;
 
 namespace MAD
 {
@@ -18,6 +19,7 @@ namespace MAD
         {
             JobSystem js = new JobSystem(dataPath);
             CLIServer cliServer = new CLIServer(999, dataPath, js);
+            MACFeeder macFeeder = new MACFeeder();
 
             if (args.Length == 0)
             { 
@@ -26,7 +28,7 @@ namespace MAD
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
                 
-                CLI cli = new CLI(dataPath, js, cliServer);
+                CLI cli = new CLI(dataPath, js, cliServer, macFeeder);
                 cli.Start();
             }
             else if (args.Length == 1)
@@ -34,7 +36,7 @@ namespace MAD
                 switch (args[0])
                 {
                     case "-console":
-                        CLI cli = new CLI(dataPath, js, cliServer);
+                        CLI cli = new CLI(dataPath, js, cliServer, macFeeder);
                         cli.Start();
                         break;
                     default:

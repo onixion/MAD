@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using MAD.CLIIO;
+using MAD.DHCPReader;
 
 namespace MAD.CLICore
 {
@@ -216,6 +217,89 @@ namespace MAD.CLICore
             }
             
             return output;
+        }
+    }
+
+    public class CatchBasicInfoStartCommand : Command
+    {
+        private MACFeeder _feeder;
+
+        public CatchBasicInfoStartCommand(object[] args)
+            : base()
+        {
+            _feeder = (MACFeeder)args[0];
+            description = "Starts the Listener for Basic Information like MAC and IP, and how they are assigned.";
+        }
+
+        public override string Execute()
+        {
+            string _tmp = _feeder.Start();
+            if (_tmp != null)
+                return "<color><red>" + _tmp;
+            else
+                return "<color><blue>Start listening for Information";
+        }
+    }
+
+    public class CatchBasicInfoStopCommand : Command
+    {
+        private MACFeeder _feeder;
+
+        public CatchBasicInfoStopCommand(object[] args)
+            : base()
+        {
+            _feeder = (MACFeeder)args[0];
+            description = "Stops the listener for basic information like MAC and IP, and how they are assigend.";
+        }
+
+        public override string Execute()
+        {
+            string _tmp = _feeder.Stop();
+            if (_tmp == null)
+                return "<color><blue>Ends";
+            else
+                return "<color><red>" + _tmp;
+        }
+    }
+
+    public class CatchBasicInfoSetTimeIntervallCommand : Command
+    {
+        private MACFeeder _feeder;
+        private string paramDescripe = "Intervall in which the System should check. In seconds";
+
+        public CatchBasicInfoSetTimeIntervallCommand(object[] args)
+            : base()
+        {
+            _feeder = (MACFeeder)args[0];
+            requiredParameter.Add(new ParameterOption("t", "INTERVALL-TIME IN SECONDS", paramDescripe , false, false, new Type[] { typeof(int) }));
+            description = "Sets the time intevall in which the programm checks if the MACs still have the assigned IP or if they changed.";  
+        }
+
+        public override string Execute()
+        {
+            int _time = 1000 * (int)parameters.GetParameter("t").argumentValues[0];
+            uint _utime = Convert.ToUInt32(_time);
+            _feeder.ChangeCheckIntervall(_utime);
+            return "<color><blue>Changed";
+        }
+    }
+
+    public class CatchBasicInfoPrintHostsCommand : Command
+    {
+        private MACFeeder _feeder;
+
+        public CatchBasicInfoPrintHostsCommand(object[] args)
+            : base()
+        {
+            _feeder = (MACFeeder)args[0];
+            description = "Prints all hosts which are currently in the List";
+        }
+
+        public override string Execute()
+        {
+            string _tmp = _feeder.PrintLists();
+
+            return "<color><blue>" + _tmp;
         }
     }
 }
