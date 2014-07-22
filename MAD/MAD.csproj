@@ -59,6 +59,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\Commands\dani_bitte_umbenennen.cs" />
     <Compile Include="CLI\Core\CLI.cs" />
     <Compile Include="CLI\Core\CLIFramework.cs" />
     <Compile Include="CLI\CLIIO\CLIInput.cs" />
