@@ -32,7 +32,6 @@ kommuniziert mit dem Client über die NetIO-Libary.
 
 
 
-
 Command
 
 Die Command-Klasse ist ein sehr wichtige Grund-Klasse der CLI. Die Command-Klasse ist eine abstrakte Klasse.

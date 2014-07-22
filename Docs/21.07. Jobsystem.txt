@@ -1,0 +1,13 @@
+Aus zeitlichen Gründen muss der Multiuser-Support entfernt werden, da eine Implementierung sich als äußerst schwierig erweist.
+Also setzt ich diese Bedingung: das JobSystem kann nur von einem User gleichzeitig bedient werden. 
+Damit ersparte ich mir sehr viel Arbeit und kann sicher sein, dass die Software auch 100% funktionstüchtig ist. Multiuser-Systeme sind 
+sehr schwer zu debuggen, da nicht immer genau klar is wo sich welcher Thread gerade befindet. Bei solchen System muss intensive
+alle Fälle in der Threorie durchgegangen werden, damit sichergestellt wird, dass egal wo sich jeder Thread befindet, keine Fehler auftreten 
+können (Referenzen, geteilte Resourcen ...).
+
+
+
+Derzeitig ist ein vollständiger CLIServer und CLIClient implementiert. Es gibt schon zahlreiche Programme die GUI aber auch Console über
+das Netzwerk übertragen können (SSH, RDP, VNC, ...). Also ist die Frage, ob ein CLIServer und CLIClient wirklich nötig sind. Sie bringen
+wahrscheinlich mehr Probleme als Vorteile. Wie gesagt ist sie derzeit Implementiert, aber ob sie wirlich benötigt wird ist eine andere
+Frage ...

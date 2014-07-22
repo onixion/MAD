@@ -7,16 +7,16 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private Version _version = new Version(2, 2);
+        private Version _version = new Version(2, 3);
         public Version version { get { return _version; } }
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
-        public List<JobNode> nodes = new List<JobNode>();
+        private List<JobNode> _nodes = new List<JobNode>();
         public const int maxNodes = 100;
 
-        public object jsNodesLock = new object();
+        public object jsLock = new object();
 
         #endregion
 
@@ -24,7 +24,7 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
-            _scedule = new JobScedule(nodes, jsNodesLock);
+            _scedule = new JobScedule(_nodes, jsLock);
         }
 
         #endregion
@@ -50,51 +50,29 @@ namespace MAD.JobSystemCore
         public int NodesActive()
         {
             int _count = 0;
-
-            lock (jsNodesLock)
-            {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    if (nodes[i].state == JobNode.State.Active)
-                    {
+            lock (jsLock)
+                for (int i = 0; i < _nodes.Count; i++)
+                    if (_nodes[i].state == JobNode.State.Active)
                         _count++;
-                    }
-                }
-            }
-
             return _count;
         }
 
         public int NodesInactive()
         {
             int _count = 0;
-
-            lock (jsNodesLock)
-            {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    if (nodes[i].state == JobNode.State.Inactive)
-                    {
+            lock (jsLock)
+                for (int i = 0; i < _nodes.Count; i++)
+                    if (_nodes[i].state == JobNode.State.Inactive)
                         _count++;
-                    }
-                }
-            }
-
             return _count;
         }
 
         public int JobsInitialized()
         {
             int _count = 0;
-
-            lock (jsNodesLock)
-            {
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    _count = _count + nodes[i].jobs.Count;
-                }
-            }
-
+            lock (jsLock)
+                for (int i = 0; i < _nodes.Count; i++)
+                    _count = _count + _nodes[i].jobs.Count;
             return _count;
         }
 
@@ -105,68 +83,61 @@ namespace MAD.JobSystemCore
         public bool StartNode(int nodeID)
         {
             JobNode _node = GetNode(nodeID);
-
             if (_node != null)
             {
                 _node.state = JobNode.State.Active;
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
 
         public bool StopNode(int nodeID)
         {
             JobNode _node = GetNode(nodeID);
-
             if (_node != null)
             {
                 _node.state = JobNode.State.Inactive;
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
 
         public bool AddNode(JobNode node)
         {
-            if (maxNodes > nodes.Count)
+            if (maxNodes > _nodes.Count)
             {
-                nodes.Add(node);
+                _nodes.Add(node);
                 return true;
             }
             else
-            {
-                //throw new Exception("Node could not be added, because the jobsystem has reached its max numbers of nodes.");
                 return false;
-            }
         }
 
         public bool RemoveNode(int nodeID)
         {
-            lock (jsNodesLock)
-                for (int i = 0; i < nodes.Count; i++)
-                    if (nodes[i].id == nodeID)
+            lock (jsLock)
+            {
+                for (int i = 0; i < _nodes.Count; i++)
+                    if (_nodes[i].id == nodeID)
                     {
-                        nodes.RemoveAt(i);
+                        _nodes.RemoveAt(i);
                         return true;
                     }
-                return false;
+            }
+            return false;
         }
 
         public void RemoveAllNodes()
         {
-            lock (jsNodesLock)
-                nodes.Clear();
+            lock (jsLock)
+                _nodes.Clear();
         }
 
         public JobNode GetNode(int nodeID)
         {
-            foreach (JobNode _node in nodes)
+            foreach (JobNode _node in _nodes)
                 if (_node.id == nodeID)
                     return _node;
             return null;
@@ -184,16 +155,15 @@ namespace MAD.JobSystemCore
 
         public void SaveNode(string fileName)
         {
-            lock (jsNodesLock)
-                JSSerializer.Serialize(fileName, nodes);
+            lock (jsLock)
+                JSSerializer.Serialize(fileName, _nodes);
         }
 
         public void LoadNode(string fileName)
         {
             List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
-
-            lock (jsNodesLock)
-                nodes.AddRange(_buffer);
+            lock (jsLock)
+                _nodes.AddRange(_buffer);
         }
 
         #endregion
@@ -203,7 +173,6 @@ namespace MAD.JobSystemCore
         public bool StartJob(int jobID)
         {
             Job _job = GetJob(jobID);
-
             if (_job != null)
             {
                 if (_job.state == Job.JobState.Inactive)
@@ -212,77 +181,51 @@ namespace MAD.JobSystemCore
                     return true;
                 }
                 else
-                {
                     return false;
-                }
             }
             else
-            {
                 return false;
-            }
         }
 
         public bool StopJob(int jobID)
         {
             Job _job = GetJob(jobID);
-
             if (_job != null)
-            {
                 if (_job.state == Job.JobState.Waiting)
                 {
                     _job.state = Job.JobState.Inactive;
                     return true;
                 }
                 else
-                {
                     return false;
-                }
-            }
             else
-            {
                 return false;
-            }
         }
 
         public bool AddJobToNode(int nodeID, Job jobToAdd)
         {
             JobNode _node = GetNode(nodeID);
-
             if (_node != null)
             {
-                lock (jsNodesLock)
-                {
+                lock (jsLock)
                     _node.jobs.Add(jobToAdd);
-                }
-
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
 
         public bool RemoveJob(int jobID)
         {
-            lock (jsNodesLock)
-            {
-                foreach (JobNode _node in nodes)
-                {
+            lock (jsLock)
+                foreach (JobNode _node in _nodes)
                     lock (_node.jobsLock)
-                    {
                         for(int i = 0; i < _node.jobs.Count; i++)
-                        {
                             if (_node.jobs[i].id == jobID)
                             {
                                 _node.jobs.RemoveAt(i);
                                 return true;
                             }
-                        }
-                    }
-                }
-            }
-
             return false;
         }
 
@@ -304,7 +247,7 @@ namespace MAD.JobSystemCore
 
         public bool JobExist(int jobID)
         {
-            foreach (JobNode _node in nodes)
+            foreach (JobNode _node in _nodes)
             {
                 foreach (Job _temp in _node.jobs)
                 {
@@ -336,7 +279,7 @@ namespace MAD.JobSystemCore
 
         public JobInfo GetJobInfo(int jobID)
         {
-            lock (jsNodesLock)
+            lock (jsLock)
             {
                 Job _temp = GetJob(jobID);
 
