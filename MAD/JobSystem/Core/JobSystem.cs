@@ -7,7 +7,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private Version _version = new Version(2, 3);
+        private Version _version = new Version(2, 6);
         public Version version { get { return _version; } }
 
         private JobScedule _scedule;
@@ -15,8 +15,9 @@ namespace MAD.JobSystemCore
 
         private List<JobNode> _nodes = new List<JobNode>();
         public const int maxNodes = 100;
+        public int nodesInitialized { get { return _nodes.Count; } }
 
-        public object jsLock = new object();
+        private object _jsLock = new object();
 
         #endregion
 
@@ -24,7 +25,7 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
-            _scedule = new JobScedule(_nodes, jsLock);
+            _scedule = new JobScedule(_nodes, _jsLock);
         }
 
         #endregion
@@ -50,7 +51,7 @@ namespace MAD.JobSystemCore
         public int NodesActive()
         {
             int _count = 0;
-            lock (jsLock)
+            lock (_jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
                     if (_nodes[i].state == JobNode.State.Active)
                         _count++;
@@ -60,7 +61,7 @@ namespace MAD.JobSystemCore
         public int NodesInactive()
         {
             int _count = 0;
-            lock (jsLock)
+            lock (_jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
                     if (_nodes[i].state == JobNode.State.Inactive)
                         _count++;
@@ -70,82 +71,81 @@ namespace MAD.JobSystemCore
         public int JobsInitialized()
         {
             int _count = 0;
-            lock (jsLock)
+            lock (_jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
                     _count = _count + _nodes[i].jobs.Count;
             return _count;
+        }
+
+        /// <summary>
+        /// This method is ONLY used to get all informations of the nodes
+        /// and jobs. DO NOT USE IT TO CHANGE NODES OR JOBS!
+        /// </summary>
+        public List<JobNode> GetNodes()
+        {
+            return _nodes;
         }
 
         #endregion
 
         #region nodes handling
 
-        public bool StartNode(int nodeID)
+        public void StartNode(int id)
         {
-            JobNode _node = GetNode(nodeID);
+            JobNode _node = GetNode(id);
             if (_node != null)
-            {
                 _node.state = JobNode.State.Active;
-                return true;
-            }
             else
-                return false;
+                throw new JobNodeException("Node already active!", null);
         }
 
-        public bool StopNode(int nodeID)
+        public void StopNode(int id)
         {
-            JobNode _node = GetNode(nodeID);
+            JobNode _node = GetNode(id);
             if (_node != null)
-            {
                 _node.state = JobNode.State.Inactive;
-                return true;
-            }
             else
-                return false;
+                throw new JobNodeException("Node already inactive!", null);
         }
 
-        public bool AddNode(JobNode node)
+        public void AddNode(JobNode node)
         {
             if (maxNodes > _nodes.Count)
-            {
                 _nodes.Add(node);
-                return true;
-            }
             else
-                return false;
+                throw new JobSystemException("Node limit reached!", null);
         }
 
-        public bool RemoveNode(int nodeID)
+        public void RemoveNode(int id)
         {
-            lock (jsLock)
-            {
+            if (!RemoveJobIntern(id))
+                throw new JobNodeException("Node does not exist!", null);
+        }
+
+        private bool RemoveNodeIntern(int id)
+        {
+            lock (_jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
-                    if (_nodes[i].id == nodeID)
+                    if (_nodes[i].id == id)
                     {
                         _nodes.RemoveAt(i);
                         return true;
                     }
-            }
             return false;
         }
 
         public void RemoveAllNodes()
         {
-            lock (jsLock)
+            lock (_jsLock)
                 _nodes.Clear();
         }
 
-        public JobNode GetNode(int nodeID)
+        public JobNode GetNode(int id)
         {
-            foreach (JobNode _node in _nodes)
-                if (_node.id == nodeID)
-                    return _node;
-            return null;
-        }
-
-        public JobNodeInfo GetNodeInfo(int nodeID)
-        {
-            // WORKIN ON THIS!
+            lock(_jsLock)
+                foreach (JobNode _node in _nodes)
+                    if (_node.id == id)
+                        return _node;
             return null;
         }
 
@@ -153,16 +153,16 @@ namespace MAD.JobSystemCore
 
         #region nodes serialization
 
-        public void SaveNode(string fileName)
+        public void SaveNodes(string fileName)
         {
-            lock (jsLock)
+            lock (_jsLock)
                 JSSerializer.Serialize(fileName, _nodes);
         }
 
-        public void LoadNode(string fileName)
+        public void LoadNodes(string fileName)
         {
             List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
-            lock (jsLock)
+            lock (_jsLock)
                 _nodes.AddRange(_buffer);
         }
 
@@ -170,58 +170,55 @@ namespace MAD.JobSystemCore
 
         #region jobs handling
 
-        public bool StartJob(int jobID)
+        public void StartJob(int id)
         {
-            Job _job = GetJob(jobID);
+            // This does only work, if nobody executes the RemoveNode/RemoveJob ...
+            Job _job = GetJob(id);
             if (_job != null)
-            {
                 if (_job.state == Job.JobState.Inactive)
-                {
                     _job.state = Job.JobState.Waiting;
-                    return true;
-                }
                 else
-                    return false;
-            }
+                    throw new JobException("Job already active!", null);
             else
-                return false;
+                throw new JobException("Job does not exist!", null);
         }
 
-        public bool StopJob(int jobID)
+        public void StopJob(int id)
         {
-            Job _job = GetJob(jobID);
+            Job _job = GetJob(id);
             if (_job != null)
                 if (_job.state == Job.JobState.Waiting)
-                {
                     _job.state = Job.JobState.Inactive;
-                    return true;
-                }
                 else
-                    return false;
+                    throw new JobException("Job already active!", null);
             else
-                return false;
+                throw new JobException("Job does not exist!", null);
         }
 
-        public bool AddJobToNode(int nodeID, Job jobToAdd)
+        /// <param name="id">The id of the node to add the job to.</param>
+        public void AddJobToNode(int id, Job job)
         {
-            JobNode _node = GetNode(nodeID);
+            JobNode _node = GetNode(id);
             if (_node != null)
-            {
-                lock (jsLock)
-                    _node.jobs.Add(jobToAdd);
-                return true;
-            }
+                lock (_jsLock)
+                    _node.jobs.Add(job);
             else
-                return false;
+                throw new JobNodeException("Node does not exist!", null);
         }
 
-        public bool RemoveJob(int jobID)
+        public void RemoveJob(int id)
         {
-            lock (jsLock)
+            if (!RemoveJobIntern(id))
+                throw new JobException("Job does not exist!", null);
+        }
+
+        private bool RemoveJobIntern(int id)
+        {
+            lock (_jsLock)
                 foreach (JobNode _node in _nodes)
                     lock (_node.jobsLock)
-                        for(int i = 0; i < _node.jobs.Count; i++)
-                            if (_node.jobs[i].id == jobID)
+                        for (int i = 0; i < _node.jobs.Count; i++)
+                            if (_node.jobs[i].id == id)
                             {
                                 _node.jobs.RemoveAt(i);
                                 return true;
@@ -229,71 +226,44 @@ namespace MAD.JobSystemCore
             return false;
         }
 
-        public bool UpdateJob(int jobID, Job newJob)
+        public void UpdateJob(int id, Job job)
         {
-            Job _job = GetJob(jobID);
-
-            if (_job != null)
-            {
-                // TODO
-                throw new NotImplementedException();
-                //return true;
-            }
-            else
-            {
-                return false;
-            }
+            if (!UpdateJobIntern(id, job))
+                throw new JobException("Job does not exist!", null);
         }
 
-        public bool JobExist(int jobID)
+        public bool UpdateJobIntern(int id, Job job)
+        {
+            Job _job = GetJob(id);
+            if (_job == null)
+                return false;
+            lock (_jsLock)
+                _job = job;
+            return true;
+        }
+
+        public bool JobExist(int id)
         {
             foreach (JobNode _node in _nodes)
-            {
                 foreach (Job _temp in _node.jobs)
-                {
-                    if (_temp.id == jobID)
-                    {
+                    if (_temp.id == id)
                         return true;
-                    }
-                }
-            }
-
             return false;
         }
 
-        public Job GetJob(int jobID)
+        /// <summary>
+        /// Get a reference of a job. (IMPORTANT: After you executed
+        /// this method make sure no other threads work with this reference!)
+        /// This reference will also update, since the scedule is working with
+        /// it.
+        /// </summary>
+        public Job GetJob(int id)
         {
-            foreach (JobNode _node in nodes)
-            {
+            foreach (JobNode _node in _nodes)
                 foreach (Job _job in _node.jobs)
-                {
-                    if (jobID == _job.id)
-                    {
+                    if (_job.id == id)
                         return _job;
-                    }
-                }
-            }
-
             return null;
-        }
-
-        public JobInfo GetJobInfo(int jobID)
-        {
-            lock (jsLock)
-            {
-                Job _temp = GetJob(jobID);
-
-                if (_temp == null)
-                    return null;
-
-                JobInfo _info = new JobInfo();
-                _info.id = _temp.id;
-                _info.name = _temp.name;
-                _info.state = _temp.state;
-                _info.outState = _temp.outState;
-
-                return _info;
-            }
         }
 
         #endregion

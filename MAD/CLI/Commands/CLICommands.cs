@@ -39,17 +39,8 @@ namespace MAD.CLICore
             {
                 output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n";
-
                 for (int i = 0; i < _commands.Count; i++)
-                {
-                    output += "<color><white>" + _commands[i].command + "<color><darkyellow> [" + i + "]";
-
-                    if (i != _commands.Count - 1)
-                    {
-                        output += "<color><white>, ";
-                    }
-                }
-
+                    output += "<color><darkyellow>[" + i + "]" + "\t<color><white>" + _commands[i].command + "\n";
                 output += "\n";
             }
             else
@@ -90,16 +81,10 @@ namespace MAD.CLICore
                                 output += "\t<color><darkyellow>-" + _temp.par + " <color><white>";
 
                                 if (_temp.multiargs)
-                                {
                                     output += "<arg_1> <arg_2> ...";
-                                }
                                 else
-                                {
                                     if (!_temp.argEmpty)
-                                    {
                                         output += "<arg>";
-                                    }
-                                }
 
                                 output += "\n";
                                 output += "\t<color><gray>" + _temp.description + "\n\n";
@@ -115,16 +100,10 @@ namespace MAD.CLICore
                                 output += "\t<color><darkyellow>-" + _temp.par + " <color><white>";
 
                                 if (_temp.multiargs)
-                                {
                                     output += "<arg_1> <arg_2> ...";
-                                }
                                 else
-                                {
                                     if (!_temp.argEmpty)
-                                    {
                                         output += "<arg>";
-                                    }
-                                }
 
                                 output += "\n";
                                 output += "\t<color><gray>" + _temp.description + "\n\n";
@@ -132,9 +111,7 @@ namespace MAD.CLICore
                         }
                     }
                     else
-                    {
                         output += "\n\t<color><gray>(command does not use any par)\n";
-                    }
                 }
                 catch (Exception)
                 {
@@ -154,20 +131,14 @@ namespace MAD.CLICore
                 _buffer += " -" + _temp.par;
 
                 if (!_temp.argEmpty)
-                {
                     _buffer += " <" + _temp.parInfo + ">";
-                }
             }
 
             foreach (ParOption _temp in _command.oPar)
             {
                 _buffer += " [-" + _temp.par;
-
                 if (!_temp.argEmpty)
-                { 
                     _buffer += " <" + _temp.parInfo + ">";
-                }
-
                 _buffer += "]";
             }
 
@@ -210,11 +181,8 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             output += "<color><white>" + CLIOutput.colors.Count + " colors available.\n";
-
             foreach (object[] _temp in CLIOutput.colors)
-            {
                 output += "<color>" + (string) _temp[0] + (string) _temp[0] + "\n";
-            }
             
             return output;
         }

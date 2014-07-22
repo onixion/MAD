@@ -24,7 +24,7 @@ namespace MAD.CLICore
         {
             output += "<color><yellow>\nJOBSYSTEM version " + _js.version + "\n\n";
 
-            output += " Nodes stored in RAM: <color><white>" + _js.nodes.Count + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
+            output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
             output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes * JobNode.maxJobs + ")\n";
 
             output += "\n\n Scedule-State: ";
@@ -100,7 +100,7 @@ namespace MAD.CLICore
             output += "\n";
 
             output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.maxNodes + "\n";
-            output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodes.Count + "\n";
+            output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodesInitialized + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
 
@@ -109,19 +109,17 @@ namespace MAD.CLICore
             output += ConsoleTable.splitline;
 
             output += "<color><white>";
-            lock (_js.jsNodesLock)
-            {
-                foreach (JobNode _temp in _js.nodes)
-                {
-                    _tableRow[0] = _temp.id.ToString();
-                    _tableRow[1] = _temp.name;
-                    _tableRow[2] = _temp.state.ToString();
-                    _tableRow[3] = _temp.macAddress.ToString();
-                    _tableRow[4] = _temp.ipAddress.ToString();
-                    _tableRow[5] = _temp.jobs.Count.ToString();
 
-                    output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
-                }
+            foreach (JobNode _temp in _js.GetNodes())
+            {
+                _tableRow[0] = _temp.id.ToString();
+                _tableRow[1] = _temp.name;
+                _tableRow[2] = _temp.state.ToString();
+                _tableRow[3] = _temp.macAddress.ToString();
+                _tableRow[4] = _temp.ipAddress.ToString();
+                _tableRow[5] = _temp.jobs.Count.ToString();
+
+                output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
             }
 
             return output;
@@ -141,13 +139,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.StartNode((int)pars.GetPar("id").argValues[0]))
+            try
             {
+                _js.StartNode((int)pars.GetPar("id").argValues[0]);
                 return "<color><green>Node is active.";
             }
-            else
+            catch(Exception e)
             {
-                return "<color><red>Node does not exist!";
+                return "<color><red>" + e.Message;
             }
         }
     }
@@ -165,13 +164,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.StartNode((int)pars.GetPar("id").argValues[0]))
+            try
             {
+                _js.StartNode((int)pars.GetPar("id").argValues[0]);
                 return "<color><green>Node is inactive.";
             }
-            else
+            catch (Exception e)
             {
-                return "<color><red>Node does not exist!";
+                return "<color><red>" + e.Message;
             }
         }
     }
@@ -186,10 +186,6 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
             rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
-
-            // If there is enough time, this can be added. So jobs can be parsed directly from command.
-            //rPar.Add(new ParOption("jobs", "<JOB-OBJECTS>", "", false, false, new Type[] { typeof(IPAddress) }));
-
             description = "This command creates a node for the cached jobs.";
         }
 
@@ -220,13 +216,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if (_js.RemoveNode((int)pars.GetPar("id").argValues[0]))
+            try
             {
+                _js.RemoveNode((int)pars.GetPar("id").argValues[0]);
                 return "<color><green>Node removed.";
             }
-            else
-            {
-                return JSError.Error(JSError.Type.NodeNotExist, null, true);
+            catch (Exception e)
+            { 
+                return "<color><green>" + e.Message;
             }
         }
     }
@@ -248,7 +245,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.SaveNode(_fileName);
+                _js.SaveNodes(_fileName);
                 return "<color><green>Nodes saved.";
             }
             catch(Exception e)
@@ -275,7 +272,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.LoadNode(_fileName);
+                _js.LoadNodes(_fileName);
                 return "<color><green>Nodes loaded.";
             }
             catch(Exception e)
@@ -316,26 +313,21 @@ namespace MAD.CLICore
             output += ConsoleTable.splitline;
 
             output += "<color><white>";
-            lock (_js.jsNodesLock)
-            {
-                foreach (JobNode _temp in _js.nodes)
+
+            foreach (JobNode _temp in _js.GetNodes())
+                foreach (Job _temp2 in _temp.jobs)
                 {
-                    foreach (Job _temp2 in _temp.jobs)
-                    {
-                        _tableRow[0] = _temp.id.ToString();
-                        _tableRow[1] = _temp2.id.ToString();
-                        _tableRow[2] = _temp2.name;
-                        _tableRow[3] = _temp2.type.ToString();
-                        _tableRow[4] = _temp2.state.ToString();
-                        _tableRow[5] = _temp2.time.type.ToString();
-                        _tableRow[6] = _temp2.time.GetValues();
-                        _tableRow[7] = _temp2.outState.ToString();
+                    _tableRow[0] = _temp.id.ToString();
+                    _tableRow[1] = _temp2.id.ToString();
+                    _tableRow[2] = _temp2.name;
+                    _tableRow[3] = _temp2.type.ToString();
+                    _tableRow[4] = _temp2.state.ToString();
+                    _tableRow[5] = _temp2.time.type.ToString();
+                    _tableRow[6] = _temp2.time.GetValues();
+                    _tableRow[7] = _temp2.outState.ToString();
 
-                        output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
-                    }
+                    output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                 }
-            }
-
             return output;
         }
     }
@@ -355,34 +347,18 @@ namespace MAD.CLICore
         {
             if (OParUsed("id"))
             {
-                lock (_js.jsNodesLock)
-                {
-                    Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-
-                    if (_job != null)
-                    {
-                        output = _job.Status();
-                    }
-                    else
-                    {
-                        output = "<color><red>Job does not exist!";
-                    }
-                }
-
+                Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
+                if (_job != null)
+                    output = _job.Status();
+                else
+                    output = "<color><red>Job does not exist!";
                 return output;
             }
             else
             {
-                lock (_js.jsNodesLock)
-                {
-                    foreach (JobNode _node in _js.nodes)
-                    {
-                        foreach (Job _job in _node.jobs)
-                        {
-                            output += _job.Status() + "\n";
-                        }
-                    }
-                }
+                foreach (JobNode _node in _js.GetNodes())
+                    foreach (Job _job in _node.jobs)
+                        output += _job.Status() + "\n";
             }
 
             return output;
@@ -404,13 +380,14 @@ namespace MAD.CLICore
         {
             int _jobID = (int)pars.GetPar("id").argValues[0];
 
-            if (_js.StartJob(_jobID))
+            try
             {
+                _js.StartJob(_jobID);
                 return "<color><green>Job is active.";
             }
-            else
+            catch(Exception e)
             {
-                return "<color><red>Job does not exist!";
+                return "<color><red>" + e.Message;
             }
         }
     }
@@ -430,13 +407,14 @@ namespace MAD.CLICore
         {
             int _jobID = (int)pars.GetPar("id").argValues[0];
 
-            if (_js.StopJob(_jobID))
+            try
             {
+                _js.StopJob(_jobID);
                 return "<color><green>Job is inactive.";
             }
-            else
+            catch (Exception e)
             {
-                return "<color><red>Job does not exist!";
+                return "<color><red>" + e.Message;
             }
         }
     }
@@ -456,10 +434,15 @@ namespace MAD.CLICore
         {
             int _jobID = (int)pars.GetPar("id").argValues[0];
 
-            if (_js.RemoveJob(_jobID))
+            try
+            {
+                _js.RemoveJob(_jobID);
                 return "<color><green>Job removed.";
-            else
-                return JSError.Error(JSError.Type.JobNotExist, null, true);
+            }
+            catch (Exception e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 
