@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MAD.CLIIO
+namespace MAD.CLICore
 {
     public static class CLIOutput
     {

@@ -55,3 +55,4 @@ Now using the TcpListener and TcpClient)
 [13.07.2014][12:00-15:00][3h][106h] Working on serialization for the JobNodes so they can be saved as a file.
 [13.07.2014][15:00-16:30][1,5h][107,5h] Added Serialization to all Jobs. NOT TESTED YET!
 [22.07.2014][18:00-20:00][2h][109,5h] Tested Serialization. Cleaning JobSystem and rewritting some things.
+[26.07.2014][19:00-21:00][2h][111,5h] Working on JobSystem.

@@ -11,3 +11,19 @@ Derzeitig ist ein vollständiger CLIServer und CLIClient implementiert. Es gibt s
 das Netzwerk übertragen können (SSH, RDP, VNC, ...). Also ist die Frage, ob ein CLIServer und CLIClient wirklich nötig sind. Sie bringen
 wahrscheinlich mehr Probleme als Vorteile. Wie gesagt ist sie derzeit Implementiert, aber ob sie wirlich benötigt wird ist eine andere
 Frage ...
+
+
+EDIT 26.07.14:
+
+Es soll möglich sein, dem Programm mitzuteilen, wie der Benutzer das Programm verwalten möchte. Entweder der User möchte eine GUI starten oder
+die CLI (jedoch kann bei der CLI-Variante ein CLI-Server oder eine CLI-Standalone gestartet werden).
+
+	-> GUI: erklärt sich von selbst -> eine grafische Oberfläche
+	
+	-> CLI:
+		-> CLI-Standalone: eine CLI in der gestarten Konsole, Befehle werden local eingeben
+		-> CLI-Server: startet einen CLI-Server auf dem dann CLI-Clients (immer nur EINER gleichzeitig) sich verbinden können.
+
+Mithilfe eines solchen Aufbaues ist dem Benutzer viele Möglichkeiten geboten, das Programm zu nutzen. Wie schon zuvor angeschnitten: es 
+kann immer nur eine Variante verwendet werden und nur einer kann gleichzeitig damit arbeiten.
+

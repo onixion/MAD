@@ -4,7 +4,6 @@ using System.IO;
 
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
-using MAD.CLIIO;
 using MAD.DHCPReader;
 
 namespace MAD.CLICore
@@ -13,7 +12,7 @@ namespace MAD.CLICore
     {
         #region constructor
 
-        public CLI(string dataPath, JobSystem js, CLIServer cliServer, MACFeeder macFeeder)
+        public CLI(string dataPath, JobSystem js, MACFeeder macFeeder)
             :base()
         {
             // !! INIT COMMANDS !!
@@ -59,11 +58,12 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
 
-            // CLIServer
+            // CLIServer (these commands cannot be used by cli!)
+            /*
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
-            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
+            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));*/
         }
 
         #endregion
@@ -80,13 +80,17 @@ namespace MAD.CLICore
 
                 CLIInput.WriteCursor();
 
-                //string _cliInput = Console.ReadLine(); -> OLD
-                string _cliInput = CLIInput.ReadInput(); // <- using own read method (for input-history ..)
+                // This was the old method to read input from cli.
+                //string _cliInput = Console.ReadLine();
 
+                string _cliInput = CLIInput.ReadInput();
                 _cliInput = _cliInput.Trim();
 
                 if (_cliInput != "")
                 {
+                    // It is not necessery to use 'ref', but then
+                    // it is obvious that the command-object gets
+                    // modified.
                     string response = AnalyseInput(ref _command, _cliInput);
 
                     // Check if the par and args are valid.

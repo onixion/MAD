@@ -10,36 +10,39 @@ namespace MAD
 {
     class Mad
     {
-        /* MAD - Network Monitoring v0.0.4.0 RC1 */
+        /* MAD - Network Monitoring v0.0.4.0 RC3 */
 
-        private static string dataPath = "data";
+        private const string dataPath = "data";
 
         [STAThread]
         static int Main(string[] args)
         {
-            // warning
-            Console.WriteLine("WARNING! This software is still under development!");
+            Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOMPENT!");
 
             JobSystem js = new JobSystem();
-            CLIServer cliServer = new CLIServer(999, js);
             MACFeeder macFeeder = new MACFeeder();
 
             if (args.Length == 0)
             { 
                 // No args -> start gui.
+
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
 
-                CLI cli = new CLI(dataPath, js, cliServer, macFeeder);
+                CLI cli = new CLI(dataPath, js, macFeeder);
                 cli.Start();
             }
             else if (args.Length == 1)
             {
                 switch (args[0])
                 {
-                    case "-console":
-                        CLI cli = new CLI(dataPath, js, cliServer, macFeeder);
+                    case "-cli":
+                        CLI cli = new CLI(dataPath, js, macFeeder);
                         cli.Start();
+                        break;
+                    case "-cliserver":
+                        CLIServer cliServer = new CLIServer(999, js);
+                        cliServer.Start();
                         break;
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");

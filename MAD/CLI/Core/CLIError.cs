@@ -11,7 +11,9 @@ namespace MAD.CLICore
             CommandError,
             parError,
             argError,
-            argTypeError
+            argTypeError,
+            inputError,
+            outputError
         }
 
         public static string Error(ErrorType type, string errorText, bool colorEnable)
@@ -37,6 +39,12 @@ namespace MAD.CLICore
 
                 case ErrorType.argTypeError:
                     return _buffer + "Argument-type error: " + errorText;
+
+                case ErrorType.inputError:
+                    return _buffer + "Input error: " + errorText;
+
+                case ErrorType.outputError:
+                    return _buffer + "Output error: " + errorText;
 
                 default:
                     return "";

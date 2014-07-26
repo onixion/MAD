@@ -42,3 +42,19 @@ JONOTIFICATIONRULE
 Diese Klasse definiert eine Regel (=Rule). Die JobNotification-Klasse überprüft die Regeln auf ihre Gültigkeit.
 
 
+________________________________________________________________________
+
+Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
+
+	1.) Der JobScedule muss aktiv sein. Ist der JobScedule inaktiv werden die JobNodes nicht einmal angesehen.
+	2.) Der JobNode (an dem der Job befestigt ist) muss aktiv sein, sonst springt der JobScedule darüber und
+            sieht sich nicht einaml die Jobs des Nodes an.
+	3.) Der Job muss aktiv sein. Falls der JobState auf inaktiv ist, wird er vom JobScedule nicht ausgeführt.
+        4.) Die JobTime (des jeweiligen Jobs) muss dem JobScedule vor der Ausführung zustimmen, sonst darf der JobScedule den Job nicht ausführen.
+
+Wenn der JobScedule läuft, die JobNode, der Job aktiv sind UND die JobTime des jeweiligen Jobs ein 'OK' gibt, erst dann wird der Job ausgeführt.
+
+
+
+
+
