@@ -69,7 +69,6 @@
     <Compile Include="CLI\Core\Parameter.cs" />
     <Compile Include="CLI\Core\ParameterInput.cs" />
     <Compile Include="CLI\Core\ParameterOption.cs" />
-    <Compile Include="CLI\Server\CLIUser.cs" />
     <Compile Include="CLI\Core\Command.cs" />
     <Compile Include="CLI\Core\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />

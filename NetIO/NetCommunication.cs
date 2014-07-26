@@ -3,6 +3,8 @@ using System.IO;
 using System.Text;
 using System.Net.Sockets;
 
+using CryptoNet;
+
 namespace MAD.NetIO
 {
     public static class NetCom

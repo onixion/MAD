@@ -1,0 +1,4 @@
+Monitoring ist ein Überbegriff für alle Arten der unmittelbaren systematischen Erfassung (Protokollierung),
+Beobachtung oder Überwachung eines Vorgangs oder Prozesses mittels technischer Hilfsmittel oder anderer 
+Beobachtungssysteme. Dabei ist die wiederholte regelmäßige Durchführung ein zentrales Element der jeweiligen 
+Untersuchungsprogramme, um anhand von Ergebnisvergleichen Schlussfolgerungen ziehen zu können. (siehe Wikipedia)

@@ -23,7 +23,6 @@ namespace MAD.CLIServerCore
 
         private TcpClient _client;
         private IPEndPoint _clientEndPoint;
-        private CLIUser _user;
 
         private string _cursor = "=> ";
 
@@ -34,7 +33,7 @@ namespace MAD.CLIServerCore
 
         #endregion
 
-        public CLISession(TcpClient client, CLIUser user)
+        public CLISession(TcpClient client)
             : base()
         {
             lock (_sessionInitLock)
@@ -45,7 +44,6 @@ namespace MAD.CLIServerCore
 
             _client = client;
             _clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
-            _user = user;
         }
 
         #region methodes

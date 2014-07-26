@@ -15,8 +15,6 @@ namespace MAD.CLICore
         public CLI(string dataPath, JobSystem js, MACFeeder macFeeder)
             :base()
         {
-            // !! INIT COMMANDS !!
-
             // general purpose
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));

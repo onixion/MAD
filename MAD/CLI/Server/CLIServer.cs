@@ -15,10 +15,10 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private TcpListener _serverListener;
+        private static bool _userOnline = false;
 
-        private List<CLIUser> _users = new List<CLIUser>();
-        private List<CLISession> _sessions = new List<CLISession>();
+        private TcpListener _serverListener;
+        private CLISession _session;
 
         private JobSystem _js;
 
@@ -30,9 +30,6 @@ namespace MAD.CLIServerCore
         {
             serverPort = port;
             _js = js;
-
-            // TODO: Load users out of the database.
-            _users.Add(new CLIUser("root", MD5Hashing.GetHash("123"), CLIUser.Group.root));
         }
 
         #endregion
@@ -58,6 +55,14 @@ namespace MAD.CLIServerCore
             _serverListener.Stop();
         }
 
+        public void ChangePort(int newPort)
+        {
+            if (!IsListening)
+                serverPort = newPort;
+            else
+                throw new Exception("Server running!");
+        }
+
         protected override object GetClient()
         {
             return _serverListener.AcceptTcpClient();
@@ -66,157 +71,129 @@ namespace MAD.CLIServerCore
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
-            IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-            NetworkStream _clientStream = _client.GetStream();
-
-            // LOG
 
             try
             {
-                // First send server informations to client.
-                NetCom.SendStringUnicode(_clientStream, "Mad CLI-Server", true);
+                IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                NetworkStream _clientStream = _client.GetStream();
+
+                // LOG
+
+                if (_userOnline)
+                {
+                    return null;
+                }
+
+                // First make a diffi-hellman key exchange (working on this)
 
                 // Receive the login-data.
                 string loginData = NetCom.ReceiveStringUnicode(_clientStream);
 
                 // Check the login-data.
-                CLIUser _user = Login(loginData);
-
-                if (_user != null)
+                if (!Login(loginData))
                 {
-                    NetCom.SendStringUnicode(_clientStream, "ACCESS GRANTED", true);
-
-                    // Init CLISession for client.
-                    CLISession _session = new CLISession(_client, _user);
-
-                    // Add session to list.
-                    _sessions.Add(_session);
-
-                    // Start session in own thread from SmartThreadPool
-                    _session.Start();
+                    NetCom.SendStringUnicode(_clientStream, "ACCESS DENIED", true);
+                    return null;
                 }
                 else
                 {
-                    NetCom.SendStringUnicode(_clientStream, "ACCESS DENIED", true);
+                    NetCom.SendStringUnicode(_clientStream, "ACCESS GRANTED", true);
+                    _userOnline = true;
                 }
+
+                // Init CLISession for client and start it.
+                _session = new CLISession(_client);
+                _session.Start();
             }
             catch (Exception)
             {
                 // Client lost connection or disconnected.
+
                 // LOG
             }
 
             // Client disconnected.
+
             // LOG
 
+            _userOnline = false;
             _client.Close();
 
             return null;
         }
 
-        private void InitSessionCommands(CLISession session, CLIUser user)
+        private void InitSessionCommands()
         {
-            List<CommandOptions> commands = session.commands;
+            if (_session != null)
+            {
+                List<CommandOptions> commands = _session.commands;
 
-            // For now, all user get the same commands.
+                // general purpose
+                commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
+                commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+                commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+                commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
-            // !! INIT COMMANDS !!
+                // MAC AND IP READER
+                /*
+                commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
+                commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
+                commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
+                commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
+                */
+                // JOBSYSTEM
+                commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
 
-            // general purpose
-            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
-            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
-            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+                // SCEDULE
+                commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
 
-            // JobSystem
-            commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js status", typeof(JobStatusCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
-            /*commands.Add(new CommandOptions("js add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("js remove job", typeof(JobSystemRemoveJobCommand), new object[] { _js }));*/
+                // NODES
+                commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
+
+                // JOBS
+                commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
+
+                commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
+                commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
+
+                // CLIServer (these commands cannot be used by cli!)
+                /*
+                commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
+                commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
+                commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
+                commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));*/
+            }
         }
 
-        public void ChangePort(int newPort)
-        {
-            if (!IsListening)
-            {
-                serverPort = newPort;
-            }
-            else
-            {
-                throw new Exception("Server running!");
-            }
-        }
-
-        private CLIUser Login(string loginData)
+        private bool Login(string loginData)
         {
             string[] buffer = loginData.Split(new string[] { "<seperator>" },StringSplitOptions.None);
 
-            if (buffer.Length == 2)
-            {
-                if (CheckUsernameAndPassword(buffer[0], buffer[1]))
-                {
-                    CLIUser _user = GetCLIUser(buffer[0]);
-
-                    if (!_user.online)
-                    {
-                        _user.online = true;
-                        return _user;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
+            return true;
         }
 
-        private bool CheckUsernameAndPassword(string username, string passwordMD5)
+        private byte[] GenerateRandomPass(int length)
         {
-            CLIUser user = GetCLIUser(username);
+            byte[] _buffer = new byte[length];
 
-            if (user != null)
-            {
-                if (user.passwordMD5 == passwordMD5)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
+            Random _rand = new Random();
+            _rand.NextBytes(_buffer);
 
-        private CLIUser GetCLIUser(string username)
-        {
-            foreach (CLIUser temp in _users)
-            {
-                if (temp.username == username)
-                {
-                    return temp;
-                }
-            }
-
-            return null;
+            return _buffer;
         }
 
         #endregion
