@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.IO; 
@@ -22,11 +23,9 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>\nJOBSYSTEM version " + _js.version + "\n\n";
-
+            output += "<color><yellow>\n JOBSYSTEM version " + _js.version + "\n\n";
             output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
             output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes * JobNode.maxJobs + ")\n";
-
             output += "\n\n Scedule-State: ";
 
             if (_js.sceduleState == JobScedule.State.Active)
@@ -34,7 +33,7 @@ namespace MAD.CLICore
             else
                 output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
 
-            output += "\n\n";
+            output += "\n";
 
             return output;
         }
@@ -98,19 +97,24 @@ namespace MAD.CLICore
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
 
             output += "\n";
-
             output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.maxNodes + "\n";
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodesInitialized + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
-
             output += "<color><yellow>" + ConsoleTable.splitline; 
             output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
             output += ConsoleTable.splitline;
-
             output += "<color><white>";
 
-            foreach (JobNode _temp in _js.GetNodes())
+            List<JobNode> _nodes;
+            
+            try { _nodes = _js.GetNodes(); }
+            catch (JobSceduleException e)
+            { 
+                return "<color><red>" + e.Message; 
+            }
+
+            foreach (JobNode _temp in _nodes)
             {
                 _tableRow[0] = _temp.id.ToString();
                 _tableRow[1] = _temp.name;
@@ -118,7 +122,6 @@ namespace MAD.CLICore
                 _tableRow[3] = _temp.macAddress.ToString();
                 _tableRow[4] = _temp.ipAddress.ToString();
                 _tableRow[5] = _temp.jobs.Count.ToString();
-
                 output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
             }
 

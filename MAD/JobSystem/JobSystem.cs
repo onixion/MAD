@@ -101,6 +101,8 @@ namespace MAD.JobSystemCore
 
         public void StartNode(int id)
         {
+            if (SceduleActive())
+                throw new JobSceduleException("Scedule is active!", null);
             JobNode _node = GetNode(id);
             if (_node != null)
                 _node.state = JobNode.State.Active;
@@ -110,6 +112,8 @@ namespace MAD.JobSystemCore
 
         public void StopNode(int id)
         {
+            if (SceduleActive())
+                throw new JobSceduleException("Scedule is active!", null);
             JobNode _node = GetNode(id);
             if (_node != null)
                 _node.state = JobNode.State.Inactive;
@@ -119,6 +123,9 @@ namespace MAD.JobSystemCore
 
         public void AddNode(JobNode node)
         {
+            if (SceduleActive())
+                throw new JobSceduleException("Scedule is active!", null);
+
             if (maxNodes > _nodes.Count)
                 _nodes.Add(node);
             else
@@ -173,6 +180,8 @@ namespace MAD.JobSystemCore
 
         public void RemoveAllNodes()
         {
+            if (SceduleActive())
+                throw new JobSceduleException("Scedule is active!", null);
             _nodes.Clear();
         }
 
@@ -219,7 +228,6 @@ namespace MAD.JobSystemCore
         {
             if (SceduleActive())
                 throw new JobSceduleException("Scedule is active!", null);
-
             Job _job = GetJob(id);
             if (_job != null)
                 if (_job.state == Job.JobState.Inactive)
@@ -234,7 +242,6 @@ namespace MAD.JobSystemCore
         {
             if (SceduleActive())
                 throw new JobSceduleException("Scedule is active!", null);
-
             Job _job = GetJob(id);
             if (_job != null)
                 if (_job.state == Job.JobState.Waiting)
@@ -250,7 +257,6 @@ namespace MAD.JobSystemCore
         {
             if (SceduleActive())
                 throw new JobSceduleException("Scedule is active!", null);
-
             JobNode _node = GetNode(id);
             if (_node != null)
                 _node.jobs.Add(job);
@@ -262,7 +268,6 @@ namespace MAD.JobSystemCore
         {
             if (SceduleActive())
                 throw new JobSceduleException("Scedule is active!", null);
-
             if (!RemoveJobIntern(id))
                 throw new JobException("Job does not exist!", null);
         }
@@ -271,13 +276,11 @@ namespace MAD.JobSystemCore
         {
             foreach (JobNode _node in _nodes)
                 for (int i = 0; i < _node.jobs.Count; i++)
-                {
                     if (_node.jobs[i].id == id)
                     {
                         _node.jobs.RemoveAt(i);
                         return true;
                     }
-                }
             return false;
         }
 
@@ -285,7 +288,6 @@ namespace MAD.JobSystemCore
         {
             if (SceduleActive())
                 throw new JobSceduleException("Scedule is active!", null);
-
             if (!UpdateJobIntern(id, job))
                 throw new JobException("Job does not exist!", null);
         }
