@@ -2,6 +2,7 @@
 
 namespace MAD.JobSystemCore
 {
+    // NIU
     public class OutputDesc
     {
         #region members

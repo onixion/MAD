@@ -81,17 +81,12 @@ namespace MAD.JobSystemCore
         }
 
         /// <summary>
-        /// After you used this method to optain the nodes, do not start the
-        /// scedule. But after you destroyed the reference you are good to go.
-        /// The problem is when you get the reference you can remove entries
-        /// by you own, while the scedule may be running and this can cause
-        /// problems. So be aware of this when using the jobsystem.
+        /// Only use this list for READ-ONLY.
+        /// Changing some settings while the scedule
+        /// is working with it, can cause errors.
         /// </summary>
         public List<JobNode> GetNodes()
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-
             return _nodes;
         }
 

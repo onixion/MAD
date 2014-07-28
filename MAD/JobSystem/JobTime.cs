@@ -10,7 +10,7 @@ namespace MAD.JobSystemCore
         #region members
 
         public enum TimeType { NULL, Absolute, Relative }
-        public TimeType type;
+        public TimeType type = TimeType.NULL;
 
         public JobDelayHandler jobDelay;
         public List<JobTimeHandler> jobTimes;
@@ -19,21 +19,20 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        public JobTime()
-        {
-            this.type = TimeType.NULL;
-        }
+        public JobTime() { }
 
-        public JobTime(List<JobTimeHandler> jobTimes)
-        {
-            this.type = TimeType.Absolute;
-            this.jobTimes = jobTimes;
-        }
-
+        // for delay (e.g. 2000ms)
         public JobTime(JobDelayHandler jobDelay)
         {
             type = TimeType.Relative;
             this.jobDelay = jobDelay;
+        }
+
+        // for times (e.g. 19:30)
+        public JobTime(List<JobTimeHandler> jobTimes)
+        {
+            this.type = TimeType.Absolute;
+            this.jobTimes = jobTimes;
         }
 
         // for serialization
@@ -51,13 +50,8 @@ namespace MAD.JobSystemCore
         public JobTimeHandler GetJobTimeHandler(DateTime time)
         {
             foreach (JobTimeHandler _handler in jobTimes)
-            {
                 if (_handler.CheckTime(time))
-                {
                     return _handler;
-                }
-            }
-
             return null;
         }
 
@@ -107,9 +101,7 @@ namespace MAD.JobSystemCore
                         }
                     }
                     else
-                    {
                         throw new Exception("Syntax-Error! Maybe too many ';'?");
-                    }
                 }
 
             return _buffer;
@@ -135,26 +127,18 @@ namespace MAD.JobSystemCore
                 }
 
                 if (_hour <= 23 && _hour >= 0)
-                {
                     if (_minute <= 59 && _minute >= 0)
                     {
                         hour = _hour;
                         minute = _minute;
                     }
                     else
-                    {
                         throw new Exception("Minute can't be '" + _minute + "'!");
-                    }
-                }
                 else
-                {
                     throw new Exception("Hour can't be '" + _hour + "'!");
-                }
             }
             else
-            {
                 throw new Exception("Syntax-Error! Maybe too many ':'?");
-            }
         }
 
         private static void ParseYearMonthDay(string data, ref int year, ref int month, ref int day)
@@ -175,14 +159,9 @@ namespace MAD.JobSystemCore
                 }
 
                 if (_day <= 31 && _day >= 1)
-                {
                     day = _day;
-                }
                 else
-                {
                     throw new Exception("Day can't be '" + _day + "'!");
-                }
-
             }
             else if (_split.Length == 2)
             {
@@ -200,21 +179,15 @@ namespace MAD.JobSystemCore
                 }
 
                 if (_day <= 31 && _day >= 1)
-                {
                     if (_month <= 12 && _month >= 1)
                     {
                         day = _day;
                         month = _month;
                     }
                     else
-                    {
                         throw new Exception("Month can't be '" + _month + "'!");
-                    }
-                }
                 else
-                {
                     throw new Exception("Day can't be '" + _day + "'!");
-                }
             }
             else if (_split.Length == 3)
             {
@@ -233,8 +206,7 @@ namespace MAD.JobSystemCore
                     throw new Exception("Could not parse time arg(s)!");
                 }
 
-                if (_day <= 31 && _day >= 1)
-                {
+                if (_day <= 31 && _day >= 1) 
                     if (_month <= 12 && _month >= 1)
                     {
                         day = _day;
@@ -242,42 +214,27 @@ namespace MAD.JobSystemCore
                         year = _year;
                     }
                     else
-                    {
                         throw new Exception("Month can't be '" + _month + "'!");
-                    }
-                }
                 else
-                {
                     throw new Exception("Day can't be '" + _day + "'!");
-                }
             }
             else
-            {
                 throw new Exception("Syntax-Error! Maybe too many '.'?");
-            }
         }
 
         public string GetValues()
         {
             if (type == TimeType.Relative)
-            {
                 return jobDelay.delayTime.ToString();
-            }
             else if (type == TimeType.Absolute)
             {
                 string _temp = "";
-
                 foreach (JobTimeHandler _buffer in jobTimes)
-                {
                     _temp += _buffer.JobTimeStatus();
-                }
-
                 return _temp;
             }
             else
-            {
                 return "NULL";
-            }
         }
 
         #region for serialization
@@ -299,8 +256,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public Type type = Type.NULL;
         public enum Type { NULL, Daily, Monthly, Yearly, Unique }
+        public Type type = Type.NULL;
 
         public int year { get; set; }
         public int month { get; set; }
@@ -507,13 +464,9 @@ namespace MAD.JobSystemCore
         public bool CheckTime()
         {
             if (_delayTimeRemaining <= 0)
-            {
                 return true;
-            }
             else
-            {
                 return false;
-            }
         }
 
         public void Reset()

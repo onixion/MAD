@@ -78,20 +78,17 @@ namespace MAD.JobSystemCore
                     {
                         foreach (Job _job in _node.jobs)
                         {
-                            /* Scedule execute only these jobs, which states are equal to 'Waiting'. */
                             if (_job.state == Job.JobState.Waiting)
                             {
-                                // Set job-state to working.
-                                _job.state = Job.JobState.Working;
-
                                 if (CheckJobTime(_job.time, _time))
                                 {
                                     if (_job.time.type == JobTime.TimeType.Relative)
                                     {
+                                        _job.state = Job.JobState.Working;
                                         _job.time.jobDelay.Reset();
 
-                                        _holder.job = _job;
-                                        _holder.targetAddress = _node.ipAddress;
+                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
 
                                         JobThreadStart(_holder);
                                     }
@@ -101,10 +98,11 @@ namespace MAD.JobSystemCore
 
                                         if (!_handler.IsBlocked(_time))
                                         {
+                                            _job.state = Job.JobState.Working;
                                             _handler.minuteAtBlock = _time.Minute;
 
-                                            _holder.job = _job;
-                                            _holder.targetAddress = _node.ipAddress;
+                                            _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                            _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
 
                                             JobThreadStart(_holder);
                                         }
@@ -119,9 +117,7 @@ namespace MAD.JobSystemCore
                 }
 
                 if (_state == State.StopRequest)
-                {
                     break;
-                }
             }
         }
 
@@ -138,7 +134,6 @@ namespace MAD.JobSystemCore
                         return true;
                     else
                         return false;
-
             return false;
         }
 
@@ -158,6 +153,7 @@ namespace MAD.JobSystemCore
             _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
             // Check JobNotification.
+            // Make query to NotificationSystem if necessary.
 
             _job.state = Job.JobState.Waiting;
 

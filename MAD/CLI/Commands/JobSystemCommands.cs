@@ -8,6 +8,9 @@ using MAD.JobSystemCore;
 
 namespace MAD.CLICore
 {
+    // Commands with the identifier 'SS' (=SceduleStop)
+    // cannot be executed when the scedule is active.
+
     #region commands for JOBSYSTEM
 
     public class JobSystemStatusCommand : Command
@@ -27,12 +30,10 @@ namespace MAD.CLICore
             output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
             output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes * JobNode.maxJobs + ")\n";
             output += "\n\n Scedule-State: ";
-
             if (_js.sceduleState == JobScedule.State.Active)
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
             else
                 output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-
             output += "\n";
 
             return output;
@@ -42,6 +43,28 @@ namespace MAD.CLICore
     #endregion
 
     #region commands for SCEUDLE
+
+    public class JobSceduleCommand : Command
+    { 
+        JobSystem _js;
+
+        public JobSceduleCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            description = "This command shows the current state of the scedule.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            output = "<color><yellow>Scedule-state: ";
+            if (_js.sceduleState == JobScedule.State.Active)
+                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            else
+                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+            return output;
+        }
+    }
 
     public class JobSceduleStartCommand : Command
     {
@@ -106,15 +129,7 @@ namespace MAD.CLICore
             output += ConsoleTable.splitline;
             output += "<color><white>";
 
-            List<JobNode> _nodes;
-            
-            try { _nodes = _js.GetNodes(); }
-            catch (JobSceduleException e)
-            { 
-                return "<color><red>" + e.Message; 
-            }
-
-            foreach (JobNode _temp in _nodes)
+            foreach (JobNode _temp in _js.GetNodes())
             {
                 _tableRow[0] = _temp.id.ToString();
                 _tableRow[1] = _temp.name;
@@ -179,6 +194,7 @@ namespace MAD.CLICore
         }
     }
 
+    // SS
     public class JobSystemAddNodeCommand : Command
     { 
         private JobSystem _js;
@@ -189,7 +205,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
             rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
-            description = "This command creates a node for the cached jobs.";
+            description = "This command creates a node.";
         }
 
         public override string Execute(int consoleWidth)
@@ -197,15 +213,21 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0]; // MAC ADDRESS
+            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
             _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
 
-            _js.AddNode(_node);
+            try
+            { _js.AddNode(_node); }
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
 
             return "<color><green>Node created (ID " + _node.id + ").";
         }
     }
 
+    // SS
     public class JobSystemRemoveNodeCommand : Command
     {
         private JobSystem _js;
@@ -258,6 +280,7 @@ namespace MAD.CLICore
         }
     }
 
+    // SS
     public class JobSystemLoadNodeCommand : Command
     {
         private JobSystem _js;
@@ -303,21 +326,26 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-
             output += "\n";
-
             output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.maxNodes * JobNode.maxJobs + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
-
             output += "<color><yellow>" + ConsoleTable.splitline;
             output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
             output += ConsoleTable.splitline;
-
             output += "<color><white>";
 
-            foreach (JobNode _temp in _js.GetNodes())
+            List<JobNode> _nodes;
+
+            try
+            { _nodes = _js.GetNodes(); }
+            catch (JobSceduleException e)
+            {
+                return "<color><red>" + e.Message;
+            }
+
+            foreach (JobNode _temp in _nodes)
                 foreach (Job _temp2 in _temp.jobs)
                 {
                     _tableRow[0] = _temp.id.ToString();
@@ -328,7 +356,6 @@ namespace MAD.CLICore
                     _tableRow[5] = _temp2.time.type.ToString();
                     _tableRow[6] = _temp2.time.GetValues();
                     _tableRow[7] = _temp2.outState.ToString();
-
                     output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                 }
             return output;
@@ -368,6 +395,7 @@ namespace MAD.CLICore
         }
     }
 
+    //SS
     public class JobSystemStartJobCommand : Command
     {
         private JobSystem _js;
@@ -395,6 +423,7 @@ namespace MAD.CLICore
         }
     }
 
+    // SS
     public class JobSystemStopJobCommand : Command
     {
         private JobSystem _js;
@@ -422,6 +451,7 @@ namespace MAD.CLICore
         }
     }
 
+    // SS
     public class JobSystemRemoveJobCommand : Command
     {
         private JobSystem _js;
@@ -450,7 +480,7 @@ namespace MAD.CLICore
     }
 
     #region commands for adding jobs
-
+    /* ALL ADD-JOBS-COMMANDS HAVE 'SS' */
     public class JobSystemAddServiceCheckCommand : Command
     {
         private JobSystem _js;
