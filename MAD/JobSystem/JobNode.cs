@@ -9,7 +9,7 @@ namespace MAD.JobSystemCore
     [Serializable]
     public class JobNode : ISerializable
     {
-        #region member
+        #region members
 
         private static int _nodesCount = 0;
         private static object _idLock = new object();
@@ -20,12 +20,11 @@ namespace MAD.JobSystemCore
         public State state = State.Inactive;
 
         public List<Job> jobs = new List<Job>();
-        public object jobsLock = new object();
         public const int maxJobs = 100;
 
-        public string name;
-        public PhysicalAddress macAddress;
-        public IPAddress ipAddress;
+        public string name { get; set; }
+        public PhysicalAddress macAddress { get; set; }
+        public IPAddress ipAddress { get; set; }
 
         #endregion
 
@@ -45,6 +44,8 @@ namespace MAD.JobSystemCore
             this.jobs = jobs;
         }
 
+        #region for serialization only
+
         public JobNode(SerializationInfo info, StreamingContext context)
         {
             InitID();
@@ -53,6 +54,8 @@ namespace MAD.JobSystemCore
             this.ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
             this.jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
         }
+
+        #endregion
 
         #endregion
 
@@ -67,7 +70,8 @@ namespace MAD.JobSystemCore
             }
         }
 
-        // This is need for serialization.
+        #region for serialization only
+
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("SER_NODE_NAME", name);
@@ -75,6 +79,8 @@ namespace MAD.JobSystemCore
             info.AddValue("SER_NODE_IP", ipAddress.ToString());
             info.AddValue("SER_NODE_JOBS", jobs);
         }
+
+        #endregion
 
         #endregion
     }

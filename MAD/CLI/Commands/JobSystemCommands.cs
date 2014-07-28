@@ -29,7 +29,7 @@ namespace MAD.CLICore
 
             output += "\n\n Scedule-State: ";
 
-            if (_js.sceduleState == JobScedule.State.Running)
+            if (_js.sceduleState == JobScedule.State.Active)
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
             else
                 output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
@@ -514,22 +514,18 @@ namespace MAD.CLICore
                 _job.time.type = JobTime.TimeType.Relative;
             }
 
-            // This need to be fixed first!
             JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
             if (_node != null)
             {
-                lock (_node.jobsLock)
-                {
-                    _node.jobs.Add(_job);
-                }
-
+                if (_js.SceduleActive())
+                    return "<color><red>Job cannot be added, while scedule is running!";
+                
+                _node.jobs.Add(_job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
-            {
-                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
-            }
+                return "<color><red>Node does not exist!";
         }
     }
 
@@ -592,17 +588,14 @@ namespace MAD.CLICore
 
             if (_node != null)
             {
-                lock (_node.jobsLock)
-                {
-                    _node.jobs.Add(_job);
-                }
+                if (_js.SceduleActive())
+                    return "<color><red>Job cannot be added, while scedule is running!";
 
+                _node.jobs.Add(_job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
-            {
-                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
-            }
+                return "<color><red>Node does not exist!";
         }
     }
 
@@ -669,21 +662,16 @@ namespace MAD.CLICore
             
             JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
-            if(_node != null)
+            if (_node != null)
             {
-                // Use lock. Because if the scedule is working on those jobs, it will fail.
-                lock(_node.jobsLock)
-                {
-                    _node.jobs.Add(_job);
-                }
-
+                if (_js.SceduleActive())
+                    return "<color><red>Job cannot be added, while scedule is running!";
+                
+                _node.jobs.Add(_job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
-            {
-                // JobSystemError.
-                return JSError.Error(JSError.Type.NodeNotExist, null, true);
-            }
+                return "<color><red>Node does not exist!";
         }
     }
 
@@ -746,21 +734,16 @@ namespace MAD.CLICore
 
             JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
-            if(_node != null)
+            if (_node != null)
             {
-                // Use lock. Because if the scedule is working on those jobs, it will fail.
-                lock(_node.jobsLock)
-                {
-                    _node.jobs.Add(_job);
-                }
-
+                if (_js.SceduleActive())
+                    return "<color><red>Job cannot be added, while scedule is running!";
+                
+                _node.jobs.Add(_job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
-            {
-                // JobSystemError.
-                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
-            }
+                return "<color><red>Node does not exist!";
         }
     }
 
@@ -822,17 +805,14 @@ namespace MAD.CLICore
 
             if (_node != null)
             {
-                lock (_node.jobsLock)
-                {
-                    _node.jobs.Add(_job);
-                }
-
+                if (_js.SceduleActive())
+                    return "<color><red>Job cannot be added, while scedule is running!";
+                
+                _node.jobs.Add(_job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
             }
             else
-            {
-                return JSError.Error(JSError.Type.NodeNotExist, "(ID " + _node.id + ")", true);
-            }
+                return "<color><red>Node does not exist!";
         }
     }
 

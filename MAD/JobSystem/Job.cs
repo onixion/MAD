@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-
 using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
@@ -19,20 +18,22 @@ namespace MAD.JobSystemCore
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
         public JobType type = JobType.NULL;
 
-        public enum JobState { NULL, Inactive, Waiting, Working, Exception }
+        public enum JobState { Inactive, Waiting, Working, Exception }
         public JobState state = JobState.Inactive;
 
         public enum OutState { NULL, Success, Failed, Exception }
         public OutState outState = OutState.NULL;
 
-        public DateTime lastStarted;
-        public DateTime lastFinished;
-        public TimeSpan lastTimeSpan;
+        public DateTime tStart;
+        public DateTime tStop;
+        public TimeSpan tSpan;
 
-        public string name;
+        public string name { get; set; }
         public JobTime time = new JobTime();
-        public List<OutputDesc> outDesc = new List<OutputDesc>(); // NOT SERIALIZED YET!
-        public JobNotification notification = new JobNotification(); // NOT SERIALIZED YET!
+
+        // !_TODO_!
+        //public List<OutputDesc> outDesc = new List<OutputDesc>(); // NOT SERIALIZED YET!
+        //public JobNotification notification = new JobNotification(); // NOT SERIALIZED YET!
 
         #endregion
 
@@ -70,24 +71,26 @@ namespace MAD.JobSystemCore
 
         public abstract void Execute(IPAddress targetAddress);
 
+        #region for CLI only
+
         public string Status()
         {
             string _temp = "\n";
 
-            _temp += "<color><yellow>ID: <color><white>" + _id + "\n";
-            _temp += "<color><yellow>NAME: <color><white>" + name + "\n";
-            _temp += "<color><yellow>TYPE: <color><white>" + type.ToString() + "\n";
-            _temp += "<color><yellow>STATE: <color><white>" + state.ToString() + "\n";
-            _temp += "<color><yellow>TIME-TYPE: <color><white>" + time.type.ToString() + "\n";
+            _temp += "<color><yellow>ID:\t\t<color><white>" + _id + "\n";
+            _temp += "<color><yellow>NAME:\t\t<color><white>" + name + "\n";
+            _temp += "<color><yellow>TYPE:\t\t<color><white>" + type.ToString() + "\n";
+            _temp += "<color><yellow>STATE:\t\t<color><white>" + state.ToString() + "\n";
+            _temp += "<color><yellow>TIME-TYPE:\t\t<color><white>" + time.type.ToString() + "\n";
 
             if (time.type == JobTime.TimeType.Relative)
             {
-                _temp += "<color><yellow>DELAY-TIME: <color><white>" + time.jobDelay.delayTime + "\n";
-                _temp += "<color><yellow>DELAY-REMAIN-TIME: <color><white>" + time.jobDelay.delayTimeRemaining + "\n";
+                _temp += "<color><yellow>DELAY-TIME:\t\t<color><white>" + time.jobDelay.delayTime + "\n";
+                _temp += "<color><yellow>DELAY-REMAIN-TIME:\t\t<color><white>" + time.jobDelay.delayTimeRemaining + "\n";
             }
             else if (time.type == JobTime.TimeType.Absolute)
             {
-                _temp += "<color><yellow>TIMES: <color><white>";
+                _temp += "<color><yellow>TIMES:\t\t<color><white>";
 
                 foreach (JobTimeHandler _buffer in time.jobTimes)
                 {
@@ -97,15 +100,17 @@ namespace MAD.JobSystemCore
                 _temp += "\n";
             }
 
-            _temp += "<color><yellow>LAST-STARTTIME: <color><white>" + lastStarted.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
-            _temp += "<color><yellow>LAST-STOPTIME: <color><white>" + lastFinished.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
-            _temp += "<color><yellow>LAST-TIMESPAN: <color><white>" + lastTimeSpan.Seconds + "s " + lastTimeSpan.Milliseconds + "ms (" + lastTimeSpan.Ticks + " ticks)\n";
-            _temp += "<color><yellow>OUTPUT-STATE: <color><white>" + outState.ToString() +"\n";
+            _temp += "<color><yellow>LAST-STARTTIME:\t\t<color><white>" + tStart.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>LAST-STOPTIME:\t\t<color><white>" + tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            _temp += "<color><yellow>LAST-TIMESPAN:\t\t<color><white>" + tSpan.Seconds + "s " + tSpan.Milliseconds + "ms (" + tSpan.Ticks + " ticks)\n";
+            _temp += "<color><yellow>OUTPUT-STATE:\t\t<color><white>" + outState.ToString() + "\n";
 
             return _temp + JobStatus();
         }
 
         protected abstract string JobStatus();
+
+        #endregion
 
         #region for serialization
 
