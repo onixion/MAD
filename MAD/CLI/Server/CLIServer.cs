@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
 
@@ -71,11 +73,12 @@ namespace MAD.CLIServerCore
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
+            NetworkStream _clientStream = _client.GetStream();
 
             try
             {
                 IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-                NetworkStream _clientStream = _client.GetStream();
+                SslStream _sslStream = new SslStream(_clientStream, false);
 
                 // LOG
 
@@ -83,8 +86,6 @@ namespace MAD.CLIServerCore
                 {
                     return null;
                 }
-
-                // First make a diffi-hellman key exchange (working on this)
 
                 // Receive the login-data.
                 string loginData = NetCom.ReceiveStringUnicode(_clientStream);
@@ -189,10 +190,8 @@ namespace MAD.CLIServerCore
         private byte[] GenerateRandomPass(int length)
         {
             byte[] _buffer = new byte[length];
-
             Random _rand = new Random();
             _rand.NextBytes(_buffer);
-
             return _buffer;
         }
 
