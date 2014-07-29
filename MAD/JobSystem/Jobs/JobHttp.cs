@@ -19,13 +19,13 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHttp() 
-            : base("NULL", JobType.Http, new JobTime())
+            : base("NULL", JobType.Http, new JobTime(), new JobNotification())
         {
             this.port = 80;
         }
 
-        public JobHttp(string jobName, JobType jobType, JobTime jobTime, int port) 
-            : base (jobName, jobType, jobTime)
+        public JobHttp(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, int port) 
+            : base (jobName, jobType, jobTime, noti)
         {
             this.port = port;
         }

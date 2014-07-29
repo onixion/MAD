@@ -27,6 +27,7 @@ namespace MAD.JobSystemCore
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; }
         public IPAddress ipAddress { get; set; }
+        public JobNotification defaultNoti;
 
         #endregion
 
@@ -35,19 +36,20 @@ namespace MAD.JobSystemCore
         public JobNode()
         {
             InitID();
+            defaultNoti = new JobNotification();
         }
 
-        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
+        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotification defaultNoti)
         {
             InitID();
             this.name = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
             this.jobs = jobs;
+            this.defaultNoti = defaultNoti;
         }
 
-        #region for serialization only
-
+        // for serialization only
         public JobNode(SerializationInfo info, StreamingContext context)
         {
             InitID();
@@ -56,8 +58,6 @@ namespace MAD.JobSystemCore
             this.ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
             this.jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
         }
-
-        #endregion
 
         #endregion
 

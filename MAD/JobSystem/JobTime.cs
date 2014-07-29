@@ -9,8 +9,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public enum TimeType { NULL, Absolute, Relative }
-        public TimeType type = TimeType.NULL;
+        public enum TimeType { Absolute, Relative }
+        public TimeType type;
 
         public JobDelayHandler jobDelay;
         public List<JobTimeHandler> jobTimes;

@@ -8,9 +8,6 @@ using MAD.JobSystemCore;
 
 namespace MAD.CLICore
 {
-    // Commands with the identifier 'SS' (=SceduleStop)
-    // cannot be executed when the scedule is active.
-
     #region commands for JOBSYSTEM
 
     public class JobSystemStatusCommand : Command
@@ -193,7 +190,6 @@ namespace MAD.CLICore
         }
     }
 
-    // SS
     public class JobSystemAddNodeCommand : Command
     { 
         private JobSystem _js;
@@ -226,7 +222,6 @@ namespace MAD.CLICore
         }
     }
 
-    // SS
     public class JobSystemRemoveNodeCommand : Command
     {
         private JobSystem _js;
@@ -279,7 +274,6 @@ namespace MAD.CLICore
         }
     }
 
-    // SS
     public class JobSystemLoadNodeCommand : Command
     {
         private JobSystem _js;
@@ -394,7 +388,6 @@ namespace MAD.CLICore
         }
     }
 
-    //SS
     public class JobSystemStartJobCommand : Command
     {
         private JobSystem _js;
@@ -422,7 +415,6 @@ namespace MAD.CLICore
         }
     }
 
-    // SS
     public class JobSystemStopJobCommand : Command
     {
         private JobSystem _js;
@@ -450,7 +442,6 @@ namespace MAD.CLICore
         }
     }
 
-    // SS
     public class JobSystemRemoveJobCommand : Command
     {
         private JobSystem _js;
@@ -479,7 +470,7 @@ namespace MAD.CLICore
     }
 
     #region commands for adding jobs
-    /* ALL ADD-JOBS-COMMANDS HAVE 'SS' */
+
     public class JobSystemAddServiceCheckCommand : Command
     {
         private JobSystem _js;
@@ -493,13 +484,10 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
             //there will be more, still working
             oPar.Add(new ParOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on with the job should be executed", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
         }
 
@@ -560,7 +548,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddHostDetectCommand : Command
+    public class JobSystemAddHostDetectCommand : JobCommand
     {
         private JobSystem _js;
 
@@ -568,11 +556,7 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            //rPar.Add(new ParOption("a", "NET-ADDRESS", "Netaddress of the target Net", false, false, new Type[] { typeof(IPAddress) }));
             rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
-            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on with the job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
         }
 
@@ -629,7 +613,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddPingCommand : Command
+    public class JobSystemAddPingCommand : JobCommand
     {
         private JobSystem _js;
 
@@ -638,9 +622,6 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
 
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
 
             description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
@@ -712,9 +693,6 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            oPar.Add(new ParOption("t", "JOB-TIME", "Delaytime or time on which the job schould be executed", false, true, new Type[] { typeof(string), typeof(int) }));
             oPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
         }
 
@@ -783,10 +761,7 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             rPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
-            oPar.Add(new ParOption("t", "JOB-TIME", "Delaytime or time on which the job should be executed", false, true, new Type[] { typeof(string), typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)

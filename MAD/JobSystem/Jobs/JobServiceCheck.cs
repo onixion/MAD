@@ -22,7 +22,7 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobServiceCheck()
-            : base("NULL", JobType.ServiceCheck, new JobTime())
+            : base("NULL", JobType.ServiceCheck, new JobTime(), new JobNotification())
         {
             this.arg = "";
             this.username = "";
@@ -30,8 +30,8 @@ namespace MAD.JobSystemCore
             //this.targetIP = IPAddress.Parse("127.0.0.1");
         }
 
-        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, string arg, string username, string password)
-            : base(jobName, jobType, jobTime)
+        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, string arg, string username, string password)
+            : base(jobName, jobType, jobTime, noti)
         {
             this.arg = arg;
             this.username = username;

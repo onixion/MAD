@@ -17,9 +17,6 @@ namespace MAD.JobSystemCore
         private int _id;
         public int id { get { return _id; } }
 
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
-        public JobType type = JobType.NULL;
-
         public enum JobState { Inactive, Waiting, Working, Exception }
         public JobState state = JobState.Inactive;
 
@@ -30,23 +27,25 @@ namespace MAD.JobSystemCore
         public DateTime tStop;
         public TimeSpan tSpan;
 
-        public string name { get; set; }
-        public JobTime time = new JobTime();
+        public List<OutputDesc> outDesc = new List<OutputDesc>();
 
-        // !_TODO_!
-        //public List<OutputDesc> outDesc = new List<OutputDesc>(); // NOT SERIALIZED YET!
-        //public JobNotification notification = new JobNotification(); // NOT SERIALIZED YET!
+        public string name { get; set; }
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
+        public JobType type = JobType.NULL;
+        public JobTime time = new JobTime();
+        public JobNotification noti;
 
         #endregion
 
         #region constructors
 
-        protected Job(string name, JobType type, JobTime time)
+        protected Job(string name, JobType type, JobTime time, JobNotification noti)
         {
             InitJob();
             this.name = name;
             this.type = type;
             this.time = time;
+            this.noti = noti;
         }
 
         // for serialization
@@ -114,7 +113,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region for serialization
+        #region for serialization only
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

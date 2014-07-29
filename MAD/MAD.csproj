@@ -66,6 +66,7 @@
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
     <Compile Include="CLI\CLIOutput.cs" />
     <Compile Include="CLI\CLIServer.cs" />
+    <Compile Include="CLI\JobCommand.cs" />
     <Compile Include="CLI\Parameter.cs" />
     <Compile Include="CLI\ParameterInput.cs" />
     <Compile Include="CLI\ParameterOption.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="CLI\CLIError.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobNode.cs" />
+    <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobSystemExceptions.cs" />
     <Compile Include="JobSystem\JSSerializer.cs" />
     <Compile Include="JobSystem\JobScedule.cs" />

@@ -26,14 +26,14 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHostDetect()
-            : base("NULL", JobType.HostDetect, new JobTime())
+            : base("NULL", JobType.HostDetect, new JobTime(), new JobNotification())
         {
             //this.Net = IPAddress.Parse("192.168.0.0"); <- This need to be implemented in the execute-method.
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
         }
 
-        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, IPAddress Subnetmask)
-            : base(jobName, jobType, jobTime)
+        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, IPAddress Subnetmask)
+            : base(jobName, jobType, jobTime, noti)
         {
             this.Subnetmask = Subnetmask;
         }
