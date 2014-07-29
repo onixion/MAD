@@ -7,7 +7,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private Version _version = new Version(2, 6);
+        private Version _version = new Version(2, 8);
         public Version version { get { return _version; } }
 
         private JobScedule _scedule;
@@ -16,6 +16,7 @@ namespace MAD.JobSystemCore
         private List<JobNode> _nodes = new List<JobNode>();
         public const int maxNodes = 100;
         public int nodesInitialized { get { return _nodes.Count; } }
+        private object _nodesLock = new object();
 
         #endregion
 
@@ -23,7 +24,7 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
-            _scedule = new JobScedule(_nodes);
+            _scedule = new JobScedule(_nodesLock, _nodes);
         }
 
         #endregion
@@ -80,11 +81,7 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
-        /// <summary>
-        /// Only use this list for READ-ONLY.
-        /// Changing some settings while the scedule
-        /// is working with it, can cause errors.
-        /// </summary>
+        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
         public List<JobNode> GetNodes()
         {
             return _nodes;
@@ -94,92 +91,67 @@ namespace MAD.JobSystemCore
 
         #region nodes handling
 
+        // sw
         public void StartNode(int id)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
             JobNode _node = GetNode(id);
             if (_node != null)
-                _node.state = JobNode.State.Active;
+                lock (_node.nodeLock)
+                    _node.state = JobNode.State.Active;
             else
                 throw new JobNodeException("Node already active!", null);
         }
 
+        // sw
         public void StopNode(int id)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
             JobNode _node = GetNode(id);
             if (_node != null)
-                _node.state = JobNode.State.Inactive;
+                lock (_node.nodeLock)
+                    _node.state = JobNode.State.Inactive;
             else
                 throw new JobNodeException("Node already inactive!", null);
         }
 
+        // sw
         public void AddNode(JobNode node)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-
             if (maxNodes > _nodes.Count)
-                _nodes.Add(node);
+                lock (_nodesLock)
+                    _nodes.Add(node);
             else
                 throw new JobSystemException("Node limit reached!", null);
         }
 
+        // sw
         public void RemoveNode(int id)
         {
-            if (!RemoveJobIntern(id))
-                throw new JobNodeException("Node does not exist!", null);
-        }
-
-        /// <returns>Count of removed nodes.</returns>
-        public int RemoveNodeFromIDToID(int fromID, int toID)
-        {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-            /* TODO
-            if (!NodeExist(from) || !NodeExist(to))
-                throw new JobNodeException("Node(s) does not exist!", null);
-
-            if(from == to)
-            {
-                RemoveNode(from);
-                return 1;
-            }
-
-            if(from > to)
-            {
-                for (int i = from; i > to; i--)
-                    RemoveNode(i);
-            }
-            
-            if(from < to)
-            {
-                for (int i = from; i < to; i++)
-                    RemoveNode(i);
-            }*/
-            return 0;
-        }
-
-        private bool RemoveNodeIntern(int id)
-        {
+            bool _success = false;
             for (int i = 0; i < _nodes.Count; i++)
                 if (_nodes[i].id == id)
                 {
-                    _nodes.RemoveAt(i);
-                    return true;
+                    lock (_nodesLock)
+                        _nodes.RemoveAt(i);
+                    _success = true;
                 }
-            return false;
+            if(!_success)
+                throw new JobNodeException("Node does not exist!", null);
+        }
+
+        // TODO
+        /// <returns>Count of removed nodes.</returns>
+        public int RemoveNodeFromIDToID(int fromID, int toID)
+        {
+            return 0;
         }
 
         public void RemoveAllNodes()
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-            _nodes.Clear();
+            lock (_nodesLock)
+                _nodes.Clear();
         }
 
+        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
         public JobNode GetNode(int id)
         {
             foreach (JobNode _node in _nodes)
@@ -208,92 +180,81 @@ namespace MAD.JobSystemCore
 
         public void LoadNodes(string fileName)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-
             List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
-            _nodes.AddRange(_buffer);
+            lock (_nodesLock)
+            {
+                _nodes.AddRange(_buffer);
+            }
         }
 
         #endregion
 
         #region jobs handling
 
+        // sw
         public void StartJob(int id)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
             Job _job = GetJob(id);
             if (_job != null)
                 if (_job.state == Job.JobState.Inactive)
-                    _job.state = Job.JobState.Waiting;
+                    lock (_job.jobLock)
+                        _job.state = Job.JobState.Waiting;
                 else
                     throw new JobException("Job already active!", null);
             else
                 throw new JobException("Job does not exist!", null);
         }
 
+        // sw
         public void StopJob(int id)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
             Job _job = GetJob(id);
             if (_job != null)
                 if (_job.state == Job.JobState.Waiting)
-                    _job.state = Job.JobState.Inactive;
+                    lock(_job.jobLock)
+                        _job.state = Job.JobState.Inactive;
                 else
                     throw new JobException("Job already active!", null);
             else
                 throw new JobException("Job does not exist!", null);
         }
 
-        /// <param name="id">The id of the node to add the job to.</param>
-        public void AddJobToNode(int id, Job job)
+        // sw
+        public void AddJobToNode(int nodeId, Job job)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-            JobNode _node = GetNode(id);
+            JobNode _node = GetNode(nodeId);
             if (_node != null)
-                _node.jobs.Add(job);
+                lock(_node.nodeLock)
+                    _node.jobs.Add(job);
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
 
+        // sw
         public void RemoveJob(int id)
         {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-            if (!RemoveJobIntern(id))
-                throw new JobException("Job does not exist!", null);
-        }
-
-        private bool RemoveJobIntern(int id)
-        {
+            bool _success = false;
             foreach (JobNode _node in _nodes)
                 for (int i = 0; i < _node.jobs.Count; i++)
                     if (_node.jobs[i].id == id)
-                    {
-                        _node.jobs.RemoveAt(i);
-                        return true;
-                    }
-            return false;
-        }
-
-        public void UpdateJob(int id, Job job)
-        {
-            if (SceduleActive())
-                throw new JobSceduleException("Scedule is active!", null);
-            if (!UpdateJobIntern(id, job))
+                        lock (_node.nodeLock)
+                        {
+                            _node.jobs.RemoveAt(i);
+                            _success = true;
+                        }
+            if(!_success)
                 throw new JobException("Job does not exist!", null);
         }
 
-        public bool UpdateJobIntern(int id, Job job)
+        // sw
+        public void UpdateJob(int id, Job job)
         {
             Job _job = GetJob(id);
-            if (_job == null)
-                return false;
-            _job = job;
-            return true;
+            if (_job != null)
+                lock(_job.jobLock)
+                    _job = job;
+            else
+                throw new JobException("Job does not exist!", null);
         }
 
         public bool JobExist(int id)
@@ -305,11 +266,7 @@ namespace MAD.JobSystemCore
             return false;
         }
 
-        /// <summary>
-        /// Get a reference of a job. (IMPORTANT: After you executed
-        /// this method make sure no other threads work with this reference!)
-        /// This reference will also update, since the scedule is working with it.
-        /// </summary>
+        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
         public Job GetJob(int id)
         {
             foreach (JobNode _node in _nodes)

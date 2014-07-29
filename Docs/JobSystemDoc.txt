@@ -1,48 +1,61 @@
+____________________________
+DOKUMENTATION DES JOBSYSTEMS
+----------------------------
+
+_________
 JOBSYSTEM
 
-Das JobSystem hat die Aufgabe alle wichtigen Objekte, die mit der Verwaltung der Jobs in Verbindung stehen, zu verwalten.
-Es ist ein geschlossenes System und regelt den Zugriff auf die Jobs.
+Das JobSystem ist ein geschlossenes System, dass den Zugriff auf die Jobs, Nodes, Scedules usw. regelt.
+Der Zugriff auf diese Komponenten wird durch das JobSystem definiert.
 
-Das JobSystem arbeitet mit sogenannten JobNode-Objekte. Diese Objekte beschreiben die Jobs, die für einen Client,
-ausgeführt werden sollen. Es können beliebig viele Jobs für jede JobNode erstellt werden.
+Das System ist aber NICHT multithreading-fähig, d.h. das die Methoden des JobSystems nicht von vielen
+Threads gleichzeitig verwendet werden dürfen, da es sonst zu internen Schwierigkeiten kommen kann.
 
+Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernommen werden (nicht gleichzeitig):
 
+	* CLI (standalone: wird auf dem localen Rechner ausgeführt)
+	* CLI-Server (Client kann mit dem JobSystem kommunizieren)
+	* GUI
+
+Diese Komponente können sich mit dem JobSystem verständigen und z.B. einen Job zu starten/stoppen.
+
+__________
 JOBSCEDULE
 
-Der JobScedule hat die Aufgaben alle Jobs in periodischen Abständen (cycleTime) auf ihre JobTime-Objekte zu überprüfen.
-Das JobTime-Objekt entscheidet wann ein Job ausgeführt werden darf. Wenn das JobTime-Objekt für die Ausführung ein 'OK'
-gibt, kann der Scedule den Job in einem Pool aus Threads starten (SmartThreadPool).
+Der JobScedule ist ein Zeitplaner, der mithilfe einiger Zusatzklassen (JobTime, ...) erkennt, wann es für einen
+Job zeit ist, ausgeführt zu werden. Dabei überprüft der Scedule in periodischen Abständen (=cycleTime) die
+JobTime-Objekte der jeweiligen Jobs. Sobald ein JobTime-Objekt ein 'OK' für die Ausführung eines Jobs gibt,
+kann der JobScedule den Job ausführen. Damit der Scedule bei der Ausführung des Jobs nicht zu viel Zeit
+verliert, wird der Job in einem eigenen Thread ausgeführt.
 
-Der Zugriff auf die JobTime-Klasse und die Verarbeitung der JobTime-Klasse ist einer der Hauptaufgaben des JobScedules.
-Die Verwaltung der NotificationRules ist die zweite Hauptaufgabe des JobScedules. Die JobNotification-Klasse muss nach
-dem Ausführen überprüft werden und falls nötig, sorgt die JobNotifcation-Klasse für eine Benachrichtigung.
+Die Überprüfungen der JobTime-Objekte ist die Hautpaufgabe des JobScedules. Aber auch die Verarbeitung der
+Notification-Rules gehört in den Aufgabenbereich des Scedules.
 
-
+_______
 JOBTIME
 
-Wie oben bereits angeschnitten, ist die Hauptaufgabe der JobTime-Klasse das Überprüfen der Zeitangaben eines Jobs.
+Die JobTime-Klasse kann drei verschiedene Typen annehmen: NULL, Relative und Absolute. 
+Alle JobTime-Objekte, die mit dem Typen NULL initalisiert werden, werden von dem Scedule nicht beachtet. 
+D.h. auch wenn der JobState auf 'Active' ist, wird der Job trotzdem nicht ausgeführt.
 
-Die JobTime-Klasse hat drei verschiedene Typen: NULL, Relative und Absolute. 
-Alle JobTime-Objekte, die mit dem Typen NULL initalisiert werden, werden vom JobScedule nicht beachtet. 
-D.h. auch wenn der Job laufen sollte, wird er NIE ausgeführt. 
-
-JobTime-Objekte mit dem Typen Relativ werden immer zyklisch ausgeführt (z.B. alle 20 Sekunden). 
-
+JobTime-Objekte mit dem Typen 'Relative' werden immer zyklisch ausgeführt (z.B. alle 20 Sekunden). 
 JobTime-Objekte mit dem Typen Absolute, können an verschieden Tagen, Jahren, Stunden und Minuten ausgeführt
 werden (z.B. jeden Tag um 19:30).
 
+_______________
 JOBNOTIFICATION
 
 Diese Klasse beinhaltet alle JobNotificationRules. Diese Regeln werden nach der Ausführung des Jobs auf ihre Gültikeit
 überprüft. Ist mindestens eine Regel gültig, dann wird eine Anfrage an das NotificationSystem gegeben. Das NotificationSystem
 bekommt eine Liste mit allen gültigen Regeln und kann daraus, die nötigen Informationen herausholen.
 
+__________________
 JONOTIFICATIONRULE
 
 Diese Klasse definiert eine Regel (=Rule). Die JobNotification-Klasse überprüft die Regeln auf ihre Gültigkeit.
 
 
-________________________________________________________________________
+______________________________________________________________________________________________________________________________________
 
 Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
 

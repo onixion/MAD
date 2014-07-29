@@ -16,21 +16,24 @@ namespace MAD.JobSystemCore
 
         private SmartThreadPool _workerPool;
         private int _maxThreads = 10;
+        private int _maxTimeToWaitForIdle = 5000;
 
         public enum State { Active, Inactive, StopRequest }
         private State _state = State.Inactive;
         public State state { get { return _state; } }
 
         private List<JobNode> _jobNodes;
+        private object _nodesLock;
 
         #endregion
 
         #region constructor
 
-        public JobScedule(List<JobNode> jobNodes)
+        public JobScedule(object nodesLock, List<JobNode> jobNodes)
         {
+            _nodesLock = nodesLock;
             _jobNodes = jobNodes;
-            _workerPool = new SmartThreadPool(1000, _maxThreads);
+            _workerPool = new SmartThreadPool(_maxThreads);
         }
 
         #endregion
@@ -57,7 +60,11 @@ namespace MAD.JobSystemCore
                 if (_state == State.Active)
                 {
                     _state = State.StopRequest;
+                    
                     _cycleThread.Join();
+                    _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
+                    _workerPool.Cancel();
+
                     _state = State.Inactive;
                 }
             }
@@ -71,46 +78,58 @@ namespace MAD.JobSystemCore
             {
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
-    
-                foreach (JobNode _node in _jobNodes)
+  
+                // RESERVE NODES
+                lock(_nodesLock)
                 {
-                    if (_node.state == JobNode.State.Active)
+                    foreach (JobNode _node in _jobNodes)
                     {
-                        foreach (Job _job in _node.jobs)
+                        // RESERV NODE
+                        lock (_node.nodeLock)
                         {
-                            if (_job.state == Job.JobState.Waiting)
+                            if (_node.state == JobNode.State.Active)
                             {
-                                if (CheckJobTime(_job.time, _time))
+                                foreach (Job _job in _node.jobs)
                                 {
-                                    if (_job.time.type == JobTime.TimeType.Relative)
+                                    // RESERVE JOB OF NODE
+                                    lock (_job.jobLock)
                                     {
-                                        _job.state = Job.JobState.Working;
-                                        _job.time.jobDelay.Reset();
-
-                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
-
-                                        JobThreadStart(_holder);
-                                    }
-                                    else if (_job.time.type == JobTime.TimeType.Absolute)
-                                    {
-                                        JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
-
-                                        if (!_handler.IsBlocked(_time))
+                                        if (_job.state == Job.JobState.Waiting)
                                         {
-                                            _job.state = Job.JobState.Working;
-                                            _handler.minuteAtBlock = _time.Minute;
+                                            if (CheckJobTime(_job.time, _time))
+                                            {
+                                                if (_job.time.type == JobTime.TimeType.Relative)
+                                                {
+                                                    _job.state = Job.JobState.Working;
+                                                    _job.time.jobDelay.Reset();
 
-                                            _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                            _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+                                                    _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                                    _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
 
-                                            JobThreadStart(_holder);
+                                                    JobThreadStart(_holder);
+                                                }
+                                                else if (_job.time.type == JobTime.TimeType.Absolute)
+                                                {
+                                                    JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
+
+                                                    if (!_handler.IsBlocked(_time))
+                                                    {
+                                                        _job.state = Job.JobState.Working;
+                                                        _handler.minuteAtBlock = _time.Minute;
+
+                                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+
+                                                        JobThreadStart(_holder);
+                                                    }
+                                                }
+                                            }
+                                            else
+                                                if (_job.time.type == JobTime.TimeType.Relative)
+                                                    _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                         }
                                     }
                                 }
-                                else
-                                    if (_job.time.type == JobTime.TimeType.Relative)
-                                        _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                             }
                         }
                     }

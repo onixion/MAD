@@ -118,7 +118,6 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
-
             output += "\n";
             output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.maxNodes + "\n";
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodesInitialized + "\n";
@@ -547,18 +546,17 @@ namespace MAD.CLICore
                 _job.time.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
 
-            if (_node != null)
+            try
             {
-                if (_js.SceduleActive())
-                    return "<color><red>Job cannot be added, while scedule is running!";
-                
-                _node.jobs.Add(_job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            else
-                return "<color><red>Node does not exist!";
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 
@@ -617,18 +615,17 @@ namespace MAD.CLICore
                 _job.time.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
 
-            if (_node != null)
+            try
             {
-                if (_js.SceduleActive())
-                    return "<color><red>Job cannot be added, while scedule is running!";
-
-                _node.jobs.Add(_job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            else
-                return "<color><red>Node does not exist!";
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 
@@ -692,19 +689,18 @@ namespace MAD.CLICore
             }
 
             // So now the JobPing is finished and set properly. 
-            
-            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
 
-            if (_node != null)
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+
+            try
             {
-                if (_js.SceduleActive())
-                    return "<color><red>Job cannot be added, while scedule is running!";
-                
-                _node.jobs.Add(_job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            else
-                return "<color><red>Node does not exist!";
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 
@@ -765,18 +761,17 @@ namespace MAD.CLICore
                 _job.port = (int)pars.GetPar("p").argValues[0];
             }
 
-            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
 
-            if (_node != null)
+            try
             {
-                if (_js.SceduleActive())
-                    return "<color><red>Job cannot be added, while scedule is running!";
-                
-                _node.jobs.Add(_job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            else
-                return "<color><red>Node does not exist!";
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 
@@ -834,18 +829,17 @@ namespace MAD.CLICore
                 _job.time.type = JobTime.TimeType.Relative;
             }
 
-            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
 
-            if (_node != null)
+            try
             {
-                if (_js.SceduleActive())
-                    return "<color><red>Job cannot be added, while scedule is running!";
-                
-                _node.jobs.Add(_job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _node.id + ").";
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            else
-                return "<color><red>Node does not exist!";
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
         }
     }
 

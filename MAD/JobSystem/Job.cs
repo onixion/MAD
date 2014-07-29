@@ -10,6 +10,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
+        public object jobLock = new object();
+
         private static int _jobsCount = 0;
         private static object _idLock = new object();
         private int _id;

@@ -11,6 +11,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
+        public object nodeLock = new object();
+
         private static int _nodesCount = 0;
         private static object _idLock = new object();
         private int _id;
