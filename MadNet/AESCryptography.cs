@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 
 using CryptoNet;
 
-namespace MAD.NetIO
+namespace MadNet
 {
     public static class AESCryptography
     {

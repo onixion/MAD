@@ -66,7 +66,6 @@
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
     <Compile Include="CLI\CLIOutput.cs" />
     <Compile Include="CLI\CLIServer.cs" />
-    <Compile Include="CLI\JobCommand.cs" />
     <Compile Include="CLI\Parameter.cs" />
     <Compile Include="CLI\ParameterInput.cs" />
     <Compile Include="CLI\ParameterOption.cs" />
@@ -120,9 +119,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetIO\NetIO.csproj">
-      <Project>{543FF0AA-C17C-478E-8FFE-FB63C3842131}</Project>
-      <Name>NetIO</Name>
+    <ProjectReference Include="..\MadNet\MadNet.csproj">
+      <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
+      <Name>MadNet</Name>
     </ProjectReference>
     <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
       <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>

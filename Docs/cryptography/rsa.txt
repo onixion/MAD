@@ -1,0 +1,2 @@
+Verwendete Libary: 
+http://www.codeproject.com/Articles/421656/RSA-Library-with-Private-Key-Encryption-in-Csharp

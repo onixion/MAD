@@ -5,10 +5,33 @@ using System.Net.Sockets;
 
 using CryptoNet;
 
-namespace MAD.NetIO
+namespace MadNet
 {
     public static class NetCom
     {
+        #region sending / receiving WITHOUT encryption (byte array)
+
+        public static void SendByte(NetworkStream stream, byte[] data, bool flush)
+        {
+            using (StreamIO _stream = new StreamIO(stream))
+            {
+                _stream.Write(data, true);
+                if (flush)
+                    _stream.Flush();
+            }
+        }
+
+        public static byte[] ReceiveByte(NetworkStream stream)
+        {
+            using (StreamIO _stream = new StreamIO(stream))
+            {
+                uint _length = _stream.ReadUInt();
+                return _stream.ReadBytes(_length);
+            }
+        }
+
+        #endregion
+
         #region sending / receiving WITHOUT encryption (encoding UNICODE)
 
         public static void SendStringUnicode(NetworkStream stream, string data, bool flush)

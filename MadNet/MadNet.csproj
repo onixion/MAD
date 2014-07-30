@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{543FF0AA-C17C-478E-8FFE-FB63C3842131}</ProjectGuid>
+    <ProjectGuid>{A514087D-3F5D-4B89-A5E9-EB673210566F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NetIO</RootNamespace>
-    <AssemblyName>NetIO</AssemblyName>
+    <RootNamespace>MadNet</RootNamespace>
+    <AssemblyName>MadNet</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -35,12 +35,17 @@
       <HintPath>.\CryptoNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AESCryptography.cs" />
     <Compile Include="MD5Hashing.cs" />
     <Compile Include="NetCommunication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RSAx.cs" />
+    <Compile Include="RSAxParameters.cs" />
+    <Compile Include="RSAxUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

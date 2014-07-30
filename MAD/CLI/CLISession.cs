@@ -7,7 +7,8 @@ using System.Text;
 
 using MAD.CLICore;
 using MAD.JobSystemCore;
-using MAD.NetIO;
+
+using MadNet;
 
 namespace MAD.CLIServerCore
 {

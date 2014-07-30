@@ -7,9 +7,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
 
-using MAD.NetIO;
 using MAD.JobSystemCore;
 using MAD.CLICore;
+
+using MadNet;
 
 namespace MAD.CLIServerCore
 {
@@ -17,7 +18,11 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private static bool _userOnline = false;
+        private int _rsaModulus = 1048;
+        private bool _userOnline = false;
+
+        private string _user = "root";
+        private string _pass = "test123";
 
         private TcpListener _serverListener;
         private CLISession _session;
@@ -32,6 +37,8 @@ namespace MAD.CLIServerCore
         {
             serverPort = port;
             _js = js;
+
+            InitSessionCommands();
         }
 
         #endregion
@@ -78,38 +85,36 @@ namespace MAD.CLIServerCore
             try
             {
                 IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-                SslStream _sslStream = new SslStream(_clientStream, false);
-
-                // LOG
+                //LOG
 
                 if (_userOnline)
-                {
                     return null;
-                }
 
-                // Receive the login-data.
-                string loginData = NetCom.ReceiveStringUnicode(_clientStream);
+                byte[] _clientPublicKey = NetCom.ReceiveByte(_clientStream);
+                byte[] _clientModulus = NetCom.ReceiveByte(_clientStream);
+                RSAx _decryptor = new RSAx(new RSAxParameters(_clientModulus, _clientPublicKey, _rsaModulus));
 
-                // Check the login-data.
+                string _aesPass = Encoding.Unicode.GetString(_decryptor.Decrypt(NetCom.ReceiveByte(_clientStream), true));
+
+                string loginData = NetCom.ReceiveStringAESUnicode(_clientStream, _aesPass);
                 if (!Login(loginData))
                 {
-                    NetCom.SendStringUnicode(_clientStream, "ACCESS DENIED", true);
+                    NetCom.SendStringAESUnicode(_clientStream, "ACCESS DENIED", _aesPass, true);
+                    //LOG
                     return null;
                 }
                 else
                 {
-                    NetCom.SendStringUnicode(_clientStream, "ACCESS GRANTED", true);
+                    NetCom.SendStringAESUnicode(_clientStream, "ACCESS GRANTED", _aesPass, true);
+                    // LOG
                     _userOnline = true;
                 }
-
-                // Init CLISession for client and start it.
+                // HERE
                 _session = new CLISession(_client);
                 _session.Start();
             }
             catch (Exception)
             {
-                // Client lost connection or disconnected.
-
                 // LOG
             }
 
@@ -182,9 +187,11 @@ namespace MAD.CLIServerCore
 
         private bool Login(string loginData)
         {
-            string[] buffer = loginData.Split(new string[] { "<seperator>" },StringSplitOptions.None);
-
-            return true;
+            string[] _buffer = loginData.Split(new string[] { ":" },StringSplitOptions.None);
+            if (_buffer.Length == 2)
+                if (_buffer[0] == _user && _buffer[1] == _pass)
+                    return true;
+            return false;
         }
 
         private byte[] GenerateRandomPass(int length)

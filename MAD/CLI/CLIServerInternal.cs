@@ -4,6 +4,8 @@ using System.Threading;
 // ThreadPool
 using Amib.Threading;
 
+using MadNet;
+
 namespace MAD.CLIServerCore
 {
     public abstract class CLIServerInternal
