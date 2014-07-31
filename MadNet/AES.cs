@@ -7,23 +7,30 @@ using CryptoNet;
 
 namespace MadNet
 {
-    public static class AESCryptography
+    public class AES
     {
         private static byte[] _salt = new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 };
+        private string _pass { get; set; }
+        public string pass { set { _pass = value; } }
 
-        public static byte[] AESEncryption(byte[] data, string password)
+        public AES(string pass)
         {
-            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(password), _salt);
+            _pass = pass;
+        }
+
+        public byte[] Encrypt(byte[] data)
+        {
+            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
             return AESEncryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
         }
 
-        public static byte[] AESDecryption(byte[] data, string password)
+        public byte[] Decrypt(byte[] data)
         {
-            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(password), _salt);
+            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
             return AESDecryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
         }
 
-        public static byte[] AESEncryption(byte[] data, byte[] key, byte[] iv)
+        private byte[] AESEncryption(byte[] data, byte[] key, byte[] iv)
         {
             RijndaelOpen _aes = new RijndaelOpen();
 
@@ -46,7 +53,7 @@ namespace MadNet
             return data;
         }
 
-        public static byte[] AESDecryption(byte[] data, byte[] key, byte[] iv)
+        private byte[] AESDecryption(byte[] data, byte[] key, byte[] iv)
         {
             RijndaelOpen _aes = new RijndaelOpen();
 

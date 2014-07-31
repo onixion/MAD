@@ -25,12 +25,14 @@ namespace MAD
             if (args.Length == 0)
             { 
                 // No args -> start gui.
-
                 //Application.EnableVisualStyles();
                 //Application.Run(new Form());
 
-                CLI cli = new CLI(dataPath, js, macFeeder);
-                cli.Start();
+                //CLI cli = new CLI(dataPath, js, macFeeder);
+                //cli.Start();
+
+                CLIServer server = new CLIServer(999, js);
+                server.Start();
             }
             else if (args.Length == 1)
             {
@@ -41,6 +43,7 @@ namespace MAD
                         cli.Start();
                         break;
                     case "-cliserver":
+                        Console.WriteLine("CLI-Server running on port 999 ...");
                         CLIServer cliServer = new CLIServer(999, js);
                         cliServer.Start();
                         break;

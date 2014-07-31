@@ -120,12 +120,12 @@ namespace MadNet
             }
         }
 
-        public int OctetsInModulus 
-        { 
-            get 
+        public int OctetsInModulus
+        {
+            get
             {
                 return _ModulusOctets;
-            } 
+            }
         }
 
         public BigInteger N
@@ -207,7 +207,7 @@ namespace MadNet
         /// <param name="ModulusSize">Modulus size in bits</param>
         public RSAxParameters(RSAParameters rsaParams, int ModulusSize)
         {
-           // rsaParams;
+            // rsaParams;
             _ModulusOctets = ModulusSize / 8;
             _E = RSAxUtils.OS2IP(rsaParams.Exponent, false);
             _D = RSAxUtils.OS2IP(rsaParams.D, false);
@@ -232,7 +232,7 @@ namespace MadNet
         {
             // rsaParams;
             _ModulusOctets = ModulusSize / 8;
-            _E = RSAxUtils.OS2IP(Exponent, false);            
+            _E = RSAxUtils.OS2IP(Exponent, false);
             _N = RSAxUtils.OS2IP(Modulus, false);
             _Has_PUBLIC_Info = true;
         }
@@ -244,7 +244,7 @@ namespace MadNet
         /// <param name="Exponent">Exponent of the RSA key</param>
         /// /// <param name="D">Exponent of the RSA key</param>
         /// <param name="ModulusSize">Modulus size in number of bits. Ex: 512, 1024, 2048, 4096 etc.</param>
-        public RSAxParameters(byte[] Modulus, byte[] Exponent, byte [] D, int ModulusSize)
+        public RSAxParameters(byte[] Modulus, byte[] Exponent, byte[] D, int ModulusSize)
         {
             // rsaParams;
             _ModulusOctets = ModulusSize / 8;
@@ -267,13 +267,13 @@ namespace MadNet
         /// <param name="DQ">DQ paramater of RSA Algorithm.</param>
         /// <param name="InverseQ">InverseQ paramater of RSA Algorithm.</param>
         /// <param name="ModulusSize">Modulus size in number of bits. Ex: 512, 1024, 2048, 4096 etc.</param>
-        public RSAxParameters(byte[] Modulus, byte[] Exponent, byte[] D, byte[] P, byte [] Q, byte [] DP, byte [] DQ, byte [] InverseQ, int ModulusSize)
+        public RSAxParameters(byte[] Modulus, byte[] Exponent, byte[] D, byte[] P, byte[] Q, byte[] DP, byte[] DQ, byte[] InverseQ, int ModulusSize)
         {
             // rsaParams;
             _ModulusOctets = ModulusSize / 8;
             _E = RSAxUtils.OS2IP(Exponent, false);
             _N = RSAxUtils.OS2IP(Modulus, false);
-            _D = RSAxUtils.OS2IP(D, false);           
+            _D = RSAxUtils.OS2IP(D, false);
             _P = RSAxUtils.OS2IP(P, false);
             _Q = RSAxUtils.OS2IP(Q, false);
             _DP = RSAxUtils.OS2IP(DP, false);

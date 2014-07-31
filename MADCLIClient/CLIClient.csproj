@@ -47,9 +47,12 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\NetIO\NetIO.csproj">
-      <Project>{543FF0AA-C17C-478E-8FFE-FB63C3842131}</Project>
-      <Name>NetIO</Name>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MadNet\MadNet.csproj">
+      <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
+      <Name>MadNet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

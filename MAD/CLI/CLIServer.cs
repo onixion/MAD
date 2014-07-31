@@ -87,6 +87,10 @@ namespace MAD.CLIServerCore
                 IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
                 //LOG
 
+                Packet pak = PacketReader.ReadPacket(_clientStream, new AES("LOL"));
+
+                Console.Write("");
+                /*
                 if (_userOnline)
                     return null;
 
@@ -108,8 +112,8 @@ namespace MAD.CLIServerCore
                     NetCom.SendStringAESUnicode(_clientStream, "ACCESS GRANTED", _aesPass, true);
                     // LOG
                     _userOnline = true;
-                }
-                // HERE
+                }*/
+
                 _session = new CLISession(_client);
                 _session.Start();
             }

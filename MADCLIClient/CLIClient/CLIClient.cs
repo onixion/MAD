@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
-using MAD.NetIO;
+using MadNet;
 
 namespace CLIClient
 {
@@ -59,9 +59,24 @@ namespace CLIClient
 
         private void CLIConnection(NetworkStream _stream)
         {
-            Console.WriteLine("SERVER-INFO: " + NetCom.ReceiveStringUnicode(_stream));
-            NetCom.SendStringUnicode(_stream, _username + "<seperator>" + _passwordMD5, true);
+            DataPacket pak = new DataPacket(_stream, new AES("LOL"));
+            pak.SendPacket();
 
+
+
+
+
+
+
+
+
+
+            /*RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM_KEY", 1048);
+            NetCom.SendByte(_stream, _par.E , true); // public-key
+            NetCom.SendByte(_stream, _par.N, true); // modulus
+
+            NetCom.SendStringAESUnicode(_stream, _username + "<>" + _passwordMD5, "RANDOM_KEY", true);
+            */
             switch (NetCom.ReceiveStringUnicode(_stream))
             { 
                 case "ACCESS GRANTED":

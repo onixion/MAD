@@ -58,3 +58,8 @@ Now using the TcpListener and TcpClient)
 [26.07.2014][19:00-21:00][2h][111,5h] Working on JobSystem.
 [28.07.2014][17:00-23:00][6h][117,5h] Re-Writing JobSystem to be used by one person at the time.
 [29.07.2014][17:00-22:00][5h][122,5h] Re-Writing JobSystem, CleanCoding.
+[30.07.2014][18:00-22:00][4h][126,5h] Implementing RSA for Key-Exchange (CLIServer / CLIClient); CleanCoding.
+
+(NOTE: Working on making CLIServer and CLIClient packet-oriented.)
+
+[31.07.2014][18:00-22:30][4,5h][131h] Working on Packet, PacketExceptions, DataPacket, LoginPacket ...

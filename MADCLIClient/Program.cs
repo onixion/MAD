@@ -3,7 +3,7 @@ using System.Net;
 using System.Text;
 using System.IO;
 
-using MAD.NetIO;
+using MadNet;
 
 namespace CLIClient
 {
@@ -105,7 +105,6 @@ namespace CLIClient
                 {
                     CLIClient client = new CLIClient(new IPEndPoint(serverAddress, serverPort), username, passwordMD5);
                     client.Start();
-
                     break;
                 }
 
