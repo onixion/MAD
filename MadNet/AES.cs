@@ -20,14 +20,42 @@ namespace MadNet
 
         public byte[] Encrypt(byte[] data)
         {
-            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
-            return AESEncryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
+            if (data != null)
+            {
+                if (data.Length != 0)
+                {
+                    PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
+                    return AESEncryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
+                }
+                else
+                {
+                    return data;
+                }
+            }
+            else
+            {
+                return new byte[0];
+            }
         }
 
         public byte[] Decrypt(byte[] data)
         {
-            PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
-            return AESDecryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
+            if (data != null)
+            {
+                if (data.Length != 0)
+                {
+                    PasswordDeriveBytes _pdb = new PasswordDeriveBytes(Encoding.Unicode.GetBytes(_pass), _salt);
+                    return AESDecryption(data, _pdb.GetBytes(32), _pdb.GetBytes(16));
+                }
+                else
+                {
+                    return data;
+                }
+            }
+            else
+            {
+                return new byte[0];
+            }
         }
 
         private byte[] AESEncryption(byte[] data, byte[] key, byte[] iv)

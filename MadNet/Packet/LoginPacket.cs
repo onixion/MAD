@@ -19,13 +19,13 @@ namespace MadNet
             this.passMD5 = passMD5;
         }
 
-        protected override void SendPacketSpec(StreamIO streamIO)
+        public override void SendPacketSpec(StreamIO streamIO)
         {
             streamIO.Write(user, true);
             streamIO.Write(passMD5, true);
         }
 
-        protected override void  ReceivePacketSpec(StreamIO streamIO)
+        public override void ReceivePacketSpec(StreamIO streamIO)
         {
             user = streamIO.ReadBytes();
             passMD5 = streamIO.ReadBytes();

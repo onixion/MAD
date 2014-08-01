@@ -18,8 +18,10 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private int _rsaModulus = 1048;
         private bool _userOnline = false;
+
+        private int[] _acceptedRSAModulusLength = new int[] { 2048, 4096, 8192 };
+        private int _aesGeneratedPassLength = 20;
 
         private string _user = "root";
         private string _pass = "test123";
@@ -80,42 +82,56 @@ namespace MAD.CLIServerCore
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
-            NetworkStream _clientStream = _client.GetStream();
+            NetworkStream _stream = _client.GetStream();
 
             try
             {
                 IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
-                //LOG
 
-                Packet pak = PacketReader.ReadPacket(_clientStream, new AES("LOL"));
+                // LOG
 
-                Console.Write("");
-                /*
-                if (_userOnline)
+                // -----------------------------------------------
+                // KEY-EXCHANGE
+
+                // 1.) Receive RSA-packet.
+                RSAPacket _rsaP = new RSAPacket(_stream, null);
+                _rsaP.ReceivePacket();
+
+                // 2.) Check if modulus is valid for connection.
+                if (!ValidRSAModulus(_rsaP.modulusLength))
                     return null;
 
-                byte[] _clientPublicKey = NetCom.ReceiveByte(_clientStream);
-                byte[] _clientModulus = NetCom.ReceiveByte(_clientStream);
-                RSAx _decryptor = new RSAx(new RSAxParameters(_clientModulus, _clientPublicKey, _rsaModulus));
+                // 3.) Create RSA-encryptor.
+                RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
+                // RSA-packet not needed any more.
+                _rsaP.Dispose();
 
-                string _aesPass = Encoding.Unicode.GetString(_decryptor.Decrypt(NetCom.ReceiveByte(_clientStream), true));
+                // 4.) Generate random password.
+                string _randomPass = GenRandomPassUnicode(_aesGeneratedPassLength);
 
-                string loginData = NetCom.ReceiveStringAESUnicode(_clientStream, _aesPass);
-                if (!Login(loginData))
+                // 5.) Encrypt password with RSA.
+                byte[] _randomPassEncrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_randomPass), true);
+
+                // 6.) Create DataPacket and send it to client.
+                DataPacket _dataP = new DataPacket(_stream, null, _randomPassEncrypted);
+                _dataP.SendPacket();
+                _dataP.Dispose();
+
+                // 7.) And from here -> AES.
+
+                // -----------------------------------------------
+
+                LoginPacket _loginP = new LoginPacket(_stream, new AES(_randomPass));
+                _loginP.ReceivePacket();
+
+                if (Login(_loginP))
                 {
-                    NetCom.SendStringAESUnicode(_clientStream, "ACCESS DENIED", _aesPass, true);
-                    //LOG
-                    return null;
+
                 }
                 else
                 {
-                    NetCom.SendStringAESUnicode(_clientStream, "ACCESS GRANTED", _aesPass, true);
-                    // LOG
-                    _userOnline = true;
-                }*/
-
-                _session = new CLISession(_client);
-                _session.Start();
+                    return null;
+                }
             }
             catch (Exception)
             {
@@ -130,6 +146,29 @@ namespace MAD.CLIServerCore
             _client.Close();
 
             return null;
+        }
+
+        private bool ValidRSAModulus(int modulus)
+        {
+            for (int i = 0; i < _acceptedRSAModulusLength.Length; i++)
+                if (_acceptedRSAModulusLength[i] == modulus)
+                    return true;
+            return false;
+        }
+
+        private string GenRandomPassUnicode(int stringLength)
+        {
+            Random _rand = new Random();
+            byte[] _str = new byte[stringLength * 2];
+
+            for (int i = 0; i < stringLength * 2; i += 2)
+            {
+                int _chr = _rand.Next(0xD7FF);
+                _str[i + 1] = (byte)((_chr & 0xFF00) >> 8);
+                _str[i] = (byte)(_chr & 0xFF);
+            }
+
+            return Encoding.Unicode.GetString(_str);
         }
 
         private void InitSessionCommands()
@@ -189,13 +228,20 @@ namespace MAD.CLIServerCore
             }
         }
 
-        private bool Login(string loginData)
+        private bool Login(LoginPacket loginP)
         {
-            string[] _buffer = loginData.Split(new string[] { ":" },StringSplitOptions.None);
-            if (_buffer.Length == 2)
-                if (_buffer[0] == _user && _buffer[1] == _pass)
+            if (loginP.user.Length != 0 || loginP.passMD5.Length != 0)
+            {
+                string _userUnicode = Encoding.Unicode.GetString(loginP.user);
+                string _passUnicode = Encoding.Unicode.GetString(loginP.passMD5);
+
+                if (_userUnicode == _user && _passUnicode == _pass)
                     return true;
-            return false;
+                else
+                    return false;
+            }
+            else
+                return false;
         }
 
         private byte[] GenerateRandomPass(int length)

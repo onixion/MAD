@@ -16,12 +16,12 @@ namespace MadNet
             this.data = data;
         }
 
-        protected override void SendPacketSpec(StreamIO streamIO)
+        public override void SendPacketSpec(StreamIO streamIO)
         {
             SendBytes(data);
         }
 
-        protected override void ReceivePacketSpec(StreamIO streamIO)
+        public override void ReceivePacketSpec(StreamIO streamIO)
         {
             data = ReceiveBytes();
         }

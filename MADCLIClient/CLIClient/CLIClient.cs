@@ -13,81 +13,52 @@ namespace CLIClient
         #region member
 
         private IPEndPoint _serverEndPoint;
-        private string _username;
-        private string _passwordMD5;
+
+        private TcpClient _client;
+        private NetworkStream _stream;
 
         #endregion
 
         #region constructor
 
-        public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
+        public CLIClient(IPEndPoint serverEndPoint)
         {
             _serverEndPoint = serverEndPoint;
-            _username = username;
-            _passwordMD5 = passwordMD5;
         }
 
         #endregion
 
         #region methodes
 
-        public void Start()
+        public void Connect()
         {
-            TcpClient _client = new TcpClient();
-            NetworkStream _stream;
+            _client = new TcpClient();
 
             try
             {
-                Console.WriteLine("Connecting ...");
                 _client.Connect(_serverEndPoint);
-
                 _stream = _client.GetStream();
-
-                CLIConnection(_stream);
-
-                _stream.Close();
-
-                Console.WriteLine("Disconnected.");
             }
             catch (Exception)
             {
-                Console.WriteLine("Lost connection to server.");
+                throw new Exception("Could not connect to server.");
             }
-
-            _client.Close();
         }
 
-        private void CLIConnection(NetworkStream _stream)
+        public void StartRemoteCLI()
         {
-            DataPacket pak = new DataPacket(_stream, new AES("LOL"));
-            pak.SendPacket();
+            try
+            {
+                // Establish connection.
+                RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM", 1048);
+                RSAx _rsa = new RSAx(_par);
 
+                RSAPacket _rsaPacket = new RSAPacket(_stream, null, Encoding.Unicode.GetBytes(_par.E), _par.N);
 
-
-
-
-
-
-
-
-
-            /*RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM_KEY", 1048);
-            NetCom.SendByte(_stream, _par.E , true); // public-key
-            NetCom.SendByte(_stream, _par.N, true); // modulus
-
-            NetCom.SendStringAESUnicode(_stream, _username + "<>" + _passwordMD5, "RANDOM_KEY", true);
-            */
-            switch (NetCom.ReceiveStringUnicode(_stream))
-            { 
-                case "ACCESS GRANTED":
-                    StartVirtualConsole(_stream);
-                    break;
-                case "ACCESS DENIED":
-                    Console.WriteLine("Server denied access!");
-                    break;
-                default:
-                    Console.WriteLine("Server-Response-Error!");
-                    break;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Lost connection to server.", e);
             }
         }
 

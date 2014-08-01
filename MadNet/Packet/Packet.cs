@@ -11,10 +11,12 @@ namespace MadNet
         private uint _packetType = 0;
 
         /* TYPE           UINT
+
          * NullPacket   | 0
          * DataPacket   | 1
          * LoginPacket  | 2
-         * RSAPacket    | 3                   
+         * RSAPacket    | 3    
+
          */
 
         public Packet(NetworkStream stream, AES aes)
@@ -30,15 +32,26 @@ namespace MadNet
             _packetType = packetType;
         }
 
-        public void SendPacket()
+        private void SendPacketType()
         {
             _streamIO.Write(_packetType);
+            _streamIO.Flush();
+        }
+
+        private uint ReceivePacketType()
+        {
+            return _streamIO.ReadUInt();
+        }
+
+        public void SendPacket()
+        {
+            SendPacketType();
             SendPacketSpec(_streamIO);
         }
 
         public void ReceivePacket()
         {
-            if (_packetType == _streamIO.ReadUInt())
+            if (_packetType == ReceivePacketType())
                 ReceivePacketSpec(_streamIO);
             else
                 throw new PacketException("Wrong packet type!", null);
@@ -50,14 +63,22 @@ namespace MadNet
 
         protected void SendBytes(byte[] data)
         {
-            if (_aes == null)
+            if (data != null)
             {
-                _streamIO.Write(data, true);
-                _streamIO.Flush();
+                if (_aes == null)
+                {
+                    _streamIO.Write(data, true);
+                    _streamIO.Flush();
+                }
+                else
+                {
+                    _streamIO.Write(_aes.Encrypt(data), true);
+                    _streamIO.Flush();
+                }
             }
             else
             {
-                _streamIO.Write(_aes.Encrypt(data), true);
+                _streamIO.Write(new byte[0], true);
                 _streamIO.Flush();
             }
         }

@@ -63,3 +63,4 @@ Now using the TcpListener and TcpClient)
 (NOTE: Working on making CLIServer and CLIClient packet-oriented.)
 
 [31.07.2014][18:00-22:30][4,5h][131h] Working on Packet, PacketExceptions, DataPacket, LoginPacket ...
+[01.08.2014][18:00-23:00][5h][136h] Still working on Packet ... their are working. Not tested fully, but working.
