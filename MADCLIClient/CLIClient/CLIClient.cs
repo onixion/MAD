@@ -17,6 +17,9 @@ namespace CLIClient
         private TcpClient _client;
         private NetworkStream _stream;
 
+        private int _RSAModulusLength = 2048;
+        private string _aesPassFromServer { get; set; }
+
         #endregion
 
         #region constructor
@@ -45,20 +48,58 @@ namespace CLIClient
             }
         }
 
-        public void StartRemoteCLI()
+        public void LoginToRemoteCLI(string username, string passwordMD5)
         {
-            try
+            if (_client.Connected)
             {
-                // Establish connection.
-                RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM", 1048);
-                RSAx _rsa = new RSAx(_par);
+                try
+                {
+                    // -----------------------------------------------
+                    // KEY-EXCHANGE
 
-                RSAPacket _rsaPacket = new RSAPacket(_stream, null, Encoding.Unicode.GetBytes(_par.E), _par.N);
+                    // 1.) Generate public-key and private-key
+                    RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM", _RSAModulusLength);
 
+                    // 2.) Send RSA-packet to server.
+                    RSAPacket _rsaP = new RSAPacket(_stream, null, Encoding.Unicode.GetBytes(_par.E), Encoding.Unicode.GetBytes(_par.N), _RSAModulusLength);
+                    _rsaP.SendPacket();
+                    _rsaP.Dispose();
+
+                    // 3.) Create RSA-decryptor.
+                    RSAx _rsa = new RSAx(_par);
+
+                    // 3.) Receive encrypted AES-pass, which was generate by the server.
+                    DataPacket _dataP = new DataPacket(_stream, null);
+                    _dataP.ReceivePacket();
+
+                    // 4.) Encrypt AES-pass.
+                    _aesPassFromServer = Encoding.Unicode.GetString(_rsa.Decrypt(_dataP.data, true));
+
+                    // 5.) From here -> AES.
+
+                    // -----------------------------------------------
+
+                    LoginPacket _loginP = new LoginPacket(_stream, null);
+                    _loginP.user = Encoding.Unicode.GetBytes(username);
+                    _loginP.passMD5 = Encoding.Unicode.GetBytes(passwordMD5);
+                    _loginP.SendPacket();
+                    _loginP.Dispose();
+
+                    /*
+                     * If the login or rsa-connection-establishment will fail, server will close stream.
+                     */
+
+                    // HERE
+
+                }
+                catch (Exception e)
+                {
+                    throw new Exception("Lost connection to server.", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                throw new Exception("Lost connection to server.", e);
+                throw new Exception("Not connected to server!");
             }
         }
 

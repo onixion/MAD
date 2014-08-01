@@ -18,16 +18,14 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private bool _userOnline = false;
-
         private int[] _acceptedRSAModulusLength = new int[] { 2048, 4096, 8192 };
         private int _aesGeneratedPassLength = 20;
 
         private string _user = "root";
         private string _pass = "test123";
+        private bool _userOnline = false;
 
         private TcpListener _serverListener;
-        private CLISession _session;
 
         private JobSystem _js;
 
@@ -107,13 +105,13 @@ namespace MAD.CLIServerCore
                 _rsaP.Dispose();
 
                 // 4.) Generate random password.
-                string _randomPass = GenRandomPassUnicode(_aesGeneratedPassLength);
+                string _aesPass = GenRandomPassUnicode(_aesGeneratedPassLength);
 
                 // 5.) Encrypt password with RSA.
-                byte[] _randomPassEncrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_randomPass), true);
+                byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), true);
 
                 // 6.) Create DataPacket and send it to client.
-                DataPacket _dataP = new DataPacket(_stream, null, _randomPassEncrypted);
+                DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted);
                 _dataP.SendPacket();
                 _dataP.Dispose();
 
@@ -121,12 +119,15 @@ namespace MAD.CLIServerCore
 
                 // -----------------------------------------------
 
-                LoginPacket _loginP = new LoginPacket(_stream, new AES(_randomPass));
+                LoginPacket _loginP = new LoginPacket(_stream, new AES(_aesPass));
                 _loginP.ReceivePacket();
 
-                if (Login(_loginP))
-                {
+                bool _loginSuccess = Login(_loginP);
+                _loginP.Dispose();
 
+                if (_loginSuccess)
+                {
+                    // START CLI.
                 }
                 else
                 {
