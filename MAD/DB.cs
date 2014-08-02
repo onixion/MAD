@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data.SQLite; //include SQLite database library
 using System.IO;  
+using System.Data;
 
 namespace MAD
 {
@@ -12,11 +13,14 @@ namespace MAD
         private string _DBname = "MyDatabase.sqlite";
         private SQLiteConnection _dbConnection;
 
-        public DB(string filename)
+        private object _lock = new object();
+
+        public DB(string DBname)
         {
+            _DBname = DBname;
             if (!File.Exists(_DBname))
             {
-                SQLiteConnection.CreateFile(_DBname); 
+                SQLiteConnection.CreateFile(_DBname);
             }
         }
         public void Connect()
@@ -27,7 +31,15 @@ namespace MAD
 
         public void CreateDB(string DBname)
         {
-           if (_dbConnection.State == SQLiteConnection. )
+           lock(_lock)
+           {
+                if (_dbConnection.State == System.Data.ConnectionState.Open )
+                {
+
+                    SQLiteCommand _command = new SQLiteCommand(_dbConnection);
+                    _command
+                }
+           }
         }
     }
 }
