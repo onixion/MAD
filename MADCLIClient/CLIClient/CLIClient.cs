@@ -3,6 +3,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
+using System.Numerics;
+using System.Xml;
+
+using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 
 using MadNet;
 
@@ -11,9 +16,9 @@ namespace CLIClient
     public class CLIClient
     {
         #region member
-
+        
         private IPEndPoint _serverEndPoint;
-
+        
         private TcpClient _client;
         private NetworkStream _stream;
 
@@ -36,7 +41,7 @@ namespace CLIClient
         public void Connect()
         {
             _client = new TcpClient();
-
+            
             try
             {
                 _client.Connect(_serverEndPoint);
@@ -54,14 +59,21 @@ namespace CLIClient
             {
                 try
                 {
+                    /* TESTING
+                    DataPacket _sendPacket = new DataPacket(_stream, null);
+                    _sendPacket.SendPacket();
+
+                    Console.WriteLine("");
+                    */
+
                     // -----------------------------------------------
                     // KEY-EXCHANGE
 
                     // 1.) Generate public-key and private-key
-                    RSAxParameters _par = RSAxUtils.GetRSAxParameters("RANDOM", _RSAModulusLength);
+                    RSAxParameters _par = RSAxUtils.GetRSAxParameters("GAYGAYGAY", _RSAModulusLength);
 
                     // 2.) Send RSA-packet to server.
-                    RSAPacket _rsaP = new RSAPacket(_stream, null, Encoding.Unicode.GetBytes(_par.E), Encoding.Unicode.GetBytes(_par.N), _RSAModulusLength);
+                    RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
                     _rsaP.SendPacket();
                     _rsaP.Dispose();
 

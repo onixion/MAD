@@ -86,6 +86,15 @@ namespace MAD.CLIServerCore
             {
                 IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
+                /* TESTING
+                DataPacket _receivePacket = new DataPacket(_stream, null);
+                _receivePacket.ReceivePacket();
+
+                string text = Encoding.Unicode.GetString(_receivePacket.data);
+
+                Console.WriteLine("");
+                */
+
                 // LOG
 
                 // -----------------------------------------------
@@ -174,7 +183,7 @@ namespace MAD.CLIServerCore
 
         private void InitSessionCommands()
         {
-            if (_session != null)
+            /*if (_session != null)
             {
                 List<CommandOptions> commands = _session.commands;
 
@@ -185,12 +194,10 @@ namespace MAD.CLIServerCore
                 commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
                 // MAC AND IP READER
-                /*
                 commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
                 commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
                 commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
                 commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
-                */
                 // JOBSYSTEM
                 commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
                 commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
@@ -221,12 +228,13 @@ namespace MAD.CLIServerCore
                 commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
 
                 // CLIServer (these commands cannot be used by cli!)
-                /*
+               
                 commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
                 commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
                 commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
-                commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));*/
+                commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
             }
+        */
         }
 
         private bool Login(LoginPacket loginP)

@@ -70,8 +70,7 @@ namespace CLIClient
 
                 while (true)
                 {
-                    ConsoleKeyInfo key = Console.ReadKey();
-                    Console.Write("\b");
+                    ConsoleKeyInfo key = Console.ReadKey(true);
 
                     if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
                     {
@@ -103,9 +102,17 @@ namespace CLIClient
 
                 if (key2.Key == ConsoleKey.Y)
                 {
-                    CLIClient client = new CLIClient(new IPEndPoint(serverAddress, serverPort), username, passwordMD5);
-                    client.Start();
-                    break;
+                    CLIClient _client = new CLIClient(new IPEndPoint(serverAddress, serverPort));
+
+                    try
+                    {
+                        _client.Connect();
+                        _client.LoginToRemoteCLI(username, passwordMD5);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("EXCEPTION: " + e.Message);
+                    }
                 }
 
                 Console.Clear();

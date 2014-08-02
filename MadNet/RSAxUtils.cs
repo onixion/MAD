@@ -10,6 +10,7 @@ using System.Text;
 using System.Numerics;
 using System.Xml;
 
+
 namespace MadNet
 {
     /// <summary>
@@ -28,7 +29,7 @@ namespace MadNet
             bool Has_CRT_Info = false;
             bool Has_PRIVATE_Info = false;
             bool Has_PUBLIC_Info = false;
-
+     
             XmlDocument doc = new XmlDocument();
             try
             {
