@@ -22,19 +22,18 @@ namespace MAD.CLIServerCore
 
         private object _sessionInitLock = new object();
 
-        private TcpClient _client;
-        private IPEndPoint _clientEndPoint;
-
-        private string _cursor = "=> ";
+        private NetworkStream _stream;
+        private AES _aes;
 
         private Command _command;
-        private string _response;
+        private string _clientCLIInput;
+        private string _cliInterpreter;
 
-        private int _consoleWidth = 0;
+        private JobSystem _js;
 
         #endregion
 
-        public CLISession(TcpClient client)
+        public CLISession(NetworkStream stream, AES aes, JobSystem js)
             : base()
         {
             lock (_sessionInitLock)
@@ -43,41 +42,84 @@ namespace MAD.CLIServerCore
                 _sessionsCount++;
             }
 
-            _client = client;
-            _clientEndPoint = (IPEndPoint)client.Client.RemoteEndPoint;
+            _stream = stream;
+            _aes = aes;
+            _js = js;
         }
 
         #region methodes
 
+        public void InitCommands()
+        {
+            // general purpose
+            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
+            commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
+            commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
+
+            // MAC AND IP READER
+            /*
+            commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
+            */
+            // JOBSYSTEM
+            commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
+
+            // SCEDULE
+            commands.Add(new CommandOptions("scedule", typeof(JobSceduleCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
+
+            // NODES
+            commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
+
+            // JOBS
+            commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
+
+            commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
+        }
+
         public void Start()
         {
-            NetworkStream _stream = _client.GetStream();
-
-            // Send first cursor.
-            NetCom.SendStringUnicode(_stream, _cursor, true);
+            DataPacket _dataP = new DataPacket(_stream, _aes);
+            CLIPacket _cliP = new CLIPacket(_stream, _aes);
 
             while (true)
             {
-                // First receive console-width.
-                try { _consoleWidth = System.Convert.ToInt32(NetCom.ReceiveStringUnicode(_stream)); }
-                catch (Exception)
-                {
-                    _consoleWidth = 50;
-                }
+                _cliP.ReceivePacket();
+                _clientCLIInput = Encoding.Unicode.GetString(_cliP.cliInput);
 
-                // Then cli-input of the client.
-                _response = NetCom.ReceiveStringUnicode(_stream);
-                _response = AnalyseInput(ref _command, _response);
+                _cliInterpreter = AnalyseInput(ref _command, _clientCLIInput);
 
-                if (_response == "VALID_par")
+                if (_cliInterpreter == "VALID_PARAMETERS")
                 {
-                    NetCom.SendStringUnicode(_stream, _command.Execute(_consoleWidth) + "\n<color><gray>" + _cursor, true);
+                    _dataP.data = Encoding.Unicode.GetBytes(_command.Execute(_cliP.consoleWidth));
                 }
                 else
                 {
-                    NetCom.SendStringUnicode(_stream, _response + "\n<color><gray>" + _cursor, true);
+                    _dataP.data = Encoding.Unicode.GetBytes(_cliInterpreter);
                 }
+                _dataP.SendPacket();
             }
+
+            _dataP.Dispose();
+            _cliP.Dispose();
         }
 
         #endregion

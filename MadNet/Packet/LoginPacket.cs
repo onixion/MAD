@@ -4,10 +4,13 @@ using System.Net.Sockets;
 
 namespace MadNet
 {
+    /*
+     * This packet is used to send the login data to the server. */
+
     public class LoginPacket : Packet
     {
-        public byte[] user;
-        public byte[] passMD5;
+        public byte[] user { get; set; }
+        public byte[] passMD5 { get; set; }
 
         public LoginPacket(NetworkStream stream, AES aes)
             : base(stream, aes, 2) { }
@@ -21,14 +24,14 @@ namespace MadNet
 
         public override void SendPacketSpec(StreamIO streamIO)
         {
-            streamIO.Write(user, true);
-            streamIO.Write(passMD5, true);
+            SendBytes(user);
+            SendBytes(passMD5);
         }
 
         public override void ReceivePacketSpec(StreamIO streamIO)
         {
-            user = streamIO.ReadBytes();
-            passMD5 = streamIO.ReadBytes();
+            user = ReceiveBytes();
+            passMD5 = ReceiveBytes();
         }
     }
 }

@@ -18,11 +18,13 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private int[] _acceptedRSAModulusLength = new int[] { 2048, 4096, 8192 };
-        private int _aesGeneratedPassLength = 20;
+        public const string _VERSION = "2.2v";
+        private const bool _DEBUG_MODE = true;
+        private const int _ACCEPTED_MODULUS_LENGTH = 2048;
+        private const int _AES_PASS_LENGTH = 20;
 
         private string _user = "root";
-        private string _pass = MD5Hashing.GetHash("rofl");
+        private string _pass = MD5Hashing.GetHash("rofl123");
         private bool _userOnline = false;
 
         private TcpListener _serverListener;
@@ -37,8 +39,6 @@ namespace MAD.CLIServerCore
         {
             serverPort = port;
             _js = js;
-
-            InitSessionCommands();
         }
 
         #endregion
@@ -88,47 +88,21 @@ namespace MAD.CLIServerCore
                 _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
+                if (_userOnline)
+                    throw new Exception("User already online!");
+
                 /*
-                DataPacket _receivePacket = new DataPacket(_stream, new AES("GAY"));
-                _receivePacket.ReceivePacket();
-
-                string text = Encoding.Unicode.GetString(_receivePacket.data);
-
-                Console.WriteLine("");
-                */
-                /*
-                // LOG
-
-                // -----------------------------------------------
-                // KEY-EXCHANGE
-
-                // 1.) Receive RSA-packet.
                 RSAPacket _rsaP = new RSAPacket(_stream, null);
                 _rsaP.ReceivePacket();
-
-                // 2.) Check if modulus is valid for connection.
-                if (!ValidRSAModulus(_rsaP.modulusLength))
+                if (_rsaP.modulusLength != _ACCEPTED_MODULUS_LENGTH)
                     throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
-
-                // 3.) Create RSA-encryptor.
                 RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
-                // RSA-packet not needed any more.
                 _rsaP.Dispose();
-
-                // 4.) Generate random password.
-                string _aesPass = GenRandomPassUnicode(_aesGeneratedPassLength);
-
-                // 5.) Encrypt password with RSA.
+                string _aesPass = GenRandomPassUnicode(_AES_PASS_LENGTH);
                 byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), true);
-
-                // 6.) Create DataPacket and send it to client.
-                DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted);
-                _dataP.SendPacket();
-                _dataP.Dispose();
-
-                // 7.) And from here -> AES.
-
-                // -----------------------------------------------
+                using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
+                    _dataP.SendPacket();
+                AES _aes = new AES(_aesPass);    
                 */
 
                 bool _loginSuccess;
@@ -146,9 +120,19 @@ namespace MAD.CLIServerCore
                         _dataP.data = Encoding.Unicode.GetBytes("LOGIN_DENIED");
                     _dataP.SendPacket();
                 }
+
+                if (_loginSuccess)
+                {
+                    CLISession _session = new CLISession(_stream, null, _js);
+                    _session.InitCommands();
+                    _session.Start();
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                if (_DEBUG_MODE)
+                    Console.WriteLine("EX: " + e.Message);
+
                 // LOG
             }
 
@@ -160,14 +144,6 @@ namespace MAD.CLIServerCore
             _client.Close();
 
             return null;
-        }
-
-        private bool ValidRSAModulus(int modulus)
-        {
-            for (int i = 0; i < _acceptedRSAModulusLength.Length; i++)
-                if (_acceptedRSAModulusLength[i] == modulus)
-                    return true;
-            return false;
         }
 
         private string GenRandomPassUnicode(int stringLength)
@@ -183,62 +159,6 @@ namespace MAD.CLIServerCore
             }
 
             return Encoding.Unicode.GetString(_str);
-        }
-
-        private void InitSessionCommands()
-        {
-            /*if (_session != null)
-            {
-                List<CommandOptions> commands = _session.commands;
-
-                // general purpose
-                commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
-                commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-                commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
-                commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-
-                // MAC AND IP READER
-                commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
-                commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
-                commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
-                commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
-                // JOBSYSTEM
-                commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
-
-                // SCEDULE
-                commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
-
-                // NODES
-                commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
-
-                // JOBS
-                commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
-
-                commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
-                commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
-
-                // CLIServer (these commands cannot be used by cli!)
-               
-                commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
-                commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
-                commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
-                commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
-            }
-        */
         }
 
         private bool Login(LoginPacket loginP)

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CLIClient
+namespace CLIIO
 {
-    public static class ConsoleIO
+    public static class CLIOutput
     {
         #region members
 
-        public static object _consoleLock = new object();
+        public static object _outputLock = new object();
 
         private const string colorTag = "<color>";
-
         public static List<object[]> colors = new List<object[]>()
         {
             new object[] { "<blue>" , ConsoleColor.Blue },
@@ -36,7 +35,7 @@ namespace CLIClient
 
         public static void WriteToConsole(string data)
         {
-            lock (_consoleLock)
+            lock (_outputLock)
             {
                 if (data != "")
                 {
@@ -84,6 +83,68 @@ namespace CLIClient
                 }
             }
         }
+
+        // Wanted to add text-wraping, so words won't be cut into two pieces at the end of lines.
+        // But it can't be used in combination with those color-codes ...
+        // Maybe it can be implemented somehow ... but for now I won't spend more time working on it.
+        /*
+        public static void WrapTextToConsole(string textToPrint, int lineWidth)
+        {
+            string[] _words = textToPrint.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            string _buffer = null;
+
+            for (int i = 0; i < _words.Length; i++)
+            {
+                if (_buffer == null)
+                {
+                    _buffer = "";
+                }
+
+                // Add one word to buffer.
+                _buffer += _words[i];
+
+                // Check if the buffer length is equal or bigger than the line width.
+                if (_buffer.Length > lineWidth)
+                {
+                    if (_buffer.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).Length != 1)
+                    {
+                        // Remove last word from buffer.
+                        _buffer = _buffer.Remove(_buffer.Length - _words[i].Length - 1);
+                        // Write it to console.
+                        Console.Write(_buffer);
+                        // Clear buffer.
+                        _buffer = null;
+                        // Set i one back.
+                        i--;
+                    }
+                    else
+                    { 
+                        // If the line has one word and it is to long for the line, than just write it into the console.
+                        Console.Write(_buffer);
+                        // Clear buffer.
+                        _buffer = null;
+                    }
+                }
+                else if (_buffer.Length == lineWidth)
+                {
+                    Console.Write(_buffer);
+                    _buffer = null;
+                }
+                else
+                {
+                    // Check if it is the last word.
+                    if (_words.Length - 1 == i)
+                    {
+                        Console.Write(_buffer);
+                        break;
+                    }
+                    else
+                    {
+                        _buffer += " ";
+                    }
+                }
+            }
+        }*/
 
         #endregion
     }

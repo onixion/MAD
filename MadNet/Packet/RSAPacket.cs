@@ -1,9 +1,14 @@
 ﻿using System;
-using System.Net;
+using System.Text;
 using System.Net.Sockets;
 
 namespace MadNet
 {
+    /*
+     * This packet is used to send the server the public-key,
+     * modulus and modulus-length. These things are needed
+     * for RSA-enryption. */
+
     public class RSAPacket : Packet
     {
         public byte[] publicKey { get; set; }
@@ -23,16 +28,16 @@ namespace MadNet
 
         public override void SendPacketSpec(StreamIO streamIO)
         {
-            streamIO.Write(publicKey, true);
-            streamIO.Write(modulus, true);
-            streamIO.Write(modulusLength);
+            SendBytes(publicKey);
+            SendBytes(modulus);
+            SendBytes(Encoding.Unicode.GetBytes(modulusLength.ToString()));
         }
 
         public override void ReceivePacketSpec(StreamIO streamIO)
         {
-            publicKey = streamIO.ReadBytes();
-            modulus = streamIO.ReadBytes();
-            modulusLength = streamIO.ReadInt();
+            publicKey = ReceiveBytes();
+            modulus = ReceiveBytes();
+            modulusLength = Int32.Parse(Encoding.Unicode.GetString(ReceiveBytes()));
         }
     }
 }

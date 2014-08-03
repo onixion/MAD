@@ -12,10 +12,12 @@ namespace MadNet
 
         /* TYPE           UINT
 
-         * NullPacket   | 0
-         * DataPacket   | 1
-         * LoginPacket  | 2
-         * RSAPacket    | 3    
+         * NullPacket       | 0
+         * DataPacket       | 1
+         * LoginPacket      | 2
+         * RSAPacket        | 3    
+         * CLIPacket        | 4
+         * ServerInfoPacket | 5
 
          */
 
@@ -54,7 +56,7 @@ namespace MadNet
             if (_packetType == ReceivePacketType())
                 ReceivePacketSpec(_streamIO);
             else
-                throw new PacketException("Wrong packet type!", null);
+                throw new PacketException("No packet or wrong packet!", null);
         }
 
         public abstract void SendPacketSpec(StreamIO streamIO);
