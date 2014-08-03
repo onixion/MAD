@@ -66,21 +66,15 @@ namespace MadNet
             if (data != null)
             {
                 if (_aes == null)
-                {
                     _streamIO.Write(data, true);
-                    _streamIO.Flush();
-                }
                 else
-                {
                     _streamIO.Write(_aes.Encrypt(data), true);
-                    _streamIO.Flush();
-                }
             }
             else
             {
                 _streamIO.Write(new byte[0], true);
-                _streamIO.Flush();
             }
+            _streamIO.Flush();
         }
 
         protected byte[] ReceiveBytes()

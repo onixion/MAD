@@ -59,13 +59,12 @@ namespace CLIClient
             {
                 try
                 {
-                    /* TESTING
-                    DataPacket _sendPacket = new DataPacket(_stream, null);
+                    /*
+                    DataPacket _sendPacket = new DataPacket(_stream, null, Encoding.Unicode.GetBytes("GAYLORD"));
                     _sendPacket.SendPacket();
-
                     Console.WriteLine("");
                     */
-
+                    /*
                     // -----------------------------------------------
                     // KEY-EXCHANGE
 
@@ -97,12 +96,31 @@ namespace CLIClient
                     _loginP.SendPacket();
                     _loginP.Dispose();
 
-                    /*
-                     * If the login or rsa-connection-establishment will fail, server will close stream.
-                     */
+                    */
+                    
+                    byte[] _username = Encoding.Unicode.GetBytes(username);
+                    byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
 
-                    // HERE
+                    // Send login-data.
+                    using (LoginPacket _loginP = new LoginPacket(_stream, null, _username, _passwordMD5))
+                        _loginP.SendPacket();
 
+                    // Receive answer from server.
+                    DataPacket _dataP = new DataPacket(_stream, null);
+                    _dataP.ReceivePacket();
+
+                    string _serverAnswer = Encoding.Unicode.GetString(_dataP.data);
+                    Console.WriteLine("Server: " + _serverAnswer);
+
+                    if (_serverAnswer == "LOGIN_SUCCESS")
+                    {
+                    
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Server refused login-data.");
+                    }
                 }
                 catch (Exception e)
                 {

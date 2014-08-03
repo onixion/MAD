@@ -22,7 +22,7 @@ namespace MAD.CLIServerCore
         private int _aesGeneratedPassLength = 20;
 
         private string _user = "root";
-        private string _pass = "test123";
+        private string _pass = MD5Hashing.GetHash("rofl");
         private bool _userOnline = false;
 
         private TcpListener _serverListener;
@@ -80,21 +80,23 @@ namespace MAD.CLIServerCore
         protected override object HandleClient(object clientObject)
         {
             TcpClient _client = (TcpClient)clientObject;
-            NetworkStream _stream = _client.GetStream();
+            NetworkStream _stream;
+            IPEndPoint _clientEndPoint;
 
             try
             {
-                IPEndPoint _clientEndpoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                _stream = _client.GetStream();
+                _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                /* TESTING
-                DataPacket _receivePacket = new DataPacket(_stream, null);
+                /*
+                DataPacket _receivePacket = new DataPacket(_stream, new AES("GAY"));
                 _receivePacket.ReceivePacket();
 
                 string text = Encoding.Unicode.GetString(_receivePacket.data);
 
                 Console.WriteLine("");
                 */
-
+                /*
                 // LOG
 
                 // -----------------------------------------------
@@ -106,7 +108,7 @@ namespace MAD.CLIServerCore
 
                 // 2.) Check if modulus is valid for connection.
                 if (!ValidRSAModulus(_rsaP.modulusLength))
-                    return null;
+                    throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
 
                 // 3.) Create RSA-encryptor.
                 RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
@@ -127,20 +129,22 @@ namespace MAD.CLIServerCore
                 // 7.) And from here -> AES.
 
                 // -----------------------------------------------
+                */
 
-                LoginPacket _loginP = new LoginPacket(_stream, new AES(_aesPass));
-                _loginP.ReceivePacket();
-
-                bool _loginSuccess = Login(_loginP);
-                _loginP.Dispose();
-
-                if (_loginSuccess)
+                bool _loginSuccess;
+                using (LoginPacket _loginP = new LoginPacket(_stream, null))
                 {
-                    // START CLI.
+                    _loginP.ReceivePacket();
+                    _loginSuccess = Login(_loginP);
                 }
-                else
+
+                using (DataPacket _dataP = new DataPacket(_stream, null))
                 {
-                    return null;
+                    if (_loginSuccess)
+                        _dataP.data = Encoding.Unicode.GetBytes("LOGIN_SUCCESS");
+                    else
+                        _dataP.data = Encoding.Unicode.GetBytes("LOGIN_DENIED");
+                    _dataP.SendPacket();
                 }
             }
             catch (Exception)

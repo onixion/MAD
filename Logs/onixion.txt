@@ -64,3 +64,4 @@ Now using the TcpListener and TcpClient)
 
 [31.07.2014][18:00-22:30][4,5h][131h] Working on Packet, PacketExceptions, DataPacket, LoginPacket ...
 [01.08.2014][18:00-23:00][5h][136h] Still working on Packet ... their are working. Not tested fully, but working.
+[03.08.2014][09:00-12:00][3h][139h] Working on CLIServer / CLIClient. Problems with RSA. Trying solving them.
