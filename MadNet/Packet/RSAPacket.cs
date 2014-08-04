@@ -30,14 +30,14 @@ namespace MadNet
         {
             SendBytes(publicKey);
             SendBytes(modulus);
-            SendBytes(Encoding.Unicode.GetBytes(modulusLength.ToString()));
+            SendBytes(Ser(modulusLength));
         }
 
         public override void ReceivePacketSpec(StreamIO streamIO)
         {
             publicKey = ReceiveBytes();
             modulus = ReceiveBytes();
-            modulusLength = Int32.Parse(Encoding.Unicode.GetString(ReceiveBytes()));
+            modulusLength = (int)DeSer(ReceiveBytes(), modulusLength.GetType());
         }
     }
 }

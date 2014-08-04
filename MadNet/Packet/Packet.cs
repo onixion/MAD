@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Text;
+using System.IO;
 using System.Net.Sockets;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace MadNet
 {
@@ -90,6 +94,41 @@ namespace MadNet
             {
                 uint _length = _streamIO.ReadUInt();
                 return _aes.Decrypt(_streamIO.ReadBytes(_length));
+            }
+        }
+
+        protected  byte[] Ser(object toSerialize)
+        {
+            try
+            {
+                XmlSerializer _serializer = new XmlSerializer(toSerialize.GetType());
+                using (MemoryStream _ms = new MemoryStream())
+                {
+                    _serializer.Serialize(_ms, toSerialize);
+                    _ms.Position = 0;
+                    return _ms.ToArray();
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        protected object DeSer(byte[] toDeserialize, Type type)
+        {
+            try
+            {
+                XmlSerializer _serializer = new XmlSerializer(type);
+                using (MemoryStream _ms = new MemoryStream(toDeserialize))
+                {
+                    _ms.Position = 0;
+                    return _serializer.Deserialize(_ms);
+                }
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

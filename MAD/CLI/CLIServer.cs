@@ -79,17 +79,22 @@ namespace MAD.CLIServerCore
 
         protected override object HandleClient(object clientObject)
         {
-            TcpClient _client = (TcpClient)clientObject;
-            NetworkStream _stream;
-            IPEndPoint _clientEndPoint;
-
             try
             {
-                _stream = _client.GetStream();
-                _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                TcpClient _client = (TcpClient)clientObject;
+                NetworkStream _stream = _client.GetStream();
+                IPEndPoint _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
                 if (_userOnline)
                     throw new Exception("User already online!");
+
+                // ------------------------------------------------------------------------
+                // TESTING-ZONE
+
+                RSAPacket _R = new RSAPacket(_stream, null);
+                _R.ReceivePacket();
+
+                // ------------------------------------------------------------------------
 
                 /*
                 RSAPacket _rsaP = new RSAPacket(_stream, null);
@@ -127,6 +132,8 @@ namespace MAD.CLIServerCore
                     _session.InitCommands();
                     _session.Start();
                 }
+
+                _client.Close();
             }
             catch (Exception e)
             {
@@ -138,10 +145,7 @@ namespace MAD.CLIServerCore
 
             // Client disconnected.
 
-            // LOG
-
-            _userOnline = false;
-            _client.Close();
+            // LOG       
 
             return null;
         }

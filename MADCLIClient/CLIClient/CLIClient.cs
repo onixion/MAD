@@ -59,6 +59,10 @@ namespace CLIClient
             {
                 try
                 {
+                    RSAPacket _R = new RSAPacket(_stream, null, Encoding.ASCII.GetBytes("G"), Encoding.ASCII.GetBytes("G"), 5);
+                    _R.SendPacket();
+
+
                     /*
                     RSAxParameters _par = RSAxUtils.GetRSAxParameters("GAYGAYGAY", _RSAModulusLength);
                     RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
