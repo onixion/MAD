@@ -91,8 +91,6 @@ namespace MAD.CLIServerCore
                 // ------------------------------------------------------------------------
                 // TESTING-ZONE
 
-                RSAPacket _R = new RSAPacket(_stream, null);
-                _R.ReceivePacket();
 
                 // ------------------------------------------------------------------------
 

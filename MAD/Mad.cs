@@ -10,7 +10,7 @@ namespace MAD
 {
     class Mad
     {
-        /* MAD - Network Monitoring v0.0.4.4 */
+        /* MAD - Network Monitoring v0.0.5.0 */
 
         private const string dataPath = "data";
 
