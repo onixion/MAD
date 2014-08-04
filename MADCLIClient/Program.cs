@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 
 using MadNet;
+using CLIIO;
 
 namespace CLIClient
 {
@@ -11,14 +12,79 @@ namespace CLIClient
     {
         static int Main(string[] args)
         {
+            /* ARGS => <server-ip> <server-port> <username> <password> */
+
             MadClient _client = new MadClient();
+            
+            if (args.Length == 4)
+            {
+                try
+                {
+                    IPAddress _serverIP;
+                    try { _serverIP = IPAddress.Parse(args[0]); }
+                    catch (Exception)
+                    {
+                        CLIOutput.WriteToConsole("<color><red>Could not parse '" + args[0] + "' into an ip-address!");
+                        throw new Exception();
+                    }
 
-            _client.CLISetupAssisten();
-            Console.WriteLine("");
-            _client.CLIConnect();
+                    int _serverPort = 999;
+                    try { _serverPort = Int32.Parse(args[1]); }
+                    catch (Exception)
+                    {
+                        CLIOutput.WriteToConsole("<color><red>Could not parse '" + args[1] + "' into an interger!");
+                        throw new Exception();
+                    }
 
-            Console.WriteLine("\nPress any key to exit program ...");
-            Console.ReadKey();
+                    _client.SetConnection(_serverIP, _serverPort);
+
+                    string _username = args[2];
+                    string _password = args[3];
+
+                    _client.SetUserPass(_username, _password);
+                    _client.CLIConnect();
+                }
+                catch (Exception) { }
+
+                Console.ReadKey();
+                return 0;
+            }
+            else if( args.Length == 0)
+            {
+                // do nothing
+            }
+            else
+            {
+                CLIOutput.WriteToConsole("To many args! .. switching to CLI-Setup-Assistent ..");
+            }
+            
+            ConsoleKeyInfo _key;
+            while (true)
+            {
+                _client.CLISetupAssisten();
+
+                while (true)
+                {
+                    CLIOutput.WriteToConsole("\n<color><yellow>Connect to '" + _client.server + ":" + _client.port + "' with the username '" + _client.user + "'?");
+                    CLIOutput.WriteToConsole("<color><yellow>Sure about that? Y(es) / N(o)");
+
+                    _key = Console.ReadKey(true);
+                    if (_key.Key == ConsoleKey.Y)
+                    {
+                        _client.CLIConnect();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                CLIOutput.WriteToConsole("\n<color><yellow>Re-configure or exit? R(e-Configure) / E(xit)");
+
+                _key = Console.ReadKey(true);
+                if (_key.Key != ConsoleKey.R)
+                    break;
+            }
 
             return 0;
         }
@@ -26,10 +92,10 @@ namespace CLIClient
 
     public class MadClient
     {
-        private IPAddress _server { get; set; }
-        private int _port { get; set; }
+        public IPAddress server { get; set; }
+        public int port { get; set; }
 
-        private string _user { get; set; }
+        public string user { get; set; }
         private string _passMD5 { get; set; }
 
         public MadClient()
@@ -37,14 +103,14 @@ namespace CLIClient
 
         public void SetUserPass(string username, string password)
         {
-            _user = username;
+            user = username;
             _passMD5 = MD5Hashing.GetHash(password);
         }
 
         public void SetConnection(IPAddress server, int port)
         {
-            _server = server;
-            _port = port;
+            this.server = server;
+            this.port = port;
         }
 
         public void CLISetupAssisten()
@@ -57,7 +123,7 @@ namespace CLIClient
             string _password = "";
 
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Connection-Setup:");
+            Console.WriteLine("\nConnection-Setup:");
 
             Console.ForegroundColor = ConsoleColor.White;
             while (true)
@@ -143,34 +209,18 @@ namespace CLIClient
 
         public void CLIConnect()
         {
-            while (true)
+            CLIClient _client = new CLIClient(new IPEndPoint(server, port));
+
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Connect to '" + _server + ":" + _port + "' with the username '" + _user + "'?");
-                Console.WriteLine("Sure about that? Y/N");
+                _client.Connect();
+                _client.LoginToRemoteCLI(user, _passMD5);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(e.Message);
                 Console.ForegroundColor = ConsoleColor.White;
-
-                ConsoleKeyInfo _key = Console.ReadKey(true);
-                if (_key.Key == ConsoleKey.Y)
-                {
-                    CLIClient _client = new CLIClient(new IPEndPoint(_server, _port));
-
-                    try
-                    {
-                        _client.Connect();
-                        _client.LoginToRemoteCLI(_user, _passMD5);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(e.Message);
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                }
-                else if (_key.Key == ConsoleKey.N)
-                {
-                    break;
-                }
             }
         }
     }

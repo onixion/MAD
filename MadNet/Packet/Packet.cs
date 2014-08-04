@@ -14,7 +14,7 @@ namespace MadNet
 
         private uint _packetType = 0;
 
-        /* TYPE           UINT
+        /* TYPE               UINT
 
          * NullPacket       | 0
          * DataPacket       | 1

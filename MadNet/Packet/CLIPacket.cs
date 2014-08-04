@@ -12,8 +12,8 @@ namespace MadNet
 
     public class CLIPacket : Packet
     {
-        public int consoleWidth { get; set; }
         public byte[] cliInput { get; set; }
+        public int consoleWidth { get; set; }
 
         public CLIPacket(NetworkStream stream, AES aes)
             : base(stream, aes, 4) { }
@@ -27,13 +27,13 @@ namespace MadNet
 
         public override void SendPacketSpec(StreamIO streamIO)
         {
-            SendBytes(Encoding.Unicode.GetBytes(consoleWidth.ToString()));
+            SendBytes(Ser(consoleWidth));
             SendBytes(cliInput);
         }
 
         public override void ReceivePacketSpec(StreamIO streamIO)
         {
-            consoleWidth = Int32.Parse(Encoding.Unicode.GetString(ReceiveBytes()));
+            consoleWidth = (int)DeSer(ReceiveBytes(), typeof(Int32));
             cliInput = ReceiveBytes();
         }
     }

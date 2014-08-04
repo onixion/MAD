@@ -9,6 +9,7 @@ namespace MadNet
 {
     public class AES
     {
+        RijndaelOpen _aes = new RijndaelOpen();
         private static byte[] _salt = new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 };
         private string _pass { get; set; }
         public string pass { set { _pass = value; } }
@@ -83,8 +84,6 @@ namespace MadNet
 
         private byte[] AESDecryption(byte[] data, byte[] key, byte[] iv)
         {
-            RijndaelOpen _aes = new RijndaelOpen();
-
             _aes.Key = key;
             _aes.IV = iv;
 

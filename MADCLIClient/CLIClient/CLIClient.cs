@@ -59,6 +59,15 @@ namespace CLIClient
             {
                 try
                 {
+                    using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+                    {
+                        _serverInfoP.ReceivePacket();
+
+                        Console.WriteLine("SERVER-HEADER: " + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
+                        Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
+                    }
+
+
                     /*
                     RSAxParameters _par = RSAxUtils.GetRSAxParameters("GAYGAYGAY", _RSAModulusLength);
                     RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
@@ -83,12 +92,13 @@ namespace CLIClient
                         _dataP.ReceivePacket();
                         _serverAnswer = Encoding.Unicode.GetString(_dataP.data);
                     }
-                    Console.WriteLine("Server: " + _serverAnswer);
+  
+                    Console.WriteLine("SERVER-REPLY: " + _serverAnswer);
 
                     if (_serverAnswer == "LOGIN_SUCCESS")
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Server accepted login-data.");
+                        Console.WriteLine("\nServer accepted login-data.");
                         Console.ForegroundColor = ConsoleColor.White;
 
                         StartVirtualConsole(_stream, null);
@@ -96,7 +106,7 @@ namespace CLIClient
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Server refused login-data.");
+                        Console.WriteLine("\nServer refused login-data.");
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 }
@@ -123,7 +133,7 @@ namespace CLIClient
                 CLIInput.WriteCursor();
                 _cliInput = CLIInput.ReadInput();
 
-                _cliP.consoleWidth = Int32.Parse(Console.BufferWidth.ToString());
+                _cliP.consoleWidth = Console.BufferWidth;
                 _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);
                 _cliP.SendPacket();
 

@@ -18,6 +18,7 @@ namespace MAD.CLIServerCore
     {
         #region members
 
+        public const string _HEADER = "MAD CLI-SERVER";
         public const string _VERSION = "2.2v";
         private const bool _DEBUG_MODE = true;
         private const int _ACCEPTED_MODULUS_LENGTH = 2048;
@@ -84,6 +85,13 @@ namespace MAD.CLIServerCore
                 TcpClient _client = (TcpClient)clientObject;
                 NetworkStream _stream = _client.GetStream();
                 IPEndPoint _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+
+                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+                {
+                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_HEADER);
+                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_VERSION);
+                    _serverInfoP.SendPacket();
+                }
 
                 if (_userOnline)
                     throw new Exception("User already online!");
