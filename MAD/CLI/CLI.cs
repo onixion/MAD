@@ -5,6 +5,7 @@ using System.IO;
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
 using MAD.DHCPReader;
+using CLIIO;
 
 namespace MAD.CLICore
 {

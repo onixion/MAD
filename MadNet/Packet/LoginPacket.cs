@@ -4,8 +4,7 @@ using System.Net.Sockets;
 
 namespace MadNet
 {
-    /*
-     * This packet is used to send the login data to the server. */
+    /* This packet is used to send the login data to the server. */
 
     public class LoginPacket : Packet
     {

@@ -10,9 +10,9 @@ namespace MAD
 {
     class Mad
     {
-        /* MAD - Network Monitoring v0.0.5.0 */
+        /* MAD - Network Monitoring v0.0.5.2 */
 
-        private const string dataPath = "data";
+        private const string DATAPATH = "data";
 
         [STAThread]
         static int Main(string[] args)
@@ -25,26 +25,18 @@ namespace MAD
             if (args.Length == 0)
             { 
                 // No args -> start gui.
-                //Application.EnableVisualStyles();
-                //Application.Run(new Form());
-
-                //CLI cli = new CLI(dataPath, js, macFeeder);
-                //cli.Start();
-
-                CLIServer server = new CLIServer(999, js);
-                server.Start();
+                throw new NotImplementedException("NO GUI!");
             }
             else if (args.Length == 1)
             {
                 switch (args[0])
                 {
                     case "-cli":
-                        CLI cli = new CLI(dataPath, js, macFeeder);
+                        CLI cli = new CLI(DATAPATH, js, macFeeder);
                         cli.Start();
                         break;
                     case "-cliserver":
-                        Console.WriteLine("CLI-Server running on port 999 ...");
-                        CLIServer cliServer = new CLIServer(999, js);
+                        CLIServer cliServer = new CLIServer(999, true, false, js);
                         cliServer.Start();
                         break;
                     default:

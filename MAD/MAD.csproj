@@ -62,9 +62,7 @@
     <Compile Include="CLI\Commands\dani_bitte_umbenennen.cs" />
     <Compile Include="CLI\CLI.cs" />
     <Compile Include="CLI\CLIFramework.cs" />
-    <Compile Include="CLI\CLIInput.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
-    <Compile Include="CLI\CLIOutput.cs" />
     <Compile Include="CLI\CLIServer.cs" />
     <Compile Include="CLI\Parameter.cs" />
     <Compile Include="CLI\ParameterInput.cs" />
@@ -76,6 +74,7 @@
     <Compile Include="DHCPReader\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
+    <Compile Include="JobSystem\JobRule.cs" />
     <Compile Include="JobSystem\Job.cs" />
     <Compile Include="JobSystem\JobNode.cs" />
     <Compile Include="JobSystem\JobNotification.cs" />
@@ -93,6 +92,7 @@
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
+    <Compile Include="JobSystem\JSParser.cs" />
     <Compile Include="Mad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

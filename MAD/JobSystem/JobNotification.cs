@@ -10,8 +10,9 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public MailAddress[] mailAddr;
+        public MailAddress[] mailAddr = null;
         public MailPriority priority;
+        public List<JobRule> rules = null;
 
         #endregion
 
@@ -42,7 +43,7 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
-        public MailPriority ParsePrio(string text)
+        public static MailPriority ParsePrio(string text)
         {
             text = text.ToLower();
             switch(text)

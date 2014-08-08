@@ -34,6 +34,7 @@ namespace MAD.CLICore
         #region methodes
 
         public virtual string Execute() { return "NULL"; }
+
         public virtual string Execute(int consoleWidth) { return "NULL"; }
 
         public Type GetArgType(string par)
@@ -49,7 +50,7 @@ namespace MAD.CLICore
             return null;
         }
 
-        protected bool OParUsed(string par)
+        public bool OParUsed(string par)
         {
             foreach (Parameter _temp in pars.pars)
             {

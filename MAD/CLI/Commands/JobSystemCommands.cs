@@ -24,9 +24,9 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>\n JOBSYSTEM version " + _js.version + "\n\n";
-            output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.maxNodes * JobNode.maxJobs + ")\n";
+            output += "<color><yellow>\n JOBSYSTEM version " + _js.VERSION + "\n\n";
+            output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES + ")\n";
+            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + ")\n";
             output += "\n\n Scedule-State: ";
             if (_js.sceduleState == JobScedule.State.Active)
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
@@ -117,7 +117,7 @@ namespace MAD.CLICore
         {
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += "\n";
-            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.maxNodes + "\n";
+            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAX_NODES + "\n";
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodesInitialized + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
@@ -321,7 +321,7 @@ namespace MAD.CLICore
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
             output += "\n";
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.maxNodes * JobNode.maxJobs + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
@@ -614,6 +614,7 @@ namespace MAD.CLICore
         }
     }
 
+    // TESTING JOBNOTIFICATION ON THIS COMMAND!
     public class JobSystemAddPingCommand : JobCommand
     {
         private JobSystem _js;
@@ -631,55 +632,34 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             string jobName = (string)pars.GetPar("n").argValues[0];
-
-            JobPing _job = new JobPing();
-            _job.name = jobName;
-            _job.type = Job.JobType.Ping;
-
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeType.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeType.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return "<color><red>" + e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
-            }
-
-            if (OParUsed("ttl"))
-            {
-                _job.ttl = (int)pars.GetPar("ttl").argValues[0];
-            }
-
-            // So now the JobPing is finished and set properly. 
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            JobPing _job = new JobPing(jobName);
 
             try
             {
+                // Set jobTime.
+
+                _job.time = JSParser.ParseJobTime(this);
+                
+                // Set notification.
+
+                 JSParser.ParseJobNotification(this, _job.outDesc);
+
+                // TODO
+
+                // Set job-specific settings.
+                if (OParUsed("ttl"))
+                {
+                    _job.ttl = (int)pars.GetPar("ttl").argValues[0];
+                }
+
+                // So now the JobPing is finished and set properly. 
+
+                int _nodeID = (int)pars.GetPar("id").argValues[0];
+
                 _js.AddJobToNode(_nodeID, _job);
                 return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
             }
-            catch (JobNodeException e)
+            catch (Exception e)
             {
                 return "<color><red>" + e.Message;
             }
@@ -826,11 +806,17 @@ namespace MAD.CLICore
         public JobCommand()
             : base()
         {
+            // GENERAL
             rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            
+            // TIME
             oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
-            oPar.Add(new ParOption("nAddr", "NOTIFICATION-Addresses", "Mailaddresses to send notification to.", false, true, new Type[] { typeof(MailAddress) }));
-            oPar.Add(new ParOption("nPrio", "NOTIFICATION-Priority", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
+
+            // NOTIFICATION
+            oPar.Add(new ParOption("nAddr", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+            oPar.Add(new ParOption("nPrio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("nRule", "NOT.-RULE", "Add a rule to define when a notification should be sended.", false, true, new Type[] { typeof(string) }));
         }
     }
 

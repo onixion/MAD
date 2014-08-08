@@ -22,7 +22,7 @@ namespace MAD.JobSystemCore
         public State state = State.Inactive;
 
         public List<Job> jobs = new List<Job>();
-        public const int maxJobs = 100;
+        public const int MAX_JOBS = 100;
 
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; }

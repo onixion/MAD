@@ -8,7 +8,6 @@ namespace MAD.CLICore
         public string par;
         public object[] argValues;
 
-
         public Parameter(string par, object[] argValues)
         {
             this.par = par;

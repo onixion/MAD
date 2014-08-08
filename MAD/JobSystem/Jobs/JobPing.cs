@@ -20,14 +20,14 @@ namespace MAD.JobSystemCore
 
         #region constructor
 
-        public JobPing()
-            : base("NULL", JobType.Ping, new JobTime(), new JobNotification())
+        public JobPing(string name)
+            : base(name, JobType.Ping, new JobTime(), new JobNotification())
         {
             this.ttl = 250;
         }
 
-        public JobPing(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, int ttl)
-            : base (jobName, jobType, jobTime, noti)
+        public JobPing(string name, JobType jobType, JobTime jobTime, JobNotification noti, int ttl)
+            : base (name, jobType, jobTime, noti)
         {
             this.ttl = ttl;
         }

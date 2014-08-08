@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using CLIIO;
+
 namespace MAD.CLICore
 {
     public class ExitCommand : Command

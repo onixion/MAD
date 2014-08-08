@@ -18,27 +18,32 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        public const string _HEADER = "MAD CLI-SERVER";
-        public const string _VERSION = "2.4v";
-        private const bool _DEBUG_MODE = true;
-        private const bool _LOG_MODE = true;
-        private const int _ACCEPTED_RSA_MODULUS_LENGTH = 2048;
-        private const int _AES_PASS_LENGTH = 20;
+        public const string HEADER = "MAD CLI-Server";
+        public const string VERSION = "v2.4";
+        public readonly bool DEBUG_MODE;
+        public readonly bool LOG_MODE;
+        public readonly int ACCEPTED_RSA_MODULUS_LENGTH = 2048;
+        public readonly int AES_PASS_LENGTH = 20;
 
         private string _user = "root";
         private string _pass = MD5Hashing.GetHash("rofl123");
         private bool _userOnline = false;
 
         private TcpListener _serverListener;
+
         private JobSystem _js;
 
         #endregion
 
         #region constructor
 
-        public CLIServer(int port, JobSystem js)
+        public CLIServer(int port, bool debug, bool log, JobSystem js)
         {
             serverPort = port;
+
+            DEBUG_MODE = debug;
+            LOG_MODE = log;
+
             _js = js;
         }
 
@@ -80,27 +85,20 @@ namespace MAD.CLIServerCore
                 NetworkStream _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                if (_DEBUG_MODE)
+                if (DEBUG_MODE)
                     Console.WriteLine(GetTimeStamp() + "Client (" + _clientEndPoint.Address + ") connected.");
-
-                if (_LOG_MODE)
+                if (LOG_MODE)
                     Log("Client (" + _clientEndPoint.Address + ") connected.");
 
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
-                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_HEADER);
-                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_VERSION);
+                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(HEADER);
+                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(VERSION);
                     _serverInfoP.SendPacket();
                 }
 
                 if (_userOnline)
                     throw new Exception("User already online!");
-
-                // ------------------------------------------------------------------------
-                // TESTING-ZONE
-
-
-                // ------------------------------------------------------------------------
 
                 /*
                 RSAPacket _rsaP = new RSAPacket(_stream, null);
@@ -143,17 +141,15 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (_DEBUG_MODE)
+                if (DEBUG_MODE)
                     Console.WriteLine("EX: " + e.Message);
-
-                if (_LOG_MODE)
+                if (LOG_MODE)
                     Log("EX: " + e.Message);
             }
 
-            if (_DEBUG_MODE)
+            if (DEBUG_MODE)
                 Console.WriteLine("Client (" + _clientEndPoint.Address + ") disconnected.");
-
-            if (_LOG_MODE)
+            if (LOG_MODE)
                 Log("Client (" + _clientEndPoint.Address + ") disconnected.");
 
             return null;

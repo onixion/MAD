@@ -7,14 +7,13 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private Version _version = new Version(2, 8);
-        public Version version { get { return _version; } }
+        public readonly Version VERSION = new Version(2, 8);
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
         private List<JobNode> _nodes = new List<JobNode>();
-        public const int maxNodes = 100;
+        public const int MAX_NODES = 100;
         public int nodesInitialized { get { return _nodes.Count; } }
         private object _nodesLock = new object();
 
@@ -91,7 +90,6 @@ namespace MAD.JobSystemCore
 
         #region nodes handling
 
-        // sw
         public void StartNode(int id)
         {
             JobNode _node = GetNode(id);
@@ -102,7 +100,6 @@ namespace MAD.JobSystemCore
                 throw new JobNodeException("Node already active!", null);
         }
 
-        // sw
         public void StopNode(int id)
         {
             JobNode _node = GetNode(id);
@@ -113,17 +110,15 @@ namespace MAD.JobSystemCore
                 throw new JobNodeException("Node already inactive!", null);
         }
 
-        // sw
         public void AddNode(JobNode node)
         {
-            if (maxNodes > _nodes.Count)
+            if (MAX_NODES > _nodes.Count)
                 lock (_nodesLock)
                     _nodes.Add(node);
             else
                 throw new JobSystemException("Node limit reached!", null);
         }
 
-        // sw
         public void RemoveNode(int id)
         {
             bool _success = false;
@@ -160,6 +155,16 @@ namespace MAD.JobSystemCore
             return null;
         }
 
+        public void UpdateNodeIP(int nodeID, System.Net.IPAddress ip)
+        {
+            JobNode _node = GetNode(nodeID);
+            if (_node != null)
+                lock (_node.nodeLock)
+                    _node.ipAddress = ip;
+            else
+                throw new JobNodeException("Node does not exist!", null);
+        }
+
         public bool NodeExist(int id)
         {
             JobNode _node = GetNode(id);
@@ -191,7 +196,6 @@ namespace MAD.JobSystemCore
 
         #region jobs handling
 
-        // sw
         public void StartJob(int id)
         {
             Job _job = GetJob(id);
@@ -205,7 +209,6 @@ namespace MAD.JobSystemCore
                 throw new JobException("Job does not exist!", null);
         }
 
-        // sw
         public void StopJob(int id)
         {
             Job _job = GetJob(id);
@@ -219,7 +222,6 @@ namespace MAD.JobSystemCore
                 throw new JobException("Job does not exist!", null);
         }
 
-        // sw
         public void AddJobToNode(int nodeId, Job job)
         {
             JobNode _node = GetNode(nodeId);
@@ -230,7 +232,6 @@ namespace MAD.JobSystemCore
                 throw new JobNodeException("Node does not exist!", null);
         }
 
-        // sw
         public void RemoveJob(int id)
         {
             bool _success = false;
@@ -246,7 +247,6 @@ namespace MAD.JobSystemCore
                 throw new JobException("Job does not exist!", null);
         }
 
-        // sw
         public void UpdateJob(int id, Job job)
         {
             Job _job = GetJob(id);
