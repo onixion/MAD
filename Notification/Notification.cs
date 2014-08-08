@@ -12,14 +12,17 @@ namespace Notification
         public MailAddress eMailFrom;
         public string smtpClient;
         public int port;
+        //_[DefaultValue("")]
+        
 
 
         //Declaration of static Parameters (Private)
         private string password;
         private bool eMailSent = false;
         
+        
         //Decleration of Objects
-        SmtpClient client;
+        private SmtpClient client;
         MailMessage mail;
 
         //#Methods
@@ -33,32 +36,65 @@ namespace Notification
             this.password = password;
             this.port = port;
         }
-
+        
         //Method to send mail with mail parameters (dynamic (have to set for every mail))
-        public bool SendMail(MailAddress[] eMailTo, string subject, string body, int retryCounter)
+        public bool SendMail(MailAddress[] eMailTo, string subject, string body, bool highPriority, int retryCounter, 
+            MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
             //Declaration of Variables
             int tryCounter = 1;
 
             //Initialization of mail and setting parameters
             mail = new MailMessage();
+            
             mail.From = eMailFrom;
+           
             foreach (MailAddress element in eMailTo)//to get all eMailIds from incoming Array
             {
                 mail.To.Add(element);
             }
+
+            if (eMailToCC != null)
+            {
+                foreach (MailAddress element in eMailToCC)
+                {
+                    mail.CC.Add(element);
+                }
+            }
+
+            if (eMailToBCC != null)
+            {
+                foreach (MailAddress element in eMailToBCC)
+                {
+                    mail.Bcc.Add(element);
+                }
+            }
+
+            if (eMailAttachment != null)
+            {
+                foreach (Attachment element in eMailAttachment)
+                {
+                    mail.Attachments.Add(element);
+                }
+            }
+
             mail.Subject = subject;
             mail.Body = body;
-            mail.Priority = MailPriority.High;
+            
 
+            if (highPriority == true)
+            {
+                mail.Priority = MailPriority.High;
+            }
             //Authentification and sending process
-            for (eMailSent = false; (eMailSent == false) && (tryCounter <= retryCounter); tryCounter++)//to retryCounter because shit happens
+            for (eMailSent = false; (eMailSent == false) && (tryCounter <= retryCounter); tryCounter++)//to retry because shit happens
             {
                 try
                 {  
                     Console.WriteLine("{0}.Attempt", tryCounter);
                     //Initialization of SMTPclient and setting parameters and sending mail
                     client = new SmtpClient(smtpClient, port);
+                    lock (client) { };
                     client.Credentials = new NetworkCredential(eMailFrom.ToString(), password);
                     client.EnableSsl = true;
                     client.Send(mail); //Send order
@@ -69,10 +105,7 @@ namespace Notification
                 catch(Exception ex)
                 {   
                     eMailSent = false;
-                    Console.WriteLine("Failed becuase:");
-                    Console.WriteLine(ex);//ex gives a report of problems
-
-                    
+                    Console.WriteLine("Failed becuase:{0}", ex.ToString()); //ex gives a report of problems
                 }
 
             } return eMailSent;
