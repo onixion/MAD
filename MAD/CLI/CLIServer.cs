@@ -19,9 +19,10 @@ namespace MAD.CLIServerCore
         #region members
 
         public const string _HEADER = "MAD CLI-SERVER";
-        public const string _VERSION = "2.2v";
+        public const string _VERSION = "2.4v";
         private const bool _DEBUG_MODE = true;
-        private const int _ACCEPTED_MODULUS_LENGTH = 2048;
+        private const bool _LOG_MODE = true;
+        private const int _ACCEPTED_RSA_MODULUS_LENGTH = 2048;
         private const int _AES_PASS_LENGTH = 20;
 
         private string _user = "root";
@@ -29,7 +30,6 @@ namespace MAD.CLIServerCore
         private bool _userOnline = false;
 
         private TcpListener _serverListener;
-
         private JobSystem _js;
 
         #endregion
@@ -65,14 +65,6 @@ namespace MAD.CLIServerCore
             _serverListener.Stop();
         }
 
-        public void ChangePort(int newPort)
-        {
-            if (!IsListening)
-                serverPort = newPort;
-            else
-                throw new Exception("Server running!");
-        }
-
         protected override object GetClient()
         {
             return _serverListener.AcceptTcpClient();
@@ -80,11 +72,19 @@ namespace MAD.CLIServerCore
 
         protected override object HandleClient(object clientObject)
         {
+            IPEndPoint _clientEndPoint = null;
+
             try
             {
                 TcpClient _client = (TcpClient)clientObject;
                 NetworkStream _stream = _client.GetStream();
-                IPEndPoint _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+
+                if (_DEBUG_MODE)
+                    Console.WriteLine(GetTimeStamp() + "Client (" + _clientEndPoint.Address + ") connected.");
+
+                if (_LOG_MODE)
+                    Log("Client (" + _clientEndPoint.Address + ") connected.");
 
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
@@ -105,7 +105,7 @@ namespace MAD.CLIServerCore
                 /*
                 RSAPacket _rsaP = new RSAPacket(_stream, null);
                 _rsaP.ReceivePacket();
-                if (_rsaP.modulusLength != _ACCEPTED_MODULUS_LENGTH)
+                if (_rsaP.modulusLength != _ACCEPTED_RSA_MODULUS_LENGTH)
                     throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
                 RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
                 _rsaP.Dispose();
@@ -146,12 +146,15 @@ namespace MAD.CLIServerCore
                 if (_DEBUG_MODE)
                     Console.WriteLine("EX: " + e.Message);
 
-                // LOG
+                if (_LOG_MODE)
+                    Log("EX: " + e.Message);
             }
 
-            // Client disconnected.
+            if (_DEBUG_MODE)
+                Console.WriteLine("Client (" + _clientEndPoint.Address + ") disconnected.");
 
-            // LOG       
+            if (_LOG_MODE)
+                Log("Client (" + _clientEndPoint.Address + ") disconnected.");
 
             return null;
         }
@@ -187,12 +190,32 @@ namespace MAD.CLIServerCore
                 return false;
         }
 
-        private byte[] GenerateRandomPass(int length)
+        public void ChangePort(int newPort)
         {
-            byte[] _buffer = new byte[length];
-            Random _rand = new Random();
-            _rand.NextBytes(_buffer);
-            return _buffer;
+            if (!IsListening)
+                serverPort = newPort;
+            else
+                throw new Exception("Server running!");
+        }
+
+        private void Log(string data)
+        {
+            FileStream _stream;
+
+            if (File.Exists("server.log"))
+                _stream = new FileStream("server.log", FileMode.Append, FileAccess.Write , FileShare.Read);
+            else
+                _stream = new FileStream("server.log", FileMode.Create, FileAccess.Write, FileShare.Read);
+
+            using (StreamWriter _writer = new StreamWriter(_stream))
+                _writer.WriteLine(GetTimeStamp() + data);
+
+            _stream.Dispose();
+        }
+
+        private string GetTimeStamp()
+        {
+            return DateTime.Now.ToString("[dd.mm.yyyy|hh:MM.ss]");
         }
 
         #endregion
