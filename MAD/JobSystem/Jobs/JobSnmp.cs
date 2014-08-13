@@ -10,20 +10,20 @@ namespace MAD.JobSystemCore
     [Serializable]
     public class JobSnmp : Job
     {
-        public uint version;
-        public uint expectedHostNr = 10;
+        public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
+        public uint expectedIfNr = 10;                                                  //optional Parameter default (wie zu sehen) ist 10
 
-        public bool interfaceParUsed; 
+        public bool interfaceParUsed;                                                   //required Parameter, irgendwie a option -i oder sowas.. wenn der Parameter vorkimmt wead a Auflistung von Interfaces ausgegeben und zwar in der Menge von expectedIfNr
 
-        public string communityString = "";
-        public string auth = "";
-        public string priv = "";
-        public string ifEntryNr;
+        public string communityString = "";                                             //required Parameter
+        public string auth = "";                                                        //required Parameter sofern version == 3 && security != noAuthNoPriv
+        public string priv = "";                                                        //required Parameter sofern version == 3 && security != noAuthNoPriv
+        public string ifEntryNr;                                                        //required Parameter sofern !interfaceParUsed
 
-        public NetworkHelper.snmpProtokolls privProt;
-        public NetworkHelper.snmpProtokolls authProt;
+        public NetworkHelper.snmpProtokolls privProt;                                   //required Parameter sofern version == 3 && security != noAuthNoPriv            
+        public NetworkHelper.snmpProtokolls authProt;                                   //required Parameter sofern version == 3 && security != noAuthNoPriv
 
-        public NetworkHelper.securityLvl security;
+        public NetworkHelper.securityLvl security;                                      //required Parameter sofern version == 3
 
         private string ifEntryString = "1.3.6.1.2.1.2.2.1";
         private static uint lastRecord = 0; 
@@ -34,7 +34,7 @@ namespace MAD.JobSystemCore
             switch (version)
             {
                 case 1:
-                    //Not Supportet
+                    //Falls der zu blöd war zu verstehen dass lei 2 und 3 unterstützt werden dann a freundliche nachricht dass des nit geht
                     break;
                 case 2:
                     SnmpV2Handling(target);
@@ -62,11 +62,7 @@ namespace MAD.JobSystemCore
 
             if (!target.Discovery(param))
             {										
-                Console.WriteLine("fail");
-            }
-            else
-            {
-                Console.WriteLine("win");
+                //a fehler meldung ausgeben nach der art "Das Programm konnte sich nicht mit dem Agenten Syncronisieren"
             }
 
             switch (security)
@@ -108,15 +104,15 @@ namespace MAD.JobSystemCore
 
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
-                index.MaxRepetitions = (int)expectedHostNr;
+                index.MaxRepetitions = (int)expectedIfNr;
 
                 Pdu descr = new Pdu(PduType.GetBulk);
                 descr.VbList.Add(ifDescr);
-                descr.MaxRepetitions = (int)expectedHostNr;
+                descr.MaxRepetitions = (int)expectedIfNr;
 
                 Pdu type = new Pdu(PduType.GetBulk);
                 type.VbList.Add(ifType);
-                type.MaxRepetitions = (int)expectedHostNr;
+                type.MaxRepetitions = (int)expectedIfNr;
 
                 try
                 {
@@ -126,18 +122,21 @@ namespace MAD.JobSystemCore
 
                     if (indexResult.Pdu.ErrorStatus != 0 || descrResult.Pdu.ErrorStatus != 0 || typeResult.Pdu.ErrorStatus != 0)
                     {
-                        Console.WriteLine("An Error Occured");
+                        //Fehlermeldung 
                     }
                     else
                     {
                         for (int i = 0; i < indexResult.Pdu.VbCount; i++)
                         {
                             Console.WriteLine("Interface {0}: Type {1} -> {2}", indexResult.Pdu.VbList[i].Value.ToString(), typeResult.Pdu.VbList[i].Value.ToString(), descrResult.Pdu.VbList[i].Value.ToString());
+                            //a Ausgabe nach dem Shema.. bis ma die Datenbank haben 
                         }
                     }
                 }
                 catch (Exception)
-                { }
+                {
+                    //Fehlereldung
+                }
             }
             else
             {
@@ -157,15 +156,18 @@ namespace MAD.JobSystemCore
 
                     if (octetsResult.Pdu.ErrorStatus != 0)
                     {
-                        Console.WriteLine("An Error Occured");
+                        //Fehlermeldung 
                     }
                     else
                     {
                         Console.WriteLine("Output since the last run: {0}", result.ToString());
+                        //Ausgabe nach dem Muster.. wie oben 
                     }
                 }
                 catch (Exception)
-                { }
+                {
+                    //Fehlermeldung 
+                }
             }
         }
 
@@ -179,15 +181,15 @@ namespace MAD.JobSystemCore
 
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
-                index.MaxRepetitions = (int)expectedHostNr;
+                index.MaxRepetitions = (int)expectedIfNr;
 
                 Pdu descr = new Pdu(PduType.GetBulk);
                 descr.VbList.Add(ifDescr);
-                descr.MaxRepetitions = (int)expectedHostNr;
+                descr.MaxRepetitions = (int)expectedIfNr;
 
                 Pdu type = new Pdu(PduType.GetBulk);
                 type.VbList.Add(ifType);
-                type.MaxRepetitions = (int)expectedHostNr;
+                type.MaxRepetitions = (int)expectedIfNr;
 
                 try
                 {
@@ -197,18 +199,21 @@ namespace MAD.JobSystemCore
 
                     if (indexResult.ScopedPdu.ErrorStatus != 0 || descrResult.ScopedPdu.ErrorStatus != 0 || typeResult.ScopedPdu.ErrorStatus != 0)
                     {
-                        Console.WriteLine("An Error Occured");
+                        //Fehlermeldung
                     }
                     else
                     {
                         for (int i = 0; i < indexResult.ScopedPdu.VbCount; i++)
                         {
                             Console.WriteLine("Interface {0}: Type {1} -> {2}", indexResult.ScopedPdu.VbList[i].Value.ToString(), typeResult.ScopedPdu.VbList[i].Value.ToString(), descrResult.ScopedPdu.VbList[i].Value.ToString());
+                            //Ausgabe nach dem Muster.. wie oben 
                         }
                     }
                 }
                 catch (Exception)
-                { }
+                { 
+                    //Fehlermeldung
+                }
             }
             else
             {
@@ -228,15 +233,18 @@ namespace MAD.JobSystemCore
 
                     if (octetsResult.ScopedPdu.ErrorStatus != 0)
                     {
-                        Console.WriteLine("An Error Occured");
+                        //Fehlermeldung
                     }
                     else
                     {
                         Console.WriteLine("Output since the last run: {0}", result.ToString());
+                        //Ausgabe nach dem Muster.. wie oben 
                     }
                 }
                 catch (Exception)
-                { }
+                {
+                    //Fehlermeldung
+                }
             }
         }
     }
