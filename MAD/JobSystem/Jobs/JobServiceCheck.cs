@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Runtime.Serialization;
+using SnmpSharpNet;
 
 namespace MAD.JobSystemCore
 {
@@ -14,6 +15,12 @@ namespace MAD.JobSystemCore
 		public string arg;
         public string username;
         public string password;
+        public string community;
+        public string priv;
+        public string auth;
+
+        public uint version; 
+
         
         private bool working; 
 
@@ -62,6 +69,9 @@ namespace MAD.JobSystemCore
 				break;
             case "ftp":
                 ftpCheck();
+                break;
+            case "snmp":
+                snmpCheck();
                 break;
 			}
 		}
@@ -121,6 +131,66 @@ namespace MAD.JobSystemCore
                 working = false;
             }
              * */
+        }
+
+        private void snmpCheck()
+        {
+            switch (version)
+            {
+                case 1:
+                    //NotImplemented Fehlermeldung
+                    break;
+                case 2:
+                    SnmpV2Handling();
+                    break;
+                case 3:
+                    SnmpV3Handling();
+                    break;
+            }
+        }
+
+        private void ExecuteRequest(UdpTarget target, AgentParameters param)
+        {
+            Oid name = new Oid("1.3.6.1.2.1.1.5.0");
+
+            Pdu namePacket = new Pdu(PduType.Get);
+            namePacket.VbList.Add(name);
+
+            try
+            {
+                SnmpV2Packet nameResult = (SnmpV2Packet)target.Request(namePacket, param);
+
+                if (nameResult.Pdu.VbList[0].Value.ToString().ToLowerInvariant() == System.Environment.MachineName.ToLowerInvariant())
+                    working = true;
+                else
+                    working = false;
+            }
+            catch (Exception)
+            {
+                working = false;
+            }
+        }
+
+        private void ExecuteRequest(UdpTarget target, SecureAgentParameters param)
+        {
+            Oid name = new Oid("1.3.6.1.2.1.1.5.0");
+
+            Pdu namePacket = new Pdu(PduType.Get);
+            namePacket.VbList.Add(name);
+
+            try
+            {
+                SnmpV3Packet nameResult = (SnmpV3Packet)target.Request(namePacket, param);
+
+                if (nameResult.ScopedPdu.VbList[0].Value.ToString().ToLowerInvariant() == System.Environment.MachineName.ToLowerInvariant())
+                    working = true;
+                else
+                    working = false;
+            }
+            catch (Exception)
+            {
+                working = false;
+            }
         }
 		#endregion 
 
