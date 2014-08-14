@@ -10,9 +10,9 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public MailAddress[] mailAddr = null;
-        public MailPriority priority;
-        public List<JobRule> rules = null;
+        public MailAddress[] mailAddr = new MailAddress[0];
+        public MailPriority priority = MailPriority.High;
+        public List<JobRule> rules = new List<JobRule>();
 
         #endregion
 
@@ -23,7 +23,6 @@ namespace MAD.JobSystemCore
         public JobNotification(MailAddress[] mailAddr)
         {
             this.mailAddr = mailAddr;
-            this.priority = MailPriority.High;
         }
 
         public JobNotification(MailAddress[] mailAddr, MailPriority priority) 
@@ -43,22 +42,6 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
-        public static MailPriority ParsePrio(string text)
-        {
-            text = text.ToLower();
-            switch(text)
-            {
-                case "low":
-                    return MailPriority.Low;
-                case "normal":
-                    return MailPriority.Normal;
-                case "high":
-                    return MailPriority.High;
-                default:
-                    throw new Exception("Could not parse '" + text + "' to a mail-priority!");
-            }
-        }
-
         #region for serialization only
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -68,6 +51,15 @@ namespace MAD.JobSystemCore
         }
 
         #endregion
+
+        public List<JobRule> GetBrokenRules()
+        {
+            List<JobRule> _buffer = new List<JobRule>();
+            foreach (JobRule _temp in rules)
+                if (!_temp.CheckValidity())
+                    _buffer.Add(_temp);
+            return _buffer;
+        }
 
         #endregion
     }

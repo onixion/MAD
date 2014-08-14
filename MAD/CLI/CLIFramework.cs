@@ -12,7 +12,6 @@ namespace MAD.CLICore
         #region member
 
         public List<CommandOptions> commands = new List<CommandOptions>();
-        public enum CommandGroup { Gereral, JobSystem, CLIServer}
 
         #endregion
 
@@ -25,25 +24,17 @@ namespace MAD.CLICore
          * If the par are not valid it returns the error text, which get displayed onto
          * the CLI. When the parsing was successful, the Command-Object will be set and be ready
          * for execution. */
-        protected string AnalyseInput(ref Command command, string cliInput)
+        protected string CLIInterpreter(ref Command command, string cliInput)
         {
-            // First get the command-name.
             string _commandInput = GetCommandName(cliInput);
-
-            // Get the configuration for the command.
             CommandOptions _commandOptions = GetCommandOptions(_commandInput);
 
-            // Check if the command exist.
             if (_commandOptions == null)
                 return CLIError.Error(CLIError.ErrorType.CommandError, "Command not know!", true);
 
-            // Get the pars and args from input.
             ParInput _parInput = GetParamtersFromInput(cliInput);
-
-            // Get the command-type.
             Type _commandType = _commandOptions.commandType;
 
-            // Constructor of the command.
             ConstructorInfo _cInfo;
 
             // Check if the command need any objects.
@@ -62,11 +53,9 @@ namespace MAD.CLICore
                 command = (Command)_cInfo.Invoke(new object[] { _commandOptions.commandObjects });
             }
 
-            // Set pars and args of the command.
             command.pars = _parInput;
 
-            // Check if the pars and args are valid.
-            return CLIFramework.ValidPar(command, _parInput);
+            return CLIFramework.ValidPar(command);
         }
 
         private string GetCommandName(string input)
@@ -124,7 +113,7 @@ namespace MAD.CLICore
                         for (int i2 = 1; i2 < _buffer2.Length; i2++)
                             _buffer3[i2 - 1] = _buffer2[i2];
 
-                        _temp.pars.Add(new Parameter(_buffer2[0], _buffer));
+                        _temp.pars.Add(new Parameter(_buffer2[0], _buffer3));
                     }
                 }
             }
@@ -145,7 +134,7 @@ namespace MAD.CLICore
             return null;
         }
 
-        public static string ValidPar(Command command, ParInput pars)
+        public static string ValidPar(Command command)
         {
             List<ParOption> _rPar = command.rPar;
             List<ParOption> _oPar = command.oPar;
@@ -158,7 +147,7 @@ namespace MAD.CLICore
             // Check every parameter.
             for (int i = 0; i < command.pars.pars.Count; i++)
             {
-                _temp = pars.pars[i];
+                _temp = command.pars.pars[i];
                 _tempOptions = CLIFramework.GetParOptions(_rPar, _oPar, _temp.par);
 
                 // Check if the parameter is known.
@@ -299,13 +288,8 @@ namespace MAD.CLICore
         public static bool IsRequiredPar(List<ParOption> rPar, Parameter par)
         {
             foreach (ParOption _temp in rPar)
-            {
                 if (_temp.par == par.par)
-                {
                     return true;
-                }
-            }
-
             return false;
         }
 

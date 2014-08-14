@@ -97,25 +97,35 @@ namespace MAD.CLIServerCore
 
         public void Start()
         {
-            DataPacket _dataP = new DataPacket(_stream, _aes);
-            CLIPacket _cliP = new CLIPacket(_stream, _aes);
+            DataPacket _dataP = null;
+            CLIPacket _cliP = null;
 
-            while (true)
+            try
             {
-                _cliP.ReceivePacket();
-                _clientCLIInput = Encoding.Unicode.GetString(_cliP.cliInput);
+                _dataP = new DataPacket(_stream, _aes);
+                _cliP = new CLIPacket(_stream, _aes);
 
-                _cliInterpreter = AnalyseInput(ref _command, _clientCLIInput);
+                while (true)
+                {
+                    _cliP.ReceivePacket();
+                    _clientCLIInput = Encoding.Unicode.GetString(_cliP.cliInput);
 
-                if (_cliInterpreter == "VALID_PARAMETERS")
-                {
-                    _dataP.data = Encoding.Unicode.GetBytes(_command.Execute(_cliP.consoleWidth));
+                    _cliInterpreter = CLIInterpreter(ref _command, _clientCLIInput);
+
+                    if (_cliInterpreter == "VALID_PARAMETERS")
+                    {
+                        _dataP.data = Encoding.Unicode.GetBytes(_command.Execute(_cliP.consoleWidth));
+                    }
+                    else
+                    {
+                        _dataP.data = Encoding.Unicode.GetBytes(_cliInterpreter);
+                    }
+                    _dataP.SendPacket();
                 }
-                else
-                {
-                    _dataP.data = Encoding.Unicode.GetBytes(_cliInterpreter);
-                }
-                _dataP.SendPacket();
+            }
+            catch (Exception e)
+            { 
+            
             }
 
             _dataP.Dispose();

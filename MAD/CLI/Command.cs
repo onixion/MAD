@@ -16,7 +16,6 @@ namespace MAD.CLICore
         public string description { get; set; }
         protected string output = "";
 
-        // This object contains all pars given by the cli.
         public ParInput pars = new ParInput();
 
         #endregion

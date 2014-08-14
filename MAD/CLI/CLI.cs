@@ -77,7 +77,6 @@ namespace MAD.CLICore
             while (true)
             {
                 Command _command = null;
-
                 CLIInput.WriteCursor();
 
                 // This was the old method to read input from cli.
@@ -91,7 +90,7 @@ namespace MAD.CLICore
                     // It is not necessery to use 'ref', but then
                     // it is obvious that the command-object gets
                     // modified.
-                    string response = AnalyseInput(ref _command, _cliInput);
+                    string response = CLIInterpreter(ref _command, _cliInput);
 
                     // Check if the par and args are valid.
                     if (response == "VALID_PARAMETERS")

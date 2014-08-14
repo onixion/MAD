@@ -5,10 +5,10 @@ namespace MAD
     public class JobRule
     {
         public object obj;
+        public object obj2;
         public Type type;
         public enum Operation { Equal, NotEqual, Bigger, Smaller}
         public Operation oper;
-        public object obj2;
 
         public JobRule(ref object obj, Type type, Operation oper , object obj2)
         {
@@ -21,13 +21,9 @@ namespace MAD
         public bool CheckValidity()
         {
             if (type == typeof(Int32))
-            {
                 return CheckValidityInt();
-            }
             else if (type == typeof(string))
-            {
                 return CheckValidityString();
-            }
             else
                 throw new Exception("Type not supported!");
         }

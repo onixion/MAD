@@ -79,19 +79,16 @@ namespace MAD.JobSystemCore
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
   
-                // RESERVE NODES
                 lock(_nodesLock)
                 {
                     foreach (JobNode _node in _jobNodes)
                     {
-                        // RESERV NODE
                         lock (_node.nodeLock)
                         {
                             if (_node.state == JobNode.State.Active)
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    // RESERVE JOB OF NODE
                                     lock (_job.jobLock)
                                     {
                                         if (_job.state == Job.JobState.Waiting)
