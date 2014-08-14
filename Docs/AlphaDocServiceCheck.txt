@@ -1,0 +1,14 @@
+Der Job ServiceCheck dient zur Eindeutigen identifizierung von toten Diensten auf einem Server. Durch übergabe von Ziel
+IPAddresse sowie der Art des Dienstes (und dessen wichtigste parameter) wird eine anfrage auf den Server abgefeuert. Sofern
+sich diese als Erfolgreich erweißt wird es als funktionierender Dienst interpretiert. Anderenfalls nicht.
+Momentan unterstützte Dienste sind: 
+	- ftp 
+		es wird das workingDirectory abgefragt. Bei einer Exception wird von Fehlschlag ausgegangen.
+	- dns
+		es werden die IP Eigenschaften von www.google.com abgefragt. Bei einer Exception wird von Fehlschlag 
+		ausgegangen.
+	- snmp (in progress)
+		es wird der hostName über die OID 1.3.6.1.2.1.1.5 abgefragt und mit System.Environment.MachineName verglichen.
+		Bei einer Exception oder einem nicht übereinstimmenden Namen wird von Fehlschlag ausgeganten.
+	- sqlite (in plainnig)
+		... 
