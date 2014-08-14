@@ -68,3 +68,4 @@ Now using the TcpListener and TcpClient)
 [03.08.2014][14:00-17:00][3h][142h] CLIServer / CLIClient working. RSA still not working yet (communication is NOT encrypted yet; AES working but not the key-exchange through RSA) ...
 [04.08.2014][18:00-22:00][4h][146h] XML-Serializer for packet-class.
 [14.08.2014][10:00-12:00][2h][148h] Working on notification support.
+[15.08.2014][00:00-01:00][1h][149h] Working on notification support.

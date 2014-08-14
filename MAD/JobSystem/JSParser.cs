@@ -60,35 +60,51 @@ namespace MAD.JobSystemCore
 
         public static JobRule ParseRule(List<OutputDesc> outDesc, string data)
         {
-            JobRule _rule = null;
+            JobRule _rule = new JobRule();
+            bool _operatorKnown = false;
 
             string[] _buffer = data.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
             if (_buffer.Length == 2)
+            {
                 _rule.oper = JobRule.Operation.Equal;
+                _operatorKnown = true;
+            }
 
             _buffer = data.Split(new string[] { "!=" }, StringSplitOptions.RemoveEmptyEntries);
             if (_buffer.Length == 2)
+            {
                 _rule.oper = JobRule.Operation.NotEqual;
+                _operatorKnown = true;
+            }
 
             _buffer = data.Split(new string[] { "<" }, StringSplitOptions.RemoveEmptyEntries);
             if (_buffer.Length == 2)
+            {
                 _rule.oper = JobRule.Operation.Smaller;
+                _operatorKnown = true;
+            }
 
             _buffer = data.Split(new string[] { ">" }, StringSplitOptions.RemoveEmptyEntries);
             if (_buffer.Length == 2)
+            {
                 _rule.oper = JobRule.Operation.Bigger;
+                _operatorKnown = true;
+            }
 
-            if(_rule.oper == null)
-                throw new Exception("Operator not known!");
+            if (_operatorKnown == false)
+                throw new Exception("Operation not known!");
 
-            OutputDesc _desc = GetOutDesc(outDesc, data);
+            // DATA OBJECT
+            OutputDesc _desc = GetOutDesc(outDesc, _buffer[0]);
             if (_desc == null)
                 throw new Exception("OutDescriptor not known!");
+            _rule.obj = _desc.dataObject;
 
-            // CHECK OPERATION IS SUPPORTED!
+            if(!_rule.IsOperatorSupported())
+                throw new Exception("Operator not supported!");
 
+            _rule.obj2 = _buffer[1];
             // HERE
-
             return _rule;
         }
 

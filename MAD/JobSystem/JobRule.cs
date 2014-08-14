@@ -10,12 +10,25 @@ namespace MAD
         public enum Operation { Equal, NotEqual, Bigger, Smaller}
         public Operation oper;
 
+        public JobRule() { }
+
         public JobRule(ref object obj, Type type, Operation oper , object obj2)
         {
             this.obj = obj;
             this.type = type;
             this.oper = oper;
             this.obj2 = obj2;
+        }
+
+        public bool IsOperatorSupported()
+        {
+            if (type == typeof(string))
+                if (oper == Operation.Equal || oper == Operation.NotEqual)
+                    return true;
+                else
+                    return false;
+
+            return true;
         }
 
         public bool CheckValidity()
@@ -49,11 +62,10 @@ namespace MAD
                         return true;
                     break;
                 default:
-                    throw new Exception("Operation not supported for this type!");
+                    break;
             }
-            return false; 
-        
-        
+
+            return false;
         }
 
         private bool CheckValidityString()
@@ -69,8 +81,9 @@ namespace MAD
                         return true;
                     break;
                 default:
-                    throw new Exception("Operation not supported for this type!");
+                    break;
             }
+
             return false; 
         }
     }
