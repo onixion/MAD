@@ -30,28 +30,62 @@ namespace MAD
             _dbConnection.Open();
         }
 
- //       //check if table excists, create if not, connect and write results
-        public table(string TableName, string IP, int Port)
+        //check if table excists, create if not, connect and write results
+        public void CreateTable(string TableName, params TableInfo[] tableInfos)
         {
             //check if table exists if not create it
-            string sql = "create table if not exists " + TableName + "()";
+            string sql = "create table '" + TableName + "' (";
+
+            for (int i = 0; i < tableInfos.Length; i++)
+            {
+                sql += tableInfos[i].GetCommand();
+                if(i != tableInfos.Length -1 )
+                sql += ",";
+            }
+            sql += ")";
+
+              //  create table 'NAME' (SPALTENNAME, INTEGER)
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            //write results in the table
-            sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ")";
-            command = new SQLiteCommand(sql, _dbConnection);
+
             command.ExecuteNonQuery();
         }
 
+        public void InsertToTable(string TableName, params Insert[] insdata)
+        {
+           // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
+            string sql = "insert into " + TableName + " (";
+            for (int i = 0; i < insdata.Length; i++)
+            {
+                sql += insdata[i].column;
+                if (i != insdata.Length - 1)
+                    sql += ",";
+            }
+            sql += ") VALUES (";
+
+            for (int i = 0; i < insdata.Length; i++)
+            {
+                sql += insdata[i].data;
+                if (i != insdata.Length - 1)
+                    sql += ",";
+            }
+            sql += ")";
+
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
 
 
+        }
+    }
+}
 
-
+       
 
 /*
-        public bool CheckTableExists(string tableName)
+        public bool CheckTableExists(string TableName)
         {
            bool tableExists = false;
-           string query1 = "SELECT name FROM sqlite_master WHERE name ='" + tableName + "';";
+           string query1 = "SELECT name FROM sqlite_master WHERE name ='" + TableName + "';";
 
            SQLiteConnection sqlConnection = OpenConnection();
            SQLiteCommand sqlCommand = new SQLiteCommand(query1, sqlConnection);
@@ -79,6 +113,8 @@ namespace MAD
         }
 */
 
+         //write results in the table
+          //  sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
 
 
 
@@ -86,5 +122,3 @@ namespace MAD
 
 
 
-    }
-}

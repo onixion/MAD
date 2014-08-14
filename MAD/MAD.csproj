@@ -78,7 +78,8 @@
     <Compile Include="CLI\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\CLIServerInternal.cs" />
-    <Compile Include="DB.cs" />
+    <Compile Include="DB\DB.cs" />
+    <Compile Include="DB_Table_Info.cs" />
     <Compile Include="DHCPReader\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
@@ -133,9 +134,7 @@
       <Name>SmartThreadPool</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DB\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
