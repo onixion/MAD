@@ -625,7 +625,6 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
 
             oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
-
             description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
         }
 
@@ -637,20 +636,14 @@ namespace MAD.CLICore
             try
             {
                 // Set jobTime.
-
                 _job.time = JSParser.ParseJobTime(this);
                 
                 // Set notification.
-
-                 JSParser.ParseJobNotification(this, _job.outDesc);
-
-                // TODO
+                _job.noti = JSParser.ParseJobNotification(this, _job.outDesc);
 
                 // Set job-specific settings.
                 if (OParUsed("ttl"))
-                {
                     _job.ttl = (int)pars.GetPar("ttl").argValues[0];
-                }
 
                 // So now the JobPing is finished and set properly. 
 
@@ -814,9 +807,9 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
 
             // NOTIFICATION
-            oPar.Add(new ParOption("nAddr", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
-            oPar.Add(new ParOption("nPrio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("nRule", "NOT.-RULE", "Add a rule to define when a notification should be sended.", false, true, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("mail", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+            oPar.Add(new ParOption("prio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("rule", "NOT.-RULE", "Add a rule to define when a notification should be sended.", false, true, new Type[] { typeof(string) }));
         }
     }
 

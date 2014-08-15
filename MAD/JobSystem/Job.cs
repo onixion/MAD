@@ -39,6 +39,15 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
+        protected Job(string name, JobType type)
+        {
+            InitJob();
+            this.name = name;
+            this.type = type;
+            this.time = new JobTime();
+            this.noti = new JobNotification();
+        }
+
         protected Job(string name, JobType type, JobTime time, JobNotification noti)
         {
             InitJob();
@@ -68,6 +77,23 @@ namespace MAD.JobSystemCore
                 _id = _jobsCount;
                 _jobsCount++;
             }
+        }
+
+        protected void SetOutput(string outDescName, object value)
+        {
+            OutputDesc _desc = GetOutputDesc(outDescName);
+            if (_desc != null)
+                _desc.dataObject = value;
+            else
+                throw new Exception("OutDescriptor not known!");
+        }
+
+        protected OutputDesc GetOutputDesc(string outDescName)
+        {
+            foreach (OutputDesc _desc in outDesc)
+                if (_desc.name == outDescName)
+                    return _desc;
+            return null;
         }
 
         public abstract void Execute(IPAddress targetAddress);

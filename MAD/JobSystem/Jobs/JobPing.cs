@@ -11,7 +11,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public int ttl;
+        public int ttl = 200;
         public bool dontFragment = true;
 
         private Ping _ping = new Ping();
@@ -21,13 +21,20 @@ namespace MAD.JobSystemCore
         #region constructor
 
         public JobPing(string name)
-            : base(name, JobType.Ping, new JobTime(), new JobNotification())
+            : base(name, JobType.Ping) 
         {
-            this.ttl = 250;
+            this.outDesc.Add(new OutputDesc("DeltaTime", typeof(string)));
         }
 
-        public JobPing(string name, JobType jobType, JobTime jobTime, JobNotification noti, int ttl)
-            : base (name, jobType, jobTime, noti)
+        public JobPing(string name, JobType type, int ttl)
+            : base (name, type)
+        {
+            this.ttl = ttl;
+            this.outDesc.Add(new OutputDesc("DeltaTime", typeof(string)));
+        }
+
+        public JobPing(string name, JobType type, JobTime time, JobNotification noti, int ttl)
+            : base(name, type, time, noti)
         {
             this.ttl = ttl;
         }
@@ -53,10 +60,12 @@ namespace MAD.JobSystemCore
                 if (_reply.Status == IPStatus.Success)
                 {
                     outState = OutState.Success;
+                    SetOutput("DeltaTime", _reply.RoundtripTime.ToString("ssss"));
                 }
                 else
                 {
                     outState = OutState.Failed;
+                    SetOutput("DeltaTime", _reply.RoundtripTime.ToString("----"));
                 }
             }
             catch (Exception)

@@ -10,7 +10,10 @@ namespace MAD.JobSystemCore
     public static class JSParser
     {
         public const string JOB_TIME_PAR = "t";
-        public const string JOB_NOTI_PAR = "nRule";
+
+        public const string JOB_NOTI_PAR = "rule";
+        public const string JOB_NOTI_MAIL = "mail";
+        public const string JOB_NOTI_PRIO = "prio";
 
         public static JobTime ParseJobTime(Command c)
         {
@@ -45,14 +48,26 @@ namespace MAD.JobSystemCore
         {
             JobNotification _buffer = new JobNotification();
 
+            // PARSE MAILADDRESSES
+            if (c.OParUsed(JOB_NOTI_MAIL))
+            {
+                MailAddress[] _mails = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
+                _buffer.mailAddr = _mails;
+            }
+
+            // PARSE PRIO
+            if (c.OParUsed(JOB_NOTI_PRIO))
+            {
+                string _arg = (string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0];
+                _buffer.priority = ParsePrio(_arg);
+            }
+
+            // PARSE RULES
             if (c.OParUsed(JOB_NOTI_PAR))
             {
                 object[] _args = c.pars.GetPar(JOB_NOTI_PAR).argValues;
-
                 for (int i = 0; i < _args.Length; i++)
-                {
-                    // HERE
-                }
+                    _buffer.rules.Add(ParseRule(outDesc, (string)_args[i]));
             }
 
             return _buffer;
@@ -63,49 +78,65 @@ namespace MAD.JobSystemCore
             JobRule _rule = new JobRule();
             bool _operatorKnown = false;
 
-            string[] _buffer = data.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
-            if (_buffer.Length == 2)
-            {
-                _rule.oper = JobRule.Operation.Equal;
-                _operatorKnown = true;
-            }
+            string[] _buffer;
 
-            _buffer = data.Split(new string[] { "!=" }, StringSplitOptions.RemoveEmptyEntries);
-            if (_buffer.Length == 2)
+            while (true)
             {
-                _rule.oper = JobRule.Operation.NotEqual;
-                _operatorKnown = true;
-            }
+                _buffer = SplitByOperator(data, "=");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Equal;
+                    _operatorKnown = true;
+                    break;
+                }
 
-            _buffer = data.Split(new string[] { "<" }, StringSplitOptions.RemoveEmptyEntries);
-            if (_buffer.Length == 2)
-            {
-                _rule.oper = JobRule.Operation.Smaller;
-                _operatorKnown = true;
-            }
+                _buffer = SplitByOperator(data, "!=");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.NotEqual;
+                    _operatorKnown = true;
+                    break;
+                }
 
-            _buffer = data.Split(new string[] { ">" }, StringSplitOptions.RemoveEmptyEntries);
-            if (_buffer.Length == 2)
-            {
-                _rule.oper = JobRule.Operation.Bigger;
-                _operatorKnown = true;
+                _buffer = SplitByOperator(data, "<");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Smaller;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                _buffer = SplitByOperator(data, ">");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Bigger;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                break;
             }
 
             if (_operatorKnown == false)
                 throw new Exception("Operation not known!");
 
-            // DATA OBJECT
             OutputDesc _desc = GetOutDesc(outDesc, _buffer[0]);
             if (_desc == null)
                 throw new Exception("OutDescriptor not known!");
+
             _rule.obj = _desc.dataObject;
 
             if(!_rule.IsOperatorSupported())
-                throw new Exception("Operator not supported!");
+                throw new Exception("Operator does not support this descriptor!");
 
             _rule.obj2 = _buffer[1];
-            // HERE
+
             return _rule;
+        }
+
+        private static string[] SplitByOperator(string toSplit, string i)
+        {
+            return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         public static OutputDesc GetOutDesc(List<OutputDesc> outDesc, string name)
