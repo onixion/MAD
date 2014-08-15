@@ -108,4 +108,5 @@ Backup*/
 UpgradeLog*.XML
 
 # Do not ignore these files:
+!SnmpSharpNet-bin-0-9-4/*
 !SnmpSharpNet-bin-0-9-4/Release/*
