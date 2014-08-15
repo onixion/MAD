@@ -17,6 +17,22 @@ namespace MAD.Helper
         public const byte COOKIE_BYTE1_VALUE = 130;                                 //Value of second -"-
         public const byte COOKIE_BYTE2_VALUE = 83;                                  //Value of third -"-
         public const byte COOKIE_BYTE3_VALUE = 99;                                  //Value of fourth -"-
+
+        public static enum snmpProtokolls
+        {
+            MD5,
+            SHA,
+            AES,
+            DES
+        }
+
+        public static enum securityLvl
+        {
+            noAuthNoPriv,
+            authNoPriv,
+            authPriv
+        }
+
         #endregion
 
         #region Methods

@@ -55,7 +55,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SnmpSharpNet">
-      <HintPath>..\SnmpSharpNet-bin-0-9-4\Debug\SnmpSharpNet.dll</HintPath>
+      <HintPath>..\SnmpSharpNet-bin-0-9-4\Release\SnmpSharpNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
@@ -82,6 +82,7 @@
     <Compile Include="JobSystem\JobNode.cs" />
     <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobSystemExceptions.cs" />
+    <Compile Include="JobSystem\Jobs\JobSnmp.cs" />
     <Compile Include="JobSystem\JSSerializer.cs" />
     <Compile Include="JobSystem\JobScedule.cs" />
     <Compile Include="JobSystem\Jobs\JobServiceCheck.cs" />
