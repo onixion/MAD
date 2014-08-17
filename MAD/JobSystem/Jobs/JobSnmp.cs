@@ -15,9 +15,9 @@ namespace MAD.JobSystemCore
 
         public bool interfaceParUsed;                                                   //required Parameter, irgendwie a option -i oder sowas.. wenn der Parameter vorkimmt wead a Auflistung von Interfaces ausgegeben und zwar in der Menge von expectedIfNr
 
-        public string communityString = "";                                             //required Parameter
-        public string auth = "";                                                        //required Parameter sofern version == 3 && security != noAuthNoPriv
-        public string priv = "";                                                        //required Parameter sofern version == 3 && security != noAuthNoPriv
+        public string communityString = "public";
+        public string auth = "MAD";
+        public string priv = "MAD";
         public string ifEntryNr;                                                        //required Parameter sofern !interfaceParUsed
 
         public NetworkHelper.snmpProtokolls privProt;                                   //required Parameter sofern version == 3 && security != noAuthNoPriv            
