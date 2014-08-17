@@ -30,7 +30,7 @@ namespace MAD.JobSystemCore
         public List<OutputDesc> outDesc = new List<OutputDesc>();
 
         public string name { get; set; }
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck }
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
         public JobType type = JobType.NULL;
         public JobTime time = new JobTime();
         public JobNotification noti;

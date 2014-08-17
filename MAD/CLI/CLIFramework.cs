@@ -237,6 +237,7 @@ namespace MAD.CLICore
 
         /* The method 'Convert' can only parse object to: 
          *  System.Int32
+         *  System.UInt32
          *  System.String
          *  System.Net.IPAddress
          *  System.Net.NetworkInformation.PhysicalAddress */
@@ -248,6 +249,8 @@ namespace MAD.CLICore
                 {
                     case "System.Int32":
                         return Int32.Parse(value);
+                    case "System.UInt32":
+                        return UInt32.Parse(value);
                     case "System.String":
                         return value;
                     case "System.Net.IPAddress":

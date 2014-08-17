@@ -2,7 +2,6 @@
 using System.Net;
 
 using MAD.Helper;
-
 using SnmpSharpNet;
 
 namespace MAD.JobSystemCore
@@ -26,7 +25,23 @@ namespace MAD.JobSystemCore
         public NetworkHelper.securityLvl security;                                      //required Parameter sofern version == 3
 
         private string ifEntryString = "1.3.6.1.2.1.2.2.1";
-        private static uint lastRecord = 0; 
+        private static uint lastRecord = 0;
+
+        public JobSnmp(string name, int version)
+            :base(name, JobType.SnmpCheck)
+        {
+            this.version = (uint) version;
+        }
+
+        public override void GetObjectDataJobSpecific(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override string JobStatus()
+        {
+            throw new NotImplementedException();
+        }
 
         public override void Execute(IPAddress targetAddress)
         {

@@ -141,10 +141,10 @@ namespace MAD.JobSystemCore
                     //NotImplemented Fehlermeldung
                     break;
                 case 2:
-                    SnmpV2Handling();
+                    //SnmpV2Handling();
                     break;
                 case 3:
-                    SnmpV3Handling();
+                    //SnmpV3Handling();
                     break;
             }
         }

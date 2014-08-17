@@ -58,6 +58,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
 
+            commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
+
             // CLIServer (these commands cannot be used by cli!)
             /*
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));

@@ -67,6 +67,7 @@
     <Compile Include="CLI\CLIFramework.cs" />
     <Compile Include="CLI\Commands\CLIServerCommands.cs" />
     <Compile Include="CLI\CLIServer.cs" />
+    <Compile Include="CLI\Commands\SnmpCommands.cs" />
     <Compile Include="CLI\Parameter.cs" />
     <Compile Include="CLI\ParameterInput.cs" />
     <Compile Include="CLI\ParameterOption.cs" />

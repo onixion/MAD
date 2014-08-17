@@ -792,6 +792,72 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemAddSnmpCheckCommand : JobCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddSnmpCheckCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            string jobName = (string)pars.GetPar("n").argValues[0];
+            int port = (int)pars.GetPar("p").argValues[0];
+
+            JobPort _job = new JobPort();
+
+            _job.name = jobName;
+            _job.type = Job.JobType.PortScan;
+            _job.port = port;
+
+            if (OParUsed("t"))
+            {
+                Type _argType = GetArgType("t");
+
+                if (_argType == typeof(int))
+                {
+                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
+                }
+                else if (_argType == typeof(string))
+                {
+                    _job.time.type = JobTime.TimeType.Absolute;
+
+                    try
+                    {
+                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
+                    }
+                    catch (Exception e)
+                    {
+                        return e.Message;
+                    }
+                }
+            }
+            else
+            {
+                _job.time.jobDelay = new JobDelayHandler(20000);
+                _job.time.type = JobTime.TimeType.Relative;
+            }
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+
+            try
+            {
+                _js.AddJobToNode(_nodeID, _job);
+                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+            }
+            catch (JobNodeException e)
+            {
+                return "<color><red>" + e.Message;
+            }
+        }
+    }
+
     #endregion
 
     public class JobCommand : Command
