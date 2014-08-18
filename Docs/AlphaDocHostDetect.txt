@@ -1,3 +1,5 @@
+v0.1
+
 Der Job HostDetect wie er im Jobs Ordner des Projektes liegt, dient zum scannen eines bekannten Netzwerkes nach existierenden 
 hosts. Diese Art der Überprüfung ist jedoch sehr ineffizient und sollte daher nicht regelmäßig durchgeführt werden. Das
 Konzept ist sehr einfach: Aus einer gegebenen Netzaddresse und dazugehöriger Subnetzmaske werden alle möglichen IPAddressen 

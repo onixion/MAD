@@ -1,3 +1,5 @@
+v0.1
+
 Der Job ServiceCheck dient zur Eindeutigen identifizierung von toten Diensten auf einem Server. Durch übergabe von Ziel
 IPAddresse sowie der Art des Dienstes (und dessen wichtigste parameter) wird eine anfrage auf den Server abgefeuert. Sofern
 sich diese als Erfolgreich erweißt wird es als funktionierender Dienst interpretiert. Anderenfalls nicht.
