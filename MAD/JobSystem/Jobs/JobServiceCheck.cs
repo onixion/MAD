@@ -22,7 +22,8 @@ namespace MAD.JobSystemCore
         public uint version; 
 
         
-        private bool working; 
+        private bool working;
+        private JobSnmp _foo;
 
         #endregion
 
@@ -65,13 +66,13 @@ namespace MAD.JobSystemCore
 			switch (arg) 
 			{
 			case "dns":
-				dnsCheck ();
+				dnsCheck();
 				break;
             case "ftp":
-                ftpCheck();
+                ftpCheck(targetAddress);
                 break;
             case "snmp":
-                snmpCheck();
+                snmpCheck(targetAddress);
                 break;
 			}
 		}
@@ -111,11 +112,9 @@ namespace MAD.JobSystemCore
             }
 		}
 
-        private void ftpCheck()
+        private void ftpCheck(IPAddress targetIP)
         {
-            // You need to pass ftpCheck the IP-Address to work.
-
-            /*
+            
             FtpWebRequest requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://"+targetIP.ToString()));
             requestDir.Credentials = new NetworkCredential(username, password);
             requestDir.Method = WebRequestMethods.Ftp.PrintWorkingDirectory;
@@ -130,21 +129,23 @@ namespace MAD.JobSystemCore
             {
                 working = false;
             }
-             * */
+            
         }
 
-        private void snmpCheck()
+        private void snmpCheck(IPAddress targetIP)
         {
+            UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
+            
             switch (version)
             {
                 case 1:
                     //NotImplemented Fehlermeldung
                     break;
                 case 2:
-                    //SnmpV2Handling();
+                    _foo.SnmpV2Handling(target);
                     break;
                 case 3:
-                    //SnmpV3Handling();
+                    _foo.SnmpV3Handling(target);
                     break;
             }
         }
