@@ -83,10 +83,13 @@
     <Compile Include="JobSystem\JobNode.cs" />
     <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobSystemExceptions.cs" />
+    <Compile Include="JobSystem\Jobs\JobCheckSnmp.cs" />
+    <Compile Include="JobSystem\Jobs\JobCheckFtp.cs" />
+    <Compile Include="JobSystem\Jobs\JobCheckDns.cs" />
     <Compile Include="JobSystem\Jobs\JobSnmp.cs" />
     <Compile Include="JobSystem\JSSerializer.cs" />
     <Compile Include="JobSystem\JobScedule.cs" />
-    <Compile Include="JobSystem\Jobs\JobServiceCheck.cs" />
+    <Compile Include="Helper\BACKUPJobServiceCheck.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\OutputDesc.cs" />

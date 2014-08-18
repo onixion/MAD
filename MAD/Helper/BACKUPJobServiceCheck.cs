@@ -10,6 +10,7 @@ namespace MAD.JobSystemCore
     [Serializable]
     public class JobServiceCheck : Job
     {
+        /*
         #region members
 
 		public string arg;
@@ -207,5 +208,6 @@ namespace MAD.JobSystemCore
         #endregion
 
         #endregion
+         * */
     }
 }

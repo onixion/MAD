@@ -61,7 +61,7 @@ namespace MAD.JobSystemCore
             target.Close();
         }
 
-        public void SnmpV2Handling(UdpTarget target)
+        private void SnmpV2Handling(UdpTarget target)
         {
             OctetString community = new OctetString(communityString);
             AgentParameters param = new AgentParameters(community);
@@ -71,7 +71,7 @@ namespace MAD.JobSystemCore
             ExecuteRequest(target, param);
         }
 
-        public void SnmpV3Handling(UdpTarget target)
+        private void SnmpV3Handling(UdpTarget target)
         {
             SecureAgentParameters param = new SecureAgentParameters();
 
