@@ -109,14 +109,21 @@ namespace MAD.CLICore
                     // Check if the par and args are valid.
                     if (response == "VALID_PARAMETERS")
                     {
-                        // Execute command and get response from command.
-                        response = _command.Execute(Console.BufferWidth);
+                        try
+                        {
+                            // Execute command and get response from command.
+                            response = _command.Execute(Console.BufferWidth);
 
-                        // When command response with 'EXIT_CLI' the CLI closes.
-                        if (response == "EXIT_CLI")
-                            break;
+                            // When command response with 'EXIT_CLI' the CLI closes.
+                            if (response == "EXIT_CLI")
+                                break;
+                        }
+                        catch (Exception e)
+                        {
+                            response = "<color><red>" + e.Message;
+                        }
 
-                        // Write command ouput to console.
+                        // Write output to console.
                         CLIOutput.WriteToConsole(response);
                     }
                     else

@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
-using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
@@ -37,12 +37,6 @@ namespace MAD.JobSystemCore
             : base(name, type, time, noti)
         {
             this.ttl = ttl;
-        }
-
-        public JobPing(SerializationInfo info, StreamingContext context)
-            : base (info, context)
-        {
-            this.ttl = (int)info.GetValue("SER_JOB_PING_TTL", typeof(int));
         }
 
         #endregion
@@ -83,14 +77,17 @@ namespace MAD.JobSystemCore
             return _temp;
         }
 
-        #region for serialization
-
-        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
+        public override void ReadXmlJobSpec(System.Xml.XmlReader reader)
         {
-            info.AddValue("SER_JOB_PING_TTL", this.ttl);
+            base.ReadXmlJobSpec(reader);
         }
 
-        #endregion
+        public override void WriteXmlJobSpec(System.Xml.XmlWriter writer)
+        {
+            writer.WriteStartElement("PingJob");
+            writer.WriteElementString("TTL", ttl.ToString());
+            writer.WriteEndElement();
+        }
 
         #endregion
     }

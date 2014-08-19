@@ -30,13 +30,6 @@ namespace MAD.JobSystemCore
             this.port = port;
         }
 
-        // for serialization
-        public JobHttp(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            this.port = (int)info.GetValue("SER_JOB_HTTP_PORT", typeof(int));
-        }
-
         #endregion
 
         #region methodes
@@ -75,15 +68,6 @@ namespace MAD.JobSystemCore
 
             return _temp;
         }
-
-        #region for serialization
-
-        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("SER_JOB_HTTP_PORT", this.port);
-        }
-
-        #endregion
 
         #endregion
     }

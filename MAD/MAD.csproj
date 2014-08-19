@@ -97,7 +97,6 @@
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
-    <Compile Include="JobSystem\JSParser.cs" />
     <Compile Include="Mad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

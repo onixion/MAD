@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Runtime.Serialization;
 
 using System.Net;
 using System.Net.NetworkInformation;
@@ -28,7 +27,6 @@ namespace MAD.JobSystemCore
         public JobHostDetect()
             : base("NULL", JobType.HostDetect, new JobTime(), new JobNotification())
         {
-            //this.Net = IPAddress.Parse("192.168.0.0"); <- This need to be implemented in the execute-method.
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
         }
 
@@ -36,12 +34,6 @@ namespace MAD.JobSystemCore
             : base(jobName, jobType, jobTime, noti)
         {
             this.Subnetmask = Subnetmask;
-        }
-
-        public JobHostDetect(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-            throw new NotImplementedException(); // this job is not ready for this
         }
 
         #endregion
@@ -111,15 +103,6 @@ namespace MAD.JobSystemCore
             _tmp += "IP: " + _tmpAdr.ToString() + "\n";
             //jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("Host", typeof(IPAddress), _tmpAdr));
         }
-
-        #region for serialization
-
-        public override void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         #endregion
     }

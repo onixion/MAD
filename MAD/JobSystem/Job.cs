@@ -18,15 +18,14 @@ namespace MAD.JobSystemCore
         private int _id;
         public int id { get { return _id; } }
 
-        [XmlIgnoreAttribute]
         public enum JobState { Inactive, Waiting, Working, Exception }
-        [XmlIgnoreAttribute]
         public enum OutState { NULL, Success, Failed, Exception }
-        [XmlIgnoreAttribute]
+
+        [XmlIgnore]
         public DateTime tStart;
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public DateTime tStop;
-        [XmlIgnoreAttribute]
+        [XmlIgnore]
         public TimeSpan tSpan;
 
         public List<OutputDesc> outDesc = new List<OutputDesc>();
@@ -149,12 +148,20 @@ namespace MAD.JobSystemCore
 
         public void ReadXml(XmlReader reader)
         {
+
             ReadXmlJobSpec(reader);
         }
 
         public void WriteXml(XmlWriter writer)
         {
+            writer.WriteStartElement("Job");
+            writer.WriteAttributeString("Name", name);
+            writer.WriteAttributeString("Type", type.ToString());
+
+            time.WriteXml(writer);
+
             WriteXmlJobSpec(writer);
+            writer.WriteEndElement();
         }
 
         public virtual void ReadXmlJobSpec(XmlReader reader) { }

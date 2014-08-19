@@ -72,14 +72,23 @@ namespace MAD.JobSystemCore
 
         public void ReadXml(System.Xml.XmlReader reader)
         {
-            ipAddress = IPAddress.Parse(reader.GetAttribute("IPAddress"));
-            macAddress = PhysicalAddress.Parse(reader.GetAttribute("MacAddress"));
+            ipAddress = IPAddress.Parse(reader.GetAttribute("IP"));
+            macAddress = PhysicalAddress.Parse(reader.GetAttribute("MAC"));
+            name = reader.GetAttribute("Name");
+
+            // HERE WAR ICH
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
-            writer.WriteAttributeString("IPAddress", ipAddress.ToString());
-            writer.WriteAttributeString("MacAddress", macAddress.ToString());
+            writer.WriteAttributeString("IP", ipAddress.ToString());
+            writer.WriteAttributeString("MAC", macAddress.ToString());
+            writer.WriteAttributeString("Name", name);
+
+            writer.WriteStartElement("Jobs");
+            foreach (Job _job in jobs)
+                _job.WriteXml(writer);
+            writer.WriteEndElement();
         }
 
         #endregion

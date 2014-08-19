@@ -33,11 +33,6 @@ namespace MAD.JobSystemCore
             this.version = (uint)version;
         }
 
-        public override void GetObjectDataJobSpecific(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-        {
-            throw new NotImplementedException();
-        }
-
         protected override string JobStatus()
         {
             throw new NotImplementedException();
