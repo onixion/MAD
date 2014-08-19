@@ -69,3 +69,6 @@ Now using the TcpListener and TcpClient)
 [04.08.2014][18:00-22:00][4h][146h] XML-Serializer for packet-class.
 [14.08.2014][10:00-12:00][2h][148h] Working on notification support.
 [15.08.2014][00:00-01:00][1h][149h] Working on notification support.
+[17.08.2014][20:00-24:00][4h][153h] SnmpInterfaceCommand added. Re-writting CLIInput, because of bugs etc.
+[18.08.2014][18:00-21:00][3h][156h] Rewritten CLIInterpreter / Cleaning up ...
+[19.08.2014][10:00-14:00][4h][160h] implementing xml-serializer instead of net.-serializer for jobsystem

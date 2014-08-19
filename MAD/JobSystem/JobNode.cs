@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
-    public class JobNode : ISerializable
+    [Serializable()]
+    public class JobNode : IXmlSerializable
     {
         #region members
 
@@ -23,11 +23,11 @@ namespace MAD.JobSystemCore
 
         public List<Job> jobs = new List<Job>();
         public const int MAX_JOBS = 100;
-
+        
         public string name { get; set; }
-        public PhysicalAddress macAddress { get; set; }
-        public IPAddress ipAddress { get; set; }
-        public JobNotification defaultNoti;
+        public PhysicalAddress macAddress { get; set; } // sns
+        public IPAddress ipAddress { get; set; } // sns
+        public JobNotification defaultNoti { get; set; }
 
         #endregion
 
@@ -36,7 +36,6 @@ namespace MAD.JobSystemCore
         public JobNode()
         {
             InitID();
-            defaultNoti = new JobNotification();
         }
 
         public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotification defaultNoti)
@@ -47,16 +46,6 @@ namespace MAD.JobSystemCore
             this.ipAddress = ipAddress;
             this.jobs = jobs;
             this.defaultNoti = defaultNoti;
-        }
-
-        // for serialization only
-        public JobNode(SerializationInfo info, StreamingContext context)
-        {
-            InitID();
-            this.name = (string)info.GetValue("SER_NODE_NAME", typeof(string));
-            this.macAddress = PhysicalAddress.Parse((string)info.GetValue("SER_NODE_MAC", typeof(string)));
-            this.ipAddress = IPAddress.Parse((string)info.GetValue("SER_NODE_IP", typeof(string)));
-            this.jobs = (List<Job>)info.GetValue("SER_NODE_JOBS", typeof(List<Job>));
         }
 
         #endregion
@@ -72,17 +61,26 @@ namespace MAD.JobSystemCore
             }
         }
 
-        #region for serialization only
+        #endregion
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        #region for xml-serialization only
+
+        public System.Xml.Schema.XmlSchema GetSchema()
         {
-            info.AddValue("SER_NODE_NAME", name);
-            info.AddValue("SER_NODE_MAC", macAddress.ToString());
-            info.AddValue("SER_NODE_IP", ipAddress.ToString());
-            info.AddValue("SER_NODE_JOBS", jobs);
+            throw new NotImplementedException();
         }
 
-        #endregion
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            ipAddress = IPAddress.Parse(reader.GetAttribute("IPAddress"));
+            macAddress = PhysicalAddress.Parse(reader.GetAttribute("MacAddress"));
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteAttributeString("IPAddress", ipAddress.ToString());
+            writer.WriteAttributeString("MacAddress", macAddress.ToString());
+        }
 
         #endregion
     }

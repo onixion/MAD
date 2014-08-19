@@ -14,16 +14,11 @@ namespace CLIIO
 
         private static object _inputLock = new object();
 
-        private static ConsoleColor _cursorColor = ConsoleColor.Cyan;
-        private static ConsoleColor _inputColor = ConsoleColor.White;
-
-        private const int INPUT_MAX = 100;
-
-        public static string cursor = "MAD> ";
-
-        private static int _inputPos;
-        private static int _inputPosMIN;
-        private static int _inputPosMAX;
+        private static string _VINPUT;
+        private static int _HEAD;
+        private static int _VPOS;
+        private static int _MIN;
+        private static int _MAX;
 
         private static List<string> _cliHistory = new List<string>();
         private const int _maxHistoryEntries = 5;
@@ -33,121 +28,104 @@ namespace CLIIO
 
         #region methodes
 
-        public static void WriteCursor()
-        {
-            Console.ForegroundColor = _cursorColor;
-            Console.Write(cursor);
-        }
-
-        public static string ReadInput()
+        public static string ReadInput(int offset)
         {
             lock (_inputLock)
             {
-                string _cliInput = "";
-                Console.ForegroundColor = _inputColor;
+                Console.SetCursorPosition(offset, Console.CursorTop);
+
+                _HEAD = offset;
+                _VINPUT = "";
+                _MIN = _HEAD;
+                _historyPointer = -1; 
 
                 try
                 {
-                    _historyPointer = -1;
-                    _inputPos = cursor.Length;
-                    _inputPosMIN = cursor.Length;
-
-                    Console.SetCursorPosition(_inputPos, Console.CursorTop);
-
                     while (true)
                     {
                         ConsoleKeyInfo _key = Console.ReadKey(true);
 
-                        _inputPos = Console.CursorLeft;
-                        _inputPosMAX = cursor.Length + _cliInput.Length;
+                        _VPOS = Console.CursorLeft;
+                        _MAX = _HEAD + _VINPUT.Length;
 
                         if (_key.Key == ConsoleKey.Enter)
                         {
-                            // Add cli-input to history.
-                            AddToHistory(_cliInput);
+                            AddToHistory(_VINPUT);
                             break;
                         }
                         else if (_key.Key == ConsoleKey.Tab)
                         {
-                            // Tab does nothing .. 
+                            if (_key.Modifiers == ConsoleModifiers.Control)
+                            {
+                                ClearInput();
+
+                                _VINPUT = "Jack was here ...";
+
+                                SetCursor(_HEAD);
+                                Console.Write(_VINPUT);
+                            }
                         }
                         else if (_key.Key == ConsoleKey.Escape)
                         {
-                            // Clear cli-input.
-                            ClearInput(_cliInput.Length + 1);
-                            _cliInput = "";
+                            _VINPUT = "";
 
-                            // Set cursor new.
-                            SetCursor(cursor.Length);
+                            ClearInput();
+                            SetCursor(_HEAD);
                         }
                         else if (_key.Key == ConsoleKey.Backspace)
                         {
-                            if (_inputPos > _inputPosMIN)
+                            if (_VPOS > _HEAD)
                             {
-                                ClearInput(_cliInput.Length);
-                                _cliInput = _cliInput.Remove(_inputPos - cursor.Length - 1, 1);
+                                _VINPUT = _VINPUT.Remove(_VPOS - _HEAD - 1, 1);
 
-                                SetCursor(cursor.Length);
-                                Console.Write(_cliInput);
-                                SetCursor(_inputPos - 1);
+                                ClearInput();
+                                SetCursor(_HEAD);
+                                Console.Write(_VINPUT);
+                                SetCursor(_VPOS - 1);
                             }
                         }
                         else if (_key.Key == ConsoleKey.LeftArrow)
                         {
-                            if (_inputPos > _inputPosMIN)
-                            {
-                                SetCursor(_inputPos - 1);
-                            }
+                            if (_VPOS > _MIN)
+                                SetCursor(_VPOS - 1);
                         }
                         else if (_key.Key == ConsoleKey.RightArrow)
                         {
-                            if (_inputPos < _inputPosMAX)
-                            {
-                                SetCursor(_inputPos + 1);
-                            }
+                            if (_VPOS < _MAX)
+                                SetCursor(_VPOS + 1);
                         }
                         else if (_key.Key == ConsoleKey.UpArrow)
                         {
+                            _VINPUT = GetLastHistoryEntry(_historyPointer);
+
                             if (_cliHistory.Count - 1 > _historyPointer)
-                            {
                                 _historyPointer++;
-                            }
 
-                            string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                            ClearInput(_cliInput.Length);
-                            SetCursor(cursor.Length);
-                            Console.Write(_lastInput);
-
-                            _cliInput = _lastInput;
+                            ClearInput();
+                            SetCursor(_HEAD);
+                            Console.Write(_VINPUT);
                         }
                         else if (_key.Key == ConsoleKey.DownArrow)
                         {
+                            _VINPUT = GetLastHistoryEntry(_historyPointer);
+
                             if (0 < _historyPointer)
-                            {
                                 _historyPointer--;
-                            }
 
-                            string _lastInput = GetLastHistoryEntry(_historyPointer);
-
-                            ClearInput(_cliInput.Length);
-                            SetCursor(cursor.Length);
-                            Console.Write(_lastInput);
-
-                            _cliInput = _lastInput;
+                            ClearInput();
+                            SetCursor(_HEAD);
+                            Console.Write(_VINPUT);
                         }
                         else
                         {
-                            if (_cliInput.Length < INPUT_MAX)
+                            if (_VINPUT.Length < Console.BufferWidth - _HEAD - 2)
                             {
-                                _cliInput = _cliInput.Insert(_inputPos - cursor.Length, _key.KeyChar.ToString());
+                                _VINPUT = _VINPUT.Insert(_VPOS - _HEAD, _key.KeyChar.ToString());
 
-                                // Update cli-input.
-                                ClearInput(_cliInput.Length);
-                                SetCursor(cursor.Length);
-
-                                Console.Write(_cliInput);
-                                SetCursor(_inputPos + 1);
+                                ClearInput();
+                                SetCursor(_HEAD);
+                                Console.Write(_VINPUT);
+                                SetCursor(_VPOS + 1);
                             }
                         }
                     }
@@ -155,13 +133,13 @@ namespace CLIIO
                 catch (Exception)
                 {
                     // There are some keyboards, which can make some problems here (spezial keys, ...).
-                    // So this try-catch is just used becauce securess
-                    throw new Exception("KEYBOARD SHIT");
+                    // So this try-catch is just used becauce of security-reasons ..
+                    throw new Exception("KEYBOARD-ERROR");
                 }
                 
                 Console.Write("\n");
 
-                return _cliInput;
+                return _VINPUT;
             }
         }
 
@@ -193,15 +171,20 @@ namespace CLIIO
             }
         }
 
-        private static void ClearInput(int cliInputLength)
+        private static void ClearInput()
         {
-            Console.SetCursorPosition(cursor.Length, Console.CursorTop);
-            Console.Write("".PadLeft(cliInputLength, ' '));
+            Console.SetCursorPosition(_HEAD, Console.CursorTop);
+            Console.Write("".PadLeft(_VINPUT.Length + 1, ' '));
         }
 
         private static void SetCursor(int pos)
         {
             Console.SetCursorPosition(pos, Console.CursorTop);
+        }
+
+        private static int GetVPOS()
+        {
+            return 0;
         }
 
         #endregion

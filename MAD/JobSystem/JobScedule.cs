@@ -95,7 +95,7 @@ namespace MAD.JobSystemCore
                                         {
                                             if (CheckJobTime(_job.time, _time))
                                             {
-                                                if (_job.time.type == JobTime.TimeType.Relative)
+                                                if (_job.time.type == JobTime.TimeMethod.Relative)
                                                 {
                                                     _job.state = Job.JobState.Working;
                                                     _job.time.jobDelay.Reset();
@@ -105,7 +105,7 @@ namespace MAD.JobSystemCore
 
                                                     JobThreadStart(_holder);
                                                 }
-                                                else if (_job.time.type == JobTime.TimeType.Absolute)
+                                                else if (_job.time.type == JobTime.TimeMethod.Absolute)
                                                 {
                                                     JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
 
@@ -122,7 +122,7 @@ namespace MAD.JobSystemCore
                                                 }
                                             }
                                             else
-                                                if (_job.time.type == JobTime.TimeType.Relative)
+                                                if (_job.time.type == JobTime.TimeMethod.Relative)
                                                     _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                         }
                                     }
@@ -139,12 +139,12 @@ namespace MAD.JobSystemCore
 
         private bool CheckJobTime(JobTime jobTime, DateTime time)
         {
-            if (jobTime.type == JobTime.TimeType.Relative)
+            if (jobTime.type == JobTime.TimeMethod.Relative)
                 if (jobTime.jobDelay.CheckTime())
                     return true;
                 else
                     return false;
-            else if (jobTime.type == JobTime.TimeType.Absolute)
+            else if (jobTime.type == JobTime.TimeMethod.Absolute)
                 foreach (JobTimeHandler _handler in jobTime.jobTimes)
                     if (_handler.CheckTime(time))
                         return true;

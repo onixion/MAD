@@ -256,6 +256,7 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("file", "FILENAME", "Name of the file to load node from.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node which should be saved.", false, false, new Type[] { typeof(int) }));
             description = "This command save a node.";
         }
 
@@ -265,7 +266,7 @@ namespace MAD.CLICore
 
             try
             {
-                _js.SaveNodes(_fileName);
+                _js.SaveNode(_fileName, (int)pars.GetPar("id").argValues[0]);
                 return "<color><green>Nodes saved.";
             }
             catch(Exception e)
@@ -292,8 +293,9 @@ namespace MAD.CLICore
 
             try
             {
-                _js.LoadNodes(_fileName);
-                return "<color><green>Nodes loaded.";
+                JobNode _node = _js.LoadNode(_fileName);
+
+                return "<color><green>Node loaded.";
             }
             catch(Exception e)
             {
@@ -512,12 +514,12 @@ namespace MAD.CLICore
 
                 if (_argType == typeof(int))
                 {
-                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.type = JobTime.TimeMethod.Relative;
                     _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _job.time.type = JobTime.TimeType.Absolute;
+                    _job.time.type = JobTime.TimeMethod.Absolute;
 
                     try
                     {
@@ -532,7 +534,7 @@ namespace MAD.CLICore
             else
             {
                 _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
+                _job.time.type = JobTime.TimeMethod.Relative;
             }
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
@@ -577,12 +579,12 @@ namespace MAD.CLICore
 
                 if (_argType == typeof(int))
                 {
-                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.type = JobTime.TimeMethod.Relative;
                     _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _job.time.type = JobTime.TimeType.Absolute;
+                    _job.time.type = JobTime.TimeMethod.Absolute;
 
                     try
                     {
@@ -597,7 +599,7 @@ namespace MAD.CLICore
             else
             {
                 _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
+                _job.time.type = JobTime.TimeMethod.Relative;
             }
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
@@ -685,12 +687,12 @@ namespace MAD.CLICore
 
                 if (_argType == typeof(int))
                 {
-                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.type = JobTime.TimeMethod.Relative;
                     _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _job.time.type = JobTime.TimeType.Absolute;
+                    _job.time.type = JobTime.TimeMethod.Absolute;
 
                     try
                     {
@@ -705,7 +707,7 @@ namespace MAD.CLICore
             else
             {
                 _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
+                _job.time.type = JobTime.TimeMethod.Relative;
             }
 
             if (OParUsed("p"))
@@ -755,12 +757,12 @@ namespace MAD.CLICore
 
                 if (_argType == typeof(int))
                 {
-                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.type = JobTime.TimeMethod.Relative;
                     _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _job.time.type = JobTime.TimeType.Absolute;
+                    _job.time.type = JobTime.TimeMethod.Absolute;
 
                     try
                     {
@@ -775,7 +777,7 @@ namespace MAD.CLICore
             else
             {
                 _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
+                _job.time.type = JobTime.TimeMethod.Relative;
             }
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
@@ -821,12 +823,12 @@ namespace MAD.CLICore
 
                 if (_argType == typeof(int))
                 {
-                    _job.time.type = JobTime.TimeType.Relative;
+                    _job.time.type = JobTime.TimeMethod.Relative;
                     _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _job.time.type = JobTime.TimeType.Absolute;
+                    _job.time.type = JobTime.TimeMethod.Absolute;
 
                     try
                     {
@@ -841,7 +843,7 @@ namespace MAD.CLICore
             else
             {
                 _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeType.Relative;
+                _job.time.type = JobTime.TimeMethod.Relative;
             }
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];

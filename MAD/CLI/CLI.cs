@@ -11,6 +11,14 @@ namespace MAD.CLICore
 {
     public class CLI : CLIFramework
     {
+        #region members
+
+        public string cursor = "MAD> ";
+        private ConsoleColor _cursorColor = ConsoleColor.Cyan;
+        private ConsoleColor _inputColor = ConsoleColor.White;
+
+        #endregion
+
         #region constructor
 
         public CLI(string dataPath, JobSystem js, MACFeeder macFeeder)
@@ -79,12 +87,16 @@ namespace MAD.CLICore
             while (true)
             {
                 Command _command = null;
-                CLIInput.WriteCursor();
 
                 // This was the old method to read input from cli.
                 //string _cliInput = Console.ReadLine();
 
-                string _cliInput = CLIInput.ReadInput();
+                Console.ForegroundColor = _cursorColor;
+                Console.Write(cursor);
+
+                Console.ForegroundColor = _inputColor;
+                string _cliInput = CLIInput.ReadInput(Console.CursorLeft);
+
                 _cliInput = _cliInput.Trim();
 
                 if (_cliInput != "")

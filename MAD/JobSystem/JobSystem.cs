@@ -7,7 +7,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public readonly Version VERSION = new Version(2, 8);
+        public readonly Version VERSION = new Version(2, 9);
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
@@ -178,18 +178,19 @@ namespace MAD.JobSystemCore
 
         #region nodes serialization
 
-        public void SaveNodes(string fileName)
+        public void SaveNode(string fileName, int nodeId)
         {
-            JSSerializer.Serialize(fileName, _nodes);
+            JobNode _node = GetNode(nodeId);
+            if(_node != null)
+                JSSerializer.Serialize(fileName, _node);
+            else
+                throw new JobNodeException("Node does not exist!", null);
         }
 
-        public void LoadNodes(string fileName)
+        public JobNode LoadNode(string fileName)
         {
-            List<JobNode> _buffer = (List<JobNode>)JSSerializer.Deserialize(fileName);
-            lock (_nodesLock)
-            {
-                _nodes.AddRange(_buffer);
-            }
+            JobNode _buffer = (JobNode)JSSerializer.Deserialize(fileName, typeof(JobNode));
+            return _buffer;
         }
 
         #endregion
@@ -247,16 +248,6 @@ namespace MAD.JobSystemCore
                 throw new JobException("Job does not exist!", null);
         }
 
-        public void UpdateJob(int id, Job job)
-        {
-            Job _job = GetJob(id);
-            if (_job != null)
-                lock(_job.jobLock)
-                    _job = job;
-            else
-                throw new JobException("Job does not exist!", null);
-        }
-
         public bool JobExist(int id)
         {
             foreach (JobNode _node in _nodes)
@@ -266,7 +257,6 @@ namespace MAD.JobSystemCore
             return false;
         }
 
-        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
         public Job GetJob(int id)
         {
             foreach (JobNode _node in _nodes)

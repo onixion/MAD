@@ -2,7 +2,7 @@
 
 namespace MAD.JobSystemCore
 {
-    // NIU
+    [Serializable()]
     public class OutputDesc
     {
         #region members
@@ -14,6 +14,9 @@ namespace MAD.JobSystemCore
         #endregion
 
         #region constructor
+
+        public OutputDesc()
+        { }
 
         public OutputDesc(string name, Type dataType)
         {

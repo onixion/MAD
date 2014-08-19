@@ -5,12 +5,12 @@ using System.Runtime.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
-    public class JobNotification : ISerializable
+    [Serializable()]
+    public class JobNotification
     {
         #region members
 
-        public MailAddress[] mailAddr = new MailAddress[0];
+        public string[] mailAddr = new string[0];
         public MailPriority priority = MailPriority.High;
         public List<JobRule> rules = new List<JobRule>();
 
@@ -20,12 +20,12 @@ namespace MAD.JobSystemCore
 
         public JobNotification() { }
 
-        public JobNotification(MailAddress[] mailAddr)
+        public JobNotification(string[] mailAddr)
         {
             this.mailAddr = mailAddr;
         }
 
-        public JobNotification(MailAddress[] mailAddr, MailPriority priority) 
+        public JobNotification(string[] mailAddr, MailPriority priority) 
         {
             this.mailAddr = mailAddr;
             this.priority = priority;
@@ -34,8 +34,8 @@ namespace MAD.JobSystemCore
         // for serialization only
         public JobNotification(SerializationInfo info, StreamingContext context)
         {
-            mailAddr = (MailAddress[])info.GetValue("SER_MAILADDR", typeof(MailAddress[]));
-            priority = (MailPriority)info.GetValue("SER_MAILPRIORITY", typeof(MailPriority));
+            //mailAddr = (MailAddress[])info.GetValue("SER_MAILADDR", typeof(MailAddress[]));
+            //priority = (MailPriority)info.GetValue("SER_MAILPRIORITY", typeof(MailPriority));
         }
 
         #endregion

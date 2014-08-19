@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
     [Serializable]
-    public abstract class Job : ISerializable
+    public abstract class Job : IXmlSerializable
     {
         #region members
 
@@ -17,14 +18,15 @@ namespace MAD.JobSystemCore
         private int _id;
         public int id { get { return _id; } }
 
+        [XmlIgnoreAttribute]
         public enum JobState { Inactive, Waiting, Working, Exception }
-        public JobState state = JobState.Inactive;
-
+        [XmlIgnoreAttribute]
         public enum OutState { NULL, Success, Failed, Exception }
-        public OutState outState = OutState.NULL;
-
+        [XmlIgnoreAttribute]
         public DateTime tStart;
+        [XmlIgnoreAttribute]
         public DateTime tStop;
+        [XmlIgnoreAttribute]
         public TimeSpan tSpan;
 
         public List<OutputDesc> outDesc = new List<OutputDesc>();
@@ -35,9 +37,17 @@ namespace MAD.JobSystemCore
         public JobTime time = new JobTime();
         public JobNotification noti;
 
+        public JobState state = JobState.Inactive;
+        public OutState outState = OutState.NULL;
+
         #endregion
 
         #region constructors
+
+        public Job()
+        {
+            InitJob();
+        }
 
         protected Job(string name, JobType type)
         {
@@ -55,15 +65,6 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = time;
             this.noti = noti;
-        }
-
-        // for serialization
-        protected Job(SerializationInfo info, StreamingContext context)
-        {
-            InitJob();
-            this.name = (string) info.GetValue("SER_JOB_NAME", typeof(string));
-            this.type = (JobType)info.GetValue("SER_JOB_TYPE", typeof(JobType));
-            this.time = (JobTime)info.GetValue("SER_JOB_TIME", typeof(JobTime));
         }
 
         #endregion
@@ -110,12 +111,12 @@ namespace MAD.JobSystemCore
             _temp += "<color><yellow>STATE:\t\t<color><white>" + state.ToString() + "\n";
             _temp += "<color><yellow>TIME-TYPE:\t\t<color><white>" + time.type.ToString() + "\n";
 
-            if (time.type == JobTime.TimeType.Relative)
+            if (time.type == JobTime.TimeMethod.Relative)
             {
                 _temp += "<color><yellow>DELAY-TIME:\t\t<color><white>" + time.jobDelay.delayTime + "\n";
                 _temp += "<color><yellow>DELAY-REMAIN-TIME:\t\t<color><white>" + time.jobDelay.delayTimeRemaining + "\n";
             }
-            else if (time.type == JobTime.TimeType.Absolute)
+            else if (time.type == JobTime.TimeMethod.Absolute)
             {
                 _temp += "<color><yellow>TIMES:\t\t<color><white>";
 
@@ -141,17 +142,24 @@ namespace MAD.JobSystemCore
 
         #region for serialization only
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public System.Xml.Schema.XmlSchema GetSchema()
         {
-            info.AddValue("SER_JOB_NAME", name);
-            info.AddValue("SER_JOB_TYPE", type);
-            info.AddValue("SER_JOB_TIME", time);
-
-            GetObjectDataJobSpecific(info, context);
+            throw new NotImplementedException();
         }
 
-        // serialization for job-specific members
-        public abstract void GetObjectDataJobSpecific(SerializationInfo info, StreamingContext context);
+        public void ReadXml(XmlReader reader)
+        {
+            ReadXmlJobSpec(reader);
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            WriteXmlJobSpec(writer);
+        }
+
+        public virtual void ReadXmlJobSpec(XmlReader reader) { }
+
+        public virtual void WriteXmlJobSpec(XmlWriter writer) { }
 
         #endregion
 

@@ -11,7 +11,7 @@ Der Zugriff auf diese Komponenten wird durch das JobSystem definiert.
 Das System ist aber NICHT multithreading-fähig, d.h. das die Methoden des JobSystems nicht von vielen
 Threads gleichzeitig verwendet werden dürfen, da es sonst zu internen Schwierigkeiten kommen kann.
 
-Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernommen werden (nicht gleichzeitig):
+Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernommen werden (nicht gleichzeitig!):
 
 	* CLI (standalone: wird auf dem localen Rechner ausgeführt)
 	* CLI-Server (Client kann mit dem JobSystem kommunizieren)
@@ -30,6 +30,16 @@ verliert, wird der Job in einem eigenen Thread ausgeführt.
 
 Die Überprüfungen der JobTime-Objekte ist die Hautpaufgabe des JobScedules. Aber auch die Verarbeitung der
 Notification-Rules gehört in den Aufgabenbereich des Scedules.
+
+_______
+JOBNODE
+
+Eine JobNode ist eine Sammlung von Jobs, die an einen bestimmten Rechner im Netzwerk gerichtet sind.
+Sie definiert eine Zieladresse (IP-Adresse), eine MAC-Adresse und eine Liste mit den Jobs, die für den
+jeweiligen Rechner/Server gerichtet sind.
+
+Da sich die Zieladresse ändern kann (DHCP timeout), muss diese regelmäßig überprüft werden und falls
+notwendig geändert werden.
 
 _______
 JOBTIME
@@ -55,6 +65,11 @@ JONOTIFICATIONRULE
 Diese Klasse definiert eine Regel (=Rule). Die JobNotification-Klasse überprüft die Regeln auf ihre Gültigkeit.
 
 
+
+
+
+____________________________________________________________________________________________________________________________
+ ANDERE INFORMATIONEN
 ______________________________________________________________________________________________________________________________________
 
 Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
