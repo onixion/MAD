@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    // This class is used by the JobSystem to load and save
+    // This class is used by the JobSystem to load and save nodes.
     // JobNodes into files.
 
     public static class JSSerializer
