@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
-    public class JobTime : ISerializable
+    [Serializable()]
+    public class JobTime
     {
         #region members
 
-        public enum TimeType { Absolute, Relative }
-        public TimeType type;
+        public enum TimeMethod { Absolute, Relative }
+        public TimeMethod type;
 
-        public JobDelayHandler jobDelay;
-        public List<JobTimeHandler> jobTimes;
+        public JobDelayHandler jobDelay { get; set; }
+        public List<JobTimeHandler> jobTimes { get; set; }
 
         #endregion
 
@@ -24,23 +24,15 @@ namespace MAD.JobSystemCore
         // for delay (e.g. 2000ms)
         public JobTime(JobDelayHandler jobDelay)
         {
-            type = TimeType.Relative;
+            this.type = TimeMethod.Relative;
             this.jobDelay = jobDelay;
         }
 
         // for times (e.g. 19:30)
         public JobTime(List<JobTimeHandler> jobTimes)
         {
-            this.type = TimeType.Absolute;
+            this.type = TimeMethod.Absolute;
             this.jobTimes = jobTimes;
-        }
-
-        // for serialization
-        public JobTime(SerializationInfo info, StreamingContext context)
-        {
-            this.type = (TimeType)info.GetValue("SER_JOB_TIME_TYPE", typeof(TimeType));
-            this.jobDelay = (JobDelayHandler)info.GetValue("SER_JOB_TIME_DELAY", typeof(JobDelayHandler));
-            this.jobTimes = (List<JobTimeHandler>)info.GetValue("SER_JOB_TIME_TIMES", typeof(List<JobTimeHandler>));
         }
 
         #endregion
@@ -224,9 +216,9 @@ namespace MAD.JobSystemCore
 
         public string GetValues()
         {
-            if (type == TimeType.Relative)
+            if (type == TimeMethod.Relative)
                 return jobDelay.delayTime.ToString();
-            else if (type == TimeType.Absolute)
+            else if (type == TimeMethod.Absolute)
             {
                 string _temp = "";
                 foreach (JobTimeHandler _buffer in jobTimes)
@@ -237,27 +229,16 @@ namespace MAD.JobSystemCore
                 return "NULL";
         }
 
-        #region for serialization
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("SER_JOB_TIME_TYPE", type);
-            info.AddValue("SER_JOB_TIME_DELAY", jobDelay);
-            info.AddValue("SER_JOB_TIME_TIMES", jobTimes);
-        }
-
-        #endregion
-
         #endregion
     }
 
-    [Serializable]
-    public class JobTimeHandler : ISerializable
+    [Serializable()]
+    public class JobTimeHandler
     {
         #region members
 
-        public enum Type { NULL, Daily, Monthly, Yearly, Unique }
-        public Type type = Type.NULL;
+        public enum TimeType { NULL, Daily, Monthly, Yearly, Unique }
+        public TimeType timeType = TimeType.NULL;
 
         public int year { get; set; }
         public int month { get; set; }
@@ -265,19 +246,25 @@ namespace MAD.JobSystemCore
         public int hour { get; set; }
         public int minute { get; set; }
 
+        [XmlIgnoreAttribute]
         private bool _blockSignal = false;
         public bool blockSignal { get { return _blockSignal; } }
+
+        [XmlIgnoreAttribute]
         public int minuteAtBlock = 100;
         
         #endregion
 
         #region constructors
 
+        public JobTimeHandler()
+        { }
+
         public JobTimeHandler(int hour, int minute)
         {
             this.hour = hour;
             this.minute = minute;
-            this.type = Type.Daily;
+            this.timeType = TimeType.Daily;
         }
 
         public JobTimeHandler(int hour, int minute, int day)
@@ -285,7 +272,7 @@ namespace MAD.JobSystemCore
             this.hour = hour;
             this.minute = minute;
             this.day = day;
-            this.type = Type.Monthly;
+            this.timeType = TimeType.Monthly;
         }
 
         public JobTimeHandler(int hour, int minute, int day, int month)
@@ -294,7 +281,7 @@ namespace MAD.JobSystemCore
             this.minute = minute;
             this.day = day;
             this.month = month;
-            this.type = Type.Yearly;
+            this.timeType = TimeType.Yearly;
         }
 
         public JobTimeHandler(int hour, int minute, int day, int month, int year)
@@ -304,19 +291,7 @@ namespace MAD.JobSystemCore
             this.day = day;
             this.month = month;
             this.year = year;
-            this.type = Type.Unique;
-        }
-
-        // for serialization
-        public JobTimeHandler(SerializationInfo info, StreamingContext context)
-        {
-            this.type = (Type)info.GetValue("SER_JOB_TIME_TYPE", typeof(Type));
-
-            this.year = (int)info.GetValue("SER_JOB_TIME_YEAR", typeof(int));
-            this.month = (int)info.GetValue("SER_JOB_TIME_MONTH", typeof(int));
-            this.day = (int)info.GetValue("SER_JOB_TIME_DAY", typeof(int));
-            this.hour = (int)info.GetValue("SER_JOB_TIME_HOUR", typeof(int));
-            this.minute = (int)info.GetValue("SER_JOB_TIME_MINUTE", typeof(int));
+            this.timeType = TimeType.Unique;
         }
 
         #endregion
@@ -326,62 +301,38 @@ namespace MAD.JobSystemCore
         public bool IsBlocked(DateTime now)
         {
             if (now.Minute == minuteAtBlock)
-            {
                 return true;
-            }
             else
-            {
                 return false;
-            }
         }
 
         public bool CheckTime(DateTime now)
         {
-            switch (type)
+            switch (timeType)
             {
-                case Type.Daily:
-
+                case TimeType.Daily:
                     if (now.Hour == hour && now.Minute == minute)
-                    {
                         return true;
-                    }
                     else
-                    {
                         return false;
-                    }
 
-                case Type.Monthly:
-
+                case TimeType.Monthly:
                     if (now.Hour == hour && now.Minute == minute && now.Day == day)
-                    {
                         return true;
-                    }
                     else
-                    {
                         return false;
-                    }
 
-                case Type.Yearly:
-
+                case TimeType.Yearly:
                     if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month)
-                    {
                         return true;
-                    }
                     else
-                    {
                         return false;
-                    }
 
-                case Type.Unique:
-
+                case TimeType.Unique:
                     if (now.Hour == hour && now.Minute == minute && now.Day == day && now.Month == month && now.Year == year)
-                    {
                         return true;
-                    }
                     else
-                    {
                         return false;
-                    }
 
                 default:
                     return false;
@@ -391,18 +342,18 @@ namespace MAD.JobSystemCore
         #region for cli only
 
         public string JobTimeStatus()
-        { 
-            switch(type)
+        {
+            switch (timeType)
             {
-                case Type.Daily:
+                case TimeType.Daily:
                     return hour + ":" + minute;
-                case Type.Monthly:
+                case TimeType.Monthly:
                     return day + ";" + hour + ":" + minute;
-                case Type.Yearly:
+                case TimeType.Yearly:
                     return day + "." + month + ";" + hour + ":" + minute;
-                case Type.Unique:
+                case TimeType.Unique:
                     return day + "." + month + "." + year + ";" + hour + ":" + minute;
-                case Type.NULL:
+                case TimeType.NULL:
                     return "NULL";
                 default:
                     return null;
@@ -411,49 +362,30 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region for serialization
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("SER_JOB_TIME_TYPE", type);
-
-            info.AddValue("SER_JOB_TIME_YEAR", year);
-            info.AddValue("SER_JOB_TIME_MONTH", month);
-            info.AddValue("SER_JOB_TIME_DAY", day);
-            info.AddValue("SER_JOB_TIME_HOUR", hour);
-            info.AddValue("SER_JOB_TIME_MINUTE", minute);
-        }
-
-        #endregion
-
         #endregion
     }
 
-    [Serializable]
-    public class JobDelayHandler : ISerializable
+    [Serializable()]
+    public class JobDelayHandler
     {
         #region members
 
         private int _delayTime;
         public int delayTime { get { return _delayTime; } }
 
-        private int _delayTimeRemaining;
+        private int _delayTimeRemaining { get; set; }
         public int delayTimeRemaining { get { return _delayTimeRemaining; } }
 
         #endregion
 
         #region constructor
 
+        public JobDelayHandler()
+        { }
+
         public JobDelayHandler(int delayTime)
         {
             _delayTime = delayTime;
-            _delayTimeRemaining = delayTime;
-        }
-
-        // for serialization
-        public JobDelayHandler(SerializationInfo info, StreamingContext context)
-        {
-            _delayTime = (int)info.GetValue("SER_JOB_DELAY_DELAYTIME", typeof(int));
             _delayTimeRemaining = delayTime;
         }
 
@@ -478,15 +410,6 @@ namespace MAD.JobSystemCore
         {
             _delayTimeRemaining = _delayTimeRemaining - deltaTime;
         }
-
-        #region for serialization
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("SER_JOB_DELAY_DELAYTIME", _delayTime);
-        }
-
-        #endregion
 
         #endregion
     }

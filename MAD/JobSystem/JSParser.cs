@@ -25,12 +25,12 @@ namespace MAD.JobSystemCore
 
                 if (_argType == typeof(int))
                 {
-                    _buffer.type = JobTime.TimeType.Relative;
+                    _buffer.type = JobTime.TimeMethod.Relative;
                     _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar(JOB_TIME_PAR).argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
-                    _buffer.type = JobTime.TimeType.Absolute;
+                    _buffer.type = JobTime.TimeMethod.Absolute;
                     _buffer.jobTimes = JobTime.ParseStringArray(c.pars.GetPar(JOB_TIME_PAR).argValues);
                 }
             }
@@ -38,7 +38,7 @@ namespace MAD.JobSystemCore
             {
                 // default settings
                 _buffer.jobDelay = new JobDelayHandler(20000);
-                _buffer.type = JobTime.TimeType.Relative;
+                _buffer.type = JobTime.TimeMethod.Relative;
             }
 
             return _buffer;
@@ -52,7 +52,12 @@ namespace MAD.JobSystemCore
             if (c.OParUsed(JOB_NOTI_MAIL))
             {
                 MailAddress[] _mails = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
-                _buffer.mailAddr = _mails;
+                string[] _mailsString = new string[_mails.Length];
+
+                for (int i = 0; i < _mails.Length; i++)
+                    _mailsString[i] = _mails[i].Address;
+
+                _buffer.mailAddr = _mailsString;
             }
 
             // PARSE PRIO

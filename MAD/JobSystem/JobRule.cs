@@ -2,6 +2,7 @@
 
 namespace MAD
 {
+    [Serializable()]
     public class JobRule
     {
         public object obj;
