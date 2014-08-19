@@ -27,36 +27,43 @@ namespace MAD.CLICore
 
         public SnmpInterfaceCommand()
         {
-            oPar.Add(new ParOption("e", "INTERFACE-COUNT", "Expected number of interfaces.", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("ip", "Target-IP", "Target.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("p", "", "privPro", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("a", "", "authProt", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("s", "", "security", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("e", "INTERFACE-COUNT", "Expected number of interfaces.", false, false, new Type[] { typeof(uint) }));
+            oPar.Add(new ParOption("p", "", "privPro", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("a", "", "authProt", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("s", "", "security", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
             version = (uint)pars.GetPar("ver").argValues[0];
-
-            // PARSE ip
             string _buffer = (string)pars.GetPar("ip").argValues[0];
-            if (!IpAddress.IsIP(_buffer))
-                return "<color><red>Could not parse ip-address!";
-            else
-                targetIP = IPAddress.Parse(_buffer);
 
-            UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
-
-            // if optional par is used.
-            if(OParUsed("e"))
-            {
-                expectedIfNr = (uint)pars.GetPar("e").argValues[0];
-            }
-
-            // PARSE privProt
             if (version == 3)
             {
+                _buffer = (string)pars.GetPar("s").argValues[0];
+                switch (_buffer)
+                {
+                    case "authNoPriv":
+                        security = NetworkHelper.securityLvl.authNoPriv;
+                        if(!(OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters";
+                        break;
+                    case "authPriv":
+                        security = NetworkHelper.securityLvl.authPriv;
+                        if (!(OParUsed("a") && OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters";
+                        break;
+                    case "noAuthNoPriv":
+                        security = NetworkHelper.securityLvl.noAuthNoPriv;
+                        if (!(!OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters";
+                        break;
+                    default:
+                        return "<color><red>ERROR";
+                }
+
                 _buffer = (string)pars.GetPar("p").argValues[0];
                 switch (_buffer)
                 {
@@ -86,22 +93,26 @@ namespace MAD.CLICore
                 }
 
                 // PARSE security
-                _buffer = (string)pars.GetPar("s").argValues[0];
-                switch (_buffer)
-                {
-                    case "authNoPriv":
-                        security = NetworkHelper.securityLvl.authNoPriv;
-                        break;
-                    case "authPriv":
-                        security = NetworkHelper.securityLvl.authPriv;
-                        break;
-                    case "noAuthNoPriv":
-                        security = NetworkHelper.securityLvl.noAuthNoPriv;
-                        break;
-                    default:
-                        return "<color><red>ERROR:";
-                }
+                
             }
+
+            // PARSE ip
+            
+            if (!IpAddress.IsIP(_buffer))
+                return "<color><red>Could not parse ip-address!";
+            else
+                targetIP = IPAddress.Parse(_buffer);
+
+            UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
+
+            // if optional par is used.
+            if(OParUsed("e"))
+            {
+                expectedIfNr = (uint)pars.GetPar("e").argValues[0];
+            }
+
+            // PARSE privProt
+            
 
             if (version == 2)
             { 
