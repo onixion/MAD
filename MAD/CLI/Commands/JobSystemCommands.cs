@@ -25,7 +25,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             output += "<color><yellow>\n JOBSYSTEM version " + _js.VERSION + "\n\n";
-            output += " Nodes stored in RAM: <color><white>" + _js.nodesInitialized + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES + ")\n";
+            output += " Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES + ")\n";
             output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + ")\n";
             output += "\n\n Scedule-State: ";
             if (_js.sceduleState == JobScedule.State.Active)
@@ -118,7 +118,7 @@ namespace MAD.CLICore
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += "\n";
             output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAX_NODES + "\n";
-            output += " <color><yellow>Nodes initialized: <color><white>" + _js.nodesInitialized + "\n";
+            output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.splitline; 
@@ -126,7 +126,7 @@ namespace MAD.CLICore
             output += ConsoleTable.splitline;
             output += "<color><white>";
 
-            foreach (JobNode _temp in _js.GetNodes())
+            foreach (JobNode _temp in _js.nodes)
             {
                 _tableRow[0] = _temp.id.ToString();
                 _tableRow[1] = _temp.name;
@@ -333,16 +333,7 @@ namespace MAD.CLICore
             output += ConsoleTable.splitline;
             output += "<color><white>";
 
-            List<JobNode> _nodes;
-
-            try
-            { _nodes = _js.GetNodes(); }
-            catch (JobSceduleException e)
-            {
-                return "<color><red>" + e.Message;
-            }
-
-            foreach (JobNode _temp in _nodes)
+            foreach (JobNode _temp in _js.nodes)
                 foreach (Job _temp2 in _temp.jobs)
                 {
                     _tableRow[0] = _temp.id.ToString();
@@ -383,7 +374,7 @@ namespace MAD.CLICore
             }
             else
             {
-                foreach (JobNode _node in _js.GetNodes())
+                foreach (JobNode _node in _js.nodes)
                     foreach (Job _job in _node.jobs)
                         output += _job.Status() + "\n";
             }

@@ -77,3 +77,5 @@ Now using the TcpListener and TcpClient)
 
 (NOTE: XML-Serilizer is really difficult. Looked around for an alternativ and found Json. But i will not change
 XML, because then i have to re-write many files ...)
+
+[21.08.2014][13:00-14:00][1h][166h] CleanCoding ... Decided to remove JobRule and OutDesc ...

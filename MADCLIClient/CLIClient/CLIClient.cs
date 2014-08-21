@@ -130,8 +130,7 @@ namespace CLIClient
 
             while (true)
             {
-                CLIInput.WriteCursor();
-                _cliInput = CLIInput.ReadInput();
+                _cliInput = CLIInput.ReadInput(0);
 
                 _cliP.consoleWidth = Console.BufferWidth;
                 _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);

@@ -12,10 +12,11 @@ namespace MAD.JobSystemCore
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
-        private List<JobNode> _nodes = new List<JobNode>();
-        public const int MAX_NODES = 100;
-        public int nodesInitialized { get { return _nodes.Count; } }
+        private List<JobNode> _nodes { get; set; }
+        public List<JobNode> nodes { get { return _nodes; } }
+
         private object _nodesLock = new object();
+        public const int MAX_NODES = 100;
 
         #endregion
 
@@ -23,6 +24,7 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
+            _nodes = new List<JobNode>();
             _scedule = new JobScedule(_nodesLock, _nodes);
         }
 
@@ -42,7 +44,7 @@ namespace MAD.JobSystemCore
             _scedule.Stop();
         }
 
-        public bool SceduleActive()
+        public bool IsSceduleActive()
         {
             if (_scedule.state == JobScedule.State.Active)
                 return true;
@@ -72,18 +74,37 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
+        public int NodesInitialized()
+        {
+            return _nodes.Count;
+        }
+
+        public int JobsActive()
+        {
+            int _count = 0;
+            for (int i = 0; i < _nodes.Count; i++)
+                foreach (Job _job in _nodes[i].jobs)
+                    if (_job.state == Job.JobState.Waiting)
+                        _count++;
+            return _count;
+        }
+
+        public int JobsInactive()
+        {
+            int _count = 0;
+            for (int i = 0; i < _nodes.Count; i++)
+                foreach (Job _job in _nodes[i].jobs)
+                    if (_job.state == Job.JobState.Inactive)
+                        _count++;
+            return _count;
+        }
+
         public int JobsInitialized()
         {
             int _count = 0;
             for (int i = 0; i < _nodes.Count; i++)
                 _count = _count + _nodes[i].jobs.Count;
             return _count;
-        }
-
-        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
-        public List<JobNode> GetNodes()
-        {
-            return _nodes;
         }
 
         #endregion
@@ -133,17 +154,25 @@ namespace MAD.JobSystemCore
                 throw new JobNodeException("Node does not exist!", null);
         }
 
-        // TODO
+        public void RemoveAllNodes()
+        {
+            lock (_nodesLock)
+                _nodes.Clear();
+        }
+
         /// <returns>Count of removed nodes.</returns>
         public int RemoveNodeFromIDToID(int fromID, int toID)
         {
             return 0;
         }
 
-        public void RemoveAllNodes()
+        public bool NodeExist(int id)
         {
-            lock (_nodesLock)
-                _nodes.Clear();
+            JobNode _node = GetNode(id);
+            if (_node != null)
+                return true;
+            else
+                return false;
         }
 
         public JobNode GetNode(int id)
@@ -163,19 +192,10 @@ namespace MAD.JobSystemCore
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
-
-        public bool NodeExist(int id)
-        {
-            JobNode _node = GetNode(id);
-            if (_node != null)
-                return true;
-            else
-                return false;
-        }
-
+        
         #endregion
 
-        #region nodes serialization
+        #region node serialization
 
         public void SaveNode(string fileName, int nodeId)
         {
