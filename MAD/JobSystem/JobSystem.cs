@@ -189,8 +189,7 @@ namespace MAD.JobSystemCore
 
         public JobNode LoadNode(string fileName)
         {
-            JobNode _buffer = (JobNode)JSSerializer.Deserialize(fileName, typeof(JobNode));
-            return _buffer;
+            return (JobNode)JSSerializer.Deserialize(fileName, typeof(JobNode));
         }
 
         #endregion

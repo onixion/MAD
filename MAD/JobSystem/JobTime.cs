@@ -14,13 +14,16 @@ namespace MAD.JobSystemCore
         public TimeMethod type;
 
         public JobDelayHandler jobDelay { get; set; }
-        public List<JobTimeHandler> jobTimes { get; set; }
+        public List<JobTimeHandler> jobTimes = new List<JobTimeHandler>();
 
         #endregion
 
         #region constructors
 
-        public JobTime() { }
+        public JobTime() 
+        {
+            jobDelay = new JobDelayHandler();
+        }
 
         // for delay (e.g. 2000ms)
         public JobTime(JobDelayHandler jobDelay)
@@ -239,24 +242,36 @@ namespace MAD.JobSystemCore
 
         public void ReadXml(XmlReader reader)
         {
-            throw new NotImplementedException();
+            if (reader.Read() && reader.Name == "JobTime")
+            {
+                type = (TimeMethod)Enum.Parse(typeof(TimeMethod), reader.GetAttribute("TimeMethod"));
+                if (type == TimeMethod.Absolute)
+                {
+                    while (reader.Read() && reader.Name == "Time")
+                    {
+                        JobTimeHandler _time = new JobTimeHandler();
+                        _time.timeType = (JobTimeHandler.TimeType)Enum.Parse((typeof(JobTimeHandler.TimeType)), reader.GetAttribute("Type"));
+                        _time.ReadXml(reader);
+                        jobTimes.Add(_time);
+                    }
+                }
+                else
+                {
+                    jobDelay.ReadXml(reader);
+                    reader.Read();
+                }
+            }
         }
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteStartElement("Time");
+            writer.WriteStartElement("JobTime");
             writer.WriteAttributeString("TimeMethod", type.ToString());
-
             if (type == TimeMethod.Absolute)
-            {
                 foreach (JobTimeHandler _time in jobTimes)
                     _time.WriteXml(writer);
-            }
             else
-            {
                 jobDelay.WriteXml(writer);
-            }
-
             writer.WriteEndElement();
         }
 
@@ -451,63 +466,50 @@ namespace MAD.JobSystemCore
 
         private void WriteXmlDaily(XmlWriter writer)
         {
-            writer.WriteStartElement("Hour");
-            writer.WriteValue(hour);
-            writer.WriteEndElement();
-            writer.WriteStartElement("Minute");
-            writer.WriteValue(minute);
-            writer.WriteEndElement();
+            writer.WriteAttributeString("Hour", hour.ToString());
+            writer.WriteAttributeString("Minute", minute.ToString());
         }
 
         private void WriteXmlMonthly(XmlWriter writer)
         {
             WriteXmlDaily(writer);
-
-            writer.WriteStartElement("Day");
-            writer.WriteValue(day);
-            writer.WriteEndElement();
+            writer.WriteAttributeString("Day", day.ToString());
         }
 
         private void WriteXmlYearly(XmlWriter writer)
         {
             WriteXmlMonthly(writer);
-
-            writer.WriteStartElement("Month");
-            writer.WriteValue(month);
-            writer.WriteEndElement();
+            writer.WriteAttributeString("Month", month.ToString());
         }
 
         private void WriteXmlUnique(XmlWriter writer)
         {
             WriteXmlYearly(writer);
-
-            writer.WriteStartElement("Year");
-            writer.WriteValue(year);
-            writer.WriteEndElement();
+            writer.WriteAttributeString("Year", year.ToString());
         }
 
         private void ReadXmlDaily(XmlReader reader)
         {
-            hour = reader.ReadElementContentAsInt("Hour", reader.BaseURI);
-            minute = reader.ReadElementContentAsInt("Minute", reader.BaseURI);
+            hour = Int32.Parse(reader.GetAttribute("Hour"));
+            minute = Int32.Parse(reader.GetAttribute("Minute"));
         }
 
         private void ReadXmlMonthly(XmlReader reader)
         {
             ReadXmlDaily(reader);
-            day = reader.ReadElementContentAsInt("Day", reader.BaseURI);
+            day = Int32.Parse(reader.GetAttribute("Day"));
         }
 
         private void ReadXmlYearly(XmlReader reader)
         {
             ReadXmlMonthly(reader);
-            month = reader.ReadElementContentAsInt("Month", reader.BaseURI);
+            month = Int32.Parse(reader.GetAttribute("Month"));
         }
 
         private void ReadXmlUnique(XmlReader reader)
         {
             ReadXmlYearly(reader);
-            year = reader.ReadElementContentAsInt("Year", reader.BaseURI);
+            year = Int32.Parse(reader.GetAttribute("Year"));
         }
 
         #endregion
@@ -516,14 +518,17 @@ namespace MAD.JobSystemCore
     }
 
     [Serializable()]
-    public class JobDelayHandler : IXmlSerializable
+    public class JobDelayHandler
     {
         #region members
 
+        [XmlElement(ElementName = "DelayTime")]
         private int _delayTime;
+        [XmlIgnore]
         public int delayTime { get { return _delayTime; } }
-
+        [XmlIgnore]
         private int _delayTimeRemaining { get; set; }
+        [XmlIgnore]
         public int delayTimeRemaining { get { return _delayTimeRemaining; } }
 
         #endregion
@@ -570,13 +575,14 @@ namespace MAD.JobSystemCore
 
         public void ReadXml(XmlReader reader)
         {
-            _delayTime = reader.ReadElementContentAsInt("DelayTime", reader.BaseURI);
+            if (reader.Read() && reader.Name == "DelayTime")
+                _delayTime = Int32.Parse(reader.GetAttribute("value"));
         }
 
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteStartElement("DelayTime");
-            writer.WriteValue(delayTime);
+            writer.WriteAttributeString("value", _delayTime.ToString());
             writer.WriteEndElement();
         }
 

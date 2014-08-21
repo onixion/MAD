@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Xml.Serialization;
 
 namespace MAD
 {
     [Serializable()]
-    public class JobRule
+    public class JobRule : IXmlSerializable
     {
         public object obj;
         public object obj2;
@@ -86,6 +87,21 @@ namespace MAD
             }
 
             return false; 
+        }
+
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+
         }
     }
 }

@@ -294,12 +294,13 @@ namespace MAD.CLICore
             try
             {
                 JobNode _node = _js.LoadNode(_fileName);
+                _js.AddNode(_node);
 
                 return "<color><green>Node loaded.";
             }
             catch(Exception e)
             {
-                return "<color><red>EXCEPTION: " + e.Message;
+                return "<color><red>XML: " + e.Message;
             }
         }
     }
@@ -785,57 +786,28 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddSnmpCheckCommand : JobCommand
+    public class JobSystemAddSnmpCommand : JobCommand
     {
         private JobSystem _js;
 
-        public JobSystemAddSnmpCheckCommand(object[] args)
+        public JobSystemAddSnmpCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
 
-            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
             string jobName = (string)pars.GetPar("n").argValues[0];
-            int port = (int)pars.GetPar("p").argValues[0];
 
-            JobPort _job = new JobPort();
+            JobSnmp _job = new JobSnmp();
 
             _job.name = jobName;
-            _job.type = Job.JobType.PortScan;
-            _job.port = port;
+            _job.type = Job.JobType.SnmpCheck;
 
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeMethod.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeMethod.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeMethod.Relative;
-            }
+            _job.time = ParseJobTime(this);
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
 
@@ -911,12 +883,6 @@ namespace MAD.CLICore
             if (c.OParUsed(JOB_NOTI_MAIL))
             {
                 MailAddress[] _mails = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
-                string[] _mailsString = new string[_mails.Length];
-
-                for (int i = 0; i < _mails.Length; i++)
-                    _mailsString[i] = _mails[i].Address;
-
-                _buffer.mailAddr = _mailsString;
             }
 
             // PARSE PRIO

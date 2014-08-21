@@ -168,8 +168,13 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
-            // Check JobNotification.
-            // Make query to NotificationSystem if necessary.
+            List<JobRule> _broken = _job.noti.GetBrokenRules();
+
+            if (_broken.Count != 0)
+            { 
+                // RULE(S) BROKEN!
+            
+            }
 
             _job.state = Job.JobState.Waiting;
 

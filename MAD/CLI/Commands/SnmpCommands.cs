@@ -242,9 +242,6 @@ namespace MAD.CLICore
             {
                 return "ERROR: This is not a supported version of snmp";
             }
-
-            // 'NIX' wird in ROT auf die Console ausgeben.
-            return "<color><red>NIX";
         }
     }
 }

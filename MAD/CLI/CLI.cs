@@ -24,7 +24,7 @@ namespace MAD.CLICore
         public CLI(string dataPath, JobSystem js, MACFeeder macFeeder)
             :base()
         {
-            // general purpose
+            // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
@@ -65,7 +65,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { js }));
             commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add snmpCheck", typeof(JobSystemAddSnmpCommand), new object[] { js }));
 
+            // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
 
             // CLIServer (these commands cannot be used by cli!)

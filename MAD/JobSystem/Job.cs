@@ -12,30 +12,26 @@ namespace MAD.JobSystemCore
         #region members
 
         public object jobLock = new object();
-
         private static int _jobsCount = 0;
         private static object _idLock = new object();
         private int _id;
         public int id { get { return _id; } }
 
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
         public enum JobState { Inactive, Waiting, Working, Exception }
         public enum OutState { NULL, Success, Failed, Exception }
+        
+        public string name { get; set; }
 
-        [XmlIgnore]
+        public JobTime time { get; set; }
+        public JobNotification noti { get; set; }
+        public List<OutputDesc> outDesc { get; set; }
+
         public DateTime tStart;
-        [XmlIgnore]
         public DateTime tStop;
-        [XmlIgnore]
         public TimeSpan tSpan;
 
-        public List<OutputDesc> outDesc = new List<OutputDesc>();
-
-        public string name { get; set; }
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
         public JobType type = JobType.NULL;
-        public JobTime time = new JobTime();
-        public JobNotification noti;
-
         public JobState state = JobState.Inactive;
         public OutState outState = OutState.NULL;
 
@@ -43,9 +39,13 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        public Job()
+        protected Job(JobType type)
         {
             InitJob();
+            this.type = type;
+            this.time = new JobTime();
+            this.noti = new JobNotification();
+            this.outDesc = new List<OutputDesc>();
         }
 
         protected Job(string name, JobType type)
@@ -55,6 +55,7 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = new JobTime();
             this.noti = new JobNotification();
+            this.outDesc = new List<OutputDesc>();
         }
 
         protected Job(string name, JobType type, JobTime time, JobNotification noti)
@@ -64,6 +65,7 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = time;
             this.noti = noti;
+            this.outDesc = new List<OutputDesc>();
         }
 
         #endregion
@@ -148,8 +150,12 @@ namespace MAD.JobSystemCore
 
         public void ReadXml(XmlReader reader)
         {
+            name = reader.GetAttribute("Name");
 
-            ReadXmlJobSpec(reader);
+            time.ReadXml(reader);
+
+            if (reader.Read() && reader.Name == "Settings")
+                ReadXmlJobSpec(reader);
         }
 
         public void WriteXml(XmlWriter writer)
@@ -160,7 +166,9 @@ namespace MAD.JobSystemCore
 
             time.WriteXml(writer);
 
+            writer.WriteStartElement("Settings");
             WriteXmlJobSpec(writer);
+            writer.WriteEndElement();
             writer.WriteEndElement();
         }
 

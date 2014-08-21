@@ -1,56 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
-using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
     [Serializable()]
-    public class JobNotification
+    public class JobNotification : IXmlSerializable
     {
         #region members
 
-        public string[] mailAddr = new string[0];
-        public MailPriority priority = MailPriority.High;
+        public MailAddress[] mailAddr { get; set; }
+        public MailPriority priority { get; set; }
         public List<JobRule> rules = new List<JobRule>();
 
         #endregion
 
         #region constructors
 
-        public JobNotification() { }
+        public JobNotification() 
+        {
+            mailAddr = new MailAddress[0];
+            priority = MailPriority.High;
+        }
 
-        public JobNotification(string[] mailAddr)
+        public JobNotification(MailAddress[] mailAddr)
         {
             this.mailAddr = mailAddr;
         }
 
-        public JobNotification(string[] mailAddr, MailPriority priority) 
+        public JobNotification(MailAddress[] mailAddr, MailPriority priority) 
         {
             this.mailAddr = mailAddr;
             this.priority = priority;
         }
 
-        // for serialization only
-        public JobNotification(SerializationInfo info, StreamingContext context)
-        {
-            //mailAddr = (MailAddress[])info.GetValue("SER_MAILADDR", typeof(MailAddress[]));
-            //priority = (MailPriority)info.GetValue("SER_MAILPRIORITY", typeof(MailPriority));
-        }
-
         #endregion
 
         #region methodes
-
-        #region for serialization only
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("SER_MAILADDR", mailAddr);
-            info.AddValue("SER_MAILPRIORITY", priority);
-        }
-
-        #endregion
 
         public List<JobRule> GetBrokenRules()
         {
@@ -62,5 +49,20 @@ namespace MAD.JobSystemCore
         }
 
         #endregion
+
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+
+        }
     }
 }

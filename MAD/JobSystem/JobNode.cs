@@ -76,7 +76,30 @@ namespace MAD.JobSystemCore
             macAddress = PhysicalAddress.Parse(reader.GetAttribute("MAC"));
             name = reader.GetAttribute("Name");
 
-            // HERE WAR ICH
+            if (reader.Read() && reader.Name == "Jobs")
+                while (reader.Read() && reader.Name == "Job")
+                {
+                    // not nice but works for now ...
+
+                    Job _job = null;
+                    Job.JobType _type = (Job.JobType)Enum.Parse(typeof(Job.JobType), reader.GetAttribute("Type"));
+
+                    switch (_type)
+                    { 
+                        case Job.JobType.Ping:
+                            _job = new JobPing();
+                            _job.ReadXml(reader);
+                            break;
+
+                            // ...
+
+                        default:
+                            break;
+                    }
+                    _job.type = _type;
+
+                    jobs.Add(_job);
+                }
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
@@ -84,7 +107,6 @@ namespace MAD.JobSystemCore
             writer.WriteAttributeString("IP", ipAddress.ToString());
             writer.WriteAttributeString("MAC", macAddress.ToString());
             writer.WriteAttributeString("Name", name);
-
             writer.WriteStartElement("Jobs");
             foreach (Job _job in jobs)
                 _job.WriteXml(writer);

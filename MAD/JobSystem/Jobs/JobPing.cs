@@ -20,6 +20,10 @@ namespace MAD.JobSystemCore
 
         #region constructor
 
+        public JobPing()
+            : base(JobType.Ping)
+        { }
+
         public JobPing(string name)
             : base(name, JobType.Ping) 
         {
@@ -79,13 +83,14 @@ namespace MAD.JobSystemCore
 
         public override void ReadXmlJobSpec(System.Xml.XmlReader reader)
         {
-            base.ReadXmlJobSpec(reader);
+            if (reader.Read() && reader.Name == "TTL")
+                ttl = Int32.Parse(reader.GetAttribute("value"));
         }
 
         public override void WriteXmlJobSpec(System.Xml.XmlWriter writer)
         {
-            writer.WriteStartElement("PingJob");
-            writer.WriteElementString("TTL", ttl.ToString());
+            writer.WriteStartElement("TTL");
+            writer.WriteAttributeString("value", ttl.ToString());
             writer.WriteEndElement();
         }
 
