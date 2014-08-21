@@ -639,7 +639,7 @@ namespace MAD.CLICore
             // Set jobTime.
             _job.time = ParseJobTime(this);
             // Set notification.
-            _job.noti = ParseJobNotification(this, _job.outDesc);
+            _job.noti = ParseJobNotification(this);
 
             // Set job-specific settings.
             if (OParUsed("ttl"))
@@ -845,7 +845,6 @@ namespace MAD.CLICore
             // NOTIFICATION
             oPar.Add(new ParOption("mail", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
             oPar.Add(new ParOption("prio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("rule", "NOT.-RULE", "Add a rule to define when a notification should be sended.", false, true, new Type[] { typeof(string) }));
         }
 
         public static JobTime ParseJobTime(Command c)
@@ -875,7 +874,7 @@ namespace MAD.CLICore
             return _buffer;
         }
 
-        public static JobNotification ParseJobNotification(Command c, List<OutputDesc> outDesc)
+        public static JobNotification ParseJobNotification(Command c)
         {
             JobNotification _buffer = new JobNotification();
 
@@ -890,14 +889,6 @@ namespace MAD.CLICore
             {
                 string _arg = (string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0];
                 _buffer.priority = ParsePrio(_arg);
-            }
-
-            // PARSE RULES
-            if (c.OParUsed(JOB_NOTI_PAR))
-            {
-                object[] _args = c.pars.GetPar(JOB_NOTI_PAR).argValues;
-                for (int i = 0; i < _args.Length; i++)
-                    _buffer.rules.Add(ParseRule(outDesc, (string)_args[i]));
             }
 
             return _buffer;

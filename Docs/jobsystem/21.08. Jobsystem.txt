@@ -1,0 +1,39 @@
+Ich hatte die Idee den Jobs die Möglichkeit geben zu können, eigene 'OutDesciptors' und 'JobRules' zu definieren.
+
+Beispiel:
+
+	JobPing definiert den 'OutDescriptor' namens 'DeltaTime'. Jedes mal wen der Job ausgeführt wird,
+	wird 'DeltaTime' irgendwie berechnet (nicht wichtig wie) und dann setzt der Job
+	den 'OutDescriptor' auf den ausgerechneten Wert. Nach Abschluss der Ausführung des Jobs überprüft
+	der 'JobScedule' die OutDescriptoren und vergleicht sie mit den vordefinierten 'JobRules'. Sollte
+	mindestens eine Regel gebrochen sein, führt der 'JobScedule' eine Anfrage auf das 'NotificationSystem'
+	aus.
+
+	Die 'JobRule' für 'DeltaTime' könnte so definiert werden: Falls DeltaTime größer als 2000 ist, dann soll
+	eine Benachrichtigung erfolgen.
+
+So schön das auch klingen mag - es treten leider einige programmiertechnische Schwierigkeiten auf. 
+Eins der größten Probleme ist sicherlich die Serializierung, denn die 'JobRules' arbeiten mit Referenzen. 
+Sehr komplexe und große Ojekte sind schwierig zu serializieren - wenn dann auch noch Referenzen kreuz 
+und quer verlaufen - eine Sache der Unmöglichkeit.
+
+Es ist sicher möglich ein Objekt Teil für Teil zu serialisieren und dabei das Objekt in "der richtigen Reihenfolge"
+aufzubauen, damit Referenzen früh und richtig gesetzt werden können.
+
+Wie oben schon erwähnt: es ist schwierig, aber NICHT unmöglich. Der Code für die 'JobRules' und der 'OutDescriptors'
+habe ich schon geschrieben und auch das Parsen diese Objekte wurde erledigt. Aber ich bin auf dieses
+Serializierungs-Problem gestoßen und habe darüber nachgedacht diese Idee zu wegzulassen.
+
+Ich denke es würde reichen wenn eine Benachrichtigung erfolgt wenn der 'JobState' eines Jobs nicht das gewünschte
+Ergebnis liefert. Denn dann wird die Person benachrichtet und kann sich in der Datenbank erkundingen weshalb der
+Job das Ergebnis 'Failed' gebracht hat.
+
+Es beseteht kein Zweifel daran, dass die Variante mit den Regeln und 'OutDescriptors' für den Benutzer sicherlich
+einfacher und schöner ist, aber bei den gegebenen Umständen ist es mir nicht möglich diese Ideen umzusetzten.
+
+Lieber versuche ich meine anderen Bereichen auf Bugs zu untersuchen und die Effizenz zu verbessern, als das ich
+am Ende ein 'halb-funktionierendes' Programm habe. Derzeit liegt diese Idee auf Eis, sollte genügend Zeit 
+vorhanden sein und das Programm macht keine Schwierigkeiten - dann könnte ich es versuchen zu implementieren.
+
+Aber bis dahin -> Nette Idee; Umsetzung möglich, aber schwierig; falls genügend Zeit -> kann versucht werden zu
+implementieren. 

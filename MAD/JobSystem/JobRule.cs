@@ -7,6 +7,7 @@ namespace MAD
     public class JobRule : IXmlSerializable
     {
         public object obj;
+
         public object obj2;
         public Type type;
         public enum Operation { Equal, NotEqual, Bigger, Smaller}
@@ -14,9 +15,8 @@ namespace MAD
 
         public JobRule() { }
 
-        public JobRule(ref object obj, Type type, Operation oper , object obj2)
+        public JobRule(Type type, Operation oper , object obj2)
         {
-            this.obj = obj;
             this.type = type;
             this.oper = oper;
             this.obj2 = obj2;

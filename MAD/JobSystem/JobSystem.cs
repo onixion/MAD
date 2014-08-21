@@ -146,7 +146,6 @@ namespace MAD.JobSystemCore
                 _nodes.Clear();
         }
 
-        /// <returns>(IMPORANT: only use this reference as READ-ONLY)</returns>
         public JobNode GetNode(int id)
         {
             foreach (JobNode _node in _nodes)

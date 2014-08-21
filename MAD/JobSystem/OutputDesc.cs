@@ -2,7 +2,6 @@
 
 namespace MAD.JobSystemCore
 {
-    [Serializable()]
     public class OutputDesc
     {
         #region members
@@ -13,7 +12,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region constructor
+        #region constructors
 
         public OutputDesc()
         { }
@@ -22,6 +21,13 @@ namespace MAD.JobSystemCore
         {
             this.name = name;
             this.dataType = dataType;
+        }
+
+        public OutputDesc(string name, Type dataType, object dataObject)
+        {
+            this.name = name;
+            this.dataType = dataType;
+            this.dataObject = dataObject;
         }
 
         #endregion

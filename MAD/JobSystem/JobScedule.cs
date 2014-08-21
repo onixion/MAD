@@ -168,12 +168,16 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
-            List<JobRule> _broken = _job.noti.GetBrokenRules();
+            /*
+             * There are many difficulties in serialize/deserilize JobRules and
+             * OutDesc and therefor we use this condition to decide when
+             * a notification should be sended. Maybe we can find a 
+             * solution to solve this issue in future.
+             */
 
-            if (_broken.Count != 0)
+            if (_job.outState == Job.OutState.Exception || _job.outState == Job.OutState.Failed)
             { 
-                // RULE(S) BROKEN!
-            
+               // SEND NOTIFICATION
             }
 
             _job.state = Job.JobState.Waiting;

@@ -22,14 +22,16 @@ namespace MAD.JobSystemCore
         public enum OutState { NULL, Success, Failed, Exception }
         
         public string name { get; set; }
-
         public JobTime time { get; set; }
         public JobNotification noti { get; set; }
-        public List<OutputDesc> outDesc { get; set; }
 
-        public DateTime tStart;
-        public DateTime tStop;
-        public TimeSpan tSpan;
+        // Explanation for leaving those two out, can be found in 'JobScedule.cs'.
+        //public List<JobRule> rules { get; set; }
+        //public List<OutputDesc> outputs { get; set; }
+
+        public DateTime tStart { get; set; }
+        public DateTime tStop { get; set; }
+        public TimeSpan tSpan { get; set; }
 
         public JobType type = JobType.NULL;
         public JobState state = JobState.Inactive;
@@ -45,7 +47,6 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = new JobTime();
             this.noti = new JobNotification();
-            this.outDesc = new List<OutputDesc>();
         }
 
         protected Job(string name, JobType type)
@@ -55,7 +56,6 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = new JobTime();
             this.noti = new JobNotification();
-            this.outDesc = new List<OutputDesc>();
         }
 
         protected Job(string name, JobType type, JobTime time, JobNotification noti)
@@ -65,7 +65,6 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = time;
             this.noti = noti;
-            this.outDesc = new List<OutputDesc>();
         }
 
         #endregion
@@ -79,23 +78,6 @@ namespace MAD.JobSystemCore
                 _id = _jobsCount;
                 _jobsCount++;
             }
-        }
-
-        protected void SetOutput(string outDescName, object value)
-        {
-            OutputDesc _desc = GetOutputDesc(outDescName);
-            if (_desc != null)
-                _desc.dataObject = value;
-            else
-                throw new Exception("OutDescriptor not known!");
-        }
-
-        protected OutputDesc GetOutputDesc(string outDescName)
-        {
-            foreach (OutputDesc _desc in outDesc)
-                if (_desc.name == outDescName)
-                    return _desc;
-            return null;
         }
 
         public abstract void Execute(IPAddress targetAddress);

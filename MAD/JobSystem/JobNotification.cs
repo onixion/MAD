@@ -12,7 +12,6 @@ namespace MAD.JobSystemCore
 
         public MailAddress[] mailAddr { get; set; }
         public MailPriority priority { get; set; }
-        public List<JobRule> rules = new List<JobRule>();
 
         #endregion
 
@@ -33,19 +32,6 @@ namespace MAD.JobSystemCore
         {
             this.mailAddr = mailAddr;
             this.priority = priority;
-        }
-
-        #endregion
-
-        #region methodes
-
-        public List<JobRule> GetBrokenRules()
-        {
-            List<JobRule> _buffer = new List<JobRule>();
-            foreach (JobRule _temp in rules)
-                if (!_temp.CheckValidity())
-                    _buffer.Add(_temp);
-            return _buffer;
         }
 
         #endregion
