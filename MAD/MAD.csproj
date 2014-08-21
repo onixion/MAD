@@ -98,6 +98,7 @@
     <Compile Include="CLI\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
     <Compile Include="JobSystem\JSParser.cs" />
+    <Compile Include="Logging\Logger.cs" />
     <Compile Include="Mad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
