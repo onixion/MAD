@@ -5,6 +5,7 @@ using MAD.JobSystemCore;
 using MAD.CLICore;
 using MAD.CLIServerCore;
 using MAD.DHCPReader;
+using MAD.Logging;
 
 namespace MAD
 {
@@ -29,6 +30,11 @@ namespace MAD
             }
             else if (args.Length == 1)
             {
+                if (Logger.PathFileExists())
+                    Logger.ReadPathToLogFile();
+                else
+                    Logger.CreateNewPathFile();
+
                 switch (args[0])
                 {
                     case "-cli":
