@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
-using System.Numerics;
+using System.Xml;
 
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
@@ -67,9 +67,10 @@ namespace CLIClient
                         Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
                     }
 
-
                     /*
-                    RSAxParameters _par = RSAxUtils.GetRSAxParameters("GAYGAYGAY", _RSAModulusLength);
+                    RSA r = RSACryptoServiceProvider.Create(
+                    RSAParameters t = r.ExportParameters(true);
+                    RSAxParameters _par = new RSAxParameters(t, 2048);
                     RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
                     _rsaP.SendPacket();
                     _rsaP.Dispose();
@@ -87,9 +88,9 @@ namespace CLIClient
                         _loginP.SendPacket();
 
                     string _serverAnswer;
-                    using(DataPacket _dataP = new DataPacket(_stream, null))
+                    using(DataPacket _dataP2 = new DataPacket(_stream, null))
                     {
-                        _dataP.ReceivePacket();
+                        _dataP2.ReceivePacket();
                         _serverAnswer = Encoding.Unicode.GetString(_dataP.data);
                     }
   

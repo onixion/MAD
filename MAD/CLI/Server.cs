@@ -8,7 +8,7 @@ using MadNet;
 
 namespace MAD.CLIServerCore
 {
-    public abstract class CLIServerInternal
+    public abstract class Server
     {
         # region member
 

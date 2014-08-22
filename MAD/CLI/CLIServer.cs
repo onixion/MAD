@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
 
@@ -14,7 +13,7 @@ using MadNet;
 
 namespace MAD.CLIServerCore
 {
-    public class CLIServer : CLIServerInternal
+    public class CLIServer : Server
     {
         #region members
 
@@ -101,13 +100,14 @@ namespace MAD.CLIServerCore
                     throw new Exception("User already online!");
 
                 /*
+                // AES-KEY exchange
                 RSAPacket _rsaP = new RSAPacket(_stream, null);
                 _rsaP.ReceivePacket();
-                if (_rsaP.modulusLength != _ACCEPTED_RSA_MODULUS_LENGTH)
+                if (_rsaP.modulusLength != ACCEPTED_RSA_MODULUS_LENGTH)
                     throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
                 RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
                 _rsaP.Dispose();
-                string _aesPass = GenRandomPassUnicode(_AES_PASS_LENGTH);
+                string _aesPass = GenRandomPassUnicode(AES_PASS_LENGTH);
                 byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), true);
                 using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
                     _dataP.SendPacket();

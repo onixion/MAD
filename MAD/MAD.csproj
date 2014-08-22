@@ -74,7 +74,7 @@
     <Compile Include="CLI\Command.cs" />
     <Compile Include="CLI\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
-    <Compile Include="CLI\CLIServerInternal.cs" />
+    <Compile Include="CLI\Server.cs" />
     <Compile Include="DHCPReader\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
