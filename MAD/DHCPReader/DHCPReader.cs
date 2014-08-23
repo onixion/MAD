@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.Helper;
+using MAD.Logging;
 using MAD.JobSystemCore;
 
 using Amib.Threading; 
@@ -54,6 +55,7 @@ namespace MAD.DHCPReader
         {
             if (!_running)
             {
+                Logger.Log("MacFeeder started listening for Information", Logger.MessageType.INFORM);
                 _running = true;
                 _pool = new SmartThreadPool();
                 _check = new Thread(UpdateLists);
@@ -65,6 +67,7 @@ namespace MAD.DHCPReader
             }
             else
             {
+                Logger.Log("Tried to start MacFeeder, but was already running", Logger.MessageType.INFORM);
                 return "Is already running";
             }
         }
@@ -74,6 +77,8 @@ namespace MAD.DHCPReader
         {
             if (_running)
             {
+                Logger.Log("MacFeeder stopped listening for Information", Logger.MessageType.INFORM);
+
                 _running = false;
 
                 _pool.Cancel();
@@ -91,11 +96,15 @@ namespace MAD.DHCPReader
                 return null;
             }
             else
+            {
+                Logger.Log("Tried to stopp MacFeeder, but there wasn't any running", Logger.MessageType.INFORM);
                 return "Is already stopped";
-        }
+            }
+       }
 
         public void ChangeCheckIntervall(uint time)
         {
+            Logger.Log("Checkintervall for MacFeeder changed", Logger.MessageType.INFORM);
             _sleepFor = time; 
         }
 
