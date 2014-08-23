@@ -8,16 +8,19 @@ namespace MAD.Logging
     {
         public static string pathToLogFile;
 
-        public static enum MessageType
+        public enum MessageType
         {
             EMERGENCY,
             ERROR,
             WARNING,
-            MESSAGE,
             INFORM
         }
 
-        private static List<string> logMessages; 
+        private static List<string> logMessages = new List<string>();
+
+        private static readonly Object lockThis = new Object();
+
+        private static bool force = false; 
 
         public static bool PathFileExists()
         {
@@ -58,38 +61,52 @@ namespace MAD.Logging
 
         public static void Log(string message, MessageType type)
         {
-            string _buffer = ""; 
-            _buffer += DateTime.Now.ToString(); 
-
-            switch (type)
+            lock (lockThis)
             {
-                case MessageType.EMERGENCY:
-                    _buffer += " !EMERGENCY: ";
-                    break;
-                case MessageType.ERROR:
-                    _buffer += " ERROR: ";
-                    break;
-                case MessageType.INFORM:
-                    _buffer += " INFORMATION: ";
-                    break;
-                case MessageType.MESSAGE:
-                    _buffer += " MESSAGE: ";
-                    break;
-                case MessageType.WARNING:
-                    _buffer += " WARNING: ";
-                    break;
+                string _buffer = "";
+                _buffer += DateTime.Now.ToString();
+
+                switch (type)
+                {
+                    case MessageType.EMERGENCY:
+                        _buffer += " !EMERGENCY: ";
+                        break;
+                    case MessageType.ERROR:
+                        _buffer += " ERROR: ";
+                        break;
+                    case MessageType.INFORM:
+                        _buffer += " INFORMATION: ";
+                        break;
+                    case MessageType.WARNING:
+                        _buffer += " WARNING: ";
+                        break;
+                }
+
+                _buffer += message;
+
+                logMessages.Add(_buffer);
+
+                WriteToLog();
             }
-
-            _buffer += message;
-
-            logMessages.Add(_buffer);
-
-            WriteToLog();
         }
 
         private static void WriteToLog()
         {
+            if (logMessages.Count >= 20 || force)
+            {
+                lock (lockThis)
+                {
+                    File.AppendAllLines(pathToLogFile + @"/log.txt", logMessages.ToArray());
+                    logMessages.Clear();
+                }
+            }
+        }
 
+        public static void ForceWriteToLog()
+        {
+            force = true;
+            WriteToLog();
+            force = false;
         }
     }
 }
