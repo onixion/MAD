@@ -1,0 +1,20 @@
+v0.1
+
+Die Logger Klasse welche nun in das Projekt mit aufgenommen wurde, liefert die Mittel um eine saubere Logdatei führen zu
+können. Bei Programmstart wird überprüft ob eine Path Datei existiert. Diese MUSS im gleichen Ordner wie die Anwendung liegen.
+In der path Datei findet sich der Pfad welcher zu der Log Datei zeigt. Es wird noch ein Command geschrieben welches ermöglicht
+den Default Pfad zur LogDatei zu ändern. Der Default Pfad zeigt auf zwei Ebenen über der Executable. Der Logger funktioniert
+unter Unix und Windows jedoch nicht gleichzeitig.
+Um eine gewisse Ordnung zu gewährleisten wird die Wichtigkeit der LogMessages nach einem an syslog angelehnten System
+bewertet. Es gibt die Dringlichkeitsstufen Information, Warnung, Error und Emergency. Die Bedeutung wird im Folgenden 
+aufgeschlüsselt:
+Information: Dient für Mitteilungen die weder Fehler beinhalten noch von größerer Wichtigkeit sind. 
+Warnung: Dient für Warnungen an den System Administrator. Diese sind bereits beachtenswert. 
+Error: Dient zum Mitteilen von Fehlschlägen. 
+Emergency: Dient zum Mitteilen von Situationen in denen die Systemsicherheit gefährdet ist. Auch ein Programmabsturz zählt
+zu einem solchen Fall.
+
+Ebenfalls wird durch ein gewisses Buffern von LogNachrichten versucht, zu häufiges Öffnen der Log Datei zu vermeiden. Im
+Moment werden 20 Nachrichten gebuffert, das könnte aber noch an die Bedürfnisse angepasst werden. Damit gewährleistet ist, 
+dass dringende Nachrichten trotzdem mit genommen werden, gibt es jedoch eine Funktion die auch das Manuelle Schreiben auf die
+Log Datei gewährt ist.
