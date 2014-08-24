@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 
 using MAD.Helper;
+using MAD.Logging;
 
 namespace MAD.JobSystemCore
 {
@@ -16,7 +17,7 @@ namespace MAD.JobSystemCore
                                                                         
         public IPAddress Subnetmask;                                                                    
 
-        private List<IPAddress> _hostAddresses = new List<IPAddress>();
+        private static List<IPAddress> _hostAddresses = new List<IPAddress>();
         private NetworkHelper _helper = new NetworkHelper();
         private string _tmp = "";
 
@@ -42,6 +43,7 @@ namespace MAD.JobSystemCore
 
         public override void Execute(IPAddress targetAddress)
         {
+            Logger.Log("Started Host Detect..", Logger.MessageType.INFORM);
             byte[] _hostBytes = _helper.GetHosts(Subnetmask);
             //byte[] _netBytes = Net.GetAddressBytes();
             byte[] _netBytes = targetAddress.GetAddressBytes();
@@ -74,6 +76,7 @@ namespace MAD.JobSystemCore
                         if (!_hostAddresses.Contains(_reply.Address))
                         {
                             _hostAddresses.Add(_reply.Address);
+                            Logger.Log("HostDetect found new IP address", Logger.MessageType.INFORM);
                         }
                     }
 
