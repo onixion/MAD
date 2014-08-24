@@ -126,6 +126,11 @@ namespace MAD.CLICore
                 Oid ifDescr = new Oid(ifEntryString + ".2");
                 Oid ifType = new Oid(ifEntryString + ".3");
 
+                expectedIfNr = ParameterCountRequest(param, target);
+
+                if (expectedIfNr == 0)
+                    return "<color><red>ERROR: there are no Devices";
+
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
                 index.MaxRepetitions = (int)expectedIfNr;
@@ -198,6 +203,11 @@ namespace MAD.CLICore
                         break;
                 }
 
+                expectedIfNr = ParameterCountRequest(param, target);
+
+                if (expectedIfNr == 0)
+                    return "<color><red>ERROR: there are no Devices";
+
                 Oid ifIndex = new Oid(ifEntryString + ".1");
                 Oid ifDescr = new Oid(ifEntryString + ".2");
                 Oid ifType = new Oid(ifEntryString + ".3");
@@ -242,6 +252,52 @@ namespace MAD.CLICore
             {
                 return "ERROR: This is not a supported version of snmp";
             }
+        }
+
+        private uint ParameterCountRequest(AgentParameters param, UdpTarget target)
+        {
+            Oid deviceNr = new Oid(ifEntryString);
+            Pdu devices = new Pdu(PduType.Get);
+
+            devices.VbList.Add(deviceNr);
+
+            try
+            {
+                SnmpV2Packet devicesResult = (SnmpV2Packet)target.Request(devices, param);
+
+                if (devicesResult.Pdu.ErrorStatus != 0)
+                    return 0;
+                else
+                    return Convert.ToUInt32(devicesResult.Pdu.VbList[0].Value.ToString());
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
+        }
+
+        private uint ParameterCountRequest(SecureAgentParameters param, UdpTarget target)
+        {
+            Oid deviceNr = new Oid(ifEntryString);
+            Pdu devices = new Pdu(PduType.Get);
+
+            devices.VbList.Add(deviceNr);
+
+            try
+            {
+                SnmpV3Packet devicesResult = (SnmpV3Packet)target.Request(devices, param);
+
+                if (devicesResult.ScopedPdu.ErrorStatus != 0)
+                    return 0;
+                else
+                    return Convert.ToUInt32(devicesResult.ScopedPdu.VbList[0].Value.ToString());
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
         }
     }
 }
