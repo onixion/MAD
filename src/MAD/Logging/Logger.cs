@@ -8,6 +8,8 @@ namespace MAD.Logging
     {
         public static string pathToLogFile;
 
+        public static uint buffer = 20;
+
         public enum MessageType
         {
             EMERGENCY,
@@ -43,10 +45,22 @@ namespace MAD.Logging
         public static void CreateNewPathFile()
         {
             string _newPathToPathFile = Path.GetFullPath("./");
-            string _pathToLogFile = Path.Combine(Path.GetFullPath("./"), @"../../");
+            string _pathToLogFile = _newPathToPathFile;
             using (File.Create(_newPathToPathFile + @"/path.txt"));
 
-            using (StreamWriter sw = new StreamWriter(_newPathToPathFile + @"/path.txt"))
+            using (StreamWriter sw = new StreamWriter(_newPathToPathFile + @"/path.txt", false))
+                sw.WriteLine(_pathToLogFile);
+
+            pathToLogFile = _pathToLogFile;
+        }
+
+        public static void CreateNewPathFile(string pathExtension)
+        {
+            string _newPathToPathFile = Path.GetFullPath("./");
+            string _pathToLogFile = Path.Combine(Path.GetFullPath("./"), pathExtension);
+            using (File.Create(_newPathToPathFile + @"/path.txt")) ;
+
+            using (StreamWriter sw = new StreamWriter(_newPathToPathFile + @"/path.txt", false))
                 sw.WriteLine(_pathToLogFile);
 
             pathToLogFile = _pathToLogFile;
@@ -92,7 +106,7 @@ namespace MAD.Logging
 
         private static void WriteToLog()
         {
-            if (logMessages.Count >= 20 || force)
+            if (logMessages.Count >= buffer || force)
             {
                 lock (lockThis)
                 {
