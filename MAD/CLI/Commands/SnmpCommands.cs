@@ -30,7 +30,6 @@ namespace MAD.CLICore
         {
             rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("ip", "Target-IP", "Target.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("e", "INTERFACE-COUNT", "Expected number of interfaces.", false, false, new Type[] { typeof(uint) }));
             oPar.Add(new ParOption("p", "", "privPro", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("a", "", "authProt", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("s", "", "security", false, false, new Type[] { typeof(string) }));
@@ -122,10 +121,6 @@ namespace MAD.CLICore
             UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
 
             // if optional par is used.
-            if(OParUsed("e"))
-            {
-                expectedIfNr = (uint)pars.GetPar("e").argValues[0];
-            }
 
             // PARSE privProt
             
@@ -141,6 +136,11 @@ namespace MAD.CLICore
                 Oid ifIndex = new Oid(ifEntryString + ".1");
                 Oid ifDescr = new Oid(ifEntryString + ".2");
                 Oid ifType = new Oid(ifEntryString + ".3");
+
+                expectedIfNr = ParameterCountRequest(param, target);
+
+                if (expectedIfNr == 0)
+                    return "<color><red>ERROR: there are no Devices";
 
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
@@ -218,6 +218,11 @@ namespace MAD.CLICore
                         break;
                 }
 
+                expectedIfNr = ParameterCountRequest(param, target);
+
+                if (expectedIfNr == 0)
+                    return "<color><red>ERROR: there are no Devices";
+
                 Oid ifIndex = new Oid(ifEntryString + ".1");
                 Oid ifDescr = new Oid(ifEntryString + ".2");
                 Oid ifType = new Oid(ifEntryString + ".3");
@@ -266,6 +271,52 @@ namespace MAD.CLICore
                 Logger.Log("SNMP Request Error. Unsupported version of SNMP", Logger.MessageType.ERROR);
                 return "ERROR: This is not a supported version of snmp";
             }
+        }
+
+        private uint ParameterCountRequest(AgentParameters param, UdpTarget target)
+        {
+            Oid deviceNr = new Oid(ifEntryString);
+            Pdu devices = new Pdu(PduType.Get);
+
+            devices.VbList.Add(deviceNr);
+
+            try
+            {
+                SnmpV2Packet devicesResult = (SnmpV2Packet)target.Request(devices, param);
+
+                if (devicesResult.Pdu.ErrorStatus != 0)
+                    return 0;
+                else
+                    return Convert.ToUInt32(devicesResult.Pdu.VbList[0].Value.ToString());
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
+        }
+
+        private uint ParameterCountRequest(SecureAgentParameters param, UdpTarget target)
+        {
+            Oid deviceNr = new Oid(ifEntryString);
+            Pdu devices = new Pdu(PduType.Get);
+
+            devices.VbList.Add(deviceNr);
+
+            try
+            {
+                SnmpV3Packet devicesResult = (SnmpV3Packet)target.Request(devices, param);
+
+                if (devicesResult.ScopedPdu.ErrorStatus != 0)
+                    return 0;
+                else
+                    return Convert.ToUInt32(devicesResult.ScopedPdu.VbList[0].Value.ToString());
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
         }
     }
 }
