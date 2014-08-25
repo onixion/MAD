@@ -85,11 +85,11 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
-    <Compile Include="DB_Table_Info.cs" />
+    <Compile Include="DB\DB_Table_Info.cs" />
     <Compile Include="DHCPReader\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
-    <Compile Include="JobNotification.cs" />
+    <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobOutput.cs" />
     <Compile Include="JobSystem\JobRule.cs" />
     <Compile Include="JobSystem\Job.cs" />
