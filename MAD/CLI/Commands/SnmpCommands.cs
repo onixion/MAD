@@ -2,6 +2,7 @@
 using System.Net;
 
 using MAD.Helper;
+using MAD.Logging;
 using MAD.JobSystemCore;
 using SnmpSharpNet;
 
@@ -47,20 +48,30 @@ namespace MAD.CLICore
                 {
                     case "authNoPriv":
                         security = NetworkHelper.securityLvl.authNoPriv;
-                        if(!(OParUsed("a") && !OParUsed("p")))
+                        if (!(OParUsed("a") && !OParUsed("p")))
+                        {
+                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
                             return "<color><red>ERROR: Wrong Parameters";
+                        }
                         break;
                     case "authPriv":
                         security = NetworkHelper.securityLvl.authPriv;
                         if (!(OParUsed("a") && OParUsed("p")))
+                        {
+                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
                             return "<color><red>ERROR: Wrong Parameters";
+                        }
                         break;
                     case "noAuthNoPriv":
                         security = NetworkHelper.securityLvl.noAuthNoPriv;
                         if (!(!OParUsed("a") && !OParUsed("p")))
+                        {
+                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
                             return "<color><red>ERROR: Wrong Parameters";
+                        }
                         break;
                     default:
+                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
                         return "<color><red>ERROR";
                 }
 
@@ -74,6 +85,7 @@ namespace MAD.CLICore
                         privProt = NetworkHelper.snmpProtokolls.DES;
                         break;
                     default:
+                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
                         return "<color><red>ERROR:";
                 }
 
@@ -89,6 +101,7 @@ namespace MAD.CLICore
                         authProt = NetworkHelper.snmpProtokolls.SHA;
                         break;
                     default:
+                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
                         return "<color><red>ERROR:";
                 }
 
@@ -97,9 +110,12 @@ namespace MAD.CLICore
             }
 
             // PARSE ip
-            
+
             if (!IpAddress.IsIP(_buffer))
+            {
+                Logger.Log("SNMP device Request has problems with Parsing IPAddress", Logger.MessageType.ERROR); 
                 return "<color><red>Could not parse ip-address!";
+            }
             else
                 targetIP = IPAddress.Parse(_buffer);
 
@@ -146,6 +162,7 @@ namespace MAD.CLICore
 
                     if (indexResult.Pdu.ErrorStatus != 0 || descrResult.Pdu.ErrorStatus != 0 || typeResult.Pdu.ErrorStatus != 0)
                     {
+                        Logger.Log("SNMP Request Error", Logger.MessageType.ERROR);
                         return "<color><red>ERROR: packet error status = " + indexResult.Pdu.ErrorStatus.ToString() + " and not ZERO";
                     }
                     else
@@ -154,11 +171,13 @@ namespace MAD.CLICore
                         {
                             _output += "Interface " + indexResult.Pdu.VbList[i].Value.ToString() + ": Type " + typeResult.Pdu.VbList[i].Value.ToString() + " -> " + descrResult.Pdu.VbList[i].Value.ToString() + "\n";
                         }
+                        Logger.Log("Successfully performed SNMP Device Request", Logger.MessageType.INFORM);
                         return _output; 
                     }
                 }
                 catch (Exception)
                 {
+                    Logger.Log("SNMP Request Error", Logger.MessageType.ERROR);
                     return "<color><red>ERROR: sending requests failed";
                 }
             }
@@ -169,6 +188,7 @@ namespace MAD.CLICore
 
                 if (!target.Discovery(param))
                 {
+                    Logger.Log("SNMP Request was not able to syncronize", Logger.MessageType.ERROR);
                     return "<color><red>ERROR: Client was not able to syncronize with Agend";
                 }
 
@@ -222,6 +242,7 @@ namespace MAD.CLICore
 
                     if (indexResult.ScopedPdu.ErrorStatus != 0 || descrResult.ScopedPdu.ErrorStatus != 0 || typeResult.ScopedPdu.ErrorStatus != 0)
                     {
+                        Logger.Log("SNMP Request Error", Logger.MessageType.ERROR);
                         return "<color><red>ERROR: packet error status = " + indexResult.ScopedPdu.ErrorStatus.ToString() + " and not ZERO";
                     }
                     else
@@ -230,16 +251,19 @@ namespace MAD.CLICore
                         {
                             _output += "Interface " + indexResult.ScopedPdu.VbList[i].Value.ToString() + ": Type " + typeResult.ScopedPdu.VbList[i].Value.ToString() + " -> " + descrResult.ScopedPdu.VbList[i].Value.ToString() + "\n";
                         }
+                        Logger.Log("Successfully performed SNMP Device Request", Logger.MessageType.INFORM);
                         return _output;
                     }
                 }
                 catch (Exception)
                 {
+                    Logger.Log("SNMP Request Error", Logger.MessageType.ERROR);
                     return "<color><red>ERROR: sending requests failed";
                 }
             }
             else
             {
+                Logger.Log("SNMP Request Error. Unsupported version of SNMP", Logger.MessageType.ERROR);
                 return "ERROR: This is not a supported version of snmp";
             }
         }

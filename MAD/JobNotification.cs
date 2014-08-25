@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
-namespace MAD
+namespace MAD.JobSystemCore
 {
     public class JobNotification
     {
