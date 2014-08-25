@@ -85,8 +85,8 @@ namespace MAD.JobSystemCore
                 catch (Exception)
                 {
                     outState = OutState.Exception;
+                    Logger.Log("HostDetect threw a exception", Logger.MessageType.ERROR);
                 }
-
                 _ping.Dispose();
             }
 
