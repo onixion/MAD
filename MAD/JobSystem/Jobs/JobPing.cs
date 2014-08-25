@@ -2,18 +2,19 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
     public class JobPing : Job
     {
         #region members
 
+        [JsonIgnore]
         private Ping _ping = new Ping();
         public int ttl { get; set; }
+        [JsonIgnore]
         public bool dontFragment = true;
 
         #endregion
@@ -74,19 +75,6 @@ namespace MAD.JobSystemCore
             _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
 
             return _temp;
-        }
-
-        public override void ReadXmlJobSpec(XmlReader reader)
-        {
-            if (reader.Read() && reader.Name == "TTL")
-                ttl = Int32.Parse(reader.GetAttribute("value"));
-        }
-
-        public override void WriteXmlJobSpec(XmlWriter writer)
-        {
-            writer.WriteStartElement("TTL");
-            writer.WriteAttributeString("value", ttl.ToString());
-            writer.WriteEndElement();
         }
 
         #endregion

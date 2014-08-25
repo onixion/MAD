@@ -4,40 +4,101 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
+using Newtonsoft.Json;
+
 namespace MAD.JobSystemCore
 {
     // This class is used by the JobSystem to load and save nodes.
-    // JobNodes into files.
 
     public static class JSSerializer
     {
         private static object _serializerLock = new object();
-        private static XmlSerializer _ser;
 
-        public static void Serialize(string fileName, object objectToSave)
+        public static void SerializeNode(string fileName, JobNode node)
         {
             lock (_serializerLock)
-                using (FileStream _stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
-                {
-                    //BinaryFormatter _bf = new BinaryFormatter();
-                    //_bf.Serialize(_stream, objectToSave);
-
-                    _ser = new XmlSerializer(objectToSave.GetType());
-                    _ser.Serialize(_stream, objectToSave);
-                }
+            {
+                JsonSerializerSettings _settings = new JsonSerializerSettings();
+                _settings.Converters.Add(new IPAddressConverter());
+                _settings.Converters.Add(new MacAddressConverter());
+                _settings.TypeNameHandling = TypeNameHandling.Auto;
+                Serialize(fileName, node, _settings);
+            }
         }
 
-        public static object Deserialize(string fileName, Type objectType)
+        public static JobNode DeserializeNode(string fileName)
         {
             lock (_serializerLock)
-                using (FileStream _stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    //BinaryFormatter _bf = new BinaryFormatter();
-                    //return _bf.Deserialize(_stream);
+            {
+                JsonSerializerSettings _settings = new JsonSerializerSettings();
+                _settings.Converters.Add(new IPAddressConverter());
+                _settings.Converters.Add(new MacAddressConverter());
+                _settings.TypeNameHandling = TypeNameHandling.Auto;
+                return (JobNode)Deserialize(fileName, typeof(JobNode), _settings);
+            }
+        }
 
-                    _ser = new XmlSerializer(objectType);
-                    return _ser.Deserialize(_stream);
-                }
+        public static void Serialize(string fileName, object objectToSave, JsonSerializerSettings settings)
+        {
+            using (FileStream _stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (StreamWriter _writer = new StreamWriter(_stream))
+                _writer.Write(JsonConvert.SerializeObject(objectToSave, Formatting.Indented, settings));
+        }
+
+        public static object Deserialize(string fileName, Type objectType, JsonSerializerSettings settings)
+        {
+            using (FileStream _stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.None))
+            using (StreamReader _reader = new StreamReader(_stream))
+                return JsonConvert.DeserializeObject(_reader.ReadToEnd(), objectType, settings);
+        }
+    }
+
+    /*
+     * These classes are needed because there are some classes in NET (IPAddress, IPEndPoint, ...), which
+     * are not serialize-friendly. Therefore we need to created for these types of classes custom converters.
+     */
+
+    public class IPAddressConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            if (objectType == typeof(System.Net.IPAddress))
+                return true;
+            else
+                return false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            System.Net.IPAddress _ip = (System.Net.IPAddress)value;
+            writer.WriteValue(_ip.ToString());
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return System.Net.IPAddress.Parse((string)reader.Value);
+        }
+    }
+
+    public class MacAddressConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            if (objectType == typeof(System.Net.NetworkInformation.PhysicalAddress))
+                return true;
+            else
+                return false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            System.Net.NetworkInformation.PhysicalAddress _mac = (System.Net.NetworkInformation.PhysicalAddress)value;
+            writer.WriteValue(_mac.ToString());
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return System.Net.NetworkInformation.PhysicalAddress.Parse((string)reader.Value);
         }
     }
 }

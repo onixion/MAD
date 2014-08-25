@@ -75,7 +75,8 @@ Now using the TcpListener and TcpClient)
 [20.08.2014][18:00-21:00][3h][163h] still working on xml-serializer ..
 [21.08.2014][10:00-12:00][2h][165h] still working on xml-serializer ..
 
-(NOTE: XML-Serilizer is really difficult. Looked around for an alternativ and found Json. But i will not change
-XML, because then i have to re-write many files ...)
+(NOTE: XML-Serilizer is really difficult. Looked around for an alternativ and found Json. I am thinking of
+replacing Xml-Serializer with Json-Serializer, because Json is much easier to use.)
 
 [21.08.2014][13:00-14:00][1h][166h] CleanCoding ... Decided to remove JobRule and OutDesc ...
+[25.08.2014][11:00-15:00][4h][170h] Xml-Serializer replaced by Json-Serializer.

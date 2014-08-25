@@ -1,0 +1,1 @@
+25.08.2014 12:40:01 INFORMATION: Programm Start. CLI Server Start.

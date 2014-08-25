@@ -54,6 +54,10 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="SnmpSharpNet">
       <HintPath>..\SnmpSharpNet-bin-0-9-4\Release\SnmpSharpNet.dll</HintPath>
     </Reference>
@@ -97,7 +101,6 @@
     <Compile Include="CLI\Commands\JobSystemCommands.cs" />
     <Compile Include="CLI\CLISession.cs" />
     <Compile Include="CLI\Commands\CLICommands.cs" />
-    <Compile Include="JobSystem\JSParser.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Mad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

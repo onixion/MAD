@@ -200,15 +200,15 @@ namespace MAD.JobSystemCore
         public void SaveNode(string fileName, int nodeId)
         {
             JobNode _node = GetNode(nodeId);
-            if(_node != null)
-                JSSerializer.Serialize(fileName, _node);
+            if (_node != null)
+                JSSerializer.SerializeNode(fileName, _node);
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
 
         public JobNode LoadNode(string fileName)
         {
-            return (JobNode)JSSerializer.Deserialize(fileName, typeof(JobNode));
+            return JSSerializer.DeserializeNode(fileName);
         }
 
         #endregion

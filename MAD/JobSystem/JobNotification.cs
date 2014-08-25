@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
-using System.Xml.Serialization;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable()]
-    public class JobNotification : IXmlSerializable
+    public class JobNotification
     {
         #region members
 
@@ -35,20 +33,5 @@ namespace MAD.JobSystemCore
         }
 
         #endregion
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(System.Xml.XmlReader reader)
-        {
-
-        }
-
-        public void WriteXml(System.Xml.XmlWriter writer)
-        {
-
-        }
     }
 }

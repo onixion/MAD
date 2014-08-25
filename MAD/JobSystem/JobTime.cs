@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Serialization;
+
+using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable()]
-    public class JobTime : IXmlSerializable
+    public class JobTime
     {
         #region members
 
@@ -233,55 +232,10 @@ namespace MAD.JobSystemCore
                 return "NULL";
         }
 
-        #region for xml-serialization
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            if (reader.Read() && reader.Name == "JobTime")
-            {
-                type = (TimeMethod)Enum.Parse(typeof(TimeMethod), reader.GetAttribute("TimeMethod"));
-                if (type == TimeMethod.Absolute)
-                {
-                    while (reader.Read() && reader.Name == "Time")
-                    {
-                        JobTimeHandler _time = new JobTimeHandler();
-                        _time.timeType = (JobTimeHandler.TimeType)Enum.Parse((typeof(JobTimeHandler.TimeType)), reader.GetAttribute("Type"));
-                        _time.ReadXml(reader);
-                        jobTimes.Add(_time);
-                    }
-                }
-                else
-                {
-                    jobDelay.ReadXml(reader);
-                    reader.Read();
-                }
-            }
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteStartElement("JobTime");
-            writer.WriteAttributeString("TimeMethod", type.ToString());
-            if (type == TimeMethod.Absolute)
-                foreach (JobTimeHandler _time in jobTimes)
-                    _time.WriteXml(writer);
-            else
-                jobDelay.WriteXml(writer);
-            writer.WriteEndElement();
-        }
-
-        #endregion
-
         #endregion
     }
 
-    [Serializable()]
-    public class JobTimeHandler : IXmlSerializable
+    public class JobTimeHandler
     {
         #region members
 
@@ -294,11 +248,11 @@ namespace MAD.JobSystemCore
         public int hour { get; set; }
         public int minute { get; set; }
 
-        [XmlIgnoreAttribute]
+        [JsonIgnore]
         private bool _blockSignal = false;
+        [JsonIgnore]
         public bool blockSignal { get { return _blockSignal; } }
-
-        [XmlIgnoreAttribute]
+        [JsonIgnore]
         public int minuteAtBlock = 100;
         
         #endregion
@@ -410,125 +364,18 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region for xml-serialization only
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            switch (timeType)
-            {
-                case TimeType.Daily:
-                    ReadXmlDaily(reader);
-                    break;
-                case TimeType.Monthly:
-                    ReadXmlMonthly(reader);
-                    break;
-                case TimeType.Yearly:
-                    ReadXmlYearly(reader);
-                    break;
-                case TimeType.Unique:
-                    ReadXmlUnique(reader);
-                    break;
-                case TimeType.NULL:
-                    break;
-            }
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteStartElement("Time");
-            writer.WriteAttributeString("Type", timeType.ToString());
-
-            switch (timeType)
-            { 
-                case TimeType.Daily:
-                    WriteXmlDaily(writer);
-                    break;
-                case TimeType.Monthly:
-                    WriteXmlMonthly(writer);
-                    break;
-                case TimeType.Yearly:
-                    WriteXmlYearly(writer);
-                    break;
-                case TimeType.Unique:
-                    WriteXmlUnique(writer);
-                    break;
-                case TimeType.NULL:
-                    break;
-            }
-
-            writer.WriteEndElement();
-        }
-
-        private void WriteXmlDaily(XmlWriter writer)
-        {
-            writer.WriteAttributeString("Hour", hour.ToString());
-            writer.WriteAttributeString("Minute", minute.ToString());
-        }
-
-        private void WriteXmlMonthly(XmlWriter writer)
-        {
-            WriteXmlDaily(writer);
-            writer.WriteAttributeString("Day", day.ToString());
-        }
-
-        private void WriteXmlYearly(XmlWriter writer)
-        {
-            WriteXmlMonthly(writer);
-            writer.WriteAttributeString("Month", month.ToString());
-        }
-
-        private void WriteXmlUnique(XmlWriter writer)
-        {
-            WriteXmlYearly(writer);
-            writer.WriteAttributeString("Year", year.ToString());
-        }
-
-        private void ReadXmlDaily(XmlReader reader)
-        {
-            hour = Int32.Parse(reader.GetAttribute("Hour"));
-            minute = Int32.Parse(reader.GetAttribute("Minute"));
-        }
-
-        private void ReadXmlMonthly(XmlReader reader)
-        {
-            ReadXmlDaily(reader);
-            day = Int32.Parse(reader.GetAttribute("Day"));
-        }
-
-        private void ReadXmlYearly(XmlReader reader)
-        {
-            ReadXmlMonthly(reader);
-            month = Int32.Parse(reader.GetAttribute("Month"));
-        }
-
-        private void ReadXmlUnique(XmlReader reader)
-        {
-            ReadXmlYearly(reader);
-            year = Int32.Parse(reader.GetAttribute("Year"));
-        }
-
-        #endregion
-
         #endregion
     }
 
-    [Serializable()]
     public class JobDelayHandler
     {
         #region members
 
-        [XmlElement(ElementName = "DelayTime")]
         private int _delayTime;
-        [XmlIgnore]
+        [JsonIgnore]
         public int delayTime { get { return _delayTime; } }
-        [XmlIgnore]
         private int _delayTimeRemaining { get; set; }
-        [XmlIgnore]
+        [JsonIgnore]
         public int delayTimeRemaining { get { return _delayTimeRemaining; } }
 
         #endregion
@@ -565,28 +412,6 @@ namespace MAD.JobSystemCore
         {
             _delayTimeRemaining = _delayTimeRemaining - deltaTime;
         }
-
-        #region for xml-serialization only
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            if (reader.Read() && reader.Name == "DelayTime")
-                _delayTime = Int32.Parse(reader.GetAttribute("value"));
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteStartElement("DelayTime");
-            writer.WriteAttributeString("value", _delayTime.ToString());
-            writer.WriteEndElement();
-        }
-
-        #endregion
 
         #endregion
     }

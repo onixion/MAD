@@ -4,17 +4,23 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Serialization;
 
+using Newtonsoft.Json;
+
 namespace MAD.JobSystemCore
 {
-    [Serializable]
-    public abstract class Job : IXmlSerializable
+    public abstract class Job
     {
         #region members
 
+        [JsonIgnore]
         public object jobLock = new object();
-        private static int _jobsCount = 0;
+        [JsonIgnore]
         private static object _idLock = new object();
+        [JsonIgnore]
+        private static int _jobsCount = 0;
+        [JsonIgnore]
         private int _id;
+        [JsonIgnore]
         public int id { get { return _id; } }
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
@@ -34,7 +40,9 @@ namespace MAD.JobSystemCore
         public TimeSpan tSpan { get; set; }
 
         public JobType type = JobType.NULL;
+        [JsonIgnore]
         public JobState state = JobState.Inactive;
+        [JsonIgnore]
         public OutState outState = OutState.NULL;
 
         #endregion
@@ -120,43 +128,6 @@ namespace MAD.JobSystemCore
         }
 
         protected abstract string JobStatus();
-
-        #endregion
-
-        #region for serialization only
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(XmlReader reader)
-        {
-            name = reader.GetAttribute("Name");
-
-            time.ReadXml(reader);
-
-            if (reader.Read() && reader.Name == "Settings")
-                ReadXmlJobSpec(reader);
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            writer.WriteStartElement("Job");
-            writer.WriteAttributeString("Name", name);
-            writer.WriteAttributeString("Type", type.ToString());
-
-            time.WriteXml(writer);
-
-            writer.WriteStartElement("Settings");
-            WriteXmlJobSpec(writer);
-            writer.WriteEndElement();
-            writer.WriteEndElement();
-        }
-
-        public virtual void ReadXmlJobSpec(XmlReader reader) { }
-
-        public virtual void WriteXmlJobSpec(XmlWriter writer) { }
 
         #endregion
 
