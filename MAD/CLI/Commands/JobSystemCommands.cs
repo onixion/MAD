@@ -487,7 +487,8 @@ namespace MAD.CLICore
             JobServiceCheck _job = new JobServiceCheck();
 
             _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.type = Job.JobType.ServiceCheck;
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotification(this);
 
             _job.arg = (string)pars.GetPar("s").argValues[0];
 
@@ -496,46 +497,9 @@ namespace MAD.CLICore
             if (OParUsed("p"))
                 _job.password = (string)pars.GetPar("p").argValues[0];
 
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeMethod.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeMethod.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeMethod.Relative;
-            }
-
             int _nodeID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.AddJobToNode(_nodeID, _job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-            }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
 
@@ -556,55 +520,17 @@ namespace MAD.CLICore
             JobHostDetect _job = new JobHostDetect();
 
             _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.type = Job.JobType.HostDetect;
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotification(this);
 
-            //_job. = (IPAddress)pars.GetPar("a").argValues[0]; Not necessary anymore
             _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
 
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeMethod.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeMethod.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeMethod.Relative;
-            }
-
             int _nodeID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.AddJobToNode(_nodeID, _job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-            }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
 
-    // TESTING JOBNOTIFICATION ON THIS COMMAND!
     public class JobSystemAddPingCommand : JobCommand
     {
         private JobSystem _js;
@@ -620,9 +546,11 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)pars.GetPar("n").argValues[0];
-            JobPing _job = new JobPing(jobName);
+            // Create an empty job.
+            JobPing _job = new JobPing();
 
+            // Set name.
+            _job.name = (string)pars.GetPar("n").argValues[0];
             // Set jobTime.
             _job.time = ParseJobTime(this);
             // Set notification.
@@ -653,58 +581,17 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)pars.GetPar("n").argValues[0];
-
             JobHttp _job = new JobHttp();
 
-            _job.name = jobName;
-            _job.type = Job.JobType.Http;
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotification(this);
 
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeMethod.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeMethod.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeMethod.Relative;
-            }
-
-            if (OParUsed("p"))
-            {
-                _job.port = (int)pars.GetPar("p").argValues[0];
-            }
+            _job.port = (int)pars.GetPar("p").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.AddJobToNode(_nodeID, _job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-            }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
 
@@ -716,60 +603,22 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("p", "PORT", "Port of the target.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)pars.GetPar("n").argValues[0];
-            int port = (int)pars.GetPar("p").argValues[0];
-
             JobPort _job = new JobPort();
 
-            _job.name = jobName;
-            _job.type = Job.JobType.PortScan;
-            _job.port = port;
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotification(this);
 
-            if (OParUsed("t"))
-            {
-                Type _argType = GetArgType("t");
-
-                if (_argType == typeof(int))
-                {
-                    _job.time.type = JobTime.TimeMethod.Relative;
-                    _job.time.jobDelay = new JobDelayHandler((int)pars.GetPar("t").argValues[0]);
-                }
-                else if (_argType == typeof(string))
-                {
-                    _job.time.type = JobTime.TimeMethod.Absolute;
-
-                    try
-                    {
-                        _job.time.jobTimes = JobTime.ParseStringArray(pars.GetPar("t").argValues);
-                    }
-                    catch (Exception e)
-                    {
-                        return e.Message;
-                    }
-                }
-            }
-            else
-            {
-                _job.time.jobDelay = new JobDelayHandler(20000);
-                _job.time.type = JobTime.TimeMethod.Relative;
-            }
+            _job.port = (int)pars.GetPar("p").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.AddJobToNode(_nodeID, _job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-            }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
 
@@ -781,32 +630,22 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-
             rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string jobName = (string)pars.GetPar("n").argValues[0];
-
             JobSnmp _job = new JobSnmp();
 
-            _job.name = jobName;
-            _job.type = Job.JobType.SnmpCheck;
-
+            _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotification(this);
+
+            _job.version = (uint)pars.GetPar("ver").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.AddJobToNode(_nodeID, _job);
-                return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-            }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
 
@@ -867,20 +706,32 @@ namespace MAD.CLICore
 
             // PARSE MAILADDRESSES
             if (c.OParUsed(JOB_NOTI_MAIL))
-            {
-                MailAddress[] _mails = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
-            }
+                _buffer.mailAddr = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
 
             // PARSE PRIO
             if (c.OParUsed(JOB_NOTI_PRIO))
-            {
-                string _arg = (string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0];
-                _buffer.priority = ParsePrio(_arg);
-            }
+                _buffer.priority = ParsePrio((string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0]);
 
             return _buffer;
         }
 
+        public static MailPriority ParsePrio(string text)
+        {
+            text = text.ToLower();
+            switch (text)
+            {
+                case "low":
+                    return MailPriority.Low;
+                case "normal":
+                    return MailPriority.Normal;
+                case "high":
+                    return MailPriority.High;
+                default:
+                    throw new Exception("Could not parse '" + text + "' to a mail-priority!");
+            }
+        }
+
+        // NOT USED
         public static JobRule ParseRule(List<OutputDesc> outDesc, string data)
         {
             JobRule _rule = new JobRule();
@@ -955,21 +806,6 @@ namespace MAD.CLICore
             return null;
         }
 
-        public static MailPriority ParsePrio(string text)
-        {
-            text = text.ToLower();
-            switch (text)
-            {
-                case "low":
-                    return MailPriority.Low;
-                case "normal":
-                    return MailPriority.Normal;
-                case "high":
-                    return MailPriority.High;
-                default:
-                    throw new Exception("Could not parse '" + text + "' to a mail-priority!");
-            }
-        }
     }
 
     #endregion
