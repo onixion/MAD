@@ -1,0 +1,11 @@
+//Information of Account for Testing Usage
+
+Vorname: Maalda
+Nachname: Group
+eMail: mad.group@outlook.com
+Pw: Mad-21436587
+Land: ÖE
+PLZ: 6020
+Geb.: 01.01.1995
+Sex: Male
+Alt. eMail: manpreet.singh@students.htlinn.ac.at
