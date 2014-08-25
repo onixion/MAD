@@ -13,6 +13,10 @@ namespace MAD.JobSystemCore
         public string username; //required parameter
         public string password; //required parameter
 
+        public JobCheckFtp()
+            : base(JobType.ServiceCheck)
+        { }
+
         protected override string JobStatus()
         {
             string _tmp = "";
@@ -20,12 +24,12 @@ namespace MAD.JobSystemCore
             if (working)
             {
                 _tmp += "FTP is working";
-                outState = OutState.Success;
+                outp.outState = JobOutput.OutState.Success;
             }
             else
             {
                 _tmp += "FTP seems to be dead";
-                outState = OutState.Failed;
+                outp.outState = JobOutput.OutState.Failed;
             }
 
             return (_tmp);

@@ -7,9 +7,8 @@ using SnmpSharpNet;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
-    public class JobServiceCheck : Job
-    {
+    //public class JobServiceCheck : Job
+    //{
         /*
         #region members
 
@@ -181,5 +180,5 @@ namespace MAD.JobSystemCore
 
         #endregion
          * */
-    }
+    //}
 }

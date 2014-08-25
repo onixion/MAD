@@ -457,7 +457,9 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            JobServiceCheck _job = new JobServiceCheck();
+            // WORKING ON THIS
+
+            /*JobServiceCheck _job = new JobServiceCheck();
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
@@ -472,7 +474,8 @@ namespace MAD.CLICore
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";*/
+            return null;
         }
     }
 
