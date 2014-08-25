@@ -25,15 +25,9 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHostDetect()
-            : base("NULL", JobType.HostDetect, new JobTime(), new JobNotification())
+            : base(JobType.HostDetect)
         {
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
-        }
-
-        public JobHostDetect(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, IPAddress Subnetmask)
-            : base(jobName, jobType, jobTime, noti)
-        {
-            this.Subnetmask = Subnetmask;
         }
 
         #endregion
@@ -77,11 +71,11 @@ namespace MAD.JobSystemCore
                         }
                     }
 
-                    outState = OutState.Success;
+                    outp.outState = JobOutput.OutState.Success;
                 }
                 catch (Exception)
                 {
-                    outState = OutState.Exception;
+                    outp.outState = JobOutput.OutState.Exception;
                 }
 
                 _ping.Dispose();

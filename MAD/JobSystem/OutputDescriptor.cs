@@ -2,7 +2,7 @@
 
 namespace MAD.JobSystemCore
 {
-    public class OutputDesc
+    public class OutputDescriptor
     {
         #region members
 
@@ -14,16 +14,16 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        public OutputDesc()
+        public OutputDescriptor()
         { }
 
-        public OutputDesc(string name, Type dataType)
+        public OutputDescriptor(string name, Type dataType)
         {
             this.name = name;
             this.dataType = dataType;
         }
 
-        public OutputDesc(string name, Type dataType, object dataObject)
+        public OutputDescriptor(string name, Type dataType, object dataObject)
         {
             this.name = name;
             this.dataType = dataType;

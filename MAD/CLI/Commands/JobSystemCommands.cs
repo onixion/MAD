@@ -342,7 +342,7 @@ namespace MAD.CLICore
                     _tableRow[4] = _temp2.state.ToString();
                     _tableRow[5] = _temp2.time.type.ToString();
                     _tableRow[6] = _temp2.time.GetValues();
-                    _tableRow[7] = _temp2.outState.ToString();
+                    _tableRow[7] = _temp2.outp.outState.ToString();
                     output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                 }
             return output;
@@ -392,17 +392,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.StartJob(_jobID);
-                return "<color><green>Job is active.";
-            }
-            catch(Exception e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.StartJob((int)pars.GetPar("id").argValues[0]);
+            return "<color><green>Job is active.";
         }
     }
 
@@ -419,17 +410,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.StopJob(_jobID);
-                return "<color><green>Job is inactive.";
-            }
-            catch (Exception e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.StopJob((int)pars.GetPar("id").argValues[0]);
+            return "<color><green>Job is inactive.";
         }
     }
 
@@ -446,17 +428,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            int _jobID = (int)pars.GetPar("id").argValues[0];
-
-            try
-            {
-                _js.RemoveJob(_jobID);
-                return "<color><green>Job removed.";
-            }
-            catch (Exception e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.RemoveJob((int)pars.GetPar("id").argValues[0]);
+            return "<color><green>Job removed.";
         }
     }
 
@@ -704,6 +677,15 @@ namespace MAD.CLICore
         {
             JobNotification _buffer = new JobNotification();
 
+
+
+            return _buffer;
+        }
+
+        public static JobNotificationSettings ParseJobNotificationSettings(Command c)
+        {
+            JobNotificationSettings _buffer = new JobNotificationSettings();
+
             // PARSE MAILADDRESSES
             if (c.OParUsed(JOB_NOTI_MAIL))
                 _buffer.mailAddr = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
@@ -732,7 +714,8 @@ namespace MAD.CLICore
         }
 
         // NOT USED
-        public static JobRule ParseRule(List<OutputDesc> outDesc, string data)
+        /*
+        public static JobRule ParseRule(List<OutputDescriptor> outDesc, string data)
         {
             JobRule _rule = new JobRule();
             bool _operatorKnown = false;
@@ -792,20 +775,18 @@ namespace MAD.CLICore
 
             return _rule;
         }
-
         private static string[] SplitByOperator(string toSplit, string i)
         {
             return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
         }
-
-        public static OutputDesc GetOutDesc(List<OutputDesc> outDesc, string name)
+        public static OutputDescriptor GetOutDesc(List<OutputDescriptor> outDesc, string name)
         {
             foreach (OutputDesc _temp in outDesc)
                 if (_temp.name == name)
                     return _temp;
             return null;
         }
-
+         * */
     }
 
     #endregion

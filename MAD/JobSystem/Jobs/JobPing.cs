@@ -27,24 +27,6 @@ namespace MAD.JobSystemCore
             ttl = 200;
         }
 
-        public JobPing(string name)
-            : base(name, JobType.Ping) 
-        {
-            ttl = 200;
-        }
-
-        public JobPing(string name, JobType type, int ttl)
-            : base (name, type)
-        {
-            this.ttl = ttl;
-        }
-
-        public JobPing(string name, JobType type, JobTime time, JobNotification noti, int ttl)
-            : base(name, type, time, noti)
-        {
-            this.ttl = ttl;
-        }
-
         #endregion
 
         #region methodes
@@ -52,20 +34,12 @@ namespace MAD.JobSystemCore
         public override void Execute(IPAddress targetAddress)
         {
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
+            PingReply _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
 
-            try
-            {
-                PingReply _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
-
-                if (_reply.Status == IPStatus.Success)
-                    outState = OutState.Success;
-                else
-                    outState = OutState.Failed;
-            }
-            catch (Exception)
-            {
-                outState = OutState.Exception;
-            }
+            if (_reply.Status == IPStatus.Success)
+                outp.outState = JobOutput.OutState.Success;
+            else
+                outp.outState = JobOutput.OutState.Failed;
         }
 
         protected override string JobStatus()

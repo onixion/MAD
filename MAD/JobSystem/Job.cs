@@ -25,15 +25,19 @@ namespace MAD.JobSystemCore
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
         public enum JobState { Inactive, Waiting, Working, Exception }
-        public enum OutState { NULL, Success, Failed, Exception }
         
         public string name { get; set; }
         public JobTime time { get; set; }
-        public JobNotification noti { get; set; }
 
-        // Explanation for leaving those two out, can be found in 'JobScedule.cs'.
+
+        public JobNotification noti { get; set; }
+        public JobNotificationSettings settings { get; set; }
+
+        [JsonIgnore]
+        public JobOutput outp { get; set; }
+
+        // Explanation for leaving those one out, can be found in 'JobScedule.cs'.
         //public List<JobRule> rules { get; set; }
-        //public List<OutputDesc> outputs { get; set; }
 
         public DateTime tStart { get; set; }
         public DateTime tStop { get; set; }
@@ -42,8 +46,6 @@ namespace MAD.JobSystemCore
         public JobType type = JobType.NULL;
         [JsonIgnore]
         public JobState state = JobState.Inactive;
-        [JsonIgnore]
-        public OutState outState = OutState.NULL;
 
         #endregion
 
@@ -54,7 +56,9 @@ namespace MAD.JobSystemCore
             InitJob();
             this.type = type;
             this.time = new JobTime();
+            this.outp = new JobOutput();
             this.noti = new JobNotification();
+            this.settings = new JobNotificationSettings();
         }
 
         protected Job(string name, JobType type)
@@ -63,16 +67,20 @@ namespace MAD.JobSystemCore
             this.name = name;
             this.type = type;
             this.time = new JobTime();
+            this.outp = new JobOutput();
             this.noti = new JobNotification();
+            this.settings = new JobNotificationSettings();
         }
 
-        protected Job(string name, JobType type, JobTime time, JobNotification noti)
+        protected Job(string name, JobType type, JobTime time, JobOutput outp, JobNotification noti, JobNotificationSettings settings)
         {
             InitJob();
             this.name = name;
             this.type = type;
             this.time = time;
+            this.outp = outp;
             this.noti = noti;
+            this.settings = settings;
         }
 
         #endregion
@@ -110,19 +118,15 @@ namespace MAD.JobSystemCore
             else if (time.type == JobTime.TimeMethod.Absolute)
             {
                 _temp += "<color><yellow>TIMES:\t\t<color><white>";
-
                 foreach (JobTimeHandler _buffer in time.jobTimes)
-                {
                     _temp += _buffer.JobTimeStatus() + " ";
-                }
-
                 _temp += "\n";
             }
 
             _temp += "<color><yellow>LAST-STARTTIME:\t\t<color><white>" + tStart.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             _temp += "<color><yellow>LAST-STOPTIME:\t\t<color><white>" + tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             _temp += "<color><yellow>LAST-TIMESPAN:\t\t<color><white>" + tSpan.Seconds + "s " + tSpan.Milliseconds + "ms (" + tSpan.Ticks + " ticks)\n";
-            _temp += "<color><yellow>OUTPUT-STATE:\t\t<color><white>" + outState.ToString() + "\n";
+            _temp += "<color><yellow>OUTPUT-STATE:\t\t<color><white>" + outp.outState.ToString() + "\n";
 
             return _temp + JobStatus();
         }

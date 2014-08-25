@@ -19,15 +19,9 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHttp() 
-            : base("NULL", JobType.Http, new JobTime(), new JobNotification())
+            : base(JobType.Http)
         {
             this.port = 80;
-        }
-
-        public JobHttp(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, int port) 
-            : base (jobName, jobType, jobTime, noti)
-        {
-            this.port = port;
         }
 
         #endregion
@@ -43,20 +37,20 @@ namespace MAD.JobSystemCore
                 try
                 {
                     _response = _request.GetResponse();
-                    outState = OutState.Success;
+                    outp.outState = JobOutput.OutState.Success;
 
                     _response.Close();
                 }
                 catch (Exception)
                 {
-                    outState = OutState.Failed;
+                    outp.outState = JobOutput.OutState.Failed;
                 }
 
                 _request.Abort();
             }
             catch (Exception)
             {
-                outState = OutState.Exception;
+                outp.outState = JobOutput.OutState.Exception;
             }
         }
 

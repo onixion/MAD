@@ -4,7 +4,7 @@ using System.Net.Mail;
 
 namespace MAD.JobSystemCore
 {
-    public class JobNotification
+    public class JobNotificationSettings
     {
         #region members
 
@@ -15,18 +15,18 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        public JobNotification() 
+        public JobNotificationSettings() 
         {
             mailAddr = new MailAddress[0];
             priority = MailPriority.High;
         }
 
-        public JobNotification(MailAddress[] mailAddr)
+        public JobNotificationSettings(MailAddress[] mailAddr)
         {
             this.mailAddr = mailAddr;
         }
 
-        public JobNotification(MailAddress[] mailAddr, MailPriority priority) 
+        public JobNotificationSettings(MailAddress[] mailAddr, MailPriority priority) 
         {
             this.mailAddr = mailAddr;
             this.priority = priority;

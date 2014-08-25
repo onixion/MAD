@@ -175,10 +175,11 @@ namespace MAD.JobSystemCore
              * solution to solve this issue in future.
              */
 
+            /*
             if (_job.outState == Job.OutState.Exception || _job.outState == Job.OutState.Failed)
             { 
                // SEND NOTIFICATION
-            }
+            }*/
 
             _job.state = Job.JobState.Waiting;
 

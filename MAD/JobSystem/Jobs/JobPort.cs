@@ -17,13 +17,13 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPort()
-            : base("NULL", JobType.PortScan, new JobTime(), new JobNotification())
+            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput(), new JobNotification(), new JobNotificationSettings())
         {
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, int port)
-            : base(jobName, jobType, jobTime, noti)
+        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, JobNotification noti, JobNotificationSettings settings, int port)
+            : base(jobName, jobType, jobTime, outp, noti, settings)
         {
             this.port = port;
         }
@@ -39,11 +39,11 @@ namespace MAD.JobSystemCore
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));
-                outState = OutState.Success;
+                outp.outState = JobOutput.OutState.Success;
             }
             catch (Exception)
             {
-                outState = OutState.Failed;
+                outp.outState = JobOutput.OutState.Failed;
             }
 
             _socket.Close();

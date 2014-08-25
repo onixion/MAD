@@ -225,7 +225,7 @@ namespace MAD.JobSystemCore
             {
                 string _temp = "";
                 foreach (JobTimeHandler _buffer in jobTimes)
-                    _temp += _buffer.JobTimeStatus();
+                    _temp += _buffer.JobTimeStatus() + " ";
                 return _temp;
             }
             else
@@ -380,7 +380,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region constructor
+        #region constructors
 
         public JobDelayHandler()
         { }

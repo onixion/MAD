@@ -30,20 +30,12 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobServiceCheck()
-            : base("NULL", JobType.ServiceCheck, new JobTime(), new JobNotification())
+            : base(JobType.ServiceCheck)
         {
             this.arg = "";
             this.username = "";
             this.password = "";
             //this.targetIP = IPAddress.Parse("127.0.0.1");
-        }
-
-        public JobServiceCheck(string jobName, JobType jobType, JobTime jobTime, JobNotification noti, string arg, string username, string password)
-            : base(jobName, jobType, jobTime, noti)
-        {
-            this.arg = arg;
-            this.username = username;
-            this.password = password;
         }
 
         #endregion
@@ -75,12 +67,12 @@ namespace MAD.JobSystemCore
             if (working)
             {
                 _tmp += "Requestet service is working";
-                outState = OutState.Success;
+                outp.outState = JobOutput.OutState.Success;
             }
             else
             {
                 _tmp += "Requestet service seems to be dead";
-                outState = OutState.Failed;
+                outp.outState = JobOutput.OutState.Failed;
             }
 
             return (_tmp);

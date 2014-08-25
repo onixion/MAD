@@ -1,28 +1,30 @@
 ﻿using System;
-using System.Xml.Serialization;
+using System.Collections.Generic;
 
-namespace MAD
+namespace MAD.JobSystemCore
 {
-    [Serializable()]
-    public class JobRule : IXmlSerializable
+    public class JobRule
     {
-        public object obj;
+        private static int _idCount = 0;
+        private object _idLock = new object();
+        private int _id;
+        public int id { get { return _id; } }
 
-        public object obj2;
-        public Type type;
+        public string outDescName { get; set; }
+        public object compareValue;
+
         public enum Operation { Equal, NotEqual, Bigger, Smaller}
         public Operation oper;
 
-        public JobRule() { }
+        public JobRule() { }   
 
-        public JobRule(Type type, Operation oper , object obj2)
+        public JobRule(string outDescName, object compareValue)
         {
-            this.type = type;
-            this.oper = oper;
-            this.obj2 = obj2;
+            this.outDescName = outDescName;
+            this.compareValue = compareValue;
         }
 
-        public bool IsOperatorSupported()
+        public bool IsOperatorSupported(Type type)
         {
             if (type == typeof(string))
                 if (oper == Operation.Equal || oper == Operation.NotEqual)
@@ -32,54 +34,60 @@ namespace MAD
 
             return true;
         }
-
-        public bool CheckValidity()
+        // HERE
+        public bool CheckRulesValidity(JobOutput outp)
         {
-            if (type == typeof(Int32))
-                return CheckValidityInt();
-            else if (type == typeof(string))
-                return CheckValidityString();
+            OutputDescriptor _desc = outp.GetOutputDesc(outDescName);
+            if (_desc == null)
+                throw new Exception("OutputDescriptor '" + outDescName + "' does not exist!");
+
+            if(!IsOperatorSupported(_desc.dataType))
+                throw new Exception("OutputDescriptor-Type not supported!");
+
+            if (_desc.dataType == typeof(Int32))
+                return CheckValidityInt((Int32)_desc.dataObject);
+            else if (_desc.dataType == typeof(Int32))
+                return CheckValidityInt((Int32)_desc.dataObject);
             else
-                throw new Exception("Type not supported!");
+                return false;
         }
 
-        private bool CheckValidityInt()
+        private bool CheckValidityInt(int currentValue)
         {
             switch (oper)
             {
                 case Operation.Equal:
-                    if ((Int32)obj == (Int32)obj2)
+                    if (currentValue == (Int32)compareValue)
                         return true;
                     break;
                 case Operation.NotEqual:
-                    if ((Int32)obj != (Int32)obj2)
+                    if (currentValue != (Int32)compareValue)
                         return true;
                     break;
                 case Operation.Bigger:
-                    if ((Int32)obj > (Int32)obj2)
+                    if (currentValue > (Int32)compareValue)
                         return true;
                     break;
                 case Operation.Smaller:
-                    if ((Int32)obj < (Int32)obj2)
+                    if (currentValue < (Int32)compareValue)
                         return true;
                     break;
                 default:
                     break;
             }
-
             return false;
         }
 
-        private bool CheckValidityString()
+        private bool CheckValidityString(string currentValue)
         {
             switch (oper)
             { 
                 case Operation.Equal:
-                    if ((string)obj == (string)obj2)
+                    if (currentValue == (string)compareValue)
                         return true;
                     break;
                 case Operation.NotEqual:
-                    if ((string)obj != (string)obj2)
+                    if (currentValue != (string)compareValue)
                         return true;
                     break;
                 default:
@@ -87,21 +95,6 @@ namespace MAD
             }
 
             return false; 
-        }
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReadXml(System.Xml.XmlReader reader)
-        {
-
-        }
-
-        public void WriteXml(System.Xml.XmlWriter writer)
-        {
-
         }
     }
 }
