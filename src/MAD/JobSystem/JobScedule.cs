@@ -168,18 +168,7 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
-            /*
-             * There are many difficulties in serialize/deserilize JobRules and
-             * OutDesc and therefor we use this condition to decide when
-             * a notification should be sended. Maybe we can find a 
-             * solution to solve this issue in future.
-             */
-
-            /*
-            if (_job.outState == Job.OutState.Exception || _job.outState == Job.OutState.Failed)
-            { 
-               // SEND NOTIFICATION
-            }*/
+            _job.noti.CheckRulesAndNotify(_job.outp, _job.settings);
 
             _job.state = Job.JobState.Waiting;
 

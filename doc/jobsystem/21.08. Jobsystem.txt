@@ -37,3 +37,11 @@ vorhanden sein und das Programm macht keine Schwierigkeiten - dann könnte ich es
 
 Aber bis dahin -> Nette Idee; Umsetzung möglich, aber schwierig; falls genügend Zeit -> kann versucht werden zu
 implementieren. 
+
+
+!EDIT: Mir ist eine Idee gekommen, die diese Implementierung vor dem entgültigen Tod bewahrt hat. Durch ein neues
+Programmdesign arbeitet die JobNotification nicht mehr mit Referenzen sondern bekommt einfach die Werte während
+der Laufzeit mit. Jetzt funktioniert alles wie es soll und auch das Serializieren und Deserializieren sollte keine
+Probleme mehr machen ...
+
+

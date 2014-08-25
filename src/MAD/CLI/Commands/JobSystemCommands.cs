@@ -497,7 +497,7 @@ namespace MAD.CLICore
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotification(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
 
@@ -530,7 +530,7 @@ namespace MAD.CLICore
             // Set jobTime.
             _job.time = ParseJobTime(this);
             // Set notification.
-            _job.noti = ParseJobNotification(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             // Set job-specific settings.
             if (OParUsed("ttl"))
@@ -561,7 +561,7 @@ namespace MAD.CLICore
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotification(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.port = (int)pars.GetPar("p").argValues[0];
 
@@ -588,7 +588,7 @@ namespace MAD.CLICore
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotification(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.port = (int)pars.GetPar("p").argValues[0];
 
@@ -615,7 +615,7 @@ namespace MAD.CLICore
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotification(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.version = (uint)pars.GetPar("ver").argValues[0];
 
@@ -645,6 +645,9 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
 
             // NOTIFICATION
+            oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] {typeof(string)}));
+
+            // NOTIFICATION-SETTINGS
             oPar.Add(new ParOption("mail", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
             oPar.Add(new ParOption("prio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
         }
@@ -676,12 +679,31 @@ namespace MAD.CLICore
             return _buffer;
         }
 
-        public static JobNotification ParseJobNotification(Command c)
+        public static JobNotification ParseJobNotificationRules(Command c, JobOutput outp)
         {
             JobNotification _buffer = new JobNotification();
+            
+            object[] _args = c.pars.GetPar(JOB_NOTI_PAR).argValues;
+            string _temp;
 
+            foreach(object _arg in _args)
+            {
+                _temp = (string) _arg;
 
+                // parse rule.
+                JobRule _rule = ParseRule(_temp);
 
+                // then check if there is a outdescriptor matching the name
+                OutputDescriptor _desc = outp.GetOutputDesc(_rule.outDescName);
+                if (_desc == null)
+                    throw new Exception("No OutputDescriptor with the name '" + _rule.outDescName + "' found!");
+
+                // then check if the type is supported
+                if (!_rule.IsOperatorSupported(_desc.dataType))
+                    throw new Exception("OutputDescriptor-Type is not supported!");
+
+                _buffer.rules.Add(ParseRule(_temp));
+            }
             return _buffer;
         }
 
@@ -716,9 +738,7 @@ namespace MAD.CLICore
             }
         }
 
-        // NOT USED
-        /*
-        public static JobRule ParseRule(List<OutputDescriptor> outDesc, string data)
+        public static JobRule ParseRule(string data)
         {
             JobRule _rule = new JobRule();
             bool _operatorKnown = false;
@@ -762,34 +782,21 @@ namespace MAD.CLICore
                 break;
             }
 
+            if (_buffer.Length == 2)
+            {
+                _rule.outDescName = _buffer[0];
+                _rule.compareValue = _buffer[1];
+            }
+
+
             if (_operatorKnown == false)
                 throw new Exception("Operation not known!");
-
-            OutputDesc _desc = GetOutDesc(outDesc, _buffer[0]);
-            if (_desc == null)
-                throw new Exception("OutDescriptor not known!");
-
-            _rule.obj = _desc.dataObject;
-
-            if (!_rule.IsOperatorSupported())
-                throw new Exception("Operator does not support this descriptor!");
-
-            _rule.obj2 = _buffer[1];
-
             return _rule;
         }
         private static string[] SplitByOperator(string toSplit, string i)
         {
             return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
         }
-        public static OutputDescriptor GetOutDesc(List<OutputDescriptor> outDesc, string name)
-        {
-            foreach (OutputDesc _temp in outDesc)
-                if (_temp.name == name)
-                    return _temp;
-            return null;
-        }
-         * */
     }
 
     #endregion

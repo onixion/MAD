@@ -80,3 +80,4 @@ replacing Xml-Serializer with Json-Serializer, because Json is much easier to us
 
 [21.08.2014][13:00-14:00][1h][166h] CleanCoding ... Decided to remove JobRule and OutDesc ...
 [25.08.2014][11:00-15:00][4h][170h] Xml-Serializer replaced by Json-Serializer.
+[25.08.2014][18:00-22:00][4h][174h] Implemented JobNotification, JobOutput and JobNotificationSettings. Tested and is working.

@@ -31,11 +31,10 @@ namespace MAD.JobSystemCore
                     return true;
                 else
                     return false;
-
             return true;
         }
-        // HERE
-        public bool CheckRulesValidity(JobOutput outp)
+
+        public bool CheckRuleValidity(JobOutput outp)
         {
             OutputDescriptor _desc = outp.GetOutputDesc(outDescName);
             if (_desc == null)
@@ -46,8 +45,8 @@ namespace MAD.JobSystemCore
 
             if (_desc.dataType == typeof(Int32))
                 return CheckValidityInt((Int32)_desc.dataObject);
-            else if (_desc.dataType == typeof(Int32))
-                return CheckValidityInt((Int32)_desc.dataObject);
+            else if (_desc.dataType == typeof(string))
+                return CheckValidityString((string)_desc.dataObject);
             else
                 return false;
         }

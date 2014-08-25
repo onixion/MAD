@@ -23,6 +23,7 @@ namespace MAD
             JobSystem js = new JobSystem();
             MACFeeder macFeeder = new MACFeeder();
 
+
             if (Logger.PathFileExists())
                 Logger.ReadPathToLogFile();
             else
