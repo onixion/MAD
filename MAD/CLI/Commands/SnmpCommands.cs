@@ -29,7 +29,6 @@ namespace MAD.CLICore
         {
             rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("ip", "Target-IP", "Target.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("e", "INTERFACE-COUNT", "Expected number of interfaces.", false, false, new Type[] { typeof(uint) }));
             oPar.Add(new ParOption("p", "", "privPro", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("a", "", "authProt", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("s", "", "security", false, false, new Type[] { typeof(string) }));
@@ -106,10 +105,6 @@ namespace MAD.CLICore
             UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
 
             // if optional par is used.
-            if(OParUsed("e"))
-            {
-                expectedIfNr = (uint)pars.GetPar("e").argValues[0];
-            }
 
             // PARSE privProt
             
