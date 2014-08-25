@@ -323,7 +323,6 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-            output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
@@ -373,12 +372,9 @@ namespace MAD.CLICore
                 return output;
             }
             else
-            {
                 foreach (JobNode _node in _js.nodes)
                     foreach (Job _job in _node.jobs)
                         output += _job.Status() + "\n";
-            }
-
             return output;
         }
     }
