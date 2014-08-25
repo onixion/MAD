@@ -1,0 +1,10 @@
+v0.1
+
+Der Command snmpinterface gibt dem User die Möglichkeit über SNMP alle Interfaces die sein Rechner besitzt sich anzusehen. Zu
+diesen zählen u.a. das LoopBack Interface, das LAN Interface und vielleicht auch ein WLAN Interface. Die Abfrage wird auf die 
+OID 1.3.6.1.2.1.2. 1, 2 und 3 ausgeführt, wobei der User selbst bestimmen kann wie viele Interfaces er zu sehen vermutet. So
+sind es auf einem Lenovo ThinkPad mit ArchLinux als OS 3 während ein Windows Rechner über 20 haben kann. Dies muss der User
+für seine Schützlinge selbst herausfinden. Es werden die versionen 2c und 3 unterstützt. Um dieses Feature (so wie jedes 
+andere snmp Feature) nutzen zu können wird für die version 2c ein user "public" benötigt, und für die version 3 sollte dieser
+User für privacy und authentification die Phrase "MAD" verwenden. Es werden jedoch auch die Sicherheitsstufen noAuthNoPriv und
+AuthNoPriv unterstützt. 

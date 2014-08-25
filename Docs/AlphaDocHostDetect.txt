@@ -1,0 +1,9 @@
+v0.1
+
+Der Job HostDetect wie er im Jobs Ordner des Projektes liegt, dient zum scannen eines bekannten Netzwerkes nach existierenden 
+hosts. Diese Art der Überprüfung ist jedoch sehr ineffizient und sollte daher nicht regelmäßig durchgeführt werden. Das
+Konzept ist sehr einfach: Aus einer gegebenen Netzaddresse und dazugehöriger Subnetzmaske werden alle möglichen IPAddressen 
+konstruiert und einzeln mit einem Ping abgefragt. Bei Erfolg wird dieser Host dazugerechnet, bei Misserfolg ignoriert. Hierbei
+fällt die erste Problematik auf: sollte die firewall den Ping blokieren ergibt dies automatisch, dass der Host von HostDetect
+nicht annerkannt wird. 
+Trotzallem ist dies eine erste Methode um Sicherheiten in einem Netzwerk zu gewähren. 

@@ -1,0 +1,6 @@
+v 0.1
+
+Dieser Job ermöglicht es die Ausgehenden Pakete eines Managebaren Routers oder Switch zu erhaschen. Dafür wird man gebeten
+das Interface welches man wissen will anzugeben. Auch die version und die entsprechenden Sicherheitsmaßnahmen werden natürlich
+benötigt. Die Ausgabe ist daraufhin die Anzahl der Bytes die seit dem Letzten mal abfragen verschickt wurden von diesem
+Interface. Um das richtige Interface zu finden kann man auf den zugehörigen command zurück greifen. 
