@@ -30,6 +30,11 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
+            // LOGGER
+
+            commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
+            commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
+
             // MAC AND IP READER
             commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
             commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));

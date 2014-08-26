@@ -69,6 +69,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\Commands\LoggerCommands.cs" />
     <Compile Include="CLI\Commands\MacFeederCommands.cs" />
     <Compile Include="CLI\CLI.cs" />
     <Compile Include="CLI\CLIFramework.cs" />
