@@ -14,7 +14,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("p", "PATH", "Relativ Path to the Logfile in Unix Style", false, false, new Type[] { typeof(string) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string _additionToPath = (string) pars.GetPar("p").argValues[0];
 
@@ -39,7 +39,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("s", "SIZE", "The new size of the Buffer, has to be changed every reboot", false, false, new Type[] { typeof(uint) }));
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             uint _newSize = (uint)pars.GetPar("s").argValues[0];
 
