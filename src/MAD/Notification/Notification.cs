@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
+using MAD.Logging;
 
 namespace Notification
 {
@@ -12,6 +13,7 @@ namespace Notification
         public MailAddress eMailFrom;
         public string smtpClient;
         public int port;
+        public string messageSuccess, messageFailed, attempt;
         //_[DefaultValue("")]
         
 
@@ -23,9 +25,9 @@ namespace Notification
         
         //Decleration of Objects
         private SmtpClient client;
+        private Object thisLock = new Object();
+        public 
         MailMessage mail;
-
-        Messagetype type = new Messagetype();
 
 
         //#Methods
@@ -41,10 +43,10 @@ namespace Notification
         }
         
         //Method to send mail with mail parameters (dynamic (have to set for every mail))
-        public bool SendMail(MailAddress[] eMailTo, string subject, string body, bool highPriority, int retryCounter, 
+        public bool SendMail(MailAddress[] eMailTo, string subject, string body, bool highPriority, int retryCounter,
             MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
-            lock (lockthis)
+            lock (thisLock)
             {
                 //Declaration of Variables
                 int tryCounter = 1;
@@ -96,7 +98,8 @@ namespace Notification
                 {
                     try
                     {
-                        Console.WriteLine("{0}.Attempt", tryCounter);
+                        attempt = tryCounter + ".Attempt";
+                        Logger.Log(attempt, Logger.MessageType.INFORM);
                         //Initialization of SMTPclient and setting parameters and sending mail
                         client = new SmtpClient(smtpClient, port);
                         lock (client) { };
@@ -104,13 +107,16 @@ namespace Notification
                         client.EnableSsl = true;
                         client.Send(mail); //Send order
                         eMailSent = true;
-                        Console.WriteLine("Success");
+                        messageSuccess = "(" + tryCounter + ".Attempt) Success";
+                        Logger.Log(messageSuccess, Logger.MessageType.INFORM);
+                        //Console.WriteLine("Success");
                     }
 
                     catch (Exception ex)
                     {
                         eMailSent = false;
-                        Console.WriteLine("Failed becuase:{0}", ex.ToString()); //ex gives a report of problems
+                        messageFailed = "(" + tryCounter + ".Attempt) Sending mail failed becuase: " + ex.Message;
+                        Logger.Log(messageFailed, Logger.MessageType.ERROR);//ex gives a report of problems
                     }
 
                 } return eMailSent;
