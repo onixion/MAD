@@ -94,6 +94,21 @@ namespace MAD.Helper
             }
             return macAddress;
         }
+
+        public string getPhysicalAddressString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
+        {
+            byte[] macBytes = new byte[6];
+            string macAddress = "";
+
+            for (uint i = 28; i < (28 + 6); i++)
+            {
+                macBytes[i - 28] = data[i];
+                macAddress += String.Format("{0:X02}", macBytes[i - 28]);
+                macAddress.ToUpperInvariant();
+            }
+            return macAddress;
+        }
+
         #endregion
     }
 

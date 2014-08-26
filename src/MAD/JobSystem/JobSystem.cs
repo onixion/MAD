@@ -233,7 +233,7 @@ namespace MAD.JobSystemCore
             foreach (ModelHost _host in currentHosts)
             {
                 // First check if a node exists with the same mac-address
-                JobNode _node = GetNode(PhysicalAddress.Parse(_host.hostMac));
+                JobNode _node = GetNode(PhysicalAddress.Parse((string) _host.hostMac));
                 if (_node == null)
                 {
                     _node = new JobNode();

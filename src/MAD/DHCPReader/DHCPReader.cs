@@ -26,7 +26,7 @@ namespace MAD.DHCPReader
 
         private static bool _running = false;
 
-        public List<ModelHost> _dummyList = new List<ModelHost>();
+        public static List<ModelHost> _dummyList = new List<ModelHost>();
 
         private Thread _check;
         private Thread _start;
@@ -147,7 +147,7 @@ namespace MAD.DHCPReader
                 if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
                 {
                     ModelHost _tmpModel = new ModelHost();
-                    _tmpModel.hostMac = _helper.getMacString(_data);
+                    _tmpModel.hostMac = _helper.getPhysicalAddressString(_data);
                     _tmpModel.macGiven = true;
 
                     for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)

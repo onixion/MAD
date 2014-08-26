@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.IO; 
 
 using MAD.JobSystemCore;
+using MAD.DHCPReader;
 
 namespace MAD.CLICore
 {
@@ -264,7 +265,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             // HERE
-            SyncResult _result = _js.SyncNodes(_feeder._dummyList);
+            SyncResult _result = _js.SyncNodes(MACFeeder._dummyList);
 
             output += "<color><yellow>Nodes added:   <color><white>" + _result.nodesAdded + "\n";
             output += "<color><yellow>Nodes updated: <color><white>" + _result.nodesUpdated + "\n";

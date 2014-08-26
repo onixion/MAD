@@ -1,0 +1,2 @@
+26.08.2014 19:49:34 INFORMATION: Programm Start. CLI Start.
+26.08.2014 19:49:41 INFORMATION: MacFeeder started listening for Information
