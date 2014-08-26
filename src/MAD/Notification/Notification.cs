@@ -14,9 +14,7 @@ namespace Notification
         public string smtpClient;
         public int port;
         public string messageSuccess, messageFailed, attempt;
-        //_[DefaultValue("")]
         
-
 
         //Declaration of static Parameters (Private)
         private string password;
@@ -43,8 +41,8 @@ namespace Notification
         }
         
         //Method to send mail with mail parameters (dynamic (have to set for every mail))
-        public bool SendMail(MailAddress[] eMailTo, string subject, string body, bool highPriority, int retryCounter,
-            MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
+        public bool SendMail(MailAddress[] eMailTo, string subject, string body, int retryCounter, 
+            bool highPriority = false, MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
             lock (thisLock)
             {
