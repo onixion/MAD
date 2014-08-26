@@ -21,7 +21,7 @@ namespace MAD.CLICore
 
         #region constructor
 
-        public CLI(string dataPath, JobSystem js, MACFeeder macFeeder)
+        public CLI(JobSystem js, MACFeeder macFeeder)
             :base()
         {
             // GENERAL
@@ -51,6 +51,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { js }));
 
@@ -63,9 +64,10 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
             commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
             commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add snmpCheck", typeof(JobSystemAddSnmpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add hostdetect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add ftpcheck", typeof(JobSystemAddCheckFtpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
+            commands.Add(new CommandOptions("add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
 
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));

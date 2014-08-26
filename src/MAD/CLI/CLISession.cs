@@ -91,8 +91,6 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { _js }));
             commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { _js }));
             commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("add detect", typeof(JobSystemAddHostDetectCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("add serviceCheck", typeof(JobSystemAddServiceCheckCommand), new object[] { _js }));
         }
 
         public void Start()

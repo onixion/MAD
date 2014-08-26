@@ -32,9 +32,7 @@ namespace MAD.CLICore
 
         #region methodes
 
-        public virtual string Execute() { return "NULL"; }
-
-        public virtual string Execute(int consoleWidth) { return "NULL"; }
+        public abstract string Execute(int consoleWidth);
 
         public Type GetArgType(string par)
         {

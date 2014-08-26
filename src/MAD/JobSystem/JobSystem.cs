@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.NetworkInformation;
+
+using MAD.Helper;
 
 namespace MAD.JobSystemCore
 {
@@ -163,7 +167,18 @@ namespace MAD.JobSystemCore
         /// <returns>Count of removed nodes.</returns>
         public int RemoveNodeFromIDToID(int fromID, int toID)
         {
-            return 0;
+            int _count = 0;
+            JobNode _node;
+            for (int i = fromID; i < toID; i++)
+            {
+                _node = GetNode(i);
+                if (_node != null)
+                {
+                    _count++;
+                    RemoveNode(i);
+                }
+            }
+            return _count;
         }
 
         public bool NodeExist(int id)
@@ -175,6 +190,14 @@ namespace MAD.JobSystemCore
                 return false;
         }
 
+        public JobNode GetNode(System.Net.NetworkInformation.PhysicalAddress mac)
+        {
+            foreach (JobNode _node in _nodes)
+                if (_node.macAddress == mac)
+                    return _node;
+            return null;
+        }
+
         public JobNode GetNode(int id)
         {
             foreach (JobNode _node in _nodes)
@@ -183,7 +206,7 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public void UpdateNodeIP(int nodeID, System.Net.IPAddress ip)
+        public void UpdateNodeIP(int nodeID, IPAddress ip)
         {
             JobNode _node = GetNode(nodeID);
             if (_node != null)
@@ -192,7 +215,51 @@ namespace MAD.JobSystemCore
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
-        
+
+        public void UpdateNodeMac(int nodeID, PhysicalAddress mac)
+        {
+            JobNode _node = GetNode(nodeID);
+            if (_node != null)
+                lock (_node.nodeLock)
+                    _node.macAddress = mac;
+            else
+                throw new JobNodeException("Node does not exist!", null);
+        }
+
+        /// <returns>Number of updated nodes.</returns>
+        public SyncResult SyncNodes(List<ModelHost> currentHosts)
+        {
+            SyncResult _result = new SyncResult();
+            foreach (ModelHost _host in currentHosts)
+            {
+                // First check if a node exists with the same mac-address
+                JobNode _node = GetNode(PhysicalAddress.Parse(_host.hostMac));
+                if (_node == null)
+                {
+                    _node = new JobNode();
+                    _node.name = _host.hostName;
+                    _node.macAddress = PhysicalAddress.Parse(_host.hostMac);
+                    _node.ipAddress = _host.hostIP;
+
+                    AddNode(_node);
+                    _result.nodesAdded++;
+                }
+                else
+                {
+                    // check if node needs ip-update.
+                    if (_node.ipAddress != _host.hostIP)
+                        UpdateNodeIP(_node.id, _host.hostIP);
+
+                    // check if node needs hostname-update
+                    //if (_node.name != _host.hostName)
+                    //    UpdateNodeIP(_node.id, _host.hostName);
+
+                    _result.nodesUpdated++;
+                }
+            }
+            return _result;
+        }
+
         #endregion
 
         #region node serialization

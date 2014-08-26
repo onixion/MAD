@@ -44,7 +44,7 @@
     <Compile Include="Packet\CLIPacket.cs" />
     <Compile Include="Packet\DataPacket.cs" />
     <Compile Include="MD5Hashing.cs" />
-    <Compile Include="NetCommunication.cs" />
+    <Compile Include="NetCom.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Packet\Packet.cs" />
     <Compile Include="Packet\PacketException.cs" />
