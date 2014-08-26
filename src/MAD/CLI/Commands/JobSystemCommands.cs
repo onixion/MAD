@@ -248,6 +248,31 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemSyncNodeCommand : Command
+    {
+        private JobSystem _js;
+        private MAD.DHCPReader.MACFeeder _feeder;
+
+        public JobSystemSyncNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            _feeder = (MAD.DHCPReader.MACFeeder)args[1];
+
+            description = "This command syncs the hosts, which were found by the macfeeder, and updates the nodes of the Jobsystem.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            // HERE
+            SyncResult _result = _js.SyncNodes(_feeder._dummyList);
+
+            output += "<color><yellow>Nodes added:   <color><white>" + _result.nodesAdded + "\n";
+            output += "<color><yellow>Nodes updated: <color><white>" + _result.nodesUpdated + "\n";
+
+            return output;
+        }
+    }
+
     public class JobSystemSaveNodeCommand : Command
     { 
         private JobSystem _js;
@@ -435,78 +460,6 @@ namespace MAD.CLICore
 
     #region commands for adding jobs
 
-    public class JobSystemAddServiceCheckCommand : JobCommand
-    {
-        private JobSystem _js;
-        string serviceDescript = "Choose the service to check \n" +
-            "        Choose between following: \n" +
-            "           dns -> doesn't need any more args\n" +
-            "           ftp -> needs -a, -u, -p; leave username and password empty if there is no\n" +
-            "           NYI\n";
-
-        public JobSystemAddServiceCheckCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("s", "SERVICE", serviceDescript, false, false, new Type[] { typeof(string) }));
-            //there will be more, still working
-            oPar.Add(new ParOption("u", "USERNAME", "Username on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("p", "PASSWORD", "Password on the server, e.g. ftp", false, false, new Type[] { typeof(string) }));
-            description = "Checks the given Service for availibility. See in 'job serviceCheck help' for a list of available jobs"; //empty promises yet
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            // WORKING ON THIS
-
-            /*JobServiceCheck _job = new JobServiceCheck();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotification(this);
-
-            _job.arg = (string)pars.GetPar("s").argValues[0];
-
-            if (OParUsed("u"))
-                _job.username = (string)pars.GetPar("u").argValues[0];
-            if (OParUsed("p"))
-                _job.password = (string)pars.GetPar("p").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";*/
-            return null;
-        }
-    }
-
-    public class JobSystemAddHostDetectCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddHostDetectCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
-            description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobHostDetect _job = new JobHostDetect();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-            _job.noti = ParseJobNotificationRules(this, _job.outp);
-
-            _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
     public class JobSystemAddPingCommand : JobCommand
     {
         private JobSystem _js;
@@ -598,11 +551,39 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddSnmpCommand : JobCommand
+    public class JobSystemAddHostDetectCommand : JobCommand
     {
         private JobSystem _js;
 
-        public JobSystemAddSnmpCommand(object[] args)
+        public JobSystemAddHostDetectCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobHostDetect _job = new JobHostDetect();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
+
+            _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckSnmpCommand : JobCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckSnmpCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
@@ -618,6 +599,59 @@ namespace MAD.CLICore
             _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.version = (uint)pars.GetPar("ver").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckFtpCommand : JobCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckFtpCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("u", "USERNAME", "Username on the server.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("p", "PASSWORD", "Password on the server.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobCheckFtp _job = new JobCheckFtp();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
+
+            _job.username = (string)pars.GetPar("u").argValues[0];
+            _job.password = (string)pars.GetPar("p").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckDnsCommand : JobCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckDnsCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobCheckDns _job = new JobCheckDns();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);
@@ -652,6 +686,11 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("prio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
         }
 
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
+
         public static JobTime ParseJobTime(Command c)
         {
             JobTime _buffer = new JobTime();
@@ -682,7 +721,10 @@ namespace MAD.CLICore
         public static JobNotification ParseJobNotificationRules(Command c, JobOutput outp)
         {
             JobNotification _buffer = new JobNotification();
-            
+
+            if (!c.OParUsed(JOB_NOTI_PAR))
+                return _buffer;
+
             object[] _args = c.pars.GetPar(JOB_NOTI_PAR).argValues;
             string _temp;
 

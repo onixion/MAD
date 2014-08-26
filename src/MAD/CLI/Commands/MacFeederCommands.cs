@@ -14,7 +14,7 @@ namespace MAD.CLICore
             description = "Starts the Listener for Basic Information like MAC and IP, and how they are assigned.";
         }
 
-        public override string Execute()
+        public override string Execute(int consoleWidth)
         {
             string _tmp = _feeder.Start();
             if (_tmp != null)

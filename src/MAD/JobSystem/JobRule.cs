@@ -5,11 +5,6 @@ namespace MAD.JobSystemCore
 {
     public class JobRule
     {
-        private static int _idCount = 0;
-        private object _idLock = new object();
-        private int _id;
-        public int id { get { return _id; } }
-
         public string outDescName { get; set; }
         public object compareValue;
 

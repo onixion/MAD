@@ -40,8 +40,7 @@ namespace MAD.JobSystemCore
                 }
                 catch (Exception e)
                 {
-                    if (LOG)
-                        Logger.Log("JobNoti.: " + e.Message, Logger.MessageType.ERROR);
+                    Logger.Log("JobNoti.: " + e.Message, Logger.MessageType.ERROR);
                 }
             }
             return _brokenRules;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.IO;
+using System.Security.AccessControl;
 
 using MAD.JobSystemCore;
 using MAD.CLICore;
@@ -13,16 +15,18 @@ namespace MAD
     {
         /* MAD - Network Monitoring v0.0.5.5 */
 
-        private const string DATAPATH = "data";
+        public static readonly string VERSION = "v0.0.6.0";
+        public static readonly string DATADIR = Path.Combine("data");
 
         [STAThread]
         static int Main(string[] args)
         {
             Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOMPENT!");
+            if (!Directory.Exists(DATADIR))
+                Directory.CreateDirectory(DATADIR);
 
             JobSystem js = new JobSystem();
             MACFeeder macFeeder = new MACFeeder();
-
 
             if (Logger.PathFileExists())
                 Logger.ReadPathToLogFile();
@@ -40,14 +44,12 @@ namespace MAD
             }
             else if (args.Length == 1)
             {
-                
-
                 switch (args[0])
                 {
                     case "-cli":
                         Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
 
-                        CLI cli = new CLI(DATAPATH, js, macFeeder);
+                        CLI cli = new CLI(js, macFeeder);
                         cli.Start();
                         break;
                     case "-cliserver":

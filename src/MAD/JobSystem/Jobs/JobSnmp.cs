@@ -6,7 +6,6 @@ using SnmpSharpNet;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
     public class JobSnmp : Job
     {
         public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
