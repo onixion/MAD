@@ -5,6 +5,7 @@
 using System;
 using System.Net.Mail;
 using System.Net;
+using MAD.Logging;
 
 namespace Notification
 {   
@@ -20,10 +21,10 @@ namespace Notification
             MailAddress[] _eIDF = new MailAddress[1]{new MailAddress("singh.manpreet@live.at")};
             MailAddress[] _eMailToCC = new MailAddress[1]{new MailAddress("singh.manpreet.iphone@gmail.com")};
             MailAddress[] _eMailToBCC = new MailAddress[1]{new MailAddress("singh.manpreet.iphone@gmail.com")};
-            Attachment[] _data = new Attachment[1]{new Attachment(@"Attachment.txt")}; 
+            Attachment[] _data = new Attachment[1] { new Attachment(@"E:\Schule\Diplomarbeit\Mad\integrateLoggerToNotification\Notification\Attachment.txt") }; 
 
             Config.SendMail(_eIDF, "TestMail", "I_Am_Jack",true , 3, eMailToBCC: _eMailToBCC, eMailAttachment:_data);
-
+            Logger.ForceWriteToLog();
             Console.ReadKey();
         }
     }
