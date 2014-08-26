@@ -26,7 +26,7 @@ namespace MAD.Logging
 
         public static bool PathFileExists()
         {
-            string _pathToPathFile = Directory.GetCurrentDirectory();
+            string _pathToPathFile = "";
             string _content = "lorem ipsum";
             if (File.Exists(_pathToPathFile + @"/path.txt"))
             {

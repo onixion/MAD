@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
+
 using MAD.Logging;
 
-namespace Notification
+namespace MAD.Notification
 {
     public class NotificationSystem
     {
