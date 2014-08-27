@@ -9,20 +9,14 @@ namespace MAD.JobSystemCore
 {
     public class JobNotification
     {
-        public JobNotificationSettings settings;
-        public NotificationSystem sendmail;
-        
+        public JobNotificationSettings settings = null;
         public List<JobRule> rules = new List<JobRule>();
 
         public JobNotification()
-        {
-            this.sendmail = new NotificationSystem();
-            this.settings = new JobNotificationSettings();
-        }
+        { }
 
-        public JobNotification(NotificationSystem sendmail, JobNotificationSettings settings)
+        public JobNotification(JobNotificationSettings settings)
         {
-            this.sendmail = sendmail;
             this.settings = settings;
         }
 
@@ -31,20 +25,26 @@ namespace MAD.JobSystemCore
             List<JobRule> _brokenRules = GetBrokenRules(job.outp);
             if (_brokenRules.Count != 0)
             {
-                string _mailSubject = "[MAD][RULE-BREAK] Job (JOB-ID: " + job.id + ") broke one or more rules!";
+                string _mailSubject = "[MAD][!RULE-BREAK!] Job (JOB-ID: " + job.id + ") broke one or more rules!";
                 string _mailContent = "";
                 foreach (JobRule _brokenRule in _brokenRules)
                 {
-                    _mailContent =  "-- RULE-BROKEN\n";
+                    _mailContent =  "___RULE-BROKEN______________________\n";
                     _mailContent += "-> OutDescriptor:  " + _brokenRule.outDescName + "\n";
                     _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
                     _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
-                    _mailContent += "____________________________________\n";
                     _mailContent += "=> CurrentValue:   " + job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject.ToString() + "\n\n";
+                    _mailContent += "____________________________________\n";
                 }
 
-                if (!sendmail.SendMail(settings.mailAddr, _mailSubject, _mailContent, 0, true))
-                    throw new Exception("Could not send mail!");
+                if (settings != null)
+                {
+                    // there are settings for sending an email
+                }
+                else
+                { 
+                    // there are no settings for sending an email
+                }
             }
         }
 

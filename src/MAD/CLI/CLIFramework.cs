@@ -61,7 +61,6 @@ namespace MAD.CLICore
         private string GetCommandName(string input)
         {
             List<string> _args = new List<string>();
-            bool _PARFOUND = false;
 
             string[] _buffer = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < _buffer.Length; i++)
@@ -298,6 +297,8 @@ namespace MAD.CLICore
                         return System.Net.IPAddress.Parse(value);
                     case "System.Net.NetworkInformation.PhysicalAddress":
                         return System.Net.NetworkInformation.PhysicalAddress.Parse(value);
+                    case "System.Net.Mail.MailAddress":
+                        return new System.Net.Mail.MailAddress(value);
                 }
 
                 return null;

@@ -6,9 +6,14 @@ using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
+
+
     public abstract class Job
     {
         #region members
+
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
+        public enum JobState { Inactive, Waiting, Working, Exception }
 
         [JsonIgnore]
         public object jobLock = new object();
@@ -21,23 +26,20 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public int id { get { return _id; } }
 
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
-        public enum JobState { Inactive, Waiting, Working, Exception }
-        
         public string name { get; set; }
+        public JobType type = JobType.NULL;
         public JobTime time { get; set; }
-
-        public JobNotificationSettings notiSettings { get; set; }
         public JobNotification noti { get; set; }
 
         [JsonIgnore]
         public JobOutput outp { get; set; }
-
+        [JsonIgnore]
         public DateTime tStart { get; set; }
+        [JsonIgnore]
         public DateTime tStop { get; set; }
+        [JsonIgnore]
         public TimeSpan tSpan { get; set; }
 
-        public JobType type = JobType.NULL;
         [JsonIgnore]
         public JobState state = JobState.Inactive;
 

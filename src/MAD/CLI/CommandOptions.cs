@@ -3,6 +3,7 @@
 namespace MAD.CLICore
 {
     /* This object defines a command for the CLI. */
+
     public class CommandOptions
     {
         public string command;

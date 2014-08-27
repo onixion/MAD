@@ -7,7 +7,6 @@ namespace MAD.CLICore
 {
     public class ExitCommand : Command
     {
-        // NOT WORKING YET!
         public ExitCommand()
             : base()
         {
@@ -16,8 +15,6 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            // Shutdown jobsystem.
-
             return "EXIT_CLI";
         }
     }

@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Collections.Generic;
 
+using MAD;
+
 using Amib.Threading;
 
 namespace MAD.JobSystemCore
@@ -78,8 +80,8 @@ namespace MAD.JobSystemCore
             {
                 Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
-  
-                lock(_nodesLock)
+
+                lock (_nodesLock)
                 {
                     foreach (JobNode _node in _jobNodes)
                     {
@@ -89,9 +91,9 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    lock (_job.jobLock)
+                                    if (_job.state == Job.JobState.Waiting)
                                     {
-                                        if (_job.state == Job.JobState.Waiting)
+                                        if (_job.type != Job.JobType.NULL)
                                         {
                                             if (CheckJobTime(_job.time, _time))
                                             {
@@ -126,6 +128,7 @@ namespace MAD.JobSystemCore
                                                     _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                         }
                                     }
+
                                 }
                             }
                         }
@@ -163,14 +166,26 @@ namespace MAD.JobSystemCore
             JobHolder _holder = (JobHolder)holder;
             Job _job = _holder.job;
 
-            _job.tStart = DateTime.Now;
-            _job.Execute(_holder.targetAddress);
-            _job.tStop = DateTime.Now;
-            _job.tSpan = _job.tStart.Subtract(_job.tStop);
+            try
+            {
+                lock (_job.jobLock)
+                {
+                    _job.tStart = DateTime.Now;
+                    _job.Execute(_holder.targetAddress);
+                    _job.tStop = DateTime.Now;
+                    
+                    _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
-            _job.noti.CheckRulesAndNotify(_job);
+                    // check rules
+                    _job.noti.CheckRulesAndNotify(_job);
 
-            _job.state = Job.JobState.Waiting;
+                    _job.state = Job.JobState.Waiting;
+                }
+            }
+            catch (Exception)
+            {
+                _job.outp.outState = JobOutput.OutState.Exception;
+            }
 
             return null;
         }
@@ -179,6 +194,7 @@ namespace MAD.JobSystemCore
     }
 
     /* Need to find a better solution for this problem ... */
+
     public struct JobHolder
     { 
         public Job job;

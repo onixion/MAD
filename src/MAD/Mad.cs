@@ -13,15 +13,13 @@ namespace MAD
 {
     class Mad
     {
-        /* MAD - Network Monitoring v0.0.6.0 */
-
         public static readonly string VERSION = "v0.0.6.0";
         public static readonly string DATADIR = Path.Combine("data");
 
         [STAThread]
         static int Main(string[] args)
         {
-            Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOMPENT!");
+            Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
             if (!Directory.Exists(DATADIR))
                 Directory.CreateDirectory(DATADIR);
 
@@ -78,6 +76,9 @@ namespace MAD
             }
 
             Logger.ForceWriteToLog();
+
+            js.StopScedule();
+
             return 0;
         }
     }

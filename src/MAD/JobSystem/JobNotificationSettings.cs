@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net.Mail;
 
+using MAD.Notification;
+
 namespace MAD.JobSystemCore
 {
     public class JobNotificationSettings
@@ -10,7 +12,6 @@ namespace MAD.JobSystemCore
 
         public MailLogin login { get; set; }
         public MailAddress[] mailAddr { get; set; }
-        public MailPriority priority { get; set; }
 
         #endregion
 
@@ -18,7 +19,7 @@ namespace MAD.JobSystemCore
 
         public JobNotificationSettings() 
         {
-
+            this.login = new MailLogin();
         }
 
         public JobNotificationSettings(MailAddress[] mailAddr)
@@ -29,7 +30,6 @@ namespace MAD.JobSystemCore
         public JobNotificationSettings(MailAddress[] mailAddr, MailPriority priority) 
         {
             this.mailAddr = mailAddr;
-            this.priority = priority;
         }
 
         #endregion

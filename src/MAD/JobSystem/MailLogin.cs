@@ -2,7 +2,7 @@
 
 using System.Net.Mail;
 
-namespace MAD.JobSystemCore
+namespace MAD.Notification
 {
     public class MailLogin
     {

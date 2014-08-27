@@ -11,7 +11,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public readonly Version VERSION = new Version(2, 9);
+        public const string VERSION = "v2.9.0.0";
+        public const int MAXNODES = 100;
 
         private JobScedule _scedule;
         public JobScedule.State sceduleState { get { return _scedule.state; } }
@@ -20,7 +21,6 @@ namespace MAD.JobSystemCore
         public List<JobNode> nodes { get { return _nodes; } }
 
         private object _nodesLock = new object();
-        public const int MAX_NODES = 100;
 
         #endregion
 
@@ -137,7 +137,7 @@ namespace MAD.JobSystemCore
 
         public void AddNode(JobNode node)
         {
-            if (MAX_NODES > _nodes.Count)
+            if (MAXNODES > _nodes.Count)
                 lock (_nodesLock)
                     _nodes.Add(node);
             else
@@ -226,7 +226,6 @@ namespace MAD.JobSystemCore
                 throw new JobNodeException("Node does not exist!", null);
         }
 
-        /// <returns>Number of updated nodes.</returns>
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
             SyncResult _result = new SyncResult();

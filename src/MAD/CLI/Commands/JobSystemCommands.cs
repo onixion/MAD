@@ -26,9 +26,9 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>\n JOBSYSTEM version " + _js.VERSION + "\n\n";
-            output += " Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + ")\n";
+            output += "<color><yellow>\n JOBSYSTEM version " + JobSystem.VERSION + "\n\n";
+            output += " Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
+            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES * JobNode.MAX_JOBS + ")\n";
             output += "\n\n Scedule-State: ";
             if (_js.sceduleState == JobScedule.State.Active)
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
@@ -119,7 +119,7 @@ namespace MAD.CLICore
         {
             string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += "\n";
-            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAX_NODES + "\n";
+            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAXNODES + "\n";
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
@@ -366,7 +366,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAX_NODES * JobNode.MAX_JOBS + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXNODES * JobNode.MAX_JOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
@@ -483,6 +483,7 @@ namespace MAD.CLICore
         public JobSystemSetJobNotiCommand(object[] args)
         {
             _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node.", false, false, new Type[] { typeof(int) }));
         }
 
         public override string Execute(int consoleWidth)
@@ -491,7 +492,7 @@ namespace MAD.CLICore
             if (_job == null)
                 throw new Exception("Job does not exist!");
 
-            _job.notiSettings = ParseJobNotificationSettings(this);
+            _job.noti.settings = ParseJobNotificationSettings(this);
 
             return "<color><green>Notification-Settings set.";
         }
@@ -857,7 +858,7 @@ namespace MAD.CLICore
         {
             // NOTIFICATION-LOGIN-PARAMETER
             rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "SMTP-ADDR>:<SMTP-PORT", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(MailAddress) }));
+            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
 
             // NOTIFICATION-SETTINGS
             rPar.Add(new ParOption(NOTI_SMTP_MAILS, "TO-MAIL-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
@@ -905,6 +906,12 @@ namespace MAD.CLICore
             }
             else
                 throw new Exception(CLIError.Error(CLIError.ErrorType.SyntaxError, "SMTP-Login could not be parsed correctly!", true));
+
+            object[] _mailsTo = c.pars.GetPar(NOTI_SMTP_MAILS).argValues;
+            _buffer.mailAddr = new MailAddress[_mailsTo.Length];
+
+            for(int i = 0; i < _mailsTo.Length; i++)
+                _buffer.mailAddr[i] = (MailAddress)_mailsTo[i];
 
             return _buffer;
         }
