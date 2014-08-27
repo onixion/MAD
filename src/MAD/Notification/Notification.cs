@@ -31,6 +31,9 @@ namespace MAD.Notification
 
         //#Methods
 
+        public NotificationSystem()
+        { }
+
         //Method for getting basic information (static (have to set once))
         public NotificationSystem(string smtpClient, MailAddress eMailFrom, string password,  int port)
         {

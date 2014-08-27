@@ -34,8 +34,7 @@ namespace MAD.JobSystemCore
         public PhysicalAddress macAddress { get; set; } // sns
         public IPAddress ipAddress { get; set; } // sns
 
-        public NotificationSystem notify { get; set; }
-        public JobNotificationSettings defaultNotiSettings { get; set; }
+        public JobNotificationSettings defaultSettings { get; set; }
 
         public List<Job> jobs = new List<Job>();
 
@@ -48,14 +47,14 @@ namespace MAD.JobSystemCore
             InitID();
         }
 
-        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotificationSettings defaultNotiSettings)
+        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotificationSettings defaultSettings)
         {
             InitID();
             this.name = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
             this.jobs = jobs;
-            this.defaultNotiSettings = defaultNotiSettings;
+            this.defaultSettings = defaultSettings;
         }
 
         #endregion

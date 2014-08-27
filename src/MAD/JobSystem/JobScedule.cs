@@ -168,7 +168,7 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStart.Subtract(_job.tStop);
 
-            _job.noti.CheckRulesAndNotify(_job.outp, _job.settings);
+            _job.noti.CheckRulesAndNotify(_job);
 
             _job.state = Job.JobState.Waiting;
 

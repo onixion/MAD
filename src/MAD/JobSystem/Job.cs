@@ -27,8 +27,8 @@ namespace MAD.JobSystemCore
         public string name { get; set; }
         public JobTime time { get; set; }
 
+        public JobNotificationSettings notiSettings { get; set; }
         public JobNotification noti { get; set; }
-        public JobNotificationSettings settings { get; set; }
 
         [JsonIgnore]
         public JobOutput outp { get; set; }
@@ -52,7 +52,6 @@ namespace MAD.JobSystemCore
             this.time = new JobTime();
             this.outp = new JobOutput();
             this.noti = new JobNotification();
-            this.settings = new JobNotificationSettings();
         }
 
         protected Job(string name, JobType type)
@@ -63,10 +62,9 @@ namespace MAD.JobSystemCore
             this.time = new JobTime();
             this.outp = new JobOutput();
             this.noti = new JobNotification();
-            this.settings = new JobNotificationSettings();
         }
 
-        protected Job(string name, JobType type, JobTime time, JobOutput outp, JobNotification noti, JobNotificationSettings settings)
+        protected Job(string name, JobType type, JobTime time, JobOutput outp, JobNotification noti)
         {
             InitJob();
             this.name = name;
@@ -74,7 +72,6 @@ namespace MAD.JobSystemCore
             this.time = time;
             this.outp = outp;
             this.noti = noti;
-            this.settings = settings;
         }
 
         #endregion

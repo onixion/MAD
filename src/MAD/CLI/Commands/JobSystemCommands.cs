@@ -214,54 +214,30 @@ namespace MAD.CLICore
             _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
             _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
 
-            try
-            { _js.AddNode(_node); }
-            catch (JobNodeException e)
-            {
-                return "<color><red>" + e.Message;
-            }
+            _js.AddNode(_node); 
 
             return "<color><green>Node created (ID " + _node.id + ").";
         }
     }
 
-    public class JobSystemSetNodeNotiCommand : Command
+    public class JobSystemSetNodeNotiCommand : NotificationCommand
     {
         private JobSystem _js;
 
         public JobSystemSetNodeNotiCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-
-            rPar.Add(new ParOption("id", "NODE-ID", "Node to set notification-login.", false, false, new Type[] { typeof(int) }));
-            rPar.Add(new ParOption("s", "SMTP-ADDR", "Serveraddress.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("p", "SMTP-PORT", "Serverport.", false, false, new Type[] { typeof(int) }));
-            rPar.Add(new ParOption("m", "SMTP-MAIL", "Mailaddress.", false, false, new Type[] { typeof(MailAddress)}));
-            rPar.Add(new ParOption("pass", "SMTP-PASS", "Password.", false, false, new Type[] {typeof(string)}));
-            oPar.Add(new ParOption("maketest", "", "Sends a test-mail to check if login works.", false, false, new Type[] { typeof(MailAddress)}));
         }
 
         public override string Execute(int consoleWidth)
         {
-            JobNotificationLogin _login = new JobNotificationLogin();
-
-            _login.smtpAddr = (string)pars.GetPar("s").argValues[0];
-            _login.port = (int)pars.GetPar("p").argValues[0];
-            _login.mail = (MailAddress)pars.GetPar("m").argValues[0];
-            _login.password = (string)pars.GetPar("pass").argValues[0];
-
-            NotificationSystem _noti = new NotificationSystem(_login.smtpAddr, _login.mail, _login.password, _login.port);
-
-            if (OParUsed("sendtest"))
-                if (!_noti.SendMail(new MailAddress[] { (MailAddress)pars.GetPar("sendtest").argValues[0] }, "TEST-MAIL", "TEST TEST TEST", 0))
-                    throw new Exception("Could not send test-mail! Login-data not added to node!");
-
             JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
             if (_node == null)
                 throw new Exception("Node does not exist!");
-            _node.notify = _noti;
 
-            return "";
+            _node.defaultSettings = ParseJobNotificationSettings(this);
+
+            return "<color><green>Notification-Settings set.";
         }
     }
 
@@ -500,6 +476,27 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemSetJobNotiCommand : NotificationCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemSetJobNotiCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
+            if (_job == null)
+                throw new Exception("Job does not exist!");
+
+            _job.notiSettings = ParseJobNotificationSettings(this);
+
+            return "<color><green>Notification-Settings set.";
+        }
+    }
+
     #region commands for adding jobs
 
     public class JobSystemAddPingCommand : JobCommand
@@ -705,27 +702,23 @@ namespace MAD.CLICore
 
     public class JobCommand : Command
     {
+        public const string JOB_NAME = "n";
+        public const string JOB_ID = "id";
         public const string JOB_TIME_PAR = "t";
-        public const string JOB_NOTI_PAR = "rule";
-        public const string JOB_NOTI_MAIL = "mail";
-        public const string JOB_NOTI_PRIO = "prio";
+        public const string JOB_NOTI_RULE = "rule";
 
         public JobCommand()
             : base()
         {
             // GENERAL
-            rPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption(JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             
             // TIME
-            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            oPar.Add(new ParOption(JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
 
-            // NOTIFICATION
-            oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] {typeof(string)}));
-
-            // NOTIFICATION-SETTINGS
-            oPar.Add(new ParOption("mail", "NOT.-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
-            oPar.Add(new ParOption("prio", "NOT.-PRIO", "Priority of the mails.", false, true, new Type[] { typeof(string) }));
+            // NOTIFICATION-RULES
+            oPar.Add(new ParOption(JOB_NOTI_RULE, "NOT.-RULE", "Define Rule(s).", false, true, new Type[] {typeof(string)}));
         }
 
         public override string Execute(int consoleWidth)
@@ -764,10 +757,10 @@ namespace MAD.CLICore
         {
             JobNotification _buffer = new JobNotification();
 
-            if (!c.OParUsed(JOB_NOTI_PAR))
+            if (!c.OParUsed(JOB_NOTI_RULE))
                 return _buffer;
 
-            object[] _args = c.pars.GetPar(JOB_NOTI_PAR).argValues;
+            object[] _args = c.pars.GetPar(JOB_NOTI_RULE).argValues;
             string _temp;
 
             foreach(object _arg in _args)
@@ -851,18 +844,67 @@ namespace MAD.CLICore
         {
             return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
         }
+    }
+
+    public class NotificationCommand : Command
+    {
+        public const string NOTI_SMTP_ENDPOINT = "smtp";
+        public const string NOTI_SMTP_LOGIN = "login";
+        public const string NOTI_SMTP_MAILS = "mail";
+
+        public NotificationCommand()
+            : base()
+        {
+            // NOTIFICATION-LOGIN-PARAMETER
+            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "SMTP-ADDR>:<SMTP-PORT", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(MailAddress) }));
+
+            // NOTIFICATION-SETTINGS
+            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "TO-MAIL-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
 
         public static JobNotificationSettings ParseJobNotificationSettings(Command c)
         {
             JobNotificationSettings _buffer = new JobNotificationSettings();
 
-            // PARSE MAILADDRESSES
-            if (c.OParUsed(JOB_NOTI_MAIL))
-                _buffer.mailAddr = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
+            string[] _temp = c.pars.GetPar(NOTI_SMTP_ENDPOINT).argValues[0].ToString().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+            if (_temp.Length == 2)
+            {
+                _buffer.login.smtpAddr = _temp[0];
 
-            // PARSE PRIO
-            if (c.OParUsed(JOB_NOTI_PRIO))
-                _buffer.priority = ParsePrio((string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0]);
+                try
+                {
+                    _buffer.login.port = Int32.Parse(_temp[1]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse SMTP-Port!", true));
+                }
+            }
+            else
+                throw new Exception(CLIError.Error(CLIError.ErrorType.SyntaxError, "SMTP-Endpoint could not be parsed correctly!", true));
+
+            string[] _temp2 = c.pars.GetPar(NOTI_SMTP_LOGIN).argValues[0].ToString().Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries);
+            if (_temp2.Length == 2)
+            {
+                try
+                {
+                    _buffer.login.mail = new MailAddress(_temp2[0]);
+                }
+                catch (Exception)
+                {
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse MailAddress!", true));
+                }
+
+                _buffer.login.password = _temp2[1];
+            }
+            else
+                throw new Exception(CLIError.Error(CLIError.ErrorType.SyntaxError, "SMTP-Login could not be parsed correctly!", true));
 
             return _buffer;
         }

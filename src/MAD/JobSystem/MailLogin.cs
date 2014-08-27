@@ -4,14 +4,16 @@ using System.Net.Mail;
 
 namespace MAD.JobSystemCore
 {
-    public class JobNotificationLogin
+    public class MailLogin
     {
         public string smtpAddr { get; set; }
         public int port { get; set; }
         public MailAddress mail { get; set; }
         public string password { get; set; }
 
-        public JobNotificationLogin()
-        { }
+        public MailLogin()
+        {
+
+        }
     }
 }

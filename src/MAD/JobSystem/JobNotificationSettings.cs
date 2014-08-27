@@ -8,6 +8,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
+        public MailLogin login { get; set; }
         public MailAddress[] mailAddr { get; set; }
         public MailPriority priority { get; set; }
 
@@ -17,8 +18,7 @@ namespace MAD.JobSystemCore
 
         public JobNotificationSettings() 
         {
-            mailAddr = new MailAddress[0];
-            priority = MailPriority.High;
+
         }
 
         public JobNotificationSettings(MailAddress[] mailAddr)

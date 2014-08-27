@@ -17,13 +17,13 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPort()
-            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput(), new JobNotification(), new JobNotificationSettings())
+            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput(), new JobNotification())
         {
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, JobNotification noti, JobNotificationSettings settings, int port)
-            : base(jobName, jobType, jobTime, outp, noti, settings)
+        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, JobNotification noti, int port)
+            : base(jobName, jobType, jobTime, outp, noti)
         {
             this.port = port;
         }

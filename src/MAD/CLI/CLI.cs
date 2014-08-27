@@ -75,6 +75,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
 
+            commands.Add(new CommandOptions("job setnoti", typeof(JobSystemSetJobNotiCommand), new object[] { js }));
+
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
 
