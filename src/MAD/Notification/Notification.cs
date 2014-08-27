@@ -32,7 +32,7 @@ namespace MAD.Notification
         //#Methods
 
         //Method for getting basic information (static (have to set once))
-        public NotificationSystem(string smtpClient,MailAddress eMailFrom, string password,  int port)
+        public NotificationSystem(string smtpClient, MailAddress eMailFrom, string password,  int port)
         {
             //Convertation of income to intern
             this.smtpClient = smtpClient;

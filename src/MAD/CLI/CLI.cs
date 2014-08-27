@@ -27,11 +27,11 @@ namespace MAD.CLICore
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             // LOGGER
-
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
             commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
 
@@ -59,6 +59,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node setmail", typeof(JobSystemSetNodeNotiCommand), new object[] { js })); 
 
             // JOBS
             commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { js }));
@@ -66,13 +67,13 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
 
-            commands.Add(new CommandOptions("add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add port", typeof(JobSystemAddPortCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add hostdetect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add ftpcheck", typeof(JobSystemAddCheckFtpCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
-            commands.Add(new CommandOptions("add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add port", typeof(JobSystemAddPortCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add hostdetect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add ftpcheck", typeof(JobSystemAddCheckFtpCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
 
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));

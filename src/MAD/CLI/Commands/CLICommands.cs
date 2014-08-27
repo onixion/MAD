@@ -70,13 +70,13 @@ namespace MAD.CLICore
                     output += "<color><yellow>COMMAND     <color><white>" + commandOptions.command + "<color><darkyellow> [" + commandIndex + "]\n";
                     output += "<color><yellow>DESCRIPTION <color><white>" + tempCommand.description + "\n";
                     output += "<color><yellow>USAGE       <color><white>" + GenUsageText(tempCommand, commandOptions) + "\n";
-                    output += "<color><yellow>par\n";
+                    output += "<color><yellow>PARAMETER(S)\n";
 
                     if (!(tempCommand.rPar.Count == 0 && tempCommand.oPar.Count == 0))
                     {
                         if (tempCommand.rPar.Count != 0)
                         {
-                            output += "\t<color><yellow>REQUIRED par\n\n";
+                            output += "\t<color><yellow>REQUIRED PARAMETER(S)\n\n";
 
                             foreach (ParOption _temp in tempCommand.rPar)
                             {
@@ -95,7 +95,7 @@ namespace MAD.CLICore
 
                         if (tempCommand.oPar.Count != 0)
                         {
-                            output += "\t<color><yellow>OPTIONAL par\n\n";
+                            output += "\t<color><yellow>OPTIONAL PARAMETER(S)\n\n";
 
                             foreach (ParOption _temp in tempCommand.oPar)
                             {
@@ -169,6 +169,22 @@ namespace MAD.CLICore
             }
 
             return output;
+        }
+    }
+
+    public class SetWidthCommand : Command
+    {
+        public SetWidthCommand()
+            : base()
+        {
+            description = "This command sets the console width.";
+            rPar.Add(new ParOption("w", "CONSOLE-WIDTH", "New console width.", false, false, new Type[] { typeof(int) })); 
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            Console.WindowWidth = (int)pars.GetPar("w").argValues[0];
+            return "<color><green>Console width set.";
         }
     }
 

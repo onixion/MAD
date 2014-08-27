@@ -27,15 +27,11 @@ namespace MAD.JobSystemCore
         public string name { get; set; }
         public JobTime time { get; set; }
 
-
         public JobNotification noti { get; set; }
         public JobNotificationSettings settings { get; set; }
 
         [JsonIgnore]
         public JobOutput outp { get; set; }
-
-        // Explanation for leaving those one out, can be found in 'JobScedule.cs'.
-        //public List<JobRule> rules { get; set; }
 
         public DateTime tStart { get; set; }
         public DateTime tStop { get; set; }

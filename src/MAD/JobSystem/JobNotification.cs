@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using MAD.Logging;
+using MAD.Notification;
 
 using Newtonsoft.Json;
 
@@ -9,7 +10,7 @@ namespace MAD.JobSystemCore
 {
     public class JobNotification
     {
-        public const bool LOG = false; 
+        public const bool LOG = false;
 
         public List<JobRule> rules = new List<JobRule>();
 

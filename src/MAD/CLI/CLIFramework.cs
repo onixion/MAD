@@ -30,7 +30,7 @@ namespace MAD.CLICore
             CommandOptions _commandOptions = GetCommandOptions(_commandInput);
 
             if (_commandOptions == null)
-                return CLIError.Error(CLIError.ErrorType.CommandError, "Command not know!", true);
+                return CLIError.Error(CLIError.ErrorType.CommandError, "Command '" + _commandInput + "' not know!", true);
 
             ParInput _parInput = GetParamtersFromInput(cliInput);
             Type _commandType = _commandOptions.commandType;
@@ -60,23 +60,35 @@ namespace MAD.CLICore
 
         private string GetCommandName(string input)
         {
-            string[] _buffer = input.Split(new string[] { "-" }, StringSplitOptions.RemoveEmptyEntries);
+            List<string> _args = new List<string>();
+            bool _PARFOUND = false;
 
-            if (_buffer.Length != 0)
+            string[] _buffer = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < _buffer.Length; i++)
             {
-                if (_buffer[0] == "")
+                if (_buffer[i].StartsWith("-"))
                 {
-                    return null;
+                    break;
                 }
-
-                _buffer[0] = _buffer[0].Trim();
-
-                return _buffer[0];
+                else
+                {
+                    _args.Add(_buffer[i]);
+                }
             }
-            else
-            {
-                return null;
-            }
+
+            string _temp = "";
+            foreach (string _buff in _args)
+                _temp += _buff + " ";
+
+            return _temp.Trim();
+        }
+
+        private CommandOptions GetCommandOptions(string command)
+        {
+            foreach (CommandOptions temp in commands)
+                if (temp.command == command)
+                    return temp;
+            return null;
         }
 
         private ParInput GetParamtersFromInput(string input)
@@ -161,19 +173,6 @@ namespace MAD.CLICore
             }*/
 
             return _temp;
-        }
-
-        private CommandOptions GetCommandOptions(string command)
-        {
-            foreach (CommandOptions temp in commands)
-            {
-                if (temp.command == command)
-                {
-                    return temp;
-                }
-            }
-
-            return null;
         }
 
         public static string ValidPar(Command command)

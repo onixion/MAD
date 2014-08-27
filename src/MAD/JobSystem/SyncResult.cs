@@ -22,16 +22,4 @@ namespace MAD.JobSystemCore
             this.nodesUpdated = nodesUpdated;
         }
     }
-
-    public class SyncResultNode
-    {
-        public string name;
-        public IPAddress ip;
-        public PhysicalAddress mac;
-
-        public SyncResultNode()
-        {
-        
-        }
-    }
 }

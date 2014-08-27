@@ -90,6 +90,7 @@
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
     <Compile Include="JobSystem\JobNotification.cs" />
+    <Compile Include="JobSystem\JobNotificationLogin.cs" />
     <Compile Include="JobSystem\JobOutput.cs" />
     <Compile Include="JobSystem\JobRule.cs" />
     <Compile Include="JobSystem\Job.cs" />

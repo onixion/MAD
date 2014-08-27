@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
 
+using MAD.Notification;
+
 using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
@@ -31,7 +33,9 @@ namespace MAD.JobSystemCore
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; } // sns
         public IPAddress ipAddress { get; set; } // sns
-        public JobNotification defaultNoti { get; set; }
+
+        public NotificationSystem notify { get; set; }
+        public JobNotificationSettings defaultNotiSettings { get; set; }
 
         public List<Job> jobs = new List<Job>();
 
@@ -44,14 +48,14 @@ namespace MAD.JobSystemCore
             InitID();
         }
 
-        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotification defaultNoti)
+        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotificationSettings defaultNotiSettings)
         {
             InitID();
             this.name = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
             this.jobs = jobs;
-            this.defaultNoti = defaultNoti;
+            this.defaultNotiSettings = defaultNotiSettings;
         }
 
         #endregion

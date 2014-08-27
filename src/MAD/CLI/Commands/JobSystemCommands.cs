@@ -7,6 +7,7 @@ using System.IO;
 
 using MAD.JobSystemCore;
 using MAD.DHCPReader;
+using MAD.Notification;
 
 namespace MAD.CLICore
 {
@@ -221,6 +222,46 @@ namespace MAD.CLICore
             }
 
             return "<color><green>Node created (ID " + _node.id + ").";
+        }
+    }
+
+    public class JobSystemSetNodeNotiCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemSetNodeNotiCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption("id", "NODE-ID", "Node to set notification-login.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("s", "SMTP-ADDR", "Serveraddress.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("p", "SMTP-PORT", "Serverport.", false, false, new Type[] { typeof(int) }));
+            rPar.Add(new ParOption("m", "SMTP-MAIL", "Mailaddress.", false, false, new Type[] { typeof(MailAddress)}));
+            rPar.Add(new ParOption("pass", "SMTP-PASS", "Password.", false, false, new Type[] {typeof(string)}));
+            oPar.Add(new ParOption("maketest", "", "Sends a test-mail to check if login works.", false, false, new Type[] { typeof(MailAddress)}));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobNotificationLogin _login = new JobNotificationLogin();
+
+            _login.smtpAddr = (string)pars.GetPar("s").argValues[0];
+            _login.port = (int)pars.GetPar("p").argValues[0];
+            _login.mail = (MailAddress)pars.GetPar("m").argValues[0];
+            _login.password = (string)pars.GetPar("pass").argValues[0];
+
+            NotificationSystem _noti = new NotificationSystem(_login.smtpAddr, _login.mail, _login.password, _login.port);
+
+            if (OParUsed("sendtest"))
+                if (!_noti.SendMail(new MailAddress[] { (MailAddress)pars.GetPar("sendtest").argValues[0] }, "TEST-MAIL", "TEST TEST TEST", 0))
+                    throw new Exception("Could not send test-mail! Login-data not added to node!");
+
+            JobNode _node = _js.GetNode((int)pars.GetPar("id").argValues[0]);
+            if (_node == null)
+                throw new Exception("Node does not exist!");
+            _node.notify = _noti;
+
+            return "";
         }
     }
 
@@ -750,37 +791,6 @@ namespace MAD.CLICore
             return _buffer;
         }
 
-        public static JobNotificationSettings ParseJobNotificationSettings(Command c)
-        {
-            JobNotificationSettings _buffer = new JobNotificationSettings();
-
-            // PARSE MAILADDRESSES
-            if (c.OParUsed(JOB_NOTI_MAIL))
-                _buffer.mailAddr = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
-
-            // PARSE PRIO
-            if (c.OParUsed(JOB_NOTI_PRIO))
-                _buffer.priority = ParsePrio((string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0]);
-
-            return _buffer;
-        }
-
-        public static MailPriority ParsePrio(string text)
-        {
-            text = text.ToLower();
-            switch (text)
-            {
-                case "low":
-                    return MailPriority.Low;
-                case "normal":
-                    return MailPriority.Normal;
-                case "high":
-                    return MailPriority.High;
-                default:
-                    throw new Exception("Could not parse '" + text + "' to a mail-priority!");
-            }
-        }
-
         public static JobRule ParseRule(string data)
         {
             JobRule _rule = new JobRule();
@@ -836,9 +846,41 @@ namespace MAD.CLICore
                 throw new Exception("Operation not known!");
             return _rule;
         }
+
         private static string[] SplitByOperator(string toSplit, string i)
         {
             return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        public static JobNotificationSettings ParseJobNotificationSettings(Command c)
+        {
+            JobNotificationSettings _buffer = new JobNotificationSettings();
+
+            // PARSE MAILADDRESSES
+            if (c.OParUsed(JOB_NOTI_MAIL))
+                _buffer.mailAddr = (MailAddress[])c.pars.GetPar(JOB_NOTI_MAIL).argValues;
+
+            // PARSE PRIO
+            if (c.OParUsed(JOB_NOTI_PRIO))
+                _buffer.priority = ParsePrio((string)c.pars.GetPar(JOB_NOTI_PRIO).argValues[0]);
+
+            return _buffer;
+        }
+
+        public static MailPriority ParsePrio(string text)
+        {
+            text = text.ToLower();
+            switch (text)
+            {
+                case "low":
+                    return MailPriority.Low;
+                case "normal":
+                    return MailPriority.Normal;
+                case "high":
+                    return MailPriority.High;
+                default:
+                    throw new Exception("Could not parse '" + text + "' to a mail-priority!");
+            }
         }
     }
 

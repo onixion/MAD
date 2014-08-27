@@ -37,7 +37,7 @@ namespace CLIIO
                 _HEAD = offset;
                 _VINPUT = "";
                 _MIN = _HEAD;
-                _historyPointer = -1; 
+                _historyPointer = 0; 
 
                 try
                 {
@@ -96,12 +96,13 @@ namespace CLIIO
                         }
                         else if (_key.Key == ConsoleKey.UpArrow)
                         {
+                            ClearInput();
+
                             _VINPUT = GetLastHistoryEntry(_historyPointer);
 
                             if (_cliHistory.Count - 1 > _historyPointer)
                                 _historyPointer++;
 
-                            ClearInput();
                             SetCursor(_HEAD);
                             Console.Write(_VINPUT);
                         }
