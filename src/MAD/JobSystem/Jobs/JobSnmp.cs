@@ -8,6 +8,7 @@ namespace MAD.JobSystemCore
 {
     public class JobSnmp : Job
     {
+        #region fields
         public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
         public uint expectedIfNr = 10;                                                  //optional Parameter default (wie zu sehen) ist 10
 
@@ -23,9 +24,12 @@ namespace MAD.JobSystemCore
 
         public NetworkHelper.securityLvl security;                                      //required Parameter sofern version == 3
 
-        private string ifEntryString = "1.3.6.1.2.1.2.2.1";
-        private static uint lastRecord = 0;
+        private const string _ifEntryString = "1.3.6.1.2.1.2.2.1";
+        private static uint _lastRecord = 0;
+        #endregion
 
+        #region methods
+        #region Constructors
         public JobSnmp()
             : base(JobType.SnmpCheck)
         { }
@@ -35,45 +39,49 @@ namespace MAD.JobSystemCore
         {
             this.version = (uint)version;
         }
+        #endregion
 
+        #region FromJob
         protected override string JobStatus()
         {
             throw new NotImplementedException();
         }
 
-        public override void Execute(IPAddress targetAddress)
+        public override void Execute(IPAddress _targetAddress)
         {
-            UdpTarget target = new UdpTarget(targetAddress, 161, 5000, 3);
+            UdpTarget _target = new UdpTarget(_targetAddress, 161, 5000, 3);
             switch (version)
             {
                 case 1:
                     //Falls der zu blöd war zu verstehen dass lei 2 und 3 unterstützt werden dann a freundliche nachricht dass des nit geht
                     break;
                 case 2:
-                    SnmpV2Handling(target);
+                    SnmpV2Handling(_target);
                     break;
                 case 3:
-                    SnmpV3Handling(target);
+                    SnmpV3Handling(_target);
                     break;
             }
-            target.Close();
+            _target.Close();
+        }
+        #endregion
+
+        #region Private
+        private void SnmpV2Handling(UdpTarget _target)
+        {
+            OctetString _community = new OctetString(communityString);
+            AgentParameters _param = new AgentParameters(_community);
+
+            _param.Version = SnmpVersion.Ver2;
+
+            ExecuteRequest(_target, _param);
         }
 
-        private void SnmpV2Handling(UdpTarget target)
+        private void SnmpV3Handling(UdpTarget _target)
         {
-            OctetString community = new OctetString(communityString);
-            AgentParameters param = new AgentParameters(community);
+            SecureAgentParameters _param = new SecureAgentParameters();
 
-            param.Version = SnmpVersion.Ver2;
-
-            ExecuteRequest(target, param);
-        }
-
-        private void SnmpV3Handling(UdpTarget target)
-        {
-            SecureAgentParameters param = new SecureAgentParameters();
-
-            if (!target.Discovery(param))
+            if (!_target.Discovery(_param))
             {
                 //a fehler meldung ausgeben nach der art "Das Programm konnte sich nicht mit dem Agenten Syncronisieren"
             }
@@ -81,56 +89,56 @@ namespace MAD.JobSystemCore
             switch (security)
             {
                 case NetworkHelper.securityLvl.noAuthNoPriv:
-                    param.noAuthNoPriv(communityString);
+                    _param.noAuthNoPriv(communityString);
 
                     break;
                 case NetworkHelper.securityLvl.authNoPriv:
                     if (authProt == NetworkHelper.snmpProtokolls.MD5)
-                        param.authNoPriv(communityString, AuthenticationDigests.MD5, auth);
+                        _param.authNoPriv(communityString, AuthenticationDigests.MD5, auth);
                     else if (authProt == NetworkHelper.snmpProtokolls.SHA)
-                        param.authNoPriv(communityString, AuthenticationDigests.SHA1, auth);
+                        _param.authNoPriv(communityString, AuthenticationDigests.SHA1, auth);
 
                     break;
                 case NetworkHelper.securityLvl.authPriv:
                     if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.AES)
-                        param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.AES128, priv);
+                        _param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.AES128, priv);
                     else if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.DES)
-                        param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.DES, priv);
+                        _param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.DES, priv);
                     else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.AES)
-                        param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.AES128, priv);
+                        _param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.AES128, priv);
                     else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.DES)
-                        param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.DES, priv);
+                        _param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.DES, priv);
 
                     break;
             }
 
-            ExecuteRequest(target, param);
+            ExecuteRequest(_target, _param);
         }
 
-        private void ExecuteRequest(UdpTarget target, AgentParameters param)
+        private void ExecuteRequest(UdpTarget _target, AgentParameters _param)
         {
 
-            string outOctetsString = "1.3.6.1.2.1.2.2.1.16";
+            const string _outOctetsString = "1.3.6.1.2.1.2.2.1.16";
 
-            Oid outOctets = new Oid(outOctetsString + "." + ifEntryNr);
+            Oid _outOctets = new Oid(_outOctetsString + "." + ifEntryNr);
 
-            Pdu octets = new Pdu(PduType.Get);
-            octets.VbList.Add(outOctets);
+            Pdu _octets = new Pdu(PduType.Get);
+            _octets.VbList.Add(_outOctets);
 
             try
             {
-                SnmpV2Packet octetsResult = (SnmpV2Packet)target.Request(octets, param);
+                SnmpV2Packet _octetsResult = (SnmpV2Packet)_target.Request(_octets, _param);
 
-                uint result = (uint)Convert.ToUInt64(octetsResult.Pdu.VbList[0].Value.ToString()) - lastRecord;
-                lastRecord = (uint)Convert.ToUInt64(octetsResult.Pdu.VbList[0].Value.ToString());
+                uint _result = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString()) - _lastRecord;
+                _lastRecord = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString());
 
-                if (octetsResult.Pdu.ErrorStatus != 0)
+                if (_octetsResult.Pdu.ErrorStatus != 0)
                 {
                     //Fehlermeldung 
                 }
                 else
                 {
-                    Console.WriteLine("Output since the last run: {0}", result.ToString());
+                    Console.WriteLine("Output since the last run: {0}", _result.ToString());
                     //Ausgabe nach dem Muster.. wie oben 
                 }
             }
@@ -153,18 +161,18 @@ namespace MAD.JobSystemCore
 
             try
             {
-                SnmpV3Packet octetsResult = (SnmpV3Packet)target.Request(octets, param);
+                SnmpV3Packet _octetsResult = (SnmpV3Packet)target.Request(octets, param);
 
-                uint result = (uint)Convert.ToUInt64(octetsResult.ScopedPdu.VbList[0].Value.ToString()) - lastRecord;
-                lastRecord = (uint)Convert.ToUInt64(octetsResult.ScopedPdu.VbList[0].Value.ToString());
+                uint _result = (uint)Convert.ToUInt64(_octetsResult.ScopedPdu.VbList[0].Value.ToString()) - _lastRecord;
+                _lastRecord = (uint)Convert.ToUInt64(_octetsResult.ScopedPdu.VbList[0].Value.ToString());
 
-                if (octetsResult.ScopedPdu.ErrorStatus != 0)
+                if (_octetsResult.ScopedPdu.ErrorStatus != 0)
                 {
                     //Fehlermeldung
                 }
                 else
                 {
-                    Console.WriteLine("Output since the last run: {0}", result.ToString());
+                    Console.WriteLine("Output since the last run: {0}", _result.ToString());
                     //Ausgabe nach dem Muster.. wie oben 
                 }
             }
@@ -174,5 +182,7 @@ namespace MAD.JobSystemCore
             }
 
         }
+        #endregion
+        #endregion
     }
 }
