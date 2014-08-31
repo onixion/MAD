@@ -31,6 +31,10 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
+            commands.Add(new CommandOptions("conf", typeof(LoadConfigFileCommand), null));
+            commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfig), null));
+            commands.Add(new CommandOptions("conf-show", typeof(ConfShow), null));
+
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
             commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));

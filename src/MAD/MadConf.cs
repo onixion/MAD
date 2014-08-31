@@ -8,9 +8,10 @@ namespace MAD
     public static class MadConf
     {
         private static object _confLock = new object();
-
         private static JsonSerializer _ser = new JsonSerializer();
+
         public static MadConfigFile conf = new MadConfigFile();
+        public static event EventHandler OnConfChange;
 
         public static bool ConfDirExist(string dirPath)
         {
@@ -73,6 +74,7 @@ namespace MAD
                     {
                         JsonReader _jReader = new JsonTextReader(_reader);
                         conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
+                        OnConfChange.Invoke(null, null);
                     }
                 }
                 catch (Exception)

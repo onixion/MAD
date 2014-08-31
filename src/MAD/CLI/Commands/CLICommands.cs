@@ -202,4 +202,55 @@ namespace MAD.CLICore
             return output;
         }
     }
+
+    public class LoadConfigFileCommand : Command
+    {
+        public LoadConfigFileCommand()
+            : base()
+        {
+            description = "This command load a conf file from another path.";
+            rPar.Add(new ParOption("p", "PATH-TO-CONF", "File to load from.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            string _filepath = (string)pars.GetPar("p").argValues[0];
+
+            if (MadConf.TryReadConf(_filepath))
+                return "<color><green>Conf file loaded!";
+            else
+                return "<color><red>Could not load conf file '" + _filepath + "'!";
+        }
+    }
+
+    public class LoadDefaultConfig : Command
+    {
+        public LoadDefaultConfig()
+        {
+            description = "This command loads the default conf file.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            if(MadConf.TryReadConf(Mad.CONFFILE))
+                return "<color><green>Default conf file loaded!";
+            else
+                return "<color><red>Could not load default conf file.";
+        }
+    }
+
+    public class ConfShow : Command
+    {
+        public ConfShow()
+        {
+            description = "This command shows the content of the current loaded conf file.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            output = "<color><yellow>VERSION: <color><white>" + MadConf.conf.VERSION + "\n";
+
+            return output;
+        }
+    }
 }
