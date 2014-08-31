@@ -15,13 +15,30 @@ namespace MAD
     {
         public static readonly string VERSION = "v0.0.6.0";
         public static readonly string DATADIR = Path.Combine("data");
+        public static readonly string CONFFILE = Path.Combine(DATADIR, "configure.json");
 
         [STAThread]
         static int Main(string[] args)
         {
             Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
-            if (!Directory.Exists(DATADIR))
-                Directory.CreateDirectory(DATADIR);
+
+            // LOAD CONFIGURATION!
+            MadConf.TryCreateDir(DATADIR);
+            if (MadConf.ConfExist(CONFFILE))
+            {
+                if (MadConf.TryReadConf(CONFFILE))
+                    Console.WriteLine("Configuration loaded!");
+            }
+            else
+            {
+                MadConf.SetToDefault();
+                Console.WriteLine("Default configuration initialized!");
+
+                if (MadConf.TryCreateConf(CONFFILE))
+                    Console.WriteLine("Created default configuration file!");
+                else
+                    Console.WriteLine("Could not created default configuration file");
+            }
 
             JobSystem js = new JobSystem();
             MACFeeder macFeeder = new MACFeeder();

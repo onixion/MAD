@@ -117,6 +117,7 @@
     <Compile Include="JobSystem\SyncResult.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Mad.cs" />
+    <Compile Include="MadConf.cs" />
     <Compile Include="Notification\Notification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
