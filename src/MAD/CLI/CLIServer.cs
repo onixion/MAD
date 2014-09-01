@@ -100,20 +100,26 @@ namespace MAD.CLIServerCore
                     throw new Exception("User already online!");
 
                 /*
-                // AES-KEY exchange
-                RSAPacket _rsaP = new RSAPacket(_stream, null);
-                _rsaP.ReceivePacket();
-                if (_rsaP.modulusLength != ACCEPTED_RSA_MODULUS_LENGTH)
-                    throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
-                RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
-                _rsaP.Dispose();
-                string _aesPass = GenRandomPassUnicode(AES_PASS_LENGTH);
-                byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), true);
-                using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
-                    _dataP.SendPacket();
-                AES _aes = new AES(_aesPass);    
-                */
+                RSAx _rsa = null;
 
+                using (RSAPacket _rsaP = new RSAPacket(_stream, null))
+                {
+                    _rsaP.ReceivePacket();
+
+                    if (_rsaP.modulusLength != ACCEPTED_RSA_MODULUS_LENGTH)
+                        throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
+
+                    _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
+                }
+
+                string _aesPass = "abcdefg";//GenRandomPassUnicode(AES_PASS_LENGTH);
+                byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), false);
+                    
+                using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
+                        _dataP.SendPacket();
+               
+                AES _aes = new AES(_aesPass);
+                */
                 bool _loginSuccess;
                 using (LoginPacket _loginP = new LoginPacket(_stream, null))
                 {

@@ -79,6 +79,9 @@ namespace MAD
 
                         CLIServer cliServer = new CLIServer(999, true, false, js);
                         cliServer.Start();
+
+                        Console.WriteLine("Server running ... press any key to stop server.");
+                        Console.ReadKey();
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
@@ -101,7 +104,13 @@ namespace MAD
 
             Logger.ForceWriteToLog();
 
+            // cleaning up
             js.StopScedule();
+
+            // try to save current config.
+            try { MadConf.SaveConf(CONFFILE); }
+            catch (Exception)
+            { }
 
             return 0;
         }

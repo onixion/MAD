@@ -68,19 +68,30 @@ namespace CLIClient
                     }
 
                     /*
-                    RSA r = RSACryptoServiceProvider.Create(
-                    RSAParameters t = r.ExportParameters(true);
-                    RSAxParameters _par = new RSAxParameters(t, 2048);
-                    RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
-                    _rsaP.SendPacket();
-                    _rsaP.Dispose();
-                    RSAx _rsa = new RSAx(_par);
-                    DataPacket _dataP = new DataPacket(_stream, null);
-                    _dataP.ReceivePacket();
-                    _aesPassFromServer = Encoding.Unicode.GetString(_rsa.Decrypt(_dataP.data, true));
-                    AES _aes = new AES(_aesPassFromServer);
-                    */
+                    RSAxParameters _par = null;
 
+                    using(RSA r = new RSACryptoServiceProvider(2048))
+                    {
+                        _par = new RSAxParameters(r.ExportParameters(true), 2048);
+                    }
+
+                    using(RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength))
+                        _rsaP.SendPacket();
+
+                    AES _aes = null;
+
+                    using (DataPacket _dataP = new DataPacket(_stream, null))
+                    {
+                        _dataP.ReceivePacket();
+
+                        // decrypt using private-key
+                        RSAx _rsa = new RSAx(_par);
+                        _aesPassFromServer = Encoding.Unicode.GetString(_rsa.Decrypt(_dataP.data, true, false));
+                        
+                        // set AES-key
+                        _aes = new AES(_aesPassFromServer);
+                    }
+                    */
                     byte[] _username = Encoding.Unicode.GetBytes(username);
                     byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
 
@@ -91,7 +102,7 @@ namespace CLIClient
                     using(DataPacket _dataP2 = new DataPacket(_stream, null))
                     {
                         _dataP2.ReceivePacket();
-                        _serverAnswer = Encoding.Unicode.GetString(_dataP.data);
+                        _serverAnswer = Encoding.Unicode.GetString(_dataP2.data);
                     }
   
                     Console.WriteLine("SERVER-REPLY: " + _serverAnswer);
@@ -102,7 +113,7 @@ namespace CLIClient
                         Console.WriteLine("\nServer accepted login-data.");
                         Console.ForegroundColor = ConsoleColor.White;
 
-                        StartVirtualConsole(_stream, null);
+                        StartRemoteConsole(_stream, null);
                     }
                     else
                     {
@@ -122,16 +133,21 @@ namespace CLIClient
             }
         }
 
-        private void StartVirtualConsole(NetworkStream stream, AES aes)
+        private void StartRemoteConsole(NetworkStream stream, AES aes)
         {
             string _cliInput;
             string _serverResponse;
             DataPacket _dataP = new DataPacket(stream, aes);
             CLIPacket _cliP = new CLIPacket(stream, aes);
+            string _cursor = "MAD-CLIENT> ";
 
             while (true)
             {
-                _cliInput = CLIInput.ReadInput(0);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write(_cursor);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                _cliInput = CLIInput.ReadInput(_cursor.Length);
 
                 _cliP.consoleWidth = Console.BufferWidth;
                 _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);
@@ -140,7 +156,7 @@ namespace CLIClient
                 _dataP.ReceivePacket();
                 _serverResponse = Encoding.Unicode.GetString(_dataP.data);
 
-                if (_serverResponse == "EXIT_CLI")
+                if (_serverResponse == "CLIENT_DISCONNECT")
                     break;
 
                 CLIOutput.WriteToConsole(_serverResponse);

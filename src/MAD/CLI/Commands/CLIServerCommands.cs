@@ -4,6 +4,10 @@ using MAD.CLIServerCore;
 
 namespace MAD.CLICore
 {
+    /* These commands are not necessarry anymore, because the cliserver can't run at the same time as the cli... 
+     * But we keep it, maybe we need it some day ...
+     */
+
     public class CLIServerInfo : Command
     {
         private CLIServer _cliServer;
