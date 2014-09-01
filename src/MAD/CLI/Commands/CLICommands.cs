@@ -216,10 +216,15 @@ namespace MAD.CLICore
         {
             string _filepath = (string)pars.GetPar("p").argValues[0];
 
-            if (MadConf.TryReadConf(_filepath))
-                return "<color><green>Conf file loaded!";
-            else
-                return "<color><red>Could not load conf file '" + _filepath + "'!";
+            try
+            {
+                MadConf.LoadConf(_filepath);
+                return "<color><green>Config loaded.";
+            }
+            catch (Exception e)
+            {
+                return "<color><red>Could not load config: " + e.Message;
+            }
         }
     }
 
@@ -232,10 +237,15 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            if(MadConf.TryReadConf(Mad.CONFFILE))
-                return "<color><green>Default conf file loaded!";
-            else
-                return "<color><red>Could not load default conf file.";
+            try
+            {
+                MadConf.LoadConf(Mad.CONFFILE);
+                return "<color><green>Default config loaded.";
+            }
+            catch (Exception e)
+            {
+                return "<color><red>Could not load default config: " + e.Message;
+            }
         }
     }
 

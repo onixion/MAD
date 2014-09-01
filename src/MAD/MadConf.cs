@@ -5,13 +5,22 @@ using Newtonsoft.Json;
 
 namespace MAD
 {
+    /* This class handles the config file (MadConf) */
+
     public static class MadConf
     {
+        #region members
+
         private static object _confLock = new object();
-        private static JsonSerializer _ser = new JsonSerializer();
 
         public static MadConfigFile conf = new MadConfigFile();
+        private static JsonSerializer _ser = new JsonSerializer();
+
         public static event EventHandler OnConfChange;
+
+        #endregion
+
+        #region methodes
 
         public static bool ConfDirExist(string dirPath)
         {
@@ -40,59 +49,38 @@ namespace MAD
                 return false;
         }
 
-        public static bool TryCreateConf(string filePath)
+        public static void SaveConf(string filePath)
         {
-            if (!ConfExist(filePath))
+            lock (_confLock)
             {
-                try
-                {
-                    lock (_confLock)
-                    {
-                        using (FileStream _file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                        using (StreamWriter _writer = new StreamWriter(_file))
-                            _ser.Serialize(_writer, conf);
-                    }
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-
-                return true;
+                using (FileStream _file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                using (StreamWriter _writer = new StreamWriter(_file))
+                    _ser.Serialize(_writer, conf);
             }
-            else
-                return false;
         }
 
-        public static bool TryReadConf(string filePath)
+        public static void LoadConf(string filePath)
         {
-            if (ConfExist(filePath))
+            using (FileStream _file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (StreamReader _reader = new StreamReader(_file))
             {
-                try
-                {
-                    using (StreamReader _reader = new StreamReader(filePath))
-                    {
-                        JsonReader _jReader = new JsonTextReader(_reader);
-                        conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
-                        OnConfChange.Invoke(null, null);
-                    }
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-
-                return true;
+                JsonReader _jReader = new JsonTextReader(_reader);
+                conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
+                
+                if(OnConfChange != null)
+                    OnConfChange.Invoke(null, null);
             }
-            else
-                return false;
         }
 
         public static void SetToDefault()
         {
             conf.VERSION = "v0.0.6.0";
         }
+
+        #endregion
     }
+
+    /* This class contains all variables, which should be saved / loaded from the config file. */
 
     public class MadConfigFile
     {

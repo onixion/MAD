@@ -21,23 +21,30 @@ namespace MAD
         static int Main(string[] args)
         {
             Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
-
-            // LOAD CONFIGURATION!
             MadConf.TryCreateDir(DATADIR);
+
+            // load config
             if (MadConf.ConfExist(CONFFILE))
             {
-                if (MadConf.TryReadConf(CONFFILE))
-                    Console.WriteLine("Configuration loaded!");
+                try
+                {
+                    MadConf.LoadConf(CONFFILE);
+                    Console.WriteLine("Config loaded.");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Config could not be loaded: " + e.Message);
+
+                    MadConf.SetToDefault();
+                    Console.WriteLine("Loaded default config.");
+                }
             }
             else
             {
+                Console.WriteLine("No config file found.");
+                
                 MadConf.SetToDefault();
-                Console.WriteLine("Default configuration initialized!");
-
-                if (MadConf.TryCreateConf(CONFFILE))
-                    Console.WriteLine("Created default configuration file!");
-                else
-                    Console.WriteLine("Could not created default configuration file");
+                Console.WriteLine("Loaded default config.");
             }
 
             JobSystem js = new JobSystem();

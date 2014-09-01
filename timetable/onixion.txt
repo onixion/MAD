@@ -83,3 +83,4 @@ replacing Xml-Serializer with Json-Serializer, because Json is much easier to us
 [25.08.2014][18:00-22:00][4h][174h] Implemented JobNotification, JobOutput and JobNotificationSettings. Tested and is working.
 [31.08.2014][10:00-12:00][2h][176h] Added MadConf and MadConfFile.
 [31.08.2014][18:00-22:00][4h][180h] Fixed bugs, added three commands for handeling conf files. Added OnConfChange-EventHandler. Tested everything, works.
+[01.09.2014][21:00-23:00][3h][183h] Modified 'MadConf' and tested. Now it works with exceptions.
