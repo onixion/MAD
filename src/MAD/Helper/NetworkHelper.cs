@@ -9,10 +9,9 @@ namespace MAD.Helper
         #region Member
         public const uint DHCP_SERVER_PORT = 67;                                    //Port on which a DHCP Server listens; for catching DHCP Requests you will need this 
         public const uint DHCP_CLIENT_PORT = 68;                                    //Port on which a DHCP Client listens
-
-        public const uint _magicCookiePosition = 236;                               //Position of magic dhcp cookie in the udp datagramm
-
+        public const uint MAGIC_COOKIE_POSITION = 236;                               //Position of magic dhcp cookie in the udp datagramm
         public const uint MAGIC_COOKIE_VALUE = 1669485411;                          //Value of the four byte magic dhcp cookie
+        
         public const byte COOKIE_BYTE0_VALUE = 99;                                  //Value of first byte of the four byte magic dhcp cookie
         public const byte COOKIE_BYTE1_VALUE = 130;                                 //Value of second -"-
         public const byte COOKIE_BYTE2_VALUE = 83;                                  //Value of third -"-
@@ -57,10 +56,10 @@ namespace MAD.Helper
 
         public bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
         {
-            if (data[_magicCookiePosition] == COOKIE_BYTE0_VALUE 
-                && data[_magicCookiePosition + 1] == COOKIE_BYTE1_VALUE 
-                && data[_magicCookiePosition + 2] == COOKIE_BYTE2_VALUE 
-                && data[_magicCookiePosition + 3] == COOKIE_BYTE3_VALUE)
+            if (data[MAGIC_COOKIE_POSITION] == COOKIE_BYTE0_VALUE 
+                && data[MAGIC_COOKIE_POSITION + 1] == COOKIE_BYTE1_VALUE 
+                && data[MAGIC_COOKIE_POSITION + 2] == COOKIE_BYTE2_VALUE 
+                && data[MAGIC_COOKIE_POSITION + 3] == COOKIE_BYTE3_VALUE)
             {
                 return true;
             }
@@ -69,7 +68,7 @@ namespace MAD.Helper
 
         public bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
         {
-            for (uint i = _magicCookiePosition; i < data.Length; i++)
+            for (uint i = MAGIC_COOKIE_POSITION; i < data.Length; i++)
             {
                 if (data[i] == 53)
                 {

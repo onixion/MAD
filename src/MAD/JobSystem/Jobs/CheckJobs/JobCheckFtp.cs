@@ -8,7 +8,7 @@ namespace MAD.JobSystemCore
 {
     class JobCheckFtp : Job
     {
-        private bool working;
+        private bool _working;
 
         public string username; //required parameter
         public string password; //required parameter
@@ -21,7 +21,7 @@ namespace MAD.JobSystemCore
         {
             string _tmp = "";
 
-            if (working)
+            if (_working)
             {
                 _tmp += "FTP is working";
                 outp.outState = JobOutput.OutState.Success;
@@ -37,19 +37,19 @@ namespace MAD.JobSystemCore
 
         public override void Execute(IPAddress targetAddress)
         {
-            FtpWebRequest requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + targetAddress.ToString()));
-            requestDir.Credentials = new NetworkCredential(username, password);
-            requestDir.Method = WebRequestMethods.Ftp.PrintWorkingDirectory;
+            FtpWebRequest _requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + targetAddress.ToString()));
+            _requestDir.Credentials = new NetworkCredential(username, password);
+            _requestDir.Method = WebRequestMethods.Ftp.PrintWorkingDirectory;
 
             try
             {
-                FtpWebResponse response = (FtpWebResponse)requestDir.GetResponse();
-                working = true;
+                FtpWebResponse _response = (FtpWebResponse)_requestDir.GetResponse();
+                _working = true;
             }
 
             catch (Exception)
             {
-                working = false;
+                _working = false;
             }
         }
     }

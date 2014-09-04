@@ -88,9 +88,15 @@ namespace MAD.DHCPReader
                 else
                     _check.Abort();
 
+                if (_check.ThreadState == ThreadState.Running)
+                    _check.Abort();
+
                 if (_start.ThreadState != ThreadState.Unstarted)
                     _start.Join(TimeSpan.FromSeconds(3));
                 else
+                    _start.Abort();
+
+                if (_start.ThreadState == ThreadState.Running)
                     _start.Abort();
 
                 return null;
@@ -150,7 +156,7 @@ namespace MAD.DHCPReader
                     _tmpModel.hostMac = _helper.getPhysicalAddressString(_data);
                     _tmpModel.macGiven = true;
 
-                    for (uint i = NetworkHelper._magicCookiePosition; i < _data.Length; i++)
+                    for (uint i = NetworkHelper.MAGIC_COOKIE_POSITION; i < _data.Length; i++)
                     {
                         switch (Convert.ToUInt16(_data[i]))
                         {

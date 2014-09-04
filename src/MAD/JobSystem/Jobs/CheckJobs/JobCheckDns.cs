@@ -8,7 +8,7 @@ namespace MAD.JobSystemCore
 {
     class JobCheckDns : Job
     {
-        private bool working;
+        private bool _working;
 
         //keine Parameter benötigt 
 
@@ -21,7 +21,7 @@ namespace MAD.JobSystemCore
         {
             string _tmp = "";
 
-            if (working)
+            if (_working)
             {
                 _tmp += "DNS is working";
                 outp.outState = JobOutput.OutState.Success;
@@ -40,11 +40,11 @@ namespace MAD.JobSystemCore
             try
             {
                 IPHostEntry _tmp = Dns.GetHostEntry("www.google.com");
-                working = true;
+                _working = true;
             }
             catch (Exception)
             {
-                working = false;
+                _working = false;
             }
         }
     }

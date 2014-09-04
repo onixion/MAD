@@ -10,21 +10,21 @@ namespace MAD.CLICore
 {
     public class SnmpInterfaceCommand : Command
     {
-        private uint version;
-        private uint expectedIfNr = 10;
+        private uint _version;
+        private uint _expectedIfNr = 10;
 
         public NetworkHelper.snmpProtokolls privProt;          
         public NetworkHelper.snmpProtokolls authProt;
         public NetworkHelper.securityLvl security;
 
-        private IPAddress targetIP;
+        private IPAddress _targetIP;
 
-        private const string communityString = "public";
-        private const string priv = "MAD";
-        private const string auth = "MAD";
+        private const string _communityString = "public";
+        private const string _priv = "MAD";
+        private const string _auth = "MAD";
         private string _output = "<color><blue>"; 
 
-        private string ifEntryString = "1.3.6.1.2.1.2.2.1";
+        private string _ifEntryString = "1.3.6.1.2.1.2.2.1";
 
         public SnmpInterfaceCommand()
         {
@@ -37,10 +37,10 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            version = (uint)pars.GetPar("ver").argValues[0];
+            _version = (uint)pars.GetPar("ver").argValues[0];
             string _buffer = (string)pars.GetPar("ip").argValues[0];
 
-            if (version == 3)
+            if (_version == 3)
             {
                 _buffer = (string)pars.GetPar("s").argValues[0];
                 switch (_buffer)
@@ -116,43 +116,43 @@ namespace MAD.CLICore
                 return "<color><red>Could not parse ip-address!";
             }
             else
-                targetIP = IPAddress.Parse(_buffer);
+                _targetIP = IPAddress.Parse(_buffer);
 
-            UdpTarget target = new UdpTarget(targetIP, 161, 5000, 3);
+            UdpTarget target = new UdpTarget(_targetIP, 161, 5000, 3);
 
             // if optional par is used.
 
             // PARSE privProt
             
 
-            if (version == 2)
+            if (_version == 2)
             { 
                 // VER 2
-                OctetString community = new OctetString(communityString);
+                OctetString community = new OctetString(_communityString);
                 AgentParameters param = new AgentParameters(community);
 
                 param.Version = SnmpVersion.Ver2;
 
-                Oid ifIndex = new Oid(ifEntryString + ".1");
-                Oid ifDescr = new Oid(ifEntryString + ".2");
-                Oid ifType = new Oid(ifEntryString + ".3");
+                Oid ifIndex = new Oid(_ifEntryString + ".1");
+                Oid ifDescr = new Oid(_ifEntryString + ".2");
+                Oid ifType = new Oid(_ifEntryString + ".3");
 
-                expectedIfNr = ParameterCountRequest(param, target);
+                _expectedIfNr = ParameterCountRequest(param, target);
 
-                if (expectedIfNr == 0)
+                if (_expectedIfNr == 0)
                     return "<color><red>ERROR: there are no Devices";
 
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
-                index.MaxRepetitions = (int)expectedIfNr;
+                index.MaxRepetitions = (int)_expectedIfNr;
 
                 Pdu descr = new Pdu(PduType.GetBulk);
                 descr.VbList.Add(ifDescr);
-                descr.MaxRepetitions = (int)expectedIfNr;
+                descr.MaxRepetitions = (int)_expectedIfNr;
 
                 Pdu type = new Pdu(PduType.GetBulk);
                 type.VbList.Add(ifType);
-                type.MaxRepetitions = (int)expectedIfNr;
+                type.MaxRepetitions = (int)_expectedIfNr;
 
                 try
                 {
@@ -181,7 +181,7 @@ namespace MAD.CLICore
                     return "<color><red>ERROR: sending requests failed";
                 }
             }
-            else if (version == 3)
+            else if (_version == 3)
             {
                 // VER 3
                 SecureAgentParameters param = new SecureAgentParameters();
@@ -195,49 +195,49 @@ namespace MAD.CLICore
                 switch (security)
                 {
                     case NetworkHelper.securityLvl.noAuthNoPriv:
-                        param.noAuthNoPriv(communityString);
+                        param.noAuthNoPriv(_communityString);
 
                         break;
                     case NetworkHelper.securityLvl.authNoPriv:
                         if (authProt == NetworkHelper.snmpProtokolls.MD5)
-                            param.authNoPriv(communityString, AuthenticationDigests.MD5, auth);
+                            param.authNoPriv(_communityString, AuthenticationDigests.MD5, _auth);
                         else if (authProt == NetworkHelper.snmpProtokolls.SHA)
-                            param.authNoPriv(communityString, AuthenticationDigests.SHA1, auth);
+                            param.authNoPriv(_communityString, AuthenticationDigests.SHA1, _auth);
 
                         break;
                     case NetworkHelper.securityLvl.authPriv:
                         if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.AES)
-                            param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.AES128, priv);
+                            param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.AES128, _priv);
                         else if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.DES)
-                            param.authPriv(communityString, AuthenticationDigests.MD5, auth, PrivacyProtocols.DES, priv);
+                            param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.DES, _priv);
                         else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.AES)
-                            param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.AES128, priv);
+                            param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.AES128, _priv);
                         else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.DES)
-                            param.authPriv(communityString, AuthenticationDigests.SHA1, auth, PrivacyProtocols.DES, priv);
+                            param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.DES, _priv);
 
                         break;
                 }
 
-                expectedIfNr = ParameterCountRequest(param, target);
+                _expectedIfNr = ParameterCountRequest(param, target);
 
-                if (expectedIfNr == 0)
+                if (_expectedIfNr == 0)
                     return "<color><red>ERROR: there are no Devices";
 
-                Oid ifIndex = new Oid(ifEntryString + ".1");
-                Oid ifDescr = new Oid(ifEntryString + ".2");
-                Oid ifType = new Oid(ifEntryString + ".3");
+                Oid ifIndex = new Oid(_ifEntryString + ".1");
+                Oid ifDescr = new Oid(_ifEntryString + ".2");
+                Oid ifType = new Oid(_ifEntryString + ".3");
 
                 Pdu index = new Pdu(PduType.GetBulk);
                 index.VbList.Add(ifIndex);
-                index.MaxRepetitions = (int)expectedIfNr;
+                index.MaxRepetitions = (int)_expectedIfNr;
 
                 Pdu descr = new Pdu(PduType.GetBulk);
                 descr.VbList.Add(ifDescr);
-                descr.MaxRepetitions = (int)expectedIfNr;
+                descr.MaxRepetitions = (int)_expectedIfNr;
 
                 Pdu type = new Pdu(PduType.GetBulk);
                 type.VbList.Add(ifType);
-                type.MaxRepetitions = (int)expectedIfNr;
+                type.MaxRepetitions = (int)_expectedIfNr;
 
                 try
                 {
@@ -275,7 +275,7 @@ namespace MAD.CLICore
 
         private uint ParameterCountRequest(AgentParameters param, UdpTarget target)
         {
-            Oid deviceNr = new Oid(ifEntryString);
+            Oid deviceNr = new Oid(_ifEntryString);
             Pdu devices = new Pdu(PduType.Get);
 
             devices.VbList.Add(deviceNr);
@@ -298,7 +298,7 @@ namespace MAD.CLICore
 
         private uint ParameterCountRequest(SecureAgentParameters param, UdpTarget target)
         {
-            Oid deviceNr = new Oid(ifEntryString);
+            Oid deviceNr = new Oid(_ifEntryString);
             Pdu devices = new Pdu(PduType.Get);
 
             devices.VbList.Add(deviceNr);
