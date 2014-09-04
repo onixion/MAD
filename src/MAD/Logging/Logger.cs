@@ -7,6 +7,7 @@ namespace MAD.Logging
     public static class Logger
     {
         public static string pathToLogFile;
+        public static string logFileName = "log.txt";
 
         public static uint buffer = 20;
 
@@ -110,7 +111,7 @@ namespace MAD.Logging
             {
                 lock (lockThis)
                 {
-                    File.AppendAllLines(pathToLogFile + @"/log.txt", logMessages.ToArray());
+                    File.AppendAllLines(pathToLogFile + @"/" + logFileName, logMessages.ToArray());
                     logMessages.Clear();
                 }
             }
