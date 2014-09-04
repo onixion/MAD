@@ -9,6 +9,7 @@ Es gibt derzeitig drei Befehle:
 
 	-> 'conf -p <PFAD>' : ladet eine neue Config-Datei.
 	-> 'conf-default' : ladet die default-Werte.
+	-> 'conf-save' : speichert die aktuelle Config-Datei.
 	-> 'conf-show' : gibt eine Liste mit den geladen Variablen und deren Werte aus.
 
 Bei Komponente, die sensible Variablen aus Config-Dateien laden, muss auf jeden Fall eine Methode bereitgestellt werden,

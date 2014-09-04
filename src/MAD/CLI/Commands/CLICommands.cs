@@ -228,9 +228,9 @@ namespace MAD.CLICore
         }
     }
 
-    public class LoadDefaultConfig : Command
+    public class LoadDefaultConfigCommand : Command
     {
-        public LoadDefaultConfig()
+        public LoadDefaultConfigCommand()
         {
             description = "This command loads the default conf file.";
         }
@@ -249,9 +249,33 @@ namespace MAD.CLICore
         }
     }
 
-    public class ConfShow : Command
+    public class SaveConfigCommand : Command
     {
-        public ConfShow()
+        public SaveConfigCommand()
+        {
+            description = "This command saves the current conf file.";
+            rPar.Add(new ParOption("p", "PATH-TO-CONF", "File to load from.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            string _filepath = (string)pars.GetPar("p").argValues[0];
+
+            try
+            {
+                MadConf.SaveConf(_filepath);
+                return "<color><green>Config saved.";
+            }
+            catch (Exception e)
+            {
+                return "<color><red>Could not save conf file: " + e.Message;
+            }
+        }
+    }
+
+    public class ConfShowCommand : Command
+    {
+        public ConfShowCommand()
         {
             description = "This command shows the content of the current loaded conf file.";
         }

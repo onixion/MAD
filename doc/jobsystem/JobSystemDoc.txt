@@ -5,11 +5,8 @@ DOKUMENTATION DES JOBSYSTEMS
 _________
 JOBSYSTEM
 
-Das JobSystem ist ein geschlossenes System, dass den Zugriff auf die Jobs, Nodes, Scedules usw. regelt.
+Das JobSystem ist ein System, dass den Zugriff auf die Jobs, Nodes, Scedules usw. regelt.
 Der Zugriff auf diese Komponenten wird durch das JobSystem definiert.
-
-Das System ist aber NICHT multithreading-fähig, d.h. das die Methoden des JobSystems nicht von vielen
-Threads gleichzeitig verwendet werden dürfen, da es sonst zu internen Schwierigkeiten kommen kann.
 
 Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernommen werden (nicht gleichzeitig!):
 
@@ -19,17 +16,50 @@ Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernomme
 
 Diese Komponente können sich mit dem JobSystem verständigen und z.B. einen Job zu starten/stoppen.
 
+Das System ist aber NICHT multithreading-fähig, d.h. das die Methoden des JobSystems nicht von vielen
+Threads gleichzeitig verwendet werden dürfen, da es sonst zu internen Schwierigkeiten kommen kann.
+Es wurde versucht dieses Funktion einzubauen, damit mehrere Leute gleichzeitig am JobSystem arbeiten 
+können, doch aus betimment Gründen wurde diese Idee verworfen (Sehr schwierig zum Debuggen, Fehlersuche, ...).
+
+Das JobSystem unterstützt die Nutzung von Events. Für das Hinzufügen und Entfernen von Nodes und Jobs können
+EventHandler definiert werden, um bei bestimmen Ereignissen benachrichtigt zu werden.
+
 __________
 JOBSCEDULE
 
 Der JobScedule ist ein Zeitplaner, der mithilfe einiger Zusatzklassen (JobTime, ...) erkennt, wann es für einen
-Job zeit ist, ausgeführt zu werden. Dabei überprüft der Scedule in periodischen Abständen (=cycleTime) die
+Job an der Zeit ist, ausgeführt zu werden. Dabei überprüft der Scedule in periodischen Abständen (=cycleTime) die
 JobTime-Objekte der jeweiligen Jobs. Sobald ein JobTime-Objekt ein 'OK' für die Ausführung eines Jobs gibt,
 kann der JobScedule den Job ausführen. Damit der Scedule bei der Ausführung des Jobs nicht zu viel Zeit
 verliert, wird der Job in einem eigenen Thread ausgeführt.
 
 Die Überprüfungen der JobTime-Objekte ist die Hautpaufgabe des JobScedules. Aber auch die Verarbeitung der
 Notification-Rules gehört in den Aufgabenbereich des Scedules.
+
+___
+JOB
+
+Ein Job ist eine Klasse, die eine bestimmten Aufgabe definiert. Die Aufgabe ist fast immer eine Operation im Netzwerk
+und benötigt daher eine Zieladresse (IP). Der JobScedule startet den Job sobald die JobTime-Klasse für die Ausführung
+ein 'OK' gibt. Wenn der Job ausgeführt wird, können bestimmte Ergebnisse resultieren. 
+
+Der Job hat zwei Möglichkeiten Resultate zu setzen:
+
+	-> OutState: der OutState kann derzeitig drei verschiedene Zustände annehmen: Success, Failed oder Exception.
+	-> OutDescriptor: Outdescriptor definieren einen bestimment Ausgangswert (z.B. TTL-Left = 10).
+
+Da es viele verschiedene Jobarten gibt, ist der OutState eine universelle Möglichkeit, egal bei welchen Job, zu sehen,
+ob der Job nun erfolgreich war oder nicht. Jedoch kann man nicht sehr viel Informationen über den OutState übermitteln
+und deshalb gibt es die OutDescriptor.
+
+Ein OutDescriptor kann alles sein. Es gibt aber derzeit eine Einschränkungen: der Typ des Wertes den dieser OutDescriptor
+ausgibt kann nur STRING oder INT32 sein. Es können ohne Probleme weitere Typen implementiert werden, aber in 90% der Fälle
+ist man mit diesen zwei Typen gut ausgerüstet.
+
+Diese OutDescriptor werden während der Ausführung der Jobs gesetzt, so wie der OutState.
+
+Falls der Job JobRules definiert hat, werden diese nach der Ausführung mit den OutDescriptoren verglichen und falls notwendig,
+wird eine Benachrichtigung versendet.
 
 _______
 JOBNODE
@@ -55,22 +85,30 @@ werden (z.B. jeden Tag um 19:30).
 _______________
 JOBNOTIFICATION
 
-Diese Klasse beinhaltet alle JobNotificationRules. Diese Regeln werden nach der Ausführung des Jobs auf ihre Gültikeit
-überprüft. Ist mindestens eine Regel gültig, dann wird eine Anfrage an das NotificationSystem gegeben. Das NotificationSystem
-bekommt eine Liste mit allen gültigen Regeln und kann daraus, die nötigen Informationen herausholen.
+Diese Klasse beinhaltet alle JobRules. Diese Regeln werden nach der Ausführung des Jobs auf ihre Gültikeit
+überprüft. Ist mindestens eine Regel nicht gültig, dann wird eine E-Mail ausgesendet. Je nach 
+Konfiguration kann die Benachrichtigung an viele verschiedene E-Mails gesendet werden (verschiedene Prioritäten usw.).
 
 __________________
-JONOTIFICATIONRULE
+JOBRULE
 
 Diese Klasse definiert eine Regel (=Rule). Die JobNotification-Klasse überprüft die Regeln auf ihre Gültigkeit.
+Derzeit werden zwei verschiedene Typen an Objekten für die Erstellung einer Regel unterstützt:
 
+	-> String: Auf einen String können zwei Operationen durchgefürt werden: Gleich und Ungleich
+	-> Int32: Auf einen Int32 können vier Operationen durchgeführt werden: Gleich, Ungleich, Größer und Kleiner
 
+Sobald die Regel überprüft wird, wird der 'CompareValue' mit dem OutDescriptor des Jobs verglichen. Falls die
+Definierte Operation nicht wahr ist, wurde die Regel gebrochen (='Broken-Rule').
 
+Aus allen gebrochenen Regeln wird eine Nachricht erstellt und über das NotificationSystem an die jeweiligen 
+E-Mail Adressen gesendet.
 
+(Anhang, CC und diverse andere Eigenschaften werden derzeitig nicht verwendet, können aber hinzugefügt werden)
 
 ____________________________________________________________________________________________________________________________
  ANDERE INFORMATIONEN
-______________________________________________________________________________________________________________________________________
+____________________________________________________________________________________________________________________________
 
 Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
 
@@ -82,7 +120,13 @@ Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
 
 Wenn der JobScedule läuft, die JobNode, der Job aktiv sind UND die JobTime des jeweiligen Jobs ein 'OK' gibt, erst dann wird der Job ausgeführt.
 
+__
 
+Das JobSystem, sowie JobScedule und andere Klassen sind mit Locks vor Multi-threading Problemen geschützt. Jedoch wird
+nicht empfohlen meherer Clients gleichzeitig auf das JobSystem zugreifen zu lassen, da unvorhersehebare Fehler auftreten
+können.
+
+Falls der JobScedule gerade läuft und die Jobs abarbeitet werden, kann ohne Besorgnis ein Job oder auch eine Node entfernt werden.
 
 
 
