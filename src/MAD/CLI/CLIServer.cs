@@ -99,27 +99,20 @@ namespace MAD.CLIServerCore
                 if (_userOnline)
                     throw new Exception("User already online!");
 
-                /*
-                RSAx _rsa = null;
-
-                using (RSAPacket _rsaP = new RSAPacket(_stream, null))
+                RSAEncryption _enc = new RSAEncryption();
+                // receive packet with the public key.
+                using (DataStringPacket _dataP = new DataStringPacket(_stream, null))
                 {
-                    _rsaP.ReceivePacket();
-
-                    if (_rsaP.modulusLength != ACCEPTED_RSA_MODULUS_LENGTH)
-                        throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
-
-                    _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
+                    _dataP.ReceivePacket();
+                    _enc.LoadPublicFromXml(_dataP.data);
                 }
+                string _pass = "abcdefg";//GenRandomPassUnicode(AES_PASS_LENGTH);
 
-                string _aesPass = "abcdefg";//GenRandomPassUnicode(AES_PASS_LENGTH);
-                byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), false);
-                    
-                using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
+                using (DataPacket _dataP = new DataPacket(_stream, null, _enc.PublicEncryption(Encoding.Unicode.GetBytes(_pass))))
                         _dataP.SendPacket();
                
-                AES _aes = new AES(_aesPass);
-                */
+                AES _aes = new AES(_pass);
+
                 bool _loginSuccess;
                 using (LoginPacket _loginP = new LoginPacket(_stream, null))
                 {

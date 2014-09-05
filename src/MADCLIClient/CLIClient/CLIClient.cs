@@ -67,31 +67,24 @@ namespace CLIClient
                         Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
                     }
 
-                    /*
-                    RSAxParameters _par = null;
+                    RSACryptoServiceProvider _pro = new RSACryptoServiceProvider(2048);
+                    RSAEncryption _enc = new RSAEncryption();
+                    _enc.LoadPrivateFromXml(_pro.ToXmlString(true));
+                    _enc.LoadPublicFromXml(_pro.ToXmlString(false));
 
-                    using(RSA r = new RSACryptoServiceProvider(2048))
+                    using (DataStringPacket _dataP = new DataStringPacket(_stream, null, _pro.ToXmlString(false)))
+                        _dataP.SendPacket();
+
+                    string _aesPass = null;
+
+                    using (DataPacket dataP = new DataPacket(_stream, null))
                     {
-                        _par = new RSAxParameters(r.ExportParameters(true), 2048);
+                        dataP.ReceivePacket();
+                        _aesPass = Encoding.Unicode.GetString(dataP.data);
                     }
 
-                    using(RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength))
-                        _rsaP.SendPacket();
+                    
 
-                    AES _aes = null;
-
-                    using (DataPacket _dataP = new DataPacket(_stream, null))
-                    {
-                        _dataP.ReceivePacket();
-
-                        // decrypt using private-key
-                        RSAx _rsa = new RSAx(_par);
-                        _aesPassFromServer = Encoding.Unicode.GetString(_rsa.Decrypt(_dataP.data, true, false));
-                        
-                        // set AES-key
-                        _aes = new AES(_aesPassFromServer);
-                    }
-                    */
                     byte[] _username = Encoding.Unicode.GetBytes(username);
                     byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
 
