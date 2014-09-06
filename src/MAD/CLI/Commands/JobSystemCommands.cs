@@ -348,6 +348,15 @@ namespace MAD.CLICore
         }
     }
 
+    // TODO
+    public class JobSystemEditNode : Command
+    {
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     #endregion
 
     #region commands for jobs
@@ -390,6 +399,41 @@ namespace MAD.CLICore
                     output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
                 }
             return output;
+        }
+    }
+
+    public class JobOutDescriptorListCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobOutDescriptorListCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption("id", "JOB-ID", "Id of job.", false, false, new Type[] { typeof(int) }));
+
+            description = "Show the outdescriptors of a specific job.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
+            if (_job != null)
+            {
+                output += "<color><yellow>";
+
+                foreach (OutputDescriptor _temp in _job.outp.outputs)
+                {
+                    output += "-> OutDesc.: " + _temp.name + "\n";
+                    output += "   DataType: " + _temp.dataType.ToString() + "\n";
+                }
+
+                return output;
+            }
+            else
+            {
+                return "<color><red>Job does not exist!";
+            }
         }
     }
 
@@ -699,6 +743,12 @@ namespace MAD.CLICore
             return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
         }
     }
+
+    #endregion
+
+    #region commands for editing jobs
+
+    // TODO
 
     #endregion
 
