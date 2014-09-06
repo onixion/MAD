@@ -13,15 +13,10 @@ namespace MAD.CLICore
         private uint _version;
         private uint _expectedIfNr = 10;
 
-        public NetworkHelper.snmpProtokolls privProt;          
-        public NetworkHelper.snmpProtokolls authProt;
-        public NetworkHelper.securityLvl security;
+        public NetworkHelper.securityModel secModel; 
 
         private IPAddress _targetIP;
 
-        private const string _communityString = "public";
-        private const string _priv = "MAD";
-        private const string _auth = "MAD";
         private string _output = "<color><blue>"; 
 
         private string _ifEntryString = "1.3.6.1.2.1.2.2.1";
@@ -37,86 +32,24 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _version = (uint)pars.GetPar("ver").argValues[0];
-            string _buffer = (string)pars.GetPar("ip").argValues[0];
+            
+            string _buffer; 
 
             if (_version == 3)
             {
-                _buffer = (string)pars.GetPar("s").argValues[0];
-                switch (_buffer)
-                {
-                    case "authNoPriv":
-                        security = NetworkHelper.securityLvl.authNoPriv;
-                        if (!(OParUsed("a") && !OParUsed("p")))
-                        {
-                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                            return "<color><red>ERROR: Wrong Parameters";
-                        }
-                        break;
-                    case "authPriv":
-                        security = NetworkHelper.securityLvl.authPriv;
-                        if (!(OParUsed("a") && OParUsed("p")))
-                        {
-                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                            return "<color><red>ERROR: Wrong Parameters";
-                        }
-                        break;
-                    case "noAuthNoPriv":
-                        security = NetworkHelper.securityLvl.noAuthNoPriv;
-                        if (!(!OParUsed("a") && !OParUsed("p")))
-                        {
-                            Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                            return "<color><red>ERROR: Wrong Parameters";
-                        }
-                        break;
-                    default:
-                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
-                        return "<color><red>ERROR";
-                }
+               
 
-                _buffer = (string)pars.GetPar("p").argValues[0];
-                switch (_buffer)
-                {
-                    case "aes":
-                        privProt = NetworkHelper.snmpProtokolls.AES;
-                        break;
-                    case "des":
-                        privProt = NetworkHelper.snmpProtokolls.DES;
-                        break;
-                    default:
-                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
-                        return "<color><red>ERROR:";
-                }
+                
 
 
                 // PARSE authProt
-                _buffer = (string)pars.GetPar("a").argValues[0];
-                switch (_buffer)
-                {
-                    case "md5":
-                        authProt = NetworkHelper.snmpProtokolls.MD5;
-                        break;
-                    case "sha":
-                        authProt = NetworkHelper.snmpProtokolls.SHA;
-                        break;
-                    default:
-                        Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
-                        return "<color><red>ERROR:";
-                }
-
+                
                 // PARSE security
                 
             }
 
             // PARSE ip
-
-            if (!IpAddress.IsIP(_buffer))
-            {
-                Logger.Log("SNMP device Request has problems with Parsing IPAddress", Logger.MessageType.ERROR); 
-                return "<color><red>Could not parse ip-address!";
-            }
-            else
-                _targetIP = IPAddress.Parse(_buffer);
+            
 
             UdpTarget target = new UdpTarget(_targetIP, 161, 5000, 3);
 
@@ -199,20 +132,20 @@ namespace MAD.CLICore
 
                         break;
                     case NetworkHelper.securityLvl.authNoPriv:
-                        if (authProt == NetworkHelper.snmpProtokolls.MD5)
+                        if (authProt == NetworkHelper.snmpProtocols.MD5)
                             param.authNoPriv(_communityString, AuthenticationDigests.MD5, _auth);
-                        else if (authProt == NetworkHelper.snmpProtokolls.SHA)
+                        else if (authProt == NetworkHelper.snmpProtocols.SHA)
                             param.authNoPriv(_communityString, AuthenticationDigests.SHA1, _auth);
 
                         break;
                     case NetworkHelper.securityLvl.authPriv:
-                        if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.AES)
+                        if (authProt == NetworkHelper.snmpProtocols.MD5 && privProt == NetworkHelper.snmpProtocols.AES)
                             param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.AES128, _priv);
-                        else if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.DES)
+                        else if (authProt == NetworkHelper.snmpProtocols.MD5 && privProt == NetworkHelper.snmpProtocols.DES)
                             param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.DES, _priv);
-                        else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.AES)
+                        else if (authProt == NetworkHelper.snmpProtocols.SHA && privProt == NetworkHelper.snmpProtocols.AES)
                             param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.AES128, _priv);
-                        else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.DES)
+                        else if (authProt == NetworkHelper.snmpProtocols.SHA && privProt == NetworkHelper.snmpProtocols.DES)
                             param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.DES, _priv);
 
                         break;
@@ -317,6 +250,105 @@ namespace MAD.CLICore
                 return 0;
             }
 
+        }
+
+        private void ParseParameters()
+        {
+            ParseIP();
+            ParseVersion();
+            if (_version == 3)
+            {
+                ParseSecurityLevel();
+                ParseAuthentificationProtocol();
+                ParsePrivacyProtocol();
+            }
+        }
+
+        private void ParseIP()
+        {
+            string _buffer = (string)pars.GetPar("ip").argValues[0];
+            if (!IpAddress.IsIP(_buffer))
+            {
+                Logger.Log("SNMP device Request has problems with Parsing IPAddress", Logger.MessageType.ERROR);
+                return "<color><red>Could not parse ip-address!";
+            }
+            else
+                _targetIP = IPAddress.Parse(_buffer);
+        }
+
+        private void ParseVersion()
+        {
+            _version = (uint)pars.GetPar("v").argValues[0];
+        }
+
+        private void ParseSecurityLevel()
+        {
+            string _buffer = (string)pars.GetPar("s").argValues[0];
+            switch (_buffer)
+            {
+                case "authNoPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
+                    if (!(OParUsed("a") && !OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        return "<color><red>ERROR: Wrong Parameters";
+                    }
+                    break;
+                case "authPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
+                    if (!(OParUsed("a") && OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        return "<color><red>ERROR: Wrong Parameters";
+                    }
+                    break;
+                case "noAuthNoPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
+                    if (!(!OParUsed("a") && !OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        return "<color><red>ERROR: Wrong Parameters";
+                    }
+                    break;
+                default:
+                    Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
+                    return "<color><red>ERROR";
+            }
+        }
+
+        private void ParseAuthentificationProtocol()
+        {
+            string _buffer = (string)pars.GetPar("a").argValues[0];
+            switch (_buffer)
+            {
+                case "md5":
+                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
+                    break;
+                case "sha":
+                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
+                    break;
+                default:
+                    Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
+                    return "<color><red>ERROR:";
+            }
+
+        }
+
+        private void ParsePrivacyProtocol()
+        {
+            string _buffer = (string)pars.GetPar("p").argValues[0];
+            switch (_buffer)
+            {
+                case "aes":
+                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
+                    break;
+                case "des":
+                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
+                    break;
+                default:
+                    Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
+                    return "<color><red>ERROR:";
+            }
         }
     }
 }

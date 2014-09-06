@@ -156,7 +156,7 @@ namespace MAD.DHCPReader
                     _tmpModel.hostMac = _helper.getPhysicalAddressString(_data);
                     _tmpModel.macGiven = true;
 
-                    for (uint i = NetworkHelper.MAGIC_COOKIE_POSITION; i < _data.Length; i++)
+                    for (uint i = NetworkHelper.DHCP_COOKIE_POSITION; i < _data.Length; i++)
                     {
                         switch (Convert.ToUInt16(_data[i]))
                         {

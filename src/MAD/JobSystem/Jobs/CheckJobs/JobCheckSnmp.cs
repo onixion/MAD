@@ -11,14 +11,9 @@ namespace MAD.JobSystemCore
     class JobCheckSnmp : Job
     {
         public uint version; //required parameter
-        public NetworkHelper.snmpProtokolls privProt;  //required parameter if version == 3 && security == AuthPriv
-        public NetworkHelper.snmpProtokolls authProt;  //required parameter if version == 3 && security != noAuthNoPriv
-        public NetworkHelper.securityLvl security;     //required parameter if version == 3
+        public NetworkHelper.securityModel secModel; //required Parameter if version == 3
 
         private bool _working;
-        private string _auth = "MAD";
-        private string _priv = "MAD";
-        private string _communityString = "public";
 
         private JobSnmp _foo;
 
@@ -54,61 +49,15 @@ namespace MAD.JobSystemCore
                     //NotImplemented Fehlermeldung
                     break;
                 case 2:
-                    SnmpV2Handling(_target);
+                    ExecuteRequest(_target, NetworkHelper.GetSNMPV2Param(NetworkHelper.SNMP_COMMUNITY_STRING));
                     break;
                 case 3:
-                    SnmpV3Handling(_target);
+                    if (NetworkHelper.GetSNMPV3Param(_target, NetworkHelper.SNMP_COMMUNITY_STRING, secModel) != null)
+                        ExecuteRequest(_target, NetworkHelper.GetSNMPV3Param(_target, NetworkHelper.SNMP_COMMUNITY_STRING, secModel));
+                    else
+                        _working = false; 
                     break;
             }
-        }
-
-        public void SnmpV2Handling(UdpTarget target)
-        {
-            OctetString _community = new OctetString(_communityString);
-            AgentParameters _param = new AgentParameters(_community);
-
-            _param.Version = SnmpVersion.Ver2;
-
-            ExecuteRequest(target, _param);
-        }
-
-        public void SnmpV3Handling(UdpTarget target)
-        {
-            SecureAgentParameters _param = new SecureAgentParameters();
-
-            if (!target.Discovery(_param))
-            {
-                _working = false;
-                return; 
-            }
-
-            switch (security)
-            {
-                case NetworkHelper.securityLvl.noAuthNoPriv:
-                    _param.noAuthNoPriv(_communityString);
-
-                    break;
-                case NetworkHelper.securityLvl.authNoPriv:
-                    if (authProt == NetworkHelper.snmpProtokolls.MD5)
-                        _param.authNoPriv(_communityString, AuthenticationDigests.MD5, _auth);
-                    else if (authProt == NetworkHelper.snmpProtokolls.SHA)
-                        _param.authNoPriv(_communityString, AuthenticationDigests.SHA1, _auth);
-
-                    break;
-                case NetworkHelper.securityLvl.authPriv:
-                    if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.AES)
-                        _param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.AES128, _priv);
-                    else if (authProt == NetworkHelper.snmpProtokolls.MD5 && privProt == NetworkHelper.snmpProtokolls.DES)
-                        _param.authPriv(_communityString, AuthenticationDigests.MD5, _auth, PrivacyProtocols.DES, _priv);
-                    else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.AES)
-                        _param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.AES128, _priv);
-                    else if (authProt == NetworkHelper.snmpProtokolls.SHA && privProt == NetworkHelper.snmpProtokolls.DES)
-                        _param.authPriv(_communityString, AuthenticationDigests.SHA1, _auth, PrivacyProtocols.DES, _priv);
-
-                    break;
-            }
-
-            ExecuteRequest(target, _param);
         }
 
         private void ExecuteRequest(UdpTarget target, AgentParameters param)
