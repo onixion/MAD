@@ -75,6 +75,7 @@ namespace MAD
         public static void SetToDefault()
         {
             conf.VERSION = "v0.0.6.0";
+            conf.SERVER_PORT = 2222;
         }
 
         #endregion
@@ -85,5 +86,6 @@ namespace MAD
     public class MadConfigFile
     {
         public string VERSION;
+        public int SERVER_PORT;
     }
 }

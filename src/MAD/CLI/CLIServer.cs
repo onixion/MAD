@@ -85,9 +85,9 @@ namespace MAD.CLIServerCore
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
                 if (DEBUG_MODE)
-                    Console.WriteLine(GetTimeStamp() + "Client (" + _clientEndPoint.Address + ") connected.");
+                    Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
                 if (LOG_MODE)
-                    Log("Client (" + _clientEndPoint.Address + ") connected.");
+                    Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
 
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
