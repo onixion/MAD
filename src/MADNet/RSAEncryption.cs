@@ -67,59 +67,69 @@ namespace MadNet
         { get { return isPublicKeyLoaded; } }
 
         // Methods:
-        public void LoadPublicFromXml(string data)
+        public void LoadPublicFromXml(string XMLText)
         {
-            // Using the .NET RSA class to load a key from an Xml file, and populating the relevant members
-            // of my class with it's RSAParameters
-            try
+            if (XMLText != null || XMLText != "")
             {
-                rsa.FromXmlString(data);
-                RSAParameters rsaParams = rsa.ExportParameters(false);
-                Modulus = new BigInteger(rsaParams.Modulus);
-                Exponent = new BigInteger(rsaParams.Exponent);
-                isPublicKeyLoaded = true;
-                isPrivateKeyLoaded = false;
+                // Using the .NET RSA class to load a key from an Xml file, and populating the relevant members
+                // of my class with it's RSAParameters
+                try
+                {
+                    rsa.FromXmlString(XMLText);
+                    RSAParameters rsaParams = rsa.ExportParameters(false);
+                    Modulus = new BigInteger(rsaParams.Modulus);
+                    Exponent = new BigInteger(rsaParams.Exponent);
+                    isPublicKeyLoaded = true;
+                    isPrivateKeyLoaded = false;
+                }
+                // Examle for the proper use of try - catch blocks: Informing the main app where and why the Exception occurred
+                catch (XmlSyntaxException ex)  // Not an xml file
+                {
+                    string excReason = "Exception occurred at LoadPublicFromXml(), Selected file is not a valid xml file.";
+                    System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
+                    throw new Exception(excReason, ex);
+                }
+                catch (CryptographicException ex)  // Not a Key file
+                {
+                    string excReason = "Exception occurred at LoadPublicFromXml(), Selected xml file is not a public key file.";
+                    System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
+                    throw new Exception(excReason, ex);
+                }
+                catch (Exception ex)  // other exception, hope the ex.message will help
+                {
+                    string excReason = "General Exception occurred at LoadPublicFromXml().";
+                    System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
+                    throw new Exception(excReason, ex);
+                }
+                // You might want to replace the Diagnostics.Debug with your Log statement
             }
-            // Examle for the proper use of try - catch blocks: Informing the main app where and why the Exception occurred
-            catch (XmlSyntaxException ex)  // Not an xml file
-            {
-                string excReason = "Exception occurred at LoadPublicFromXml(), Selected file is not a valid xml file.";
-                System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
-                throw new Exception(excReason, ex);
-            }
-            catch (CryptographicException ex)  // Not a Key file
-            {
-                string excReason = "Exception occurred at LoadPublicFromXml(), Selected xml file is not a public key file.";
-                System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
-                throw new Exception(excReason, ex);
-            }
-            catch (Exception ex)  // other exception, hope the ex.message will help
-            {
-                string excReason = "General Exception occurred at LoadPublicFromXml().";
-                System.Diagnostics.Debug.WriteLine(excReason + " Exception Message: " + ex.Message);
-                throw new Exception(excReason, ex);
-            }
-            // You might want to replace the Diagnostics.Debug with your Log statement
+            else
+                throw new Exception("XMLText empty!");
         }
 
         // Same as the previous one, but this time loading the private Key
-        public void LoadPrivateFromXml(string data)
+        public void LoadPrivateFromXml(string XMLText)
         {
-            try
+            if (XMLText != null || XMLText != "")
             {
-                rsa.FromXmlString(data);
-                RSAParameters rsaParams = rsa.ExportParameters(true);
-                D = new BigInteger(rsaParams.D);  // This parameter is only for private key
-                Exponent = new BigInteger(rsaParams.Exponent);
-                Modulus = new BigInteger(rsaParams.Modulus);
-                isPrivateKeyLoaded = true;
-                isPublicKeyLoaded = true;
+                try
+                {
+                    rsa.FromXmlString(XMLText);
+                    RSAParameters rsaParams = rsa.ExportParameters(true);
+                    D = new BigInteger(rsaParams.D);  // This parameter is only for private key
+                    Exponent = new BigInteger(rsaParams.Exponent);
+                    Modulus = new BigInteger(rsaParams.Modulus);
+                    isPrivateKeyLoaded = true;
+                    isPublicKeyLoaded = true;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("Exception occurred at LoadPrivateFromXml()\nMessage: " + ex.Message);
+                    throw ex;
+                }
             }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine("Exception occurred at LoadPrivateFromXml()\nMessage: " + ex.Message);
-                throw ex;
-            }
+            else
+                throw new Exception("XMLText empty!");
         }
 
         // Encrypt data using private key

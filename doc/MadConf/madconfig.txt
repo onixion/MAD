@@ -2,7 +2,7 @@ Die 'MadConf'-Klasse ist eine statische Klasse, die den Zugriff auf die 'MadConf
 
 Die MadConf liest am Anfang des Programmes (vor der Initialisierung der Komponenten) die 'MadConfFile' ein.
 Findet er diese Datei im Verzeichnis 'data' nicht, so erstellt er die 'MadConfFile'-Klasse mit default-Werten 
-(siehe Methode-SetDefault). Findet er die Config-File versucht er sie mithilfe von Json zu deserializieren.
+(siehe Methode-SetDefault). Findet er die Config-File versucht er sie mithilfe von Json sie zu deserializieren.
 Scheitert er an der Deserializierung, erstellt er die Klasse einfach mit default-Werten.
 
 Es gibt derzeitig drei Befehle:

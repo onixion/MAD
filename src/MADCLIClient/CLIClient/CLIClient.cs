@@ -67,32 +67,31 @@ namespace CLIClient
                         Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
                     }
 
-                    RSACryptoServiceProvider _pro = new RSACryptoServiceProvider(2048);
-                    RSAEncryption _enc = new RSAEncryption();
-                    _enc.LoadPrivateFromXml(_pro.ToXmlString(true));
-                    _enc.LoadPublicFromXml(_pro.ToXmlString(false));
+                    // RSA-KEY-EXCHANGE
 
-                    using (DataStringPacket _dataP = new DataStringPacket(_stream, null, _pro.ToXmlString(false)))
+                    RSACryptoServiceProvider _rsaProvider = new RSACryptoServiceProvider();
+                    RSAEncryption _rsa = new RSAEncryption();
+                    _rsa.LoadPrivateFromXml(_rsaProvider.ToXmlString(true));
+                    using (DataStringPacket _dataP = new DataStringPacket(_stream, null, _rsaProvider.ToXmlString(false)))
                         _dataP.SendPacket();
 
                     string _aesPass = null;
-
                     using (DataPacket dataP = new DataPacket(_stream, null))
                     {
                         dataP.ReceivePacket();
-                        _aesPass = Encoding.Unicode.GetString(dataP.data);
+                        _aesPass = Encoding.UTF8.GetString(_rsa.PrivateDecryption(dataP.data));
                     }
 
-                    
+                    AES _aes = new AES(_aesPass);
 
                     byte[] _username = Encoding.Unicode.GetBytes(username);
                     byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
 
-                    using (LoginPacket _loginP = new LoginPacket(_stream, null, _username, _passwordMD5))
+                    using (LoginPacket _loginP = new LoginPacket(_stream, _aes, _username, _passwordMD5))
                         _loginP.SendPacket();
 
                     string _serverAnswer;
-                    using(DataPacket _dataP2 = new DataPacket(_stream, null))
+                    using(DataPacket _dataP2 = new DataPacket(_stream, _aes))
                     {
                         _dataP2.ReceivePacket();
                         _serverAnswer = Encoding.Unicode.GetString(_dataP2.data);
@@ -106,7 +105,7 @@ namespace CLIClient
                         Console.WriteLine("\nServer accepted login-data.");
                         Console.ForegroundColor = ConsoleColor.White;
 
-                        StartRemoteConsole(_stream, null);
+                        StartRemoteConsole(_stream, _aes);
                     }
                     else
                     {

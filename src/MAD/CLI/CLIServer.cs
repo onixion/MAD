@@ -99,28 +99,30 @@ namespace MAD.CLIServerCore
                 if (_userOnline)
                     throw new Exception("User already online!");
 
-                RSAEncryption _enc = new RSAEncryption();
-                // receive packet with the public key.
+                RSAEncryption _rsa = new RSAEncryption();
+
                 using (DataStringPacket _dataP = new DataStringPacket(_stream, null))
                 {
                     _dataP.ReceivePacket();
-                    _enc.LoadPublicFromXml(_dataP.data);
+                    _rsa.LoadPublicFromXml(_dataP.data);
                 }
-                string _pass = "abcdefg";//GenRandomPassUnicode(AES_PASS_LENGTH);
+                string _pass = GenRandomPassUnicode(AES_PASS_LENGTH);
 
-                using (DataPacket _dataP = new DataPacket(_stream, null, _enc.PublicEncryption(Encoding.Unicode.GetBytes(_pass))))
+                byte[] _encrypted = _rsa.PublicEncryption(Encoding.UTF8.GetBytes(_pass));
+
+                using (DataPacket _dataP = new DataPacket(_stream, null, _encrypted))
                         _dataP.SendPacket();
                
                 AES _aes = new AES(_pass);
 
                 bool _loginSuccess;
-                using (LoginPacket _loginP = new LoginPacket(_stream, null))
+                using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
                 {
                     _loginP.ReceivePacket();
                     _loginSuccess = Login(_loginP);
                 }
 
-                using (DataPacket _dataP = new DataPacket(_stream, null))
+                using (DataPacket _dataP = new DataPacket(_stream, _aes))
                 {
                     if (_loginSuccess)
                         _dataP.data = Encoding.Unicode.GetBytes("LOGIN_SUCCESS");
@@ -131,7 +133,7 @@ namespace MAD.CLIServerCore
 
                 if (_loginSuccess)
                 {
-                    CLISession _session = new CLISession(_stream, null, _js);
+                    CLISession _session = new CLISession(_stream, _aes, _js);
                     _session.InitCommands();
                     _session.Start();
                 }
@@ -141,15 +143,15 @@ namespace MAD.CLIServerCore
             catch (Exception e)
             {
                 if (DEBUG_MODE)
-                    Console.WriteLine("EX: " + e.Message);
+                    Console.WriteLine(GetTimeStamp() + " EX: " + e.Message);
                 if (LOG_MODE)
-                    Log("EX: " + e.Message);
+                    Log(GetTimeStamp() + " EX: " + e.Message);
             }
 
             if (DEBUG_MODE)
-                Console.WriteLine("Client (" + _clientEndPoint.Address + ") disconnected.");
+                Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
             if (LOG_MODE)
-                Log("Client (" + _clientEndPoint.Address + ") disconnected.");
+                Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
 
             return null;
         }
@@ -203,7 +205,7 @@ namespace MAD.CLIServerCore
                 _stream = new FileStream("server.log", FileMode.Create, FileAccess.Write, FileShare.Read);
 
             using (StreamWriter _writer = new StreamWriter(_stream))
-                _writer.WriteLine(GetTimeStamp() + data);
+                _writer.WriteLine(data);
 
             _stream.Dispose();
         }

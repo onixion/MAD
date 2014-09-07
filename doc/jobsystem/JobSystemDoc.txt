@@ -41,22 +41,23 @@ JOB
 
 Ein Job ist eine Klasse, die eine bestimmten Aufgabe definiert. Die Aufgabe ist fast immer eine Operation im Netzwerk
 und benötigt daher eine Zieladresse (IP). Der JobScedule startet den Job sobald die JobTime-Klasse für die Ausführung
-ein 'OK' gibt. Wenn der Job ausgeführt wird, können bestimmte Ergebnisse resultieren. 
+zustimmt. Wenn der Job ausgeführt wird, können bestimmte Ergebnisse resultieren. 
 
 Der Job hat zwei Möglichkeiten Resultate zu setzen:
 
 	-> OutState: der OutState kann derzeitig drei verschiedene Zustände annehmen: Success, Failed oder Exception.
-	-> OutDescriptor: Outdescriptor definieren einen bestimment Ausgangswert (z.B. TTL-Left = 10).
+	-> OutDescriptor: Outdescriptor definieren einen bestimmenten Ausgangswert (z.B. IPStatus, Dauer bis zur Antwort der Anfrage, usw.).
 
 Da es viele verschiedene Jobarten gibt, ist der OutState eine universelle Möglichkeit, egal bei welchen Job, zu sehen,
-ob der Job nun erfolgreich war oder nicht. Jedoch kann man nicht sehr viel Informationen über den OutState übermitteln
+ob der Job nun erfolgreich war oder nicht. Jedoch kann man nicht sehr viel Information über den OutState übermitteln
 und deshalb gibt es die OutDescriptor.
 
 Ein OutDescriptor kann alles sein. Es gibt aber derzeit eine Einschränkungen: der Typ des Wertes den dieser OutDescriptor
 ausgibt kann nur STRING oder INT32 sein. Es können ohne Probleme weitere Typen implementiert werden, aber in 90% der Fälle
 ist man mit diesen zwei Typen gut ausgerüstet.
 
-Diese OutDescriptor werden während der Ausführung der Jobs gesetzt, so wie der OutState.
+Diese OutDescriptor werden während der Ausführung der Jobs gesetzt, so wie der OutState (das Setzen der Zustände ist aber vom
+JobTyp abhängig, jeder Job kann sie verschieden nutzen).
 
 Falls der Job JobRules definiert hat, werden diese nach der Ausführung mit den OutDescriptoren verglichen und falls notwendig,
 wird eine Benachrichtigung versendet.
@@ -70,6 +71,10 @@ jeweiligen Rechner/Server gerichtet sind.
 
 Da sich die Zieladresse ändern kann (DHCP timeout), muss diese regelmäßig überprüft werden und falls
 notwendig geändert werden.
+
+Bei der Ausführung von einem Job, nimmt der Job die aktuelle IP-Adresse, die die Node gerade im RAM hat.
+Da die Jobs mit einer Referenz auf die IP-Adresse des JobNodes arbeiten, sollte auch während der Laufzeit
+der Jobs die IP-Adresse änderbar sein.
 
 _______
 JOBTIME
