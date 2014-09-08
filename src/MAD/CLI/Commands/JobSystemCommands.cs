@@ -8,6 +8,7 @@ using System.IO;
 using MAD.JobSystemCore;
 using MAD.DHCPReader;
 using MAD.Notification;
+using MAD.Helper;
 
 namespace MAD.CLICore
 {
@@ -627,17 +628,71 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("l", "SECURITY-LEVEL", "Level of used security", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "Protocol for authentification", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("p", "PRIV-PROTCOL", "Protocol for privacy", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            JobSnmp _job = new JobSnmp();
+            JobCheckSnmp _job = new JobCheckSnmp();
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
             _job.noti = ParseJobNotificationRules(this, _job.outp);
 
             _job.version = (uint)pars.GetPar("ver").argValues[0];
+
+            if (_job.version == 3)
+            {
+                string _buffer = (string)pars.GetPar("s").argValues[0];
+                switch (_buffer)
+                {
+                    case "authNoPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
+                        if (!(OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    case "authPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
+                        if (!(OParUsed("a") && OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    case "noAuthNoPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
+                        if (!(!OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong Security Level! choose between authNoPriv, authPriv and noAuthNoPriv";
+                }
+
+                _buffer = (string)pars.GetPar("a").argValues[0];
+                switch (_buffer)
+                {
+                    case "md5":
+                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
+                        break;
+                    case "sha":
+                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong authentification Protocol! choose between md5, sha";
+                }
+
+                _buffer = (string)pars.GetPar("p").argValues[0];
+                switch (_buffer)
+                {
+                    case "aes":
+                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
+                        break;
+                    case "des":
+                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong privacy Protocol! choose between aes, des";
+                }
+            }
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);

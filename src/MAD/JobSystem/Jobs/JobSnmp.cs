@@ -79,15 +79,14 @@ namespace MAD.JobSystemCore
             {
                 SnmpV2Packet _octetsResult = (SnmpV2Packet)_target.Request(_octets, _param);
 
-                uint _result = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString()) - _lastRecord;
-                _lastRecord = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString());
-
                 if (_octetsResult.Pdu.ErrorStatus != 0)
                 {
                     //Fehlermeldung 
                 }
                 else
                 {
+                    uint _result = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString()) - _lastRecord;
+                    _lastRecord = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString());
                     Console.WriteLine("Output since the last run: {0}", _result.ToString());
                     //Ausgabe nach dem Muster.. wie oben 
                 }

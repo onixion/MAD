@@ -20,8 +20,8 @@ namespace MAD.Helper
         public const byte DHCP_COOKIE_BYTE3_VALUE = 99;                             //Value of fourth -"-
 
         public const string SNMP_COMMUNITY_STRING = "public";                       //community String for snmp requests in MAD
-        public const string SNMP_AUTH_SECRET = "MAD";                               //authentification Secret -"-
-        public const string SNMP_PRIV_SECRET = "MAD";                               //privacy Secret -"-
+        public const string SNMP_AUTH_SECRET = "MADMADMAD";                         //authentification Secret -"-
+        public const string SNMP_PRIV_SECRET = "MADMADMAD";                         //privacy Secret -"-
 
         public enum snmpProtocols                                                   //an enumeration with the kinds of supported Protocols
         {
