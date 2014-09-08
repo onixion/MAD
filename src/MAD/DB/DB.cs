@@ -9,6 +9,23 @@ using System.Data;
 
 namespace MAD
 {
+    /*      //don't forget at the end .sqlite
+            DB MADmemory = new DB("MAD7.sqlite");
+            //connect to DB
+            MADmemory.ConnectDB("MAD7.sqlite");
+     * 
+     *      MADmemory.CreateTable("mac_id", new TableInfo("IP", TableInfo.OType.CHAR20), new TableInfo("PORT", TableInfo.OType.CHAR30), new TableInfo("subnetzmaske", TableInfo.OType.CHAR30));
+
+            MADmemory.InsertToTable("mac_id", new Insert("PORT", "17"), new Insert("IP", "192.168.1.8"));
+
+            DataTable TableTest = MADmemory.ReadTable("mac_id");
+
+            Console.WriteLine();
+
+            MADmemory.AllTables();
+     *
+     * */
+
     public class DB
     {
         private string _DBname;
@@ -47,10 +64,8 @@ namespace MAD
         //check if table excists, create if not and connect
         public void CreateTable(string TableName, params TableInfo[] tableInfos)
         {
-            //check if table exists if not create it
-            string sql = "create table '" + TableName + "' (";
+            string sql = "create table if not exists '" + TableName + "' (";
             sql += "id INTEGER PRIMERY KEY AUTO_INCREMENT,";
-            //id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT;
             for (int i = 0; i < tableInfos.Length; i++)
             {
                 sql += tableInfos[i].GetCommand();
@@ -58,9 +73,9 @@ namespace MAD
                     sql += ",";
             }
             sql += ")";
-            //connect
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
+          
             command.ExecuteNonQuery();
         }
 
@@ -86,35 +101,52 @@ namespace MAD
         public void InsertToTable(string TableName, params Insert[] insdata)
         {
             // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
-            string sql = "insert into " + TableName + " (";
+            string sql = "INSERT into " + TableName + " (";
             for (int i = 0; i < insdata.Length; i++)
             {
                 sql += insdata[i].column;
                 if (i != insdata.Length - 1)
                     sql += ",";
             }
-            sql += ") VALUES (";
+            sql += ") VALUES ('";
 
             for (int i = 0; i < insdata.Length; i++)
             {
                 sql += insdata[i].data;
                 if (i != insdata.Length - 1)
-                    sql += ",";
+                    sql += "','";
             }
-            sql += ")";
+            sql += "')";
 
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
         }
 
-        //read whole table
-        public DataTable ReadTable(string TableName)
+        //see all tables
+        
+        public DataTable AllTables()
         {
-            string sql = "SELECT * FROM '" + TableName + "' ORDER BY ID DESC";
+            //string sql = "SELECT name FROM '" + DBName + "'_master WHERE type='table'";
+            string sql = "SELECT name FROM sqlite_master WHERE type = 'table'";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
-            return reader.GetSchemaTable();
+            DataTable TempResult = new DataTable();
+            TempResult.Load(reader);
+            return TempResult;
+        }
+     
+
+        //read entire table
+        public DataTable ReadTable(string TableName)
+        {
+            //string sql = "SELECT * FROM '" + TableName + "' ORDER BY ID DESC";
+            string sql = "SELECT * FROM '" + TableName + "'";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            DataTable TempResult = new DataTable();
+            TempResult.Load(reader);
+            return TempResult;
         }
 
         //read one result from table
@@ -123,8 +155,12 @@ namespace MAD
             string sql = "SELECT * FROM " + TableName + " WHERE ID='" + TableID + "'";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
-            return reader.GetSchemaTable();
+            DataTable TempResult = new DataTable();
+            TempResult.Load(reader);
+            return TempResult;
         }
+
+
     }
 }
 
