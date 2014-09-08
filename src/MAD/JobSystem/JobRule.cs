@@ -51,19 +51,19 @@ namespace MAD.JobSystemCore
             switch (oper)
             {
                 case Operation.Equal:
-                    if (currentValue == (Int32)compareValue)
+                    if (currentValue == Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 case Operation.NotEqual:
-                    if (currentValue != (Int32)compareValue)
+                    if (currentValue != Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 case Operation.Bigger:
-                    if (currentValue > (Int32)compareValue)
+                    if (currentValue < Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 case Operation.Smaller:
-                    if (currentValue < (Int32)compareValue)
+                    if (currentValue > Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 default:

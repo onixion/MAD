@@ -2,7 +2,11 @@
 using System.Threading;
 using System.Collections.Generic;
 
+using System.Net;
+using System.Net.Mail;
+
 using MAD;
+using MAD.Notification;
 
 using Amib.Threading;
 
@@ -173,11 +177,9 @@ namespace MAD.JobSystemCore
                     _job.tStart = DateTime.Now;
                     _job.Execute(_holder.targetAddress);
                     _job.tStop = DateTime.Now;
-                    
-                    _job.tSpan = _job.tStart.Subtract(_job.tStop);
+                    _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
-                    // check rules
-                    _job.noti.CheckRulesAndNotify(_job);
+                    HandleNotification(_job);
 
                     _job.state = Job.JobState.Waiting;
                 }
@@ -188,6 +190,67 @@ namespace MAD.JobSystemCore
             }
 
             return null;
+        }
+
+        private void HandleNotification(Job job)
+        {
+            List<JobRule> _brokenRules = job.noti.GetBrokenRules(job.outp);
+
+            if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception || _brokenRules.Count != 0)
+            {
+                string _mailSubject = "[MAD][ERROR] Job (JOB-ID: '" + job.id + "' OUTSTATE: '" + job.outp.outState.ToString() + "')";
+                string _mailContent = "";
+
+                _mailContent += "Job-Name: '" + job.name + "'\n";
+                _mailContent += "Job-Type: '" + job.type.ToString() + "'\n\n";
+
+                _mailContent += "Job-TStart: '" + job.tStart + "'\n";
+                _mailContent += "Job-TStop:  '" + job.tStop + "'(" + job.tSpan + ").\n\n";
+                
+                _mailContent += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
+
+                if (_brokenRules.Count != 0)
+                {
+                    _mailContent += "This job broke one or more rules:\n\n";
+
+                    int _count = 0;
+                    foreach (JobRule _brokenRule in _brokenRules)
+                    {
+                        _mailContent += "#" + _count + " Rule (broken)\n";
+                        _mailContent += "-> OutDescriptor:  " + _brokenRule.outDescName + "\n";
+                        _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
+                        _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
+                        _mailContent += "=> CurrentValue:   " + job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject.ToString() + "\n\n";
+                        _mailContent += "\n\n";
+                        _count++;
+                    }
+                }
+
+                if (job.noti.settings != null)
+                {
+                    // there are settings for sending an email
+                    SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
+                }
+                else
+                {
+                    // there are no settings for sending an email
+                }
+            }
+        }
+
+        private void SendNotification(MailLogin login, MailAddress[] to, string subject, string content)
+        {
+            SmtpClient _client = new SmtpClient(login.smtpAddr, login.port);
+            _client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            _client.EnableSsl = true;
+            _client.UseDefaultCredentials = false;
+            _client.Credentials = new NetworkCredential(login.mail.ToString(), login.password);
+
+            foreach (MailAddress addr in to)
+            {
+                MailMessage _message = new MailMessage(login.mail.ToString(), addr.ToString(), subject, content);
+                _client.Send(_message);
+            }
         }
 
         #endregion

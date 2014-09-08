@@ -13,7 +13,6 @@ namespace MAD
 {
     class Mad
     {
-        public static readonly string VERSION = "v0.0.6.0";
         public static readonly string DATADIR = Path.Combine("data");
         public static readonly string CONFFILE = Path.Combine(DATADIR, "configure.json");
 
@@ -21,9 +20,8 @@ namespace MAD
         static int Main(string[] args)
         {
             Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
+            
             MadConf.TryCreateDir(DATADIR);
-
-            // load config
             if (MadConf.ConfExist(CONFFILE))
             {
                 try
@@ -77,8 +75,11 @@ namespace MAD
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
 
-                        CLIServer cliServer = new CLIServer(999, true, false, js);
+                        CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_PORT, MadConf.conf.DEBUG_MODE, MadConf.conf.LOG_MODE, js);
                         cliServer.Start();
+
+                        Console.WriteLine("Server running on port "  + MadConf.conf.SERVER_PORT  + " ... press any key to stop server.");
+                        Console.ReadKey();
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
@@ -101,7 +102,12 @@ namespace MAD
 
             Logger.ForceWriteToLog();
 
-            js.StopScedule();
+            js.Shutdown();
+
+            // try to save current config.
+            try { MadConf.SaveConf(CONFFILE); }
+            catch (Exception)
+            { }
 
             return 0;
         }

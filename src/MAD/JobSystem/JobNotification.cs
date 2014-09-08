@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using MAD.Notification;
-
 using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
@@ -34,7 +32,7 @@ namespace MAD.JobSystemCore
                     _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
                     _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
                     _mailContent += "=> CurrentValue:   " + job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject.ToString() + "\n\n";
-                    _mailContent += "____________________________________\n";
+                    _mailContent += "____________________________________\n\n";
                 }
 
                 if (settings != null)
@@ -48,7 +46,7 @@ namespace MAD.JobSystemCore
             }
         }
 
-        private List<JobRule> GetBrokenRules(JobOutput outp)
+        public List<JobRule> GetBrokenRules(JobOutput outp)
         {
             List<JobRule> _brokenRules = new List<JobRule>();
             foreach (JobRule _rule in rules)

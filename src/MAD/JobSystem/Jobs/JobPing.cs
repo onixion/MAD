@@ -26,6 +26,7 @@ namespace MAD.JobSystemCore
         {
             ttl = 200;
             outp.outputs.Add(new OutputDescriptor("TestString", typeof(string)));
+            outp.outputs.Add(new OutputDescriptor("TestInt", typeof(int)));
         }
 
         #endregion
@@ -37,7 +38,8 @@ namespace MAD.JobSystemCore
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
             PingReply _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
 
-            outp.GetOutputDesc("TestString").dataObject = "GEHT";
+            outp.GetOutputDesc("TestString").dataObject = "test";
+            outp.GetOutputDesc("TestInt").dataObject = 10;
 
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;

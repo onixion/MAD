@@ -85,9 +85,9 @@ namespace MAD.CLIServerCore
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
                 if (DEBUG_MODE)
-                    Console.WriteLine(GetTimeStamp() + "Client (" + _clientEndPoint.Address + ") connected.");
+                    Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
                 if (LOG_MODE)
-                    Log("Client (" + _clientEndPoint.Address + ") connected.");
+                    Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
 
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
@@ -99,29 +99,30 @@ namespace MAD.CLIServerCore
                 if (_userOnline)
                     throw new Exception("User already online!");
 
-                /*
-                // AES-KEY exchange
-                RSAPacket _rsaP = new RSAPacket(_stream, null);
-                _rsaP.ReceivePacket();
-                if (_rsaP.modulusLength != ACCEPTED_RSA_MODULUS_LENGTH)
-                    throw new Exception("RSA-MODULUS-LENGTH NOT SUPPORTED!");
-                RSAx _rsa = new RSAx(new RSAxParameters(_rsaP.modulus, _rsaP.publicKey, _rsaP.modulusLength));
-                _rsaP.Dispose();
-                string _aesPass = GenRandomPassUnicode(AES_PASS_LENGTH);
-                byte[] _aesPassCrypted = _rsa.Encrypt(Encoding.Unicode.GetBytes(_aesPass), true);
-                using (DataPacket _dataP = new DataPacket(_stream, null, _aesPassCrypted))
-                    _dataP.SendPacket();
-                AES _aes = new AES(_aesPass);    
-                */
+                RSAEncryption _rsa = new RSAEncryption();
+
+                using (DataStringPacket _dataP = new DataStringPacket(_stream, null))
+                {
+                    _dataP.ReceivePacket();
+                    _rsa.LoadPublicFromXml(_dataP.data);
+                }
+                string _pass = GenRandomPassUnicode(AES_PASS_LENGTH);
+
+                byte[] _encrypted = _rsa.PublicEncryption(Encoding.UTF8.GetBytes(_pass));
+
+                using (DataPacket _dataP = new DataPacket(_stream, null, _encrypted))
+                        _dataP.SendPacket();
+               
+                AES _aes = new AES(_pass);
 
                 bool _loginSuccess;
-                using (LoginPacket _loginP = new LoginPacket(_stream, null))
+                using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
                 {
                     _loginP.ReceivePacket();
                     _loginSuccess = Login(_loginP);
                 }
 
-                using (DataPacket _dataP = new DataPacket(_stream, null))
+                using (DataPacket _dataP = new DataPacket(_stream, _aes))
                 {
                     if (_loginSuccess)
                         _dataP.data = Encoding.Unicode.GetBytes("LOGIN_SUCCESS");
@@ -132,7 +133,7 @@ namespace MAD.CLIServerCore
 
                 if (_loginSuccess)
                 {
-                    CLISession _session = new CLISession(_stream, null, _js);
+                    CLISession _session = new CLISession(_stream, _aes, _js);
                     _session.InitCommands();
                     _session.Start();
                 }
@@ -142,15 +143,15 @@ namespace MAD.CLIServerCore
             catch (Exception e)
             {
                 if (DEBUG_MODE)
-                    Console.WriteLine("EX: " + e.Message);
+                    Console.WriteLine(GetTimeStamp() + " EX: " + e.Message);
                 if (LOG_MODE)
-                    Log("EX: " + e.Message);
+                    Log(GetTimeStamp() + " EX: " + e.Message);
             }
 
             if (DEBUG_MODE)
-                Console.WriteLine("Client (" + _clientEndPoint.Address + ") disconnected.");
+                Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
             if (LOG_MODE)
-                Log("Client (" + _clientEndPoint.Address + ") disconnected.");
+                Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
 
             return null;
         }
@@ -204,7 +205,7 @@ namespace MAD.CLIServerCore
                 _stream = new FileStream("server.log", FileMode.Create, FileAccess.Write, FileShare.Read);
 
             using (StreamWriter _writer = new StreamWriter(_stream))
-                _writer.WriteLine(GetTimeStamp() + data);
+                _writer.WriteLine(data);
 
             _stream.Dispose();
         }

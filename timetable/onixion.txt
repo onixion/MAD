@@ -84,3 +84,14 @@ replacing Xml-Serializer with Json-Serializer, because Json is much easier to us
 [31.08.2014][10:00-12:00][2h][176h] Added MadConf and MadConfFile.
 [31.08.2014][18:00-22:00][4h][180h] Fixed bugs, added three commands for handeling conf files. Added OnConfChange-EventHandler. Tested everything, works.
 [01.09.2014][21:00-23:00][3h][183h] Modified 'MadConf' and tested. Now it works with exceptions.
+[06.09.2014][20:00-24:00][4h][187h] CleanCoding, Testing JobSystem, Adding many new commands, Working on RSA-Encryption for CLIServer/Client.
+
+(NOTE: So the JobSystem is running without any issues, did not have any problems with it so far. JobRules are also working perfectly with
+the OutDescriptors. So what to do? - CLIServer/Client can't exchange any AES-Key yet -> working on that. Also adding some new commands
+to edit jobs, which were initalized and need to be changed. Also I am working on implemention 'JobTables' - these are json-files, which
+the JobSystem can save and load. Currently the JobSystem can only save and load specific JobNodes from seperate files -> idea is to save
+one file for all nodes - working on that as well. After these things are implemented, I will start testing different conditions to fix
+unseen bugs and try to save resources by Clean-Coding. So I won't implement new big features but rather fixing bugs, rewritting parts for
+saving resources and maybe adding some small things to it.)
+
+[07.09.2014][16:00-18:00] Fixed RSA issue. It is working now...

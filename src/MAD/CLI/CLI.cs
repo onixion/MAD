@@ -32,8 +32,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             commands.Add(new CommandOptions("conf", typeof(LoadConfigFileCommand), null));
-            commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfig), null));
-            commands.Add(new CommandOptions("conf-show", typeof(ConfShow), null));
+            commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfigCommand), null));
+            commands.Add(new CommandOptions("conf-save", typeof(SaveConfigCommand), null));
+            commands.Add(new CommandOptions("conf-show", typeof(ConfShowCommand), null));
 
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
@@ -48,6 +49,8 @@ namespace MAD.CLICore
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js load", typeof(JobSystemLoadTableCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js save", typeof(JobSystemSaveTableCommand), new object[] { js }));
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
 
@@ -68,6 +71,7 @@ namespace MAD.CLICore
 
             // JOBS
             commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job output", typeof(JobOutDescriptorListCommand), new object[] { js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));

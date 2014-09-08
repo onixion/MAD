@@ -67,31 +67,34 @@ namespace CLIClient
                         Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
                     }
 
-                    /*
-                    RSA r = RSACryptoServiceProvider.Create(
-                    RSAParameters t = r.ExportParameters(true);
-                    RSAxParameters _par = new RSAxParameters(t, 2048);
-                    RSAPacket _rsaP = new RSAPacket(_stream, null, _par.E.ToByteArray(), _par.N.ToByteArray(), _RSAModulusLength);
-                    _rsaP.SendPacket();
-                    _rsaP.Dispose();
-                    RSAx _rsa = new RSAx(_par);
-                    DataPacket _dataP = new DataPacket(_stream, null);
-                    _dataP.ReceivePacket();
-                    _aesPassFromServer = Encoding.Unicode.GetString(_rsa.Decrypt(_dataP.data, true));
-                    AES _aes = new AES(_aesPassFromServer);
-                    */
+                    // RSA-KEY-EXCHANGE
+
+                    RSACryptoServiceProvider _rsaProvider = new RSACryptoServiceProvider();
+                    RSAEncryption _rsa = new RSAEncryption();
+                    _rsa.LoadPrivateFromXml(_rsaProvider.ToXmlString(true));
+                    using (DataStringPacket _dataP = new DataStringPacket(_stream, null, _rsaProvider.ToXmlString(false)))
+                        _dataP.SendPacket();
+
+                    string _aesPass = null;
+                    using (DataPacket dataP = new DataPacket(_stream, null))
+                    {
+                        dataP.ReceivePacket();
+                        _aesPass = Encoding.UTF8.GetString(_rsa.PrivateDecryption(dataP.data));
+                    }
+
+                    AES _aes = new AES(_aesPass);
 
                     byte[] _username = Encoding.Unicode.GetBytes(username);
                     byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
 
-                    using (LoginPacket _loginP = new LoginPacket(_stream, null, _username, _passwordMD5))
+                    using (LoginPacket _loginP = new LoginPacket(_stream, _aes, _username, _passwordMD5))
                         _loginP.SendPacket();
 
                     string _serverAnswer;
-                    using(DataPacket _dataP2 = new DataPacket(_stream, null))
+                    using(DataPacket _dataP2 = new DataPacket(_stream, _aes))
                     {
                         _dataP2.ReceivePacket();
-                        _serverAnswer = Encoding.Unicode.GetString(_dataP.data);
+                        _serverAnswer = Encoding.Unicode.GetString(_dataP2.data);
                     }
   
                     Console.WriteLine("SERVER-REPLY: " + _serverAnswer);
@@ -102,7 +105,7 @@ namespace CLIClient
                         Console.WriteLine("\nServer accepted login-data.");
                         Console.ForegroundColor = ConsoleColor.White;
 
-                        StartVirtualConsole(_stream, null);
+                        StartRemoteConsole(_stream, _aes);
                     }
                     else
                     {
@@ -122,16 +125,21 @@ namespace CLIClient
             }
         }
 
-        private void StartVirtualConsole(NetworkStream stream, AES aes)
+        private void StartRemoteConsole(NetworkStream stream, AES aes)
         {
             string _cliInput;
             string _serverResponse;
             DataPacket _dataP = new DataPacket(stream, aes);
             CLIPacket _cliP = new CLIPacket(stream, aes);
+            string _cursor = "MAD-CLIENT> ";
 
             while (true)
             {
-                _cliInput = CLIInput.ReadInput(0);
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write(_cursor);
+                Console.ForegroundColor = ConsoleColor.White;
+
+                _cliInput = CLIInput.ReadInput(_cursor.Length);
 
                 _cliP.consoleWidth = Console.BufferWidth;
                 _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);
@@ -140,7 +148,7 @@ namespace CLIClient
                 _dataP.ReceivePacket();
                 _serverResponse = Encoding.Unicode.GetString(_dataP.data);
 
-                if (_serverResponse == "EXIT_CLI")
+                if (_serverResponse == "CLI_EXIT")
                     break;
 
                 CLIOutput.WriteToConsole(_serverResponse);

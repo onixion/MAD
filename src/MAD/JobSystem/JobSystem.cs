@@ -5,6 +5,8 @@ using System.Net.NetworkInformation;
 
 using MAD.Helper;
 
+using Newtonsoft.Json;
+
 namespace MAD.JobSystemCore
 {
     public class JobSystem
@@ -14,27 +16,52 @@ namespace MAD.JobSystemCore
         public const string VERSION = "v2.9.0.0";
         public const int MAXNODES = 100;
 
-        private JobScedule _scedule;
+        private JobScedule _scedule { get; set; }
         public JobScedule.State sceduleState { get { return _scedule.state; } }
 
-        private List<JobNode> _nodes { get; set; }
+        private List<JobNode> _nodes = new List<JobNode>();
         public List<JobNode> nodes { get { return _nodes; } }
 
         private object _nodesLock = new object();
 
+        public event EventHandler OnNodeCountChanged = null;
+        public event EventHandler OnNodeAdded = null;
+        public event EventHandler OnNodeRemoved = null;
+        
         #endregion
 
         #region constructor
 
         public JobSystem()
         {
-            _nodes = new List<JobNode>();
             _scedule = new JobScedule(_nodesLock, _nodes);
         }
 
         #endregion
 
         #region methodes
+
+        #region jobsystem handling
+
+        public void SaveTable(string filepath)
+        {
+            JSSerializer.SerializeTable(filepath, nodes);
+        }
+
+        public int LoadTable(string filepath)
+        {
+            List<JobNode> _nodes = JSSerializer.DeserializeTable(filepath);
+            lock (_nodesLock)
+                nodes.AddRange(_nodes);
+            return _nodes.Count;
+        }
+
+        public void Shutdown()
+        {
+            _scedule.Stop();
+        }
+
+        #endregion
 
         #region scedule handling
 
@@ -138,8 +165,15 @@ namespace MAD.JobSystemCore
         public void AddNode(JobNode node)
         {
             if (MAXNODES > _nodes.Count)
+            {
                 lock (_nodesLock)
                     _nodes.Add(node);
+
+                if(OnNodeCountChanged != null)
+                    OnNodeCountChanged.Invoke(node, null);
+                if(OnNodeAdded != null)
+                    OnNodeAdded.Invoke(node, null);
+            }
             else
                 throw new JobSystemException("Node limit reached!", null);
         }
@@ -152,6 +186,12 @@ namespace MAD.JobSystemCore
                 {
                     lock (_nodesLock)
                         _nodes.RemoveAt(i);
+
+                    if(OnNodeCountChanged != null)
+                        OnNodeCountChanged.Invoke(null, null);
+                    if(OnNodeRemoved != null)
+                        OnNodeRemoved.Invoke(null, null);
+
                     _success = true;
                 }
             if(!_success)
@@ -162,6 +202,11 @@ namespace MAD.JobSystemCore
         {
             lock (_nodesLock)
                 _nodes.Clear();
+
+            if(OnNodeCountChanged != null)
+                OnNodeCountChanged.Invoke(null, null);
+            if(OnNodeRemoved != null)
+                OnNodeRemoved.Invoke(null, null);
         }
 
         /// <returns>Count of removed nodes.</returns>
@@ -181,6 +226,10 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
+        public void DuplicateNode(int id)
+        {
+        }
+
         public bool NodeExist(int id)
         {
             JobNode _node = GetNode(id);
@@ -188,14 +237,6 @@ namespace MAD.JobSystemCore
                 return true;
             else
                 return false;
-        }
-
-        public JobNode GetNode(System.Net.NetworkInformation.PhysicalAddress mac)
-        {
-            foreach (JobNode _node in _nodes)
-                if (_node.macAddress == mac)
-                    return _node;
-            return null;
         }
 
         public JobNode GetNode(int id)
@@ -206,12 +247,36 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public void UpdateNodeIP(int nodeID, IPAddress ip)
+        public JobNode GetNode(string name)
+        {
+            foreach (JobNode _node in _nodes)
+                if (_node.name == name)
+                    return _node;
+            return null;
+        }
+
+        public JobNode GetNode(PhysicalAddress mac)
+        {
+            foreach (JobNode _node in _nodes)
+                if (_node.macAddress == mac)
+                    return _node;
+            return null;
+        }
+
+        public JobNode GetNode(IPAddress ip)
+        {
+            foreach (JobNode _node in _nodes)
+                if (_node.ipAddress == ip)
+                    return _node;
+            return null;
+        }
+
+        public void UpdateNodeName(int nodeID, string name)
         {
             JobNode _node = GetNode(nodeID);
             if (_node != null)
                 lock (_node.nodeLock)
-                    _node.ipAddress = ip;
+                    _node.name = name;
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
@@ -222,6 +287,16 @@ namespace MAD.JobSystemCore
             if (_node != null)
                 lock (_node.nodeLock)
                     _node.macAddress = mac;
+            else
+                throw new JobNodeException("Node does not exist!", null);
+        }
+
+        public void UpdateNodeIP(int nodeID, IPAddress ip)
+        {
+            JobNode _node = GetNode(nodeID);
+            if (_node != null)
+                lock (_node.nodeLock)
+                    _node.ipAddress = ip;
             else
                 throw new JobNodeException("Node does not exist!", null);
         }
