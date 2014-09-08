@@ -40,6 +40,40 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemSaveTableCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemSaveTableCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("file", "FILE", "File to save to.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            _js.SaveTable((string)pars.GetPar("file").argValues[0]);
+            return "<color><green>Table saved (contains " + _js.nodes.Count + " Nodes).";
+        }
+    }
+
+    public class JobSystemLoadTableCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemLoadTableCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("file", "FILE", "File to load from.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            int _loadedNodes = _js.LoadTable((string)pars.GetPar("file").argValues[0]);
+            return "<color><green>Table loaded (loaded " + _loadedNodes + " Nodes).";
+        }
+    }
+
     #endregion
 
     #region commands for SCEUDLE
@@ -124,7 +158,7 @@ namespace MAD.CLICore
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.splitline; 
-            output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+            output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             output += ConsoleTable.splitline;
             output += "<color><white>";
 
@@ -136,7 +170,7 @@ namespace MAD.CLICore
                 _tableRow[3] = _temp.macAddress.ToString();
                 _tableRow[4] = _temp.ipAddress.ToString();
                 _tableRow[5] = _temp.jobs.Count.ToString();
-                output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+                output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             }
 
             return output;
@@ -381,7 +415,7 @@ namespace MAD.CLICore
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.splitline;
-            output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+            output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             output += ConsoleTable.splitline;
             output += "<color><white>";
 
@@ -396,7 +430,7 @@ namespace MAD.CLICore
                     _tableRow[5] = _temp2.time.type.ToString();
                     _tableRow[6] = _temp2.time.GetValues();
                     _tableRow[7] = _temp2.outp.outState.ToString();
-                    output += ConsoleTable.FormatStringArray(Console.BufferWidth, _tableRow);
+                    output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
             return output;
         }

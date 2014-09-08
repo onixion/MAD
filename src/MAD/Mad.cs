@@ -78,7 +78,7 @@ namespace MAD
                         CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_PORT, MadConf.conf.DEBUG_MODE, MadConf.conf.LOG_MODE, js);
                         cliServer.Start();
 
-                        Console.WriteLine("Server running ... press any key to stop server.");
+                        Console.WriteLine("Server running on port "  + MadConf.conf.SERVER_PORT  + " ... press any key to stop server.");
                         Console.ReadKey();
                         break;
                     default:

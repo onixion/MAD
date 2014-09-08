@@ -48,6 +48,8 @@ namespace MAD.CLICore
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js load", typeof(JobSystemLoadTableCommand), new object[] { js }));
+            commands.Add(new CommandOptions("js save", typeof(JobSystemSaveTableCommand), new object[] { js }));
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
 

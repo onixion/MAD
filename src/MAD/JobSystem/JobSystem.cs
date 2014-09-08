@@ -5,6 +5,8 @@ using System.Net.NetworkInformation;
 
 using MAD.Helper;
 
+using Newtonsoft.Json;
+
 namespace MAD.JobSystemCore
 {
     public class JobSystem
@@ -40,6 +42,19 @@ namespace MAD.JobSystemCore
         #region methodes
 
         #region jobsystem handling
+
+        public void SaveTable(string filepath)
+        {
+            JSSerializer.SerializeTable(filepath, nodes);
+        }
+
+        public int LoadTable(string filepath)
+        {
+            List<JobNode> _nodes = JSSerializer.DeserializeTable(filepath);
+            lock (_nodesLock)
+                nodes.AddRange(_nodes);
+            return _nodes.Count;
+        }
 
         public void Shutdown()
         {

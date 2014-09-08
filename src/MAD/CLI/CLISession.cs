@@ -7,6 +7,7 @@ using System.Text;
 
 using MAD.CLICore;
 using MAD.JobSystemCore;
+using MAD.Logging;
 
 using MadNet;
 
@@ -56,7 +57,7 @@ namespace MAD.CLIServerCore
         public void InitCommands()
         {
             // GENERAL
-            commands.Add(new CommandOptions("exit", typeof(ClientExitCommand), null));
+            commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
             commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
@@ -64,6 +65,7 @@ namespace MAD.CLIServerCore
 
             commands.Add(new CommandOptions("conf", typeof(LoadConfigFileCommand), null));
             commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfigCommand), null));
+            commands.Add(new CommandOptions("conf-save", typeof(SaveConfigCommand), null));
             commands.Add(new CommandOptions("conf-show", typeof(ConfShowCommand), null));
 
             // LOGGER
@@ -75,10 +77,12 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
             commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
             commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
-            commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
-            */
+            commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));*/
+
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js load", typeof(JobSystemLoadTableCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("js save", typeof(JobSystemSaveTableCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
 
@@ -92,13 +96,14 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { _js }));
-            //commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
+            //commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { _js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node setmail", typeof(JobSystemSetNodeNotiCommand), new object[] { _js }));
 
             // JOBS
             commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("job output", typeof(JobOutDescriptorListCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
@@ -115,7 +120,6 @@ namespace MAD.CLIServerCore
 
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
-
         }
 
         public void Start()
@@ -148,7 +152,10 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                Console.WriteLine("EX: " + e.Message);
+                if (MadConf.conf.DEBUG_MODE)
+                    Console.WriteLine("CLI-Session: EX: ");
+                if (MadConf.conf.LOG_MODE)
+                    Logger.Log("CLI-Session: EX: " + e.Message, Logger.MessageType.WARNING);
             }
 
             _dataP.Dispose();

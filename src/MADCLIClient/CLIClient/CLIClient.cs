@@ -148,7 +148,7 @@ namespace CLIClient
                 _dataP.ReceivePacket();
                 _serverResponse = Encoding.Unicode.GetString(_dataP.data);
 
-                if (_serverResponse == "CLIENT_DISCONNECT")
+                if (_serverResponse == "CLI_EXIT")
                     break;
 
                 CLIOutput.WriteToConsole(_serverResponse);
