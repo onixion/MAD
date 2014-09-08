@@ -227,26 +227,20 @@ namespace MAD.JobSystemCore
                 }
 
                 if (job.noti.settings != null)
-                    SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
+                {
+                    NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3, job.noti.settings.login.smtpAddr,
+                        job.noti.settings.login.mail, job.noti.settings.login.password, job.noti.settings.login.port);
+                }
                 else
-                { }
-                    // default settings
+                {
+                    NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3);
+                }
             }
         }
 
         private void SendNotification(MailLogin login, MailAddress[] to, string subject, string content)
         {
-            SmtpClient _client = new SmtpClient(login.smtpAddr, login.port);
-            _client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            _client.EnableSsl = true;
-            _client.UseDefaultCredentials = false;
-            _client.Credentials = new NetworkCredential(login.mail.ToString(), login.password);
-
-            foreach (MailAddress addr in to)
-            {
-                MailMessage _message = new MailMessage(login.mail.ToString(), addr.ToString(), subject, content);
-                _client.Send(_message);
-            }
+            
         }
 
         #endregion
