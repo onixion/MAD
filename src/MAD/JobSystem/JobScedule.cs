@@ -170,24 +170,22 @@ namespace MAD.JobSystemCore
             JobHolder _holder = (JobHolder)holder;
             Job _job = _holder.job;
 
-            try
+            lock (_job.jobLock)
             {
-                lock (_job.jobLock)
+                _job.tStart = DateTime.Now;
+
+                try { _job.Execute(_holder.targetAddress); }
+                catch (Exception e)
                 {
-                    _job.tStart = DateTime.Now;
-                    _job.Execute(_holder.targetAddress);
-                    _job.tStop = DateTime.Now;
-                    _job.tSpan = _job.tStop.Subtract(_job.tStart);
-
-                    if(_job.noti != null)
-                        HandleNotification(_job);
-
-                    _job.state = Job.JobState.Waiting;
+                    _job.state = Job.JobState.Exception;
                 }
-            }
-            catch (Exception)
-            {
-                _job.outp.outState = JobOutput.OutState.Exception;
+
+                _job.tStop = DateTime.Now;
+                _job.tSpan = _job.tStop.Subtract(_job.tStart);
+
+                HandleNotification(_job);
+
+                _job.state = Job.JobState.Waiting;
             }
 
             return null;
@@ -228,7 +226,11 @@ namespace MAD.JobSystemCore
                     }
                 }
 
-                SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
+                if (job.noti.settings != null)
+                    SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
+                else
+                { }
+                    // default settings
             }
         }
 

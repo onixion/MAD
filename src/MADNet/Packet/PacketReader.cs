@@ -23,11 +23,6 @@ namespace MadNet
                     _loginPacket.ReceivePacketSpec(_streamIO);
                     return _loginPacket;
 
-                case 3: // LoginPacket
-                    RSAPacket _RSAPacket = new RSAPacket(stream, aes);
-                    _RSAPacket.ReceivePacketSpec(_streamIO);
-                    return _RSAPacket;
-
                 default:
                     throw new PacketException("Packet type not known!", null);
             }

@@ -51,7 +51,7 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.time = new JobTime();
             this.outp = new JobOutput();
-            this.noti = null;
+            this.noti = new JobNotification();
         }
 
         protected Job(string name, JobType type)

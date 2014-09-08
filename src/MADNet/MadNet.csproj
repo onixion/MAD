@@ -50,7 +50,6 @@
     <Compile Include="Packet\Packet.cs" />
     <Compile Include="Packet\PacketException.cs" />
     <Compile Include="Packet\PacketReader.cs" />
-    <Compile Include="Packet\RSAPacket.cs" />
     <Compile Include="Packet\ServerInfoPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RSAEncryption.cs" />

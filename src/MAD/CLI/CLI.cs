@@ -36,6 +36,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("conf-save", typeof(SaveConfigCommand), null));
             commands.Add(new CommandOptions("conf-show", typeof(ConfShowCommand), null));
 
+            // MAIL-SETTINGS GLOBAL
+            commands.Add(new CommandOptions("set-mail", typeof(SetMailSettingsCommand), null));
+
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
             commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
@@ -83,7 +86,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
 
-            commands.Add(new CommandOptions("job setnoti", typeof(JobSystemSetJobNotiCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job setmail", typeof(JobSystemSetJobMailSettingsCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job setrules", typeof(JobSystemSetJobRulesCommand), new object[] { js }));
 
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
