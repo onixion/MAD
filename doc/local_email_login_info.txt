@@ -9,3 +9,6 @@ PLZ: 6020
 Geb.: 01.01.1995
 Sex: Male
 Alt. eMail: manpreet.singh@students.htlinn.ac.at
+
+SMTP-Client: "smtp-mail.outlook.com"
+Port: "587"
