@@ -99,7 +99,6 @@ namespace MAD.CLIServerCore
             //commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { _js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("node setmail", typeof(JobSystemSetNodeNotiCommand), new object[] { _js }));
 
             // JOBS
             commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));

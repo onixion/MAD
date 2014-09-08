@@ -179,7 +179,8 @@ namespace MAD.JobSystemCore
                     _job.tStop = DateTime.Now;
                     _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
-                    HandleNotification(_job);
+                    if(_job.noti != null)
+                        HandleNotification(_job);
 
                     _job.state = Job.JobState.Waiting;
                 }
@@ -198,20 +199,21 @@ namespace MAD.JobSystemCore
 
             if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception || _brokenRules.Count != 0)
             {
-                string _mailSubject = "[MAD][ERROR] Job (JOB-ID: '" + job.id + "' OUTSTATE: '" + job.outp.outState.ToString() + "')";
+                string _mailSubject = "[MAD][ERROR] Job (JOB-ID: '" + job.id + "')";
                 string _mailContent = "";
 
-                _mailContent += "Job-Name: '" + job.name + "'\n";
-                _mailContent += "Job-Type: '" + job.type.ToString() + "'\n\n";
-
-                _mailContent += "Job-TStart: '" + job.tStart + "'\n";
-                _mailContent += "Job-TStop:  '" + job.tStop + "'(" + job.tSpan + ").\n\n";
-                
+                _mailContent += "Job-Name:     '" + job.name + "'\n";
+                _mailContent += "Job-Type:     '" + job.type.ToString() + "'\n";
                 _mailContent += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
 
+                _mailContent += "Job-TStart:   '" + job.tStart + "'\n";
+                _mailContent += "Job-TStop:    '" + job.tStop + "\n";
+                _mailContent += "Job-TSpan:    '" + job.tSpan + "\n\n";
+                
                 if (_brokenRules.Count != 0)
                 {
-                    _mailContent += "This job broke one or more rules:\n\n";
+                    _mailContent += "_________________________________________________";
+                    _mailContent += _brokenRules.Count + " Rules were broken:\n\n";
 
                     int _count = 0;
                     foreach (JobRule _brokenRule in _brokenRules)
@@ -221,20 +223,12 @@ namespace MAD.JobSystemCore
                         _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
                         _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
                         _mailContent += "=> CurrentValue:   " + job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject.ToString() + "\n\n";
-                        _mailContent += "\n\n";
+                        _mailContent += "\n";
                         _count++;
                     }
                 }
 
-                if (job.noti.settings != null)
-                {
-                    // there are settings for sending an email
-                    SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
-                }
-                else
-                {
-                    // there are no settings for sending an email
-                }
+                SendNotification(job.noti.settings.login, job.noti.settings.mailAddr, _mailSubject, _mailContent);
             }
         }
 

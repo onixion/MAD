@@ -67,7 +67,6 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { js }));
-            commands.Add(new CommandOptions("node setmail", typeof(JobSystemSetNodeNotiCommand), new object[] { js })); 
 
             // JOBS
             commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { js }));
