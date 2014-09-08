@@ -6,8 +6,6 @@ using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
-
-
     public abstract class Job
     {
         #region members
