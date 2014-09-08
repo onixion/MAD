@@ -31,7 +31,7 @@ namespace MAD.JobSystemCore
 
             outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
             outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
-            outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
+            //outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
         }
 
         #endregion
@@ -44,8 +44,13 @@ namespace MAD.JobSystemCore
             PingReply _reply = _ping.Send(targetAddress, timeout, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
 
             outp.GetOutputDesc("IPStatus").dataObject = _reply.Status.ToString();
-            outp.GetOutputDesc("TTL").dataObject = _reply.Options.Ttl;
-            outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
+
+            if (_reply.Options != null)
+                outp.GetOutputDesc("TTL").dataObject = _reply.Options.Ttl;
+            else
+                outp.GetOutputDesc("TTL").dataObject = null;
+
+            //outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
 
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;

@@ -8,6 +8,7 @@ using MAD.CLICore;
 using MAD.CLIServerCore;
 using MAD.DHCPReader;
 using MAD.Logging;
+using MAD.Notification;
 
 namespace MAD
 {
@@ -52,6 +53,8 @@ namespace MAD
                 Logger.ReadPathToLogFile();
             else
                 Logger.CreateNewPathFile();
+
+            NotificationSystem.SetOrigin(MadConf.conf.smtpServer, new System.Net.Mail.MailAddress(MadConf.conf.username), MadConf.conf.password, MadConf.conf.smtpPort);
 
             if (args.Length == 0)
             { 

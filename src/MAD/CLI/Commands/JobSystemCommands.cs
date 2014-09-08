@@ -1031,7 +1031,7 @@ namespace MAD.CLICore
             else
                 throw new Exception(CLIError.Error(CLIError.ErrorType.SyntaxError, "SMTP-Login could not be parsed correctly!", true));
 
-            _settings.mailAddr = (MailAddress[])pars.GetPar(NOTI_SMTP_MAILS).argValues;
+            _settings.mailAddr = new MailAddress[1] { (MailAddress) pars.GetPar(NOTI_SMTP_MAILS).argValues[0] };
 
             return _settings;
         }

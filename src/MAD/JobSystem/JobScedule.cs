@@ -210,7 +210,7 @@ namespace MAD.JobSystemCore
                 
                 if (_brokenRules.Count != 0)
                 {
-                    _mailContent += "_________________________________________________";
+                    _mailContent += "_________________________________________________\n";
                     _mailContent += _brokenRules.Count + " Rules were broken:\n\n";
 
                     int _count = 0;
@@ -220,7 +220,14 @@ namespace MAD.JobSystemCore
                         _mailContent += "-> OutDescriptor:  " + _brokenRule.outDescName + "\n";
                         _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
                         _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
-                        _mailContent += "=> CurrentValue:   " + job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject.ToString() + "\n\n";
+
+                        object _data = job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject;
+                        _mailContent += "=> CurrentValue:   ";
+                        if (_data != null)
+                            _mailContent += _data.ToString() + "\n\n";
+                        else
+                            _mailContent += "NULL\n\n";
+
                         _mailContent += "\n";
                         _count++;
                     }
@@ -233,7 +240,7 @@ namespace MAD.JobSystemCore
                 }
                 else
                 {
-                    NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3);
+                    NotificationSystem.SendMail(new MailAddress[1] {new MailAddress("singh.manpreet@live.at")}, _mailSubject, _mailContent, 3);
                 }
             }
         }

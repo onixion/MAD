@@ -38,12 +38,17 @@ namespace MAD.JobSystemCore
             if(!IsOperatorSupported(_desc.dataType))
                 throw new Exception("OutputDescriptor-Type not supported!");
 
-            if (_desc.dataType == typeof(Int32))
-                return CheckValidityInt((Int32)_desc.dataObject);
-            else if (_desc.dataType == typeof(long))
-                return CheckValidityLong((long)_desc.dataObject);
-            else if (_desc.dataType == typeof(string))
-                return CheckValidityString((string)_desc.dataObject);
+            if (_desc.dataObject != null)
+            {
+                if (_desc.dataType == typeof(Int32))
+                    return CheckValidityInt((Int32)_desc.dataObject);
+                else if (_desc.dataType == typeof(long))
+                    return CheckValidityLong((long)_desc.dataObject);
+                else if (_desc.dataType == typeof(string))
+                    return CheckValidityString((string)_desc.dataObject);
+                else
+                    return false;
+            }
             else
                 return false;
         }

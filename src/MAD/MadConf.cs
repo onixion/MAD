@@ -77,6 +77,11 @@ namespace MAD
             conf.DEBUG_MODE = true;
             conf.LOG_MODE = true;
             conf.SERVER_PORT = 2222;
+
+            conf.smtpServer = "smtp-mail.outlook.com";
+            conf.smtpPort = 587;
+            conf.username = "mad.group@outlook.com";
+            conf.password = "Mad-21436587";
         }
 
         #endregion
@@ -89,5 +94,10 @@ namespace MAD
         public bool DEBUG_MODE;
         public bool LOG_MODE;
         public int SERVER_PORT;
+
+        public string smtpServer;
+        public int smtpPort;
+        public string username;
+        public string password;
     }
 }
