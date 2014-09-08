@@ -9,7 +9,13 @@ namespace MAD
     {
         public string name;
         public OType type;
-        public enum OType { INTEGER, CHAR20, CHAR30, boolean1 }
+        public enum OType 
+        {
+            INTEGER,
+            CHAR20,
+            CHAR30,
+            boolean1 
+        }
 
         public TableInfo(string name, OType type)
         {
@@ -50,9 +56,6 @@ namespace MAD
         {
             this.column = column;
             this.data = data;
-
-            
-
         }
     }
 
