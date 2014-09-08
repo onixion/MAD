@@ -588,7 +588,8 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
 
-            oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) })); 
+            oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("tout", "TIMEOUT", "Timeout of the ping.", false, false, new Type[] { typeof(int) })); 
             description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
         }
 
@@ -607,6 +608,9 @@ namespace MAD.CLICore
             // Set job-specific settings.
             if (OParUsed("ttl"))
                 _job.ttl = (int)pars.GetPar("ttl").argValues[0];
+
+            if (OParUsed("tout"))
+                _job.timeout = (int)pars.GetPar("tout").argValues[0];
 
             // So now the JobPing is finished and set properly. 
 

@@ -40,6 +40,8 @@ namespace MAD.JobSystemCore
 
             if (_desc.dataType == typeof(Int32))
                 return CheckValidityInt((Int32)_desc.dataObject);
+            else if (_desc.dataType == typeof(long))
+                return CheckValidityLong((long)_desc.dataObject);
             else if (_desc.dataType == typeof(string))
                 return CheckValidityString((string)_desc.dataObject);
             else
@@ -64,6 +66,32 @@ namespace MAD.JobSystemCore
                     break;
                 case Operation.Smaller:
                     if (currentValue > Int32.Parse(compareValue.ToString()))
+                        return true;
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        }
+
+        private bool CheckValidityLong(long currentValue)
+        {
+            switch (oper)
+            {
+                case Operation.Equal:
+                    if (currentValue == long.Parse(compareValue.ToString()))
+                        return true;
+                    break;
+                case Operation.NotEqual:
+                    if (currentValue != long.Parse(compareValue.ToString()))
+                        return true;
+                    break;
+                case Operation.Bigger:
+                    if (currentValue < long.Parse(compareValue.ToString()))
+                        return true;
+                    break;
+                case Operation.Smaller:
+                    if (currentValue > long.Parse(compareValue.ToString()))
                         return true;
                     break;
                 default:

@@ -13,9 +13,11 @@ namespace MAD.JobSystemCore
 
         [JsonIgnore]
         private Ping _ping = new Ping();
-        public int ttl { get; set; }
         [JsonIgnore]
         public bool dontFragment = true;
+
+        public int ttl { get; set; }
+        public int timeout { get; set; }
 
         #endregion
 
@@ -25,8 +27,11 @@ namespace MAD.JobSystemCore
             : base(JobType.Ping)
         {
             ttl = 200;
-            outp.outputs.Add(new OutputDescriptor("TestString", typeof(string)));
-            outp.outputs.Add(new OutputDescriptor("TestInt", typeof(int)));
+            timeout = 5000;
+
+            outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
+            outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
+            outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
         }
 
         #endregion
@@ -36,10 +41,11 @@ namespace MAD.JobSystemCore
         public override void Execute(IPAddress targetAddress)
         {
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
-            PingReply _reply = _ping.Send(targetAddress, 5000, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
+            PingReply _reply = _ping.Send(targetAddress, timeout, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
 
-            outp.GetOutputDesc("TestString").dataObject = "test";
-            outp.GetOutputDesc("TestInt").dataObject = 10;
+            outp.GetOutputDesc("IPStatus").dataObject = _reply.Status.ToString();
+            outp.GetOutputDesc("TTL").dataObject = _reply.Options.Ttl;
+            outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
 
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;
@@ -52,6 +58,7 @@ namespace MAD.JobSystemCore
             string _temp = "";
 
             _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
+            _temp += "<color><yellow>Timeout: <color><white>" + timeout.ToString() + "\n";
 
             return _temp;
         }

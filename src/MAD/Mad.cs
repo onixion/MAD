@@ -80,6 +80,8 @@ namespace MAD
 
                         Console.WriteLine("Server running on port "  + MadConf.conf.SERVER_PORT  + " ... press any key to stop server.");
                         Console.ReadKey();
+
+                        cliServer.Stop();
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
