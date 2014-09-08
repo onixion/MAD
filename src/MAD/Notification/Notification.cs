@@ -1,48 +1,48 @@
 ﻿using System;
 using System.Net;
 using System.Net.Mail;
-
 using MAD.Logging;
 
 namespace MAD.Notification
 {
-    public class NotificationSystem
+    public static class NotificationSystem
     {
         //#Declaration
 
         //Declaration of static Parameters (Public)
-        public MailAddress eMailFrom;
-        public string smtpClient;
-        public int port;
-        public string messageSuccess, messageFailed, attempt;
-        
+        private static MailAddress eMailFrom_intern;
+        private static string smtpClient_intern;
+        private static int port_intern;
+        public static string messageSuccess, messageFailed, attempt;
+
 
         //Declaration of static Parameters (Private)
-        private string password;
-        private bool eMailSent = false;
-        
-        
+        private static string password_intern;
+        private static bool eMailSent = false;
+
+
         //Decleration of Objects
-        private SmtpClient client;
-        private Object thisLock = new Object();
-        public 
-        MailMessage mail;
+        private static SmtpClient client;
+        private static Object thisLock = new Object();
+        public static MailMessage mail;
 
 
         //#Methods
+        #region Methods
 
-        //Method for getting basic information (static (have to set once))
-        public NotificationSystem(string smtpClient,MailAddress eMailFrom, string password,  int port)
+        public static void SetOrigin(string smtpClient, MailAddress eMailFrom, string password, int port)
         {
             //Convertation of income to intern
-            this.smtpClient = smtpClient;
-            this.eMailFrom = eMailFrom;
-            this.password = password;
-            this.port = port;
+            smtpClient_intern = smtpClient;
+            eMailFrom_intern = eMailFrom;
+            password_intern = password;
+            port_intern = port;
         }
-        
+        //Method for getting basic information (static (have to set once))
+       
+
         //Method to send mail with mail parameters (dynamic (have to set for every mail))
-        public bool SendMail(MailAddress[] eMailTo, string subject, string body, int retryCounter, 
+        public static bool SendMail(MailAddress[] eMailTo, string subject, string body, int retryCounter,
             bool highPriority = false, MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
             lock (thisLock)
@@ -53,7 +53,7 @@ namespace MAD.Notification
                 //Initialization of mail and setting parameters
                 mail = new MailMessage();
 
-                mail.From = eMailFrom;
+                mail.From = eMailFrom_intern;
 
                 foreach (MailAddress element in eMailTo)//to get all eMailIds from incoming Array
                 {
@@ -100,9 +100,9 @@ namespace MAD.Notification
                         attempt = tryCounter + ".Attempt";
                         Logger.Log(attempt, Logger.MessageType.INFORM);
                         //Initialization of SMTPclient and setting parameters and sending mail
-                        client = new SmtpClient(smtpClient, port);
+                        client = new SmtpClient(smtpClient_intern, port_intern);
                         lock (client) { };
-                        client.Credentials = new NetworkCredential(eMailFrom.ToString(), password);
+                        client.Credentials = new NetworkCredential(eMailFrom_intern.ToString(), password_intern);
                         client.EnableSsl = true;
                         client.Send(mail); //Send order
                         eMailSent = true;
@@ -115,11 +115,12 @@ namespace MAD.Notification
                     {
                         eMailSent = false;
                         messageFailed = "(" + tryCounter + ".Attempt) Sending mail failed becuase: " + ex.Message;
-                        Logger.Log(messageFailed, Logger.MessageType.ERROR);//ex gives a report of problems
+                        Logger.Log(messageFailed, Logger.MessageType.ERROR);//ex gives a report_intern of problems
                     }
 
                 } return eMailSent;
             }
         }
+        #endregion
     }
 }
