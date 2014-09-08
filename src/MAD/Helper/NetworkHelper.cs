@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 
+using SnmpSharpNet;
+
 namespace MAD.Helper
 {
     public class NetworkHelper                                                      //This class is for Networkingstuff and needed in HostDetect.cs
@@ -9,16 +11,19 @@ namespace MAD.Helper
         #region Member
         public const uint DHCP_SERVER_PORT = 67;                                    //Port on which a DHCP Server listens; for catching DHCP Requests you will need this 
         public const uint DHCP_CLIENT_PORT = 68;                                    //Port on which a DHCP Client listens
+        public const uint DHCP_COOKIE_POSITION = 236;                               //Position of magic dhcp cookie in the udp datagramm
+        public const uint DHCP_COOKIE_VALUE = 1669485411;                           //Value of the four byte magic dhcp cookie
+        
+        public const byte DHCP_COOKIE_BYTE0_VALUE = 99;                             //Value of first byte of the four byte magic dhcp cookie
+        public const byte DHCP_COOKIE_BYTE1_VALUE = 130;                            //Value of second -"-
+        public const byte DHCP_COOKIE_BYTE2_VALUE = 83;                             //Value of third -"-
+        public const byte DHCP_COOKIE_BYTE3_VALUE = 99;                             //Value of fourth -"-
 
-        public const uint _magicCookiePosition = 236;                               //Position of magic dhcp cookie in the udp datagramm
+        public const string SNMP_COMMUNITY_STRING = "public";                       //community String for snmp requests in MAD
+        public const string SNMP_AUTH_SECRET = "MADMADMAD";                         //authentification Secret -"-
+        public const string SNMP_PRIV_SECRET = "MADMADMAD";                         //privacy Secret -"-
 
-        public const uint MAGIC_COOKIE_VALUE = 1669485411;                          //Value of the four byte magic dhcp cookie
-        public const byte COOKIE_BYTE0_VALUE = 99;                                  //Value of first byte of the four byte magic dhcp cookie
-        public const byte COOKIE_BYTE1_VALUE = 130;                                 //Value of second -"-
-        public const byte COOKIE_BYTE2_VALUE = 83;                                  //Value of third -"-
-        public const byte COOKIE_BYTE3_VALUE = 99;                                  //Value of fourth -"-
-
-        public enum snmpProtokolls
+        public enum snmpProtocols                                                   //an enumeration with the kinds of supported Protocols
         {
             MD5,
             SHA,
@@ -26,11 +31,18 @@ namespace MAD.Helper
             DES
         }
 
-        public enum securityLvl
+        public enum securityLvl                                                     //a enumeration with the levels of security provided by snmp
         {
             noAuthNoPriv,
             authNoPriv,
             authPriv
+        }
+
+        public struct securityModel                                                 //a struct which helps to contain all the security information needed for snmp
+        {
+            public NetworkHelper.securityLvl securityLevel;
+            public NetworkHelper.snmpProtocols privacyProtocol;
+            public NetworkHelper.snmpProtocols authentificationProtocol;
         }
 
         #endregion
@@ -57,10 +69,10 @@ namespace MAD.Helper
 
         public bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
         {
-            if (data[_magicCookiePosition] == COOKIE_BYTE0_VALUE 
-                && data[_magicCookiePosition + 1] == COOKIE_BYTE1_VALUE 
-                && data[_magicCookiePosition + 2] == COOKIE_BYTE2_VALUE 
-                && data[_magicCookiePosition + 3] == COOKIE_BYTE3_VALUE)
+            if (data[DHCP_COOKIE_POSITION] == DHCP_COOKIE_BYTE0_VALUE 
+                && data[DHCP_COOKIE_POSITION + 1] == DHCP_COOKIE_BYTE1_VALUE 
+                && data[DHCP_COOKIE_POSITION + 2] == DHCP_COOKIE_BYTE2_VALUE 
+                && data[DHCP_COOKIE_POSITION + 3] == DHCP_COOKIE_BYTE3_VALUE)
             {
                 return true;
             }
@@ -69,7 +81,7 @@ namespace MAD.Helper
 
         public bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
         {
-            for (uint i = _magicCookiePosition; i < data.Length; i++)
+            for (uint i = DHCP_COOKIE_POSITION; i < data.Length; i++)
             {
                 if (data[i] == 53)
                 {
@@ -95,7 +107,7 @@ namespace MAD.Helper
             return macAddress;
         }
 
-        public string getPhysicalAddressString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
+        public string getPhysicalAddressString(byte[] data)                         // same as ^ but without doubledots, so PhysicalAddress Class can parse it
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";
@@ -109,11 +121,57 @@ namespace MAD.Helper
             return macAddress;
         }
 
+        public static AgentParameters GetSNMPV2Param(string communityString)
+        {
+            OctetString _community = new OctetString(communityString);
+            AgentParameters _param = new AgentParameters(_community);
+
+            _param.Version = SnmpVersion.Ver2;
+
+            return _param; 
+        }
+
+        public static SecureAgentParameters GetSNMPV3Param(UdpTarget target, string communityString, securityModel secModel)
+        {
+            SecureAgentParameters _param = new SecureAgentParameters();
+
+            if (!target.Discovery(_param))
+            {
+                return null;
+            }
+
+            switch (secModel.securityLevel)
+            {
+                case NetworkHelper.securityLvl.noAuthNoPriv:
+                    _param.noAuthNoPriv(communityString);
+
+                    break;
+                case NetworkHelper.securityLvl.authNoPriv:
+                    if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.MD5)
+                        _param.authNoPriv(communityString, AuthenticationDigests.MD5, SNMP_AUTH_SECRET);
+                    else if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.SHA)
+                        _param.authNoPriv(communityString, AuthenticationDigests.SHA1, SNMP_AUTH_SECRET);
+
+                    break;
+                case NetworkHelper.securityLvl.authPriv:
+                    if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.MD5 && secModel.privacyProtocol == NetworkHelper.snmpProtocols.AES)
+                        _param.authPriv(SNMP_COMMUNITY_STRING, AuthenticationDigests.MD5, SNMP_AUTH_SECRET, PrivacyProtocols.AES128, SNMP_PRIV_SECRET);
+                    else if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.MD5 && secModel.privacyProtocol == NetworkHelper.snmpProtocols.DES)
+                        _param.authPriv(SNMP_COMMUNITY_STRING, AuthenticationDigests.MD5, SNMP_AUTH_SECRET, PrivacyProtocols.DES, SNMP_PRIV_SECRET);
+                    else if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.SHA && secModel.privacyProtocol == NetworkHelper.snmpProtocols.AES)
+                        _param.authPriv(SNMP_COMMUNITY_STRING, AuthenticationDigests.SHA1, SNMP_AUTH_SECRET, PrivacyProtocols.AES128, SNMP_PRIV_SECRET);
+                    else if (secModel.authentificationProtocol == NetworkHelper.snmpProtocols.SHA && secModel.privacyProtocol == NetworkHelper.snmpProtocols.DES)
+                        _param.authPriv(SNMP_COMMUNITY_STRING, AuthenticationDigests.SHA1, SNMP_AUTH_SECRET, PrivacyProtocols.DES, SNMP_PRIV_SECRET);
+
+                    break;
+            }
+
+            return _param; 
+        }
         #endregion
     }
 
-
-    public class ModelHost                                                         //A struct which provides all importand information for a host - feel free to put more in it!
+    public class ModelHost                                                         //A class which provides all importand information for a host - feel free to put more in it!
     {
         public uint ID;
 
