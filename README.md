@@ -8,7 +8,7 @@ MAD is an opensource network monitoring software, which should become an alterna
 - GUI
 - NotificationSystem (E-Mail ...)
 - Database
-- JobSystem (PingRequest, HttpRequest, PortRequest, Arp-Request, ~~SNMP~~ ...)
+- JobSystem (PingRequest, HttpRequest, PortRequest, Arp-Request, SNMP ...)
 - CLI
 - CLI-Server
 - CLI-Client
