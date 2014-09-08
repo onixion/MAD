@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MAD.Logging;
+
 using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
@@ -28,9 +30,12 @@ namespace MAD.JobSystemCore
                     if (!_rule.CheckRuleValidity(outp))
                         _brokenRules.Add(_rule);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //Logger.Log("JobNoti.: " + e.Message, Logger.MessageType.ERROR);
+                    if (MadConf.conf.DEBUG_MODE)
+                        Console.WriteLine("JobNoti.:" + e.Message);
+                    if (MadConf.conf.LOG_MODE)
+                        Logger.Log("JobNoti.: " + e.Message, Logger.MessageType.ERROR);
                 }
             }
             return _brokenRules;
