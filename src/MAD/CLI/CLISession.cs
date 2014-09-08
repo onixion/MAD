@@ -147,8 +147,8 @@ namespace MAD.CLIServerCore
                 }
             }
             catch (Exception e)
-            { 
-            
+            {
+                Console.WriteLine("EX: " + e.Message);
             }
 
             _dataP.Dispose();

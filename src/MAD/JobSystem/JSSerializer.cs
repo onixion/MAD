@@ -19,6 +19,7 @@ namespace MAD.JobSystemCore
             {
                 JsonSerializerSettings _settings = new JsonSerializerSettings();
                 _settings.Converters.Add(new IPAddressConverter());
+                _settings.Converters.Add(new MailAddressConverter());
                 _settings.Converters.Add(new MacAddressConverter());
                 _settings.TypeNameHandling = TypeNameHandling.Auto;
                 Serialize(fileName, node, _settings);
@@ -31,6 +32,7 @@ namespace MAD.JobSystemCore
             {
                 JsonSerializerSettings _settings = new JsonSerializerSettings();
                 _settings.Converters.Add(new IPAddressConverter());
+                _settings.Converters.Add(new MailAddressConverter());
                 _settings.Converters.Add(new MacAddressConverter());
                 _settings.TypeNameHandling = TypeNameHandling.Auto;
                 return (JobNode)Deserialize(fileName, typeof(JobNode), _settings);
@@ -76,6 +78,28 @@ namespace MAD.JobSystemCore
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             return System.Net.IPAddress.Parse((string)reader.Value);
+        }
+    }
+
+    public class MailAddressConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            if (objectType == typeof(System.Net.Mail.MailAddress))
+                return true;
+            else
+                return false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            System.Net.Mail.MailAddress _mail = (System.Net.Mail.MailAddress)value;
+            writer.WriteValue(_mail.ToString());
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return new System.Net.Mail.MailAddress(((string)reader.Value));
         }
     }
 

@@ -74,7 +74,8 @@ namespace MAD
 
         public static void SetToDefault()
         {
-            conf.VERSION = "v0.0.6.0";
+            conf.DEBUG_MODE = true;
+            conf.LOG_MODE = true;
             conf.SERVER_PORT = 2222;
         }
 
@@ -85,7 +86,8 @@ namespace MAD
 
     public class MadConfigFile
     {
-        public string VERSION;
+        public bool DEBUG_MODE;
+        public bool LOG_MODE;
         public int SERVER_PORT;
     }
 }

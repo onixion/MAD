@@ -282,7 +282,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output = "<color><yellow>VERSION: <color><white>" + MadConf.conf.VERSION + "\n";
+            //output = "<color><yellow>VERSION: <color><white>" + MadConf.conf.VERSION + "\n";
 
             return output;
         }

@@ -39,6 +39,15 @@ namespace MAD.JobSystemCore
 
         #region methodes
 
+        #region jobsystem handling
+
+        public void Shutdown()
+        {
+            _scedule.Stop();
+        }
+
+        #endregion
+
         #region scedule handling
 
         public void StartScedule()

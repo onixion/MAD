@@ -75,7 +75,7 @@ namespace MAD
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
 
-                        CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_PORT, true, false, js);
+                        CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_PORT, MadConf.conf.DEBUG_MODE, MadConf.conf.LOG_MODE, js);
                         cliServer.Start();
 
                         Console.WriteLine("Server running ... press any key to stop server.");
@@ -102,8 +102,7 @@ namespace MAD
 
             Logger.ForceWriteToLog();
 
-            // cleaning up
-            js.StopScedule();
+            js.Shutdown();
 
             // try to save current config.
             try { MadConf.SaveConf(CONFFILE); }
