@@ -205,17 +205,17 @@ namespace MAD.JobSystemCore
 
             if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception || _brokenRules.Count != 0)
             {
-                string _mailSubject = "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "') finished with a not expected result.";
+                string _mailSubject = "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "') - Reason: ";
+
+                if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception)
+                    _mailSubject = "OutState was '" + job.outp.outState.ToString() + "'!";
+                else
+                    _mailSubject = "Broken rules!";
+
                 string _mailContent = "";
 
-                _mailContent += "Job-Name:     '" + job.name + "'\n";
-                _mailContent += "Job-Type:     '" + job.type.ToString() + "'\n";
-                _mailContent += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
+                _mailContent += GenJobInfo(job);
 
-                _mailContent += "Job-TStart:   '" + job.tStart + "'\n";
-                _mailContent += "Job-TStop:    '" + job.tStop + "'\n";
-                _mailContent += "Job-TSpan:    '" + job.tSpan + "'\n\n";
-                
                 if (_brokenRules.Count != 0)
                 {
                     _mailContent += "_________________________________________________\n";
@@ -229,8 +229,8 @@ namespace MAD.JobSystemCore
                             _data = (string)"NULL";
 
                         _mailContent += _count + ".) Rule\n";
-                        _mailContent += "-> Rule Equation:    " + _brokenRule.outDescName + " <" + _brokenRule.oper.ToString() + "> " + _brokenRule.compareValue.ToString() + " = TRUE\n";
-                        _mailContent += "-> Current Equation: " + _data.ToString() + " <" + _brokenRule.oper.ToString() + "> " + _brokenRule.compareValue.ToString() + " = FALSE\n\n";
+                        _mailContent += "-> Rule Equation:    " + _brokenRule.outDescName + " <" + _brokenRule.oper.ToString() + "> '" + _brokenRule.compareValue.ToString() + "' = TRUE\n";
+                        _mailContent += "-> Current Equation: '" + _data.ToString() + "' <" + _brokenRule.oper.ToString() + "> '" + _brokenRule.compareValue.ToString() + "' = FALSE\n\n";
                         
                         _mailContent += "-> OutDescriptor: " + _brokenRule.outDescName + "\n";
                         _mailContent += "-> Operation:     " + _brokenRule.oper.ToString() + "\n";
@@ -241,23 +241,33 @@ namespace MAD.JobSystemCore
                     }
 
                     _mailContent += "_________________________________________________\n";
-                }
 
-                if (job.noti.settings != null)
-                {
-                    NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3, job.noti.settings.login.smtpAddr,
-                        job.noti.settings.login.mail, job.noti.settings.login.password, job.noti.settings.login.port);
-                }
-                else
-                {
-                    NotificationSystem.SendMail(new MailAddress[1] {new MailAddress("alin.porcic@gmail.com")}, _mailSubject, _mailContent, 3);
+                    if (job.noti.settings != null)
+                    {
+                        NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3, job.noti.settings.login.smtpAddr,
+                            job.noti.settings.login.mail, job.noti.settings.login.password, job.noti.settings.login.port);
+                    }
+                    else
+                    {
+                        NotificationSystem.SendMail(new MailAddress[1] { new MailAddress("alin.porcic@gmail.com") }, _mailSubject, _mailContent, 3);
+                    }
                 }
             }
         }
 
-        private void SendNotification(MailLogin login, MailAddress[] to, string subject, string content)
+        private string GenJobInfo(Job job)
         {
-            
+            string _buffer = "";
+
+            _buffer += "Job-Name:     '" + job.name + "'\n";
+            _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";
+            _buffer += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
+
+            _buffer += "Job-TStart:   '" + job.tStart + "'\n";
+            _buffer += "Job-TStop:    '" + job.tStop + "'\n";
+            _buffer += "Job-TSpan:    '" + job.tSpan + "'\n\n";
+
+            return _buffer;
         }
 
         #endregion

@@ -31,7 +31,7 @@ namespace MAD.JobSystemCore
 
             outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
             outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
-            //outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
+            outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
         }
 
         #endregion
@@ -50,7 +50,7 @@ namespace MAD.JobSystemCore
             else
                 outp.GetOutputDesc("TTL").dataObject = null;
 
-            //outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
+            outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
 
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;

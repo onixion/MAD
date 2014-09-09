@@ -72,11 +72,13 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { js }));
 
             // JOBS
-            commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { js }));
-            commands.Add(new CommandOptions("job output", typeof(JobOutDescriptorListCommand), new object[] { js }));
-            commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job info", typeof(JobInfoCommand), new object[] { js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));
+
+            commands.Add(new CommandOptions("job setmail", typeof(JobSystemSetJobMailSettingsCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job setrules", typeof(JobSystemSetJobRulesCommand), new object[] { js }));
 
             commands.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
@@ -85,9 +87,6 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job add ftpcheck", typeof(JobSystemAddCheckFtpCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { js }));
-
-            commands.Add(new CommandOptions("job setmail", typeof(JobSystemSetJobMailSettingsCommand), new object[] { js }));
-            commands.Add(new CommandOptions("job setrules", typeof(JobSystemSetJobRulesCommand), new object[] { js }));
 
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));

@@ -101,8 +101,6 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
 
             // JOBS
-            commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("job output", typeof(JobOutDescriptorListCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
