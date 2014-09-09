@@ -573,16 +573,10 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            // Create an empty job.
             JobPing _job = new JobPing();
-
-            // Set name.
             _job.name = (string)pars.GetPar("n").argValues[0];
-
-            // Set jobTime.
             _job.time = ParseJobTime(this);
-            
-            // Set job-specific settings.
+
             if (OParUsed("ttl"))
                 _job.ttl = (int)pars.GetPar("ttl").argValues[0];
 
@@ -611,11 +605,11 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             JobHttp _job = new JobHttp();
-
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-
-            _job.port = (int)pars.GetPar("p").argValues[0];
+            
+            if (OParUsed("p"))
+                _job.port = (int)pars.GetPar("p").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);

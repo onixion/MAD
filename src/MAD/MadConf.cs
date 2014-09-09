@@ -76,8 +76,8 @@ namespace MAD
         {
             conf.DEBUG_MODE = true;
             conf.LOG_MODE = true;
-            conf.SERVER_PORT = 2222;
-
+            
+            conf.cliServerPort = 2222;
             conf.smtpServer = "smtp-mail.outlook.com";
             conf.smtpPort = 587;
             conf.username = "mad.group@outlook.com";
@@ -91,9 +91,11 @@ namespace MAD
 
     public class MadConfigFile
     {
+        // Global vars
         public bool DEBUG_MODE;
         public bool LOG_MODE;
-        public int SERVER_PORT;
+
+        public int cliServerPort;
 
         public string smtpServer;
         public int smtpPort;

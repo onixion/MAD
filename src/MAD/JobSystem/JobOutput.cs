@@ -7,17 +7,14 @@ namespace MAD.JobSystemCore
 {
     public class JobOutput
     {
-        public OutState outState;
+        public OutState outState = OutState.NULL;
         public enum OutState { NULL, Success, Failed, Exception }
 
-        public List<OutputDescriptor> outputs;
+        public List<OutputDescriptor> outputs = new List<OutputDescriptor>();
         public string outDescription = "";
 
         public JobOutput()
-        {
-            outState = OutState.NULL;
-            outputs = new List<OutputDescriptor>();
-        }
+        { }
 
         public OutputDescriptor GetOutputDesc(string name)
         {

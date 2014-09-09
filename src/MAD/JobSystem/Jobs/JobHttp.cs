@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Net;
-using System.Runtime.Serialization;
+using System.Collections.Specialized;
+
+using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
     public class JobHttp : Job
     {
         #region members
 
         public int port;
 
+        [JsonIgnore]
         private WebRequest _request;
+        [JsonIgnore]
         private WebResponse _response;
 
         #endregion
@@ -33,24 +36,20 @@ namespace MAD.JobSystemCore
             try
             {
                 _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
+                _response = _request.GetResponse();
 
-                try
-                {
-                    _response = _request.GetResponse();
-                    outp.outState = JobOutput.OutState.Success;
+                NameValueCollection _headers = _response.Headers;
 
-                    _response.Close();
-                }
-                catch (Exception)
-                {
-                    outp.outState = JobOutput.OutState.Failed;
-                }
+                //for (int i = 0; i < _headers.Count; i++)
+                //    Console.WriteLine(_headers[i]);
 
-                _request.Abort();
+                outp.outState = JobOutput.OutState.Success;
+
+                _response.Close();
             }
             catch (Exception)
             {
-                outp.outState = JobOutput.OutState.Exception;
+                outp.outState = JobOutput.OutState.Failed;
             }
         }
 

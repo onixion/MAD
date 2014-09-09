@@ -6,7 +6,7 @@ namespace MAD.JobSystemCore
     public class JobRule
     {
         public string outDescName { get; set; }
-        public object compareValue;
+        public object compareValue { get; set; }
 
         public enum Operation { Equal, NotEqual, Bigger, Smaller}
         public Operation oper;
@@ -34,7 +34,6 @@ namespace MAD.JobSystemCore
             OutputDescriptor _desc = outp.GetOutputDesc(outDescName);
             if (_desc == null)
                 throw new Exception("OutputDescriptor '" + outDescName + "' does not exist!");
-
             if(!IsOperatorSupported(_desc.dataType))
                 throw new Exception("OutputDescriptor-Type not supported!");
 
@@ -66,11 +65,11 @@ namespace MAD.JobSystemCore
                         return true;
                     break;
                 case Operation.Bigger:
-                    if (currentValue < Int32.Parse(compareValue.ToString()))
+                    if (currentValue > Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 case Operation.Smaller:
-                    if (currentValue > Int32.Parse(compareValue.ToString()))
+                    if (currentValue < Int32.Parse(compareValue.ToString()))
                         return true;
                     break;
                 default:
@@ -92,11 +91,11 @@ namespace MAD.JobSystemCore
                         return true;
                     break;
                 case Operation.Bigger:
-                    if (currentValue < long.Parse(compareValue.ToString()))
+                    if (currentValue > long.Parse(compareValue.ToString()))
                         return true;
                     break;
                 case Operation.Smaller:
-                    if (currentValue > long.Parse(compareValue.ToString()))
+                    if (currentValue < long.Parse(compareValue.ToString()))
                         return true;
                     break;
                 default:
@@ -120,7 +119,6 @@ namespace MAD.JobSystemCore
                 default:
                     break;
             }
-
             return false; 
         }
     }

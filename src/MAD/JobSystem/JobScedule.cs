@@ -17,8 +17,8 @@ namespace MAD.JobSystemCore
         #region members
 
         private Thread _cycleThread;
-        private object _cycleThreadLock = new object();
         private int _cycleTime = 100;
+        private object _cycleThreadLock = new object();
 
         private SmartThreadPool _workerPool;
         private int _maxThreads = 10;
@@ -82,57 +82,67 @@ namespace MAD.JobSystemCore
 
             while(true)
             {
-                Thread.Sleep(_cycleTime);
                 DateTime _time = DateTime.Now;
 
+                // Lock node-list.
                 lock (_nodesLock)
                 {
                     foreach (JobNode _node in _jobNodes)
                     {
+                        // Lock node.
                         lock (_node.nodeLock)
                         {
                             if (_node.state == JobNode.State.Active)
                             {
-                                foreach (Job _job in _node.jobs)
+                                // Lock job-list of the node.
+                                lock (_node.jobsLock)
                                 {
-                                    if (_job.state == Job.JobState.Waiting)
+                                    foreach (Job _job in _node.jobs)
                                     {
-                                        if (_job.type != Job.JobType.NULL)
+                                        // Lock the job.
+                                        lock (_job.jobLock)
                                         {
-                                            if (CheckJobTime(_job.time, _time))
+                                            if (_job.state == Job.JobState.Waiting)
                                             {
-                                                if (_job.time.type == JobTime.TimeMethod.Relative)
+                                                if (_job.type != Job.JobType.NULL)
                                                 {
-                                                    _job.state = Job.JobState.Working;
-                                                    _job.time.jobDelay.Reset();
-
-                                                    _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                                    _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
-
-                                                    JobThreadStart(_holder);
-                                                }
-                                                else if (_job.time.type == JobTime.TimeMethod.Absolute)
-                                                {
-                                                    JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
-
-                                                    if (!_handler.IsBlocked(_time))
+                                                    if (CheckJobTime(_job.time, _time))
                                                     {
-                                                        _job.state = Job.JobState.Working;
-                                                        _handler.minuteAtBlock = _time.Minute;
+                                                        if (_job.time.type == JobTime.TimeMethod.Relative)
+                                                        {
+                                                            _job.state = Job.JobState.Working;
+                                                            _job.time.jobDelay.Reset();
 
-                                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+                                                            _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                                            _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
 
-                                                        JobThreadStart(_holder);
+                                                            JobThreadStart(_holder);
+                                                        }
+                                                        else if (_job.time.type == JobTime.TimeMethod.Absolute)
+                                                        {
+                                                            JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
+
+                                                            if (!_handler.IsBlocked(_time))
+                                                            {
+                                                                _job.state = Job.JobState.Working;
+                                                                _handler.minuteAtBlock = _time.Minute;
+
+                                                                _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                                                _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+
+                                                                JobThreadStart(_holder);
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (_job.time.type == JobTime.TimeMethod.Relative)
+                                                            _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                                     }
                                                 }
                                             }
-                                            else
-                                                if (_job.time.type == JobTime.TimeMethod.Relative)
-                                                    _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                         }
                                     }
-
                                 }
                             }
                         }
@@ -141,6 +151,8 @@ namespace MAD.JobSystemCore
 
                 if (_state == State.StopRequest)
                     break;
+
+                Thread.Sleep(_cycleTime);
             }
         }
 
@@ -170,23 +182,19 @@ namespace MAD.JobSystemCore
             JobHolder _holder = (JobHolder)holder;
             Job _job = _holder.job;
 
-            lock (_job.jobLock)
+            _job.tStart = DateTime.Now;
+            try { _job.Execute(_holder.targetAddress); }
+            catch (Exception)
             {
-                _job.tStart = DateTime.Now;
-
-                try { _job.Execute(_holder.targetAddress); }
-                catch (Exception e)
-                {
-                    _job.state = Job.JobState.Exception;
-                }
-
-                _job.tStop = DateTime.Now;
-                _job.tSpan = _job.tStop.Subtract(_job.tStart);
-
-                HandleNotification(_job);
-
-                _job.state = Job.JobState.Waiting;
+                _job.state = Job.JobState.Exception;
             }
+
+            _job.tStop = DateTime.Now;
+            _job.tSpan = _job.tStop.Subtract(_job.tStart);
+
+            HandleNotification(_job);
+
+            _job.state = Job.JobState.Waiting;
 
             return null;
         }
@@ -197,7 +205,7 @@ namespace MAD.JobSystemCore
 
             if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception || _brokenRules.Count != 0)
             {
-                string _mailSubject = "[MAD][ERROR] Job (JOB-ID: '" + job.id + "')";
+                string _mailSubject = "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "') finished with a not expected result.";
                 string _mailContent = "";
 
                 _mailContent += "Job-Name:     '" + job.name + "'\n";
@@ -205,32 +213,34 @@ namespace MAD.JobSystemCore
                 _mailContent += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
 
                 _mailContent += "Job-TStart:   '" + job.tStart + "'\n";
-                _mailContent += "Job-TStop:    '" + job.tStop + "\n";
-                _mailContent += "Job-TSpan:    '" + job.tSpan + "\n\n";
+                _mailContent += "Job-TStop:    '" + job.tStop + "'\n";
+                _mailContent += "Job-TSpan:    '" + job.tSpan + "'\n\n";
                 
                 if (_brokenRules.Count != 0)
                 {
                     _mailContent += "_________________________________________________\n";
-                    _mailContent += _brokenRules.Count + " Rules were broken:\n\n";
+                    _mailContent += "-> Rules broken: " + _brokenRules.Count + "\n\n";
 
                     int _count = 0;
                     foreach (JobRule _brokenRule in _brokenRules)
                     {
-                        _mailContent += "#" + _count + " Rule (broken)\n";
-                        _mailContent += "-> OutDescriptor:  " + _brokenRule.outDescName + "\n";
-                        _mailContent += "-> Operation:      " + _brokenRule.oper.ToString() + "\n";
-                        _mailContent += "-> CompareValue:   " + _brokenRule.compareValue.ToString() + "\n";
-
                         object _data = job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject;
-                        _mailContent += "=> CurrentValue:   ";
-                        if (_data != null)
-                            _mailContent += _data.ToString() + "\n\n";
-                        else
-                            _mailContent += "NULL\n\n";
+                        if (_data == null)
+                            _data = (string)"NULL";
 
+                        _mailContent += _count + ".) Rule\n";
+                        _mailContent += "-> Rule Equation:    " + _brokenRule.outDescName + " <" + _brokenRule.oper.ToString() + "> " + _brokenRule.compareValue.ToString() + " = TRUE\n";
+                        _mailContent += "-> Current Equation: " + _data.ToString() + " <" + _brokenRule.oper.ToString() + "> " + _brokenRule.compareValue.ToString() + " = FALSE\n\n";
+                        
+                        _mailContent += "-> OutDescriptor: " + _brokenRule.outDescName + "\n";
+                        _mailContent += "-> Operation:     " + _brokenRule.oper.ToString() + "\n";
+                        _mailContent += "-> CompareValue:  " + _brokenRule.compareValue.ToString() + "\n";
+                        _mailContent += "=> CurrentValue:  " + _data.ToString() + "\n";
                         _mailContent += "\n";
                         _count++;
                     }
+
+                    _mailContent += "_________________________________________________\n";
                 }
 
                 if (job.noti.settings != null)
@@ -240,7 +250,7 @@ namespace MAD.JobSystemCore
                 }
                 else
                 {
-                    NotificationSystem.SendMail(new MailAddress[1] {new MailAddress("singh.manpreet@live.at")}, _mailSubject, _mailContent, 3);
+                    NotificationSystem.SendMail(new MailAddress[1] {new MailAddress("alin.porcic@gmail.com")}, _mailSubject, _mailContent, 3);
                 }
             }
         }

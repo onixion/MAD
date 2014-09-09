@@ -32,14 +32,13 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public JobOutput outp { get; set; }
         [JsonIgnore]
+        public JobState state = JobState.Inactive;
+        [JsonIgnore]
         public DateTime tStart { get; set; }
         [JsonIgnore]
         public DateTime tStop { get; set; }
         [JsonIgnore]
         public TimeSpan tSpan { get; set; }
-
-        [JsonIgnore]
-        public JobState state = JobState.Inactive;
 
         #endregion
 

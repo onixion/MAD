@@ -10,7 +10,7 @@ namespace MAD.JobSystemCore
     public class JobNotification
     {
         public JobNotificationSettings settings = null;
-        public List<JobRule> rules = new List<JobRule>();
+        public List<JobRule> rules = null;
 
         public JobNotification()
         { }
@@ -23,20 +23,14 @@ namespace MAD.JobSystemCore
         public List<JobRule> GetBrokenRules(JobOutput outp)
         {
             List<JobRule> _brokenRules = new List<JobRule>();
+
+            if (rules == null)
+                return _brokenRules;
+
             foreach (JobRule _rule in rules)
             {
-                try
-                {
-                    if (!_rule.CheckRuleValidity(outp))
-                        _brokenRules.Add(_rule);
-                }
-                catch (Exception e)
-                {
-                    if (MadConf.conf.DEBUG_MODE)
-                        Console.WriteLine("JobNoti.:" + e.Message);
-                    if (MadConf.conf.LOG_MODE)
-                        Logger.Log("JobNoti.: " + e.Message, Logger.MessageType.ERROR);
-                }
+                if (!_rule.CheckRuleValidity(outp))
+                    _brokenRules.Add(_rule);
             }
             return _brokenRules;
         }
