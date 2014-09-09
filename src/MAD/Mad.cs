@@ -105,6 +105,7 @@ namespace MAD
                 return 1;
             }
 
+            Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
             Logger.ForceWriteToLog();
 
             js.Shutdown();

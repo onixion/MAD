@@ -6,13 +6,11 @@ namespace MAD.Logging
 {
     public static class Logger
     {
-        public static string pathToLogFile;
-        public static string logFileName = "log.txt";
-
-
         #region fields
         
         public static uint buffer = 20;
+
+        public static string logFileName = "log.txt";
 
         public enum MessageType
         {
@@ -34,7 +32,7 @@ namespace MAD.Logging
         #region methods
         public static bool PathFileExists()
         {
-            string _pathToPathFile = "";
+            string _pathToPathFile = ".";
             string _content = "lorem ipsum";
             if (File.Exists(_pathToPathFile + @"/path.txt"))
             {
@@ -116,7 +114,7 @@ namespace MAD.Logging
             {
                 lock (_lockThis)
                 {
-                    File.AppendAllLines(pathToLogFile + @"/" + logFileName, _logMessages.ToArray());
+                    File.AppendAllLines(_pathToLogFile + @"/" + logFileName, _logMessages.ToArray());
                     _logMessages.Clear();
                 }
             }
