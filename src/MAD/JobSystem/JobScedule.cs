@@ -201,18 +201,19 @@ namespace MAD.JobSystemCore
                         _job.outp.outState == JobOutput.OutState.Failed ||
                         _bRules.Count != 0)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target '" + _holder.targetAddress.ToString() 
+                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString() 
                             + "') finished with a not expected result!");
+
                         string _mailContent = GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                        JobNotificationSettings _sett = _job.noti.settings;
                         if (_job.noti.settings != null)
                         {
                             // This is not the perfect solution. Need to create a class, which
                             // can stack notifications, so we do not lose precious time here ...
-                            NotificationSystem.SendMail(_sett.mailAddr, _mailSubject, _mailContent, 2,
-                                _sett.login.smtpAddr, _sett.login.mail, _sett.login.password, _sett.login.port);
+                            NotificationSystem.SendMail(_job.noti.settings.mailAddr, _mailSubject, _mailContent, 2,
+                                _job.noti.settings.login.smtpAddr, _job.noti.settings.login.mail,
+                                _job.noti.settings.login.password, _job.noti.settings.login.port);
                         }
                         else
                         {
@@ -253,8 +254,8 @@ namespace MAD.JobSystemCore
 
                 _buffer += "-> OutDescriptor: " + _rule.outDescName + "\n";
                 _buffer += "-> Operation:     " + _rule.oper.ToString() + "\n";
-                _buffer += "-> CompareValue:  " + _rule.compareValue.ToString() + "\n";
-                _buffer += "=> CurrentValue:  " + _data.ToString() + "\n\n";
+                _buffer += "-> CompareValue:  '" + _rule.compareValue.ToString() + "'\n";
+                _buffer += "=> CurrentValue:  '" + _data.ToString() + "'\n\n";
                 _count++;
             }
             return _buffer;
@@ -263,9 +264,10 @@ namespace MAD.JobSystemCore
         private string GenJobInfo(Job job)
         {
             string _buffer = "";
+            _buffer += "Job-ID:       '" + job.id + "'\n";
             _buffer += "Job-Name:     '" + job.name + "'\n";
             _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";
-            _buffer += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
+            _buffer += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n";
             _buffer += "Job-TStart:   '" + job.tStart + "'\n";
             _buffer += "Job-TStop:    '" + job.tStop + "'\n";
             _buffer += "Job-TSpan:    '" + job.tSpan + "'\n\n";
@@ -277,17 +279,9 @@ namespace MAD.JobSystemCore
         #endregion
     }
 
-    /* Need to find a better solution for this problem ... */
-
-    public struct JobHolder
+    public class JobHolder
     { 
         public Job job;
         public System.Net.IPAddress targetAddress;
-
-        public JobHolder(Job job, System.Net.IPAddress targetAddress)
-        {
-            this.job = job;
-            this.targetAddress = targetAddress;
-        }
     }
 }
