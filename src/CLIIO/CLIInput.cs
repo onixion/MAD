@@ -187,11 +187,6 @@ namespace CLIIO
             Console.SetCursorPosition(pos, Console.CursorTop);
         }
 
-        private static int GetVPOS()
-        {
-            return 0;
-        }
-
         #endregion
     }
 }
