@@ -23,14 +23,10 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
-
-        public string name { get; set; }
-        public JobType type = JobType.NULL;
-        public JobTime time { get; set; }
-        public JobNotification noti { get; set; }
-
         [JsonIgnore]
         public JobOutput outp { get; set; }
+        [JsonIgnore]
+        public JobState state = JobState.Inactive;
         [JsonIgnore]
         public DateTime tStart { get; set; }
         [JsonIgnore]
@@ -38,8 +34,16 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public TimeSpan tSpan { get; set; }
 
-        [JsonIgnore]
-        public JobState state = JobState.Inactive;
+        // job components (this components are required for execution)
+        public string name = null;
+        public JobType type { get; set; }
+        public JobTime time { get; set; }
+
+        // (this on is optional, if it is not set, the JobScedule will
+        // try use the global notification-settings; if there is no
+        // global notification-settings set; he will not be able to send
+        // any notification)
+        public JobNotification noti { get; set; }
 
         #endregion
 
@@ -49,8 +53,8 @@ namespace MAD.JobSystemCore
         {
             InitJob();
             this.type = type;
-            this.time = new JobTime();
             this.outp = new JobOutput();
+            this.time = new JobTime();
             this.noti = new JobNotification();
         }
 
@@ -59,8 +63,8 @@ namespace MAD.JobSystemCore
             InitJob();
             this.name = name;
             this.type = type;
-            this.time = new JobTime();
             this.outp = new JobOutput();
+            this.time = new JobTime();
             this.noti = new JobNotification();
         }
 
@@ -69,8 +73,8 @@ namespace MAD.JobSystemCore
             InitJob();
             this.name = name;
             this.type = type;
-            this.time = time;
             this.outp = outp;
+            this.time = time;
             this.noti = noti;
         }
 

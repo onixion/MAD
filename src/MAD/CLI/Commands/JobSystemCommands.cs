@@ -158,9 +158,9 @@ namespace MAD.CLICore
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
-            output += "<color><yellow>" + ConsoleTable.splitline; 
+            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth); 
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
-            output += ConsoleTable.splitline;
+            output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
             foreach (JobNode _temp in _js.nodes)
@@ -373,9 +373,9 @@ namespace MAD.CLICore
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
-            output += "<color><yellow>" + ConsoleTable.splitline;
+            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
-            output += ConsoleTable.splitline;
+            output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
             foreach (JobNode _temp in _js.nodes)
@@ -391,71 +391,6 @@ namespace MAD.CLICore
                     _tableRow[7] = _temp2.outp.outState.ToString();
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
-            return output;
-        }
-    }
-
-    public class JobOutDescriptorListCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobOutDescriptorListCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-
-            rPar.Add(new ParOption("id", "JOB-ID", "Id of job.", false, false, new Type[] { typeof(int) }));
-
-            description = "Show the outdescriptors of a specific job.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job != null)
-            {
-                output += "<color><yellow>";
-
-                foreach (OutputDescriptor _temp in _job.outp.outputs)
-                {
-                    output += "-> OutDesc.: " + _temp.name + "\n";
-                    output += "   DataType: " + _temp.dataType.ToString() + "\n";
-                }
-
-                return output;
-            }
-            else
-            {
-                return "<color><red>Job does not exist!";
-            }
-        }
-    }
-
-    public class JobStatusCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobStatusCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            if (OParUsed("id"))
-            {
-                Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-                if (_job != null)
-                    output = _job.Status();
-                else
-                    output = "<color><red>Job does not exist!";
-                return output;
-            }
-            else
-                foreach (JobNode _node in _js.nodes)
-                    foreach (Job _job in _node.jobs)
-                        output += _job.Status() + "\n";
             return output;
         }
     }
@@ -554,6 +489,91 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobInfoCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobInfoCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] {typeof(int)}));
+            description = "This command shows useful informations about jobs.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            if (OParUsed("id"))
+            {
+                Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
+                if (_job != null)
+                    return GetJobInfo(_job);
+                else
+                    return "<color><red>Job does not exist!";
+            }
+            else
+            { 
+                foreach(JobNode _node in _js.nodes)
+                    foreach (Job _job in _node.jobs)
+                    {
+                        output += GetJobInfo(_job);
+                        output += "\n";
+                    }
+                return output;
+            }
+        }
+
+        private string GetJobInfo(Job job)
+        {
+            string output = "";
+            lock (job.jobLock)
+            {
+                output += "<color><yellow>[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
+                output += "Name: <color><white>" + job.name + "\n<color><yellow>";
+                output += "Type: <color><white>" + job.type.ToString() + "\n<color><yellow>";
+                output += "Time-Type: <color><white>" + job.time.type.ToString() + "\n<color><yellow>";
+                output += "Time-Value(s): <color><white>" + job.time.GetValues() + "<color><yellow>\n\n";
+
+                output += "<color><yellow>OutDescriptors:";
+
+                foreach (OutputDescriptor _desc in job.outp.outputs)
+                {
+                    output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
+                    output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString();
+                }
+
+                output += "\n\n<color><yellow>Notification-Settings: <color><white>";
+                if (job.noti.settings != null)
+                {
+                    output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.noti.settings.login.smtpAddr;
+                    output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.noti.settings.login.port;
+                    output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.noti.settings.login.mail;
+                    output += "\n  <color><yellow>Password: <color><white>" + job.noti.settings.login.password;
+                    output += "\n  <color><yellow>Mails to send to: <color><white>";
+
+                    foreach (MailAddress _addr in job.noti.settings.mailAddr)
+                        output += _addr.ToString() + " ";
+                }
+                else
+                    output += "NULL";
+
+                output += "\n\n<color><yellow>Notification-Rules:";
+
+                if (job.noti.rules == null)
+                    output += " <color><white>NULL";
+                else
+                {
+                    if (job.noti.rules.Count != 0)
+                        foreach (JobRule _rule in job.noti.rules)
+                        {
+                            output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
+                            output += "\n  <color><yellow>Operation: <color><white>" + _rule.oper.ToString();
+                            output += "\n  <color><yellow>Compare value: <color><white>" + _rule.compareValue.ToString();
+                        }
+                }
+                return output;
+            }
+        }
+    }
 
     #region commands for adding jobs
 
@@ -573,16 +593,10 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            // Create an empty job.
             JobPing _job = new JobPing();
-
-            // Set name.
             _job.name = (string)pars.GetPar("n").argValues[0];
-
-            // Set jobTime.
             _job.time = ParseJobTime(this);
-            
-            // Set job-specific settings.
+
             if (OParUsed("ttl"))
                 _job.ttl = (int)pars.GetPar("ttl").argValues[0];
 
@@ -611,11 +625,11 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             JobHttp _job = new JobHttp();
-
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
-
-            _job.port = (int)pars.GetPar("p").argValues[0];
+            
+            if (OParUsed("p"))
+                _job.port = (int)pars.GetPar("p").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);

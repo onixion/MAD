@@ -37,7 +37,7 @@ namespace CLIIO
                 _HEAD = offset;
                 _VINPUT = "";
                 _MIN = _HEAD;
-                _historyPointer = 0; 
+                _historyPointer = -1; 
 
                 try
                 {
@@ -51,6 +51,7 @@ namespace CLIIO
                         if (_key.Key == ConsoleKey.Enter)
                         {
                             AddToHistory(_VINPUT);
+                            _historyPointer = -1;
                             break;
                         }
                         else if (_key.Key == ConsoleKey.Tab)
@@ -96,34 +97,41 @@ namespace CLIIO
                         }
                         else if (_key.Key == ConsoleKey.UpArrow)
                         {
-                            ClearInput();
+                            if (_cliHistory.Count != 0)
+                            {
+                                if (_historyPointer < _cliHistory.Count - 1)
+                                {
+                                    _historyPointer++;
+                                    ClearInput();
+                                    _VINPUT = GetHistoryEntry(_historyPointer);
 
-                            _VINPUT = GetLastHistoryEntry(_historyPointer);
-
-                            if (_cliHistory.Count - 1 > _historyPointer)
-                                _historyPointer++;
-
-                            SetCursor(_HEAD);
-                            Console.Write(_VINPUT);
+                                    SetCursor(_HEAD);
+                                    Console.Write(_VINPUT);
+                                }
+                            }
                         }
                         else if (_key.Key == ConsoleKey.DownArrow)
                         {
-                            _VINPUT = GetLastHistoryEntry(_historyPointer);
+                            if (_cliHistory.Count != 0)
+                            {
+                                if (_historyPointer >= 1)
+                                {
+                                    _historyPointer--;
+                                    ClearInput();
+                                    _VINPUT = GetHistoryEntry(_historyPointer);
 
-                            if (0 < _historyPointer)
-                                _historyPointer--;
-
-                            ClearInput();
-                            SetCursor(_HEAD);
-                            Console.Write(_VINPUT);
+                                    SetCursor(_HEAD);
+                                    Console.Write(_VINPUT);
+                                }
+                            }
                         }
                         else
                         {
                             if (_VINPUT.Length < Console.BufferWidth - _HEAD - 2)
                             {
+                                ClearInput();
                                 _VINPUT = _VINPUT.Insert(_VPOS - _HEAD, _key.KeyChar.ToString());
 
-                                ClearInput();
                                 SetCursor(_HEAD);
                                 Console.Write(_VINPUT);
                                 SetCursor(_VPOS + 1);
@@ -144,22 +152,18 @@ namespace CLIIO
             }
         }
 
-        private static string GetLastHistoryEntry(int pointer)
+        private static string GetHistoryEntry(int pointer)
         {
-            if (pointer != -1)
-            {
-                return _cliHistory[_cliHistory.Count - 1 - pointer];
-            }
-            else
-            {
-                return "";
-            }
+            return _cliHistory[_cliHistory.Count - 1 - pointer];
         }
 
         private static void AddToHistory(string command)
         {
             if (command != "")
             {
+                if (_cliHistory.Contains(command))
+                    _cliHistory.Remove(command);
+
                 if (_cliHistory.Count >= _maxHistoryEntries)
                 {
                     _cliHistory.RemoveAt(0);
@@ -181,11 +185,6 @@ namespace CLIIO
         private static void SetCursor(int pos)
         {
             Console.SetCursorPosition(pos, Console.CursorTop);
-        }
-
-        private static int GetVPOS()
-        {
-            return 0;
         }
 
         #endregion

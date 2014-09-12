@@ -18,6 +18,8 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public object nodeLock = new object();
         [JsonIgnore]
+        public object jobsLock = new object();
+        [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
         private static int _nodesCount = 0;
@@ -34,8 +36,6 @@ namespace MAD.JobSystemCore
         public PhysicalAddress macAddress { get; set; } // sns
         public IPAddress ipAddress { get; set; } // sns
 
-        public JobNotificationSettings defaultSettings { get; set; }
-
         public List<Job> jobs = new List<Job>();
 
         #endregion
@@ -47,14 +47,13 @@ namespace MAD.JobSystemCore
             InitID();
         }
 
-        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs, JobNotificationSettings defaultSettings)
+        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
             this.name = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
             this.jobs = jobs;
-            this.defaultSettings = defaultSettings;
         }
 
         #endregion

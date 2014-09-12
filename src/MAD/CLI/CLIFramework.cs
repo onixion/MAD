@@ -93,46 +93,39 @@ namespace MAD.CLICore
         private ParInput GetParamtersFromInput(string input)
         {
             ParInput _temp = new ParInput();
-            Parameter _par = new Parameter();
-            List<object> _args = new List<object>();
-            bool _PARFOUND = false;
 
             string[] _buffer = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            for (int i = 1; i < _buffer.Length; i++)
+            string _buffer2 = null;
+
+            Parameter _par = null;
+            List<string> _args = new List<string>();
+
+            for (int i = 0; i < _buffer.Length; i++)
             {
                 if (_buffer[i].StartsWith("-"))
                 {
-                    if (_PARFOUND)
+                    if (_par != null)
                     {
                         _par.argValues = _args.ToArray();
-                        _args.Clear();
-
                         _temp.pars.Add(_par);
-
-                        _par = new Parameter();
-                        _par.par = _buffer[i].Remove(0, 1);
+                        _args.Clear();
                     }
-                    else
-                    {
-                        _PARFOUND = true;
-                        _par.par = _buffer[i].Remove(0, 1);
-                    }
+                    _par = new Parameter(_buffer[i].Remove(0,1), null);
                 }
                 else
                 {
-                    if (_PARFOUND)
+                    if (_par != null)
                     {
                         _args.Add(_buffer[i]);
                     }
                 }
             }
 
-            if (_args.Count != 0)
+            if (_par != null)
             {
                 _par.argValues = _args.ToArray();
                 _temp.pars.Add(_par);
             }
-
 
             /*
             string[] _buffer = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
