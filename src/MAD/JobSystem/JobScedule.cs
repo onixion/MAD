@@ -99,48 +99,47 @@ namespace MAD.JobSystemCore
                                 {
                                     foreach (Job _job in _node.jobs)
                                     {
-                                        // Lock the job.
-                                        lock (_job.jobLock)
+                                        // NOT LOCK JOB -> Job need to do itself.
+
+                                        if (_job.state == Job.JobState.Waiting)
                                         {
-                                            if (_job.state == Job.JobState.Waiting)
+                                            if (_job.type != Job.JobType.NULL)
                                             {
-                                                if (_job.type != Job.JobType.NULL)
+                                                if (CheckJobTime(_job.time, _time))
                                                 {
-                                                    if (CheckJobTime(_job.time, _time))
+                                                    if (_job.time.type == JobTime.TimeMethod.Relative)
                                                     {
-                                                        if (_job.time.type == JobTime.TimeMethod.Relative)
+                                                        _job.state = Job.JobState.Working;
+                                                        _job.time.jobDelay.Reset();
+
+                                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
+                                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+
+                                                        JobThreadStart(_holder);
+                                                    }
+                                                    else if (_job.time.type == JobTime.TimeMethod.Absolute)
+                                                    {
+                                                        JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
+
+                                                        if (!_handler.IsBlocked(_time))
                                                         {
                                                             _job.state = Job.JobState.Working;
-                                                            _job.time.jobDelay.Reset();
+                                                            _handler.minuteAtBlock = _time.Minute;
 
                                                             _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
                                                             _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
 
                                                             JobThreadStart(_holder);
                                                         }
-                                                        else if (_job.time.type == JobTime.TimeMethod.Absolute)
-                                                        {
-                                                            JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
-
-                                                            if (!_handler.IsBlocked(_time))
-                                                            {
-                                                                _job.state = Job.JobState.Working;
-                                                                _handler.minuteAtBlock = _time.Minute;
-
-                                                                _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                                                _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
-
-                                                                JobThreadStart(_holder);
-                                                            }
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        if (_job.time.type == JobTime.TimeMethod.Relative)
-                                                            _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
                                                     }
                                                 }
+                                                else
+                                                {
+                                                    if (_job.time.type == JobTime.TimeMethod.Relative)
+                                                        _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                                }
                                             }
+
                                         }
                                     }
                                 }
@@ -174,7 +173,7 @@ namespace MAD.JobSystemCore
 
         private void JobThreadStart(JobHolder holder)
         {
-            _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke), holder);
+            _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke),holder);
         }
 
         private object JobInvoke(object holder)
@@ -182,93 +181,98 @@ namespace MAD.JobSystemCore
             JobHolder _holder = (JobHolder)holder;
             Job _job = _holder.job;
 
-            _job.tStart = DateTime.Now;
-            try { _job.Execute(_holder.targetAddress); }
-            catch (Exception)
+            lock (_job)
             {
-                _job.state = Job.JobState.Exception;
+                _job.tStart = DateTime.Now;
+                try { _job.Execute(_holder.targetAddress); }
+                catch (Exception)
+                {
+                    _job.state = Job.JobState.Exception;
+                }
+                _job.tStop = DateTime.Now;
+                _job.tSpan = _job.tStop.Subtract(_job.tStart);
+
+                if (_job.noti.useNotification)
+                {
+                    List<JobRule> _bRules = _job.noti.GetBrokenRules(_job.outp);
+
+                    // check if notification is neseccary.
+                    if (_job.outp.outState == JobOutput.OutState.Exception ||
+                        _job.outp.outState == JobOutput.OutState.Failed ||
+                        _bRules.Count != 0)
+                    {
+                        string _mailSubject = GenMailSubject(_job, "Job (target '" + _holder.targetAddress.ToString() 
+                            + "') finished with a not expected result!");
+                        string _mailContent = GenJobInfo(_job);
+                        _mailContent += GenBrokenRulesText(_job.outp, _bRules);
+
+                        JobNotificationSettings _sett = _job.noti.settings;
+                        if (_job.noti.settings != null)
+                        {
+                            // This is not the perfect solution. Need to create a class, which
+                            // can stack notifications, so we do not lose precious time here ...
+                            NotificationSystem.SendMail(_sett.mailAddr, _mailSubject, _mailContent, 2,
+                                _sett.login.smtpAddr, _sett.login.mail, _sett.login.password, _sett.login.port);
+                        }
+                        else
+                        {
+                            // use global notifiaction settings
+                            NotificationSystem.SendMail(new MailAddress[1] {new MailAddress(MadConf.conf.defaultMailAddr) },
+                                _mailSubject, _mailContent, 2);
+                        }
+                    }
+                }
             }
 
-            _job.tStop = DateTime.Now;
-            _job.tSpan = _job.tStop.Subtract(_job.tStart);
-
-            HandleNotification(_job);
-
+            // After this line, the scedule will notice this current job again.
             _job.state = Job.JobState.Waiting;
 
             return null;
         }
 
-        private void HandleNotification(Job job)
-        {
-            List<JobRule> _brokenRules = job.noti.GetBrokenRules(job.outp);
+        #region generate mail text
 
-            if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception || _brokenRules.Count != 0)
-            {
-                string _mailSubject = "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "') - Reason: ";
-
-                if (job.outp.outState == JobOutput.OutState.Failed || job.outp.outState == JobOutput.OutState.Exception)
-                    _mailSubject = "OutState was '" + job.outp.outState.ToString() + "'!";
-                else
-                    _mailSubject = "Broken rules!";
-
-                string _mailContent = "";
-
-                _mailContent += GenJobInfo(job);
-
-                if (_brokenRules.Count != 0)
-                {
-                    _mailContent += "_________________________________________________\n";
-                    _mailContent += "-> Rules broken: " + _brokenRules.Count + "\n\n";
-
-                    int _count = 0;
-                    foreach (JobRule _brokenRule in _brokenRules)
-                    {
-                        object _data = job.outp.GetOutputDesc(_brokenRule.outDescName).dataObject;
-                        if (_data == null)
-                            _data = (string)"NULL";
-
-                        _mailContent += _count + ".) Rule\n";
-                        _mailContent += "-> Rule Equation:    " + _brokenRule.outDescName + " <" + _brokenRule.oper.ToString() + "> '" + _brokenRule.compareValue.ToString() + "' = TRUE\n";
-                        _mailContent += "-> Current Equation: '" + _data.ToString() + "' <" + _brokenRule.oper.ToString() + "> '" + _brokenRule.compareValue.ToString() + "' = FALSE\n\n";
-                        
-                        _mailContent += "-> OutDescriptor: " + _brokenRule.outDescName + "\n";
-                        _mailContent += "-> Operation:     " + _brokenRule.oper.ToString() + "\n";
-                        _mailContent += "-> CompareValue:  " + _brokenRule.compareValue.ToString() + "\n";
-                        _mailContent += "=> CurrentValue:  " + _data.ToString() + "\n";
-                        _mailContent += "\n";
-                        _count++;
-                    }
-
-                    _mailContent += "_________________________________________________\n";
-
-                    if (job.noti.settings != null)
-                    {
-                        NotificationSystem.SendMail(job.noti.settings.mailAddr, _mailSubject, _mailContent, 3, job.noti.settings.login.smtpAddr,
-                            job.noti.settings.login.mail, job.noti.settings.login.password, job.noti.settings.login.port);
-                    }
-                    else
-                    {
-                        NotificationSystem.SendMail(new MailAddress[1] { new MailAddress("alin.porcic@gmail.com") }, _mailSubject, _mailContent, 3);
-                    }
-                }
-            }
+        private string GenMailSubject(Job job, string message)
+        { 
+            return "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "'): " + message;
         }
 
+        private string GenBrokenRulesText(JobOutput outp, List<JobRule> bRules)
+        {
+            string _buffer = "";
+            int _count = 0;
+            foreach (JobRule _rule in bRules)
+            {
+                object _data = outp.GetOutputDesc(_rule.outDescName).dataObject;
+                if (_data == null)
+                    _data = (string)"NULL";
+
+                _buffer += _count + ".) Rule\n";
+                _buffer += "-> Rule Equation:    " + _rule.outDescName + " <" + _rule.oper.ToString() + "> '" + _rule.compareValue.ToString() + "' = TRUE\n";
+                _buffer += "-> Current Equation: '" + _data.ToString() + "' <" + _rule.oper.ToString() + "> '" + _rule.compareValue.ToString() + "' = FALSE\n\n";
+
+                _buffer += "-> OutDescriptor: " + _rule.outDescName + "\n";
+                _buffer += "-> Operation:     " + _rule.oper.ToString() + "\n";
+                _buffer += "-> CompareValue:  " + _rule.compareValue.ToString() + "\n";
+                _buffer += "=> CurrentValue:  " + _data.ToString() + "\n\n";
+                _count++;
+            }
+            return _buffer;
+        }
+            
         private string GenJobInfo(Job job)
         {
             string _buffer = "";
-
             _buffer += "Job-Name:     '" + job.name + "'\n";
             _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";
             _buffer += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n\n";
-
             _buffer += "Job-TStart:   '" + job.tStart + "'\n";
             _buffer += "Job-TStop:    '" + job.tStop + "'\n";
             _buffer += "Job-TSpan:    '" + job.tSpan + "'\n\n";
-
             return _buffer;
         }
+
+        #endregion
 
         #endregion
     }

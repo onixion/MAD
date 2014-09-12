@@ -506,9 +506,7 @@ namespace MAD.CLICore
             {
                 Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
                 if (_job != null)
-                {
                     return GetJobInfo(_job);
-                }
                 else
                     return "<color><red>Job does not exist!";
             }
@@ -529,7 +527,7 @@ namespace MAD.CLICore
             string output = "";
             lock (job.jobLock)
             {
-                output += "<color><yellow>->[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
+                output += "<color><yellow>[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
                 output += "Name: <color><white>" + job.name + "\n<color><yellow>";
                 output += "Type: <color><white>" + job.type.ToString() + "\n<color><yellow>";
                 output += "Time-Type: <color><white>" + job.time.type.ToString() + "\n<color><yellow>";

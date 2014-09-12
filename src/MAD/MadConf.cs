@@ -77,11 +77,14 @@ namespace MAD
             conf.DEBUG_MODE = true;
             conf.LOG_MODE = true;
             
+            // default notification settings
             conf.cliServerPort = 2222;
             conf.smtpServer = "smtp-mail.outlook.com";
             conf.smtpPort = 587;
             conf.username = "mad.group@outlook.com";
             conf.password = "Mad-21436587";
+
+            conf.defaultMailAddr = "alin.porcic@gmail.com";
         }
 
         #endregion
@@ -101,5 +104,7 @@ namespace MAD
         public int smtpPort;
         public string username;
         public string password;
+
+        public string defaultMailAddr;
     }
 }

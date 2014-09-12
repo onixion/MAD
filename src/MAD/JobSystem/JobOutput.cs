@@ -11,10 +11,11 @@ namespace MAD.JobSystemCore
         public enum OutState { NULL, Success, Failed, Exception }
 
         public List<OutputDescriptor> outputs = new List<OutputDescriptor>();
-        public string outDescription = "";
 
         public JobOutput()
-        { }
+        {
+
+        }
 
         public OutputDescriptor GetOutputDesc(string name)
         {
