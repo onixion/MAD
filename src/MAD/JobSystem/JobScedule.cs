@@ -29,13 +29,13 @@ namespace MAD.JobSystemCore
         public State state { get { return _state; } }
 
         private List<JobNode> _jobNodes;
-        private object _nodesLock;
+        private ReaderWriterLockSlim _nodesLock;
 
         #endregion
 
         #region constructor
 
-        public JobScedule(object nodesLock, List<JobNode> jobNodes)
+        public JobScedule(ReaderWriterLockSlim nodesLock, List<JobNode> jobNodes)
         {
             _nodesLock = nodesLock;
             _jobNodes = jobNodes;
@@ -82,93 +82,110 @@ namespace MAD.JobSystemCore
 
             while(true)
             {
-                DateTime _time = DateTime.Now;
+                DateTime _nowTime = DateTime.Now;
 
-                // Lock node-list.
-                lock (_nodesLock)
+                _nodesLock.EnterReadLock();
+
+                foreach (JobNode _node in _jobNodes)
                 {
-                    foreach (JobNode _node in _jobNodes)
+                    _node.nodeLock.EnterReadLock();
+
+                    if (_node.state == JobNode.State.Active)
                     {
-                        // Lock node.
-                        lock (_node.nodeLock)
+                        _node.jobsLock.EnterReadLock();
+
+                        foreach (Job _job in _node.jobs)
                         {
-                            if (_node.state == JobNode.State.Active)
+                            _job.jobLock.EnterReadLock();
+
+                            if (_job.state == Job.JobState.Waiting)
                             {
-                                // Lock job-list of the node.
-                                lock (_node.jobsLock)
+                                if (_job.type != Job.JobType.NULL)
                                 {
-                                    foreach (Job _job in _node.jobs)
+                                    JobTime _time = _job.time;
+
+                                    if (_time.type == JobTime.TimeMethod.Relative)
                                     {
-                                        // NOT LOCK JOB -> Job need to do itself.
+                                        _job.jobLock.ExitReadLock();
+                                        _job.jobLock.EnterWriteLock();
 
-                                        if (_job.state == Job.JobState.Waiting)
+                                        if (_job.time.jobDelay.CheckTime())
                                         {
-                                            if (_job.type != Job.JobType.NULL)
-                                            {
-                                                if (CheckJobTime(_job.time, _time))
-                                                {
-                                                    if (_job.time.type == JobTime.TimeMethod.Relative)
-                                                    {
-                                                        _job.state = Job.JobState.Working;
-                                                        _job.time.jobDelay.Reset();
+                                            _job.time.jobDelay.Reset(); // reset delay
 
-                                                        _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                                        _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
+                                            // Job is ready to be executed.
+                                            _job.state = Job.JobState.Working;
+                                            
+                                            _holder.job = _job;
+                                            _holder.targetAddress = _node.ipAddress;
 
-                                                        JobThreadStart(_holder);
-                                                    }
-                                                    else if (_job.time.type == JobTime.TimeMethod.Absolute)
-                                                    {
-                                                        JobTimeHandler _handler = _job.time.GetJobTimeHandler(_time);
+                                            JobInvoke(_holder);
 
-                                                        if (!_handler.IsBlocked(_time))
-                                                        {
-                                                            _job.state = Job.JobState.Working;
-                                                            _handler.minuteAtBlock = _time.Minute;
-
-                                                            _holder.job = _job; // SEARCHING FOR BETTER SOLUTION!
-                                                            _holder.targetAddress = _node.ipAddress; // SEARCHING FOR BETTER SOLUTION!
-
-                                                            JobThreadStart(_holder);
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if (_job.time.type == JobTime.TimeMethod.Relative)
-                                                        _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
-                                                }
-                                            }
-
+                                            // not exit the lock -> thread will do this.
+                                        }
+                                        else
+                                        {
+                                            _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                            _job.jobLock.ExitWriteLock();
                                         }
                                     }
+                                    else if (_time.type == JobTime.TimeMethod.Absolute)
+                                    {
+                                        JobTimeHandler _timeHandler = _time.GetJobTimeHandler(_nowTime);
+
+                                        if (_timeHandler != null)
+                                        {
+                                            if (!_timeHandler.IsBlocked(_nowTime))
+                                            {
+                                                if (_timeHandler.CheckTime(_nowTime))
+                                                {
+                                                    _job.jobLock.ExitReadLock();
+                                                    _job.jobLock.EnterWriteLock();
+
+                                                    _timeHandler.minuteAtBlock = _nowTime.Minute;
+
+                                                    // Job is ready to be executed.
+                                                    _job.state = Job.JobState.Working;
+
+                                                    _holder.job = _job;
+                                                    _holder.targetAddress = _node.ipAddress;
+
+                                                    JobInvoke(_holder);
+
+                                                    // not exit the lock -> thread will do this.
+                                                }
+                                                else
+                                                    _job.jobLock.ExitReadLock();
+                                            }
+                                            else
+                                                _job.jobLock.ExitReadLock();
+                                        }
+                                        else
+                                            _job.jobLock.ExitReadLock();
+                                    }
+                                    else
+                                        _job.jobLock.ExitReadLock();
                                 }
+                                else
+                                    _job.jobLock.ExitReadLock();
                             }
+                            else
+                                _job.jobLock.ExitReadLock();
                         }
+
+                        _node.jobsLock.ExitReadLock();
                     }
+
+                    _node.nodeLock.ExitReadLock();
                 }
+
+                _nodesLock.ExitReadLock();
 
                 if (_state == State.StopRequest)
                     break;
 
-                Thread.Sleep(_cycleTime);
+                //Thread.Sleep(_cycleTime);
             }
-        }
-
-        private bool CheckJobTime(JobTime jobTime, DateTime time)
-        {
-            if (jobTime.type == JobTime.TimeMethod.Relative)
-                if (jobTime.jobDelay.CheckTime())
-                    return true;
-                else
-                    return false;
-            else if (jobTime.type == JobTime.TimeMethod.Absolute)
-                foreach (JobTimeHandler _handler in jobTime.jobTimes)
-                    if (_handler.CheckTime(time))
-                        return true;
-                    else
-                        return false;
-            return false;
         }
 
         private void JobThreadStart(JobHolder holder)
@@ -181,52 +198,49 @@ namespace MAD.JobSystemCore
             JobHolder _holder = (JobHolder)holder;
             Job _job = _holder.job;
 
-            lock (_job)
+            _job.tStart = DateTime.Now;
+            try { _job.Execute(_holder.targetAddress); }
+            catch (Exception)
             {
-                _job.tStart = DateTime.Now;
-                try { _job.Execute(_holder.targetAddress); }
-                catch (Exception)
-                {
-                    _job.state = Job.JobState.Exception;
-                }
-                _job.tStop = DateTime.Now;
-                _job.tSpan = _job.tStop.Subtract(_job.tStart);
+                _job.state = Job.JobState.Exception;
+            }
+            _job.tStop = DateTime.Now;
+            _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
-                if (_job.noti.useNotification)
-                {
-                    List<JobRule> _bRules = _job.noti.GetBrokenRules(_job.outp);
+            if (_job.noti.useNotification)
+            {
+                List<JobRule> _bRules = _job.noti.GetBrokenRules(_job.outp);
 
-                    // check if notification is neseccary.
-                    if (_job.outp.outState == JobOutput.OutState.Exception ||
-                        _job.outp.outState == JobOutput.OutState.Failed ||
-                        _bRules.Count != 0)
+                // check if notification is neseccary.
+                if (_job.outp.outState == JobOutput.OutState.Exception ||
+                    _job.outp.outState == JobOutput.OutState.Failed ||
+                    _bRules.Count != 0)
+                {
+                    string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
+                        + "') finished with a not expected result!");
+
+                    string _mailContent = GenJobInfo(_job);
+                    _mailContent += GenBrokenRulesText(_job.outp, _bRules);
+
+                    if (_job.noti.settings != null)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString() 
-                            + "') finished with a not expected result!");
-
-                        string _mailContent = GenJobInfo(_job);
-                        _mailContent += GenBrokenRulesText(_job.outp, _bRules);
-
-                        if (_job.noti.settings != null)
-                        {
-                            // This is not the perfect solution. Need to create a class, which
-                            // can stack notifications, so we do not lose precious time here ...
-                            NotificationSystem.SendMail(_job.noti.settings.mailAddr, _mailSubject, _mailContent, 2,
-                                _job.noti.settings.login.smtpAddr, _job.noti.settings.login.mail,
-                                _job.noti.settings.login.password, _job.noti.settings.login.port);
-                        }
-                        else
-                        {
-                            // use global notifiaction settings
-                            NotificationSystem.SendMail(new MailAddress[1] {new MailAddress(MadConf.conf.defaultMailAddr) },
-                                _mailSubject, _mailContent, 2);
-                        }
+                        // This is not the perfect solution. Need to create a class, which
+                        // can stack notifications, so we do not lose precious time here ...
+                        NotificationSystem.SendMail(_job.noti.settings.mailAddr, _mailSubject, _mailContent, 2,
+                            _job.noti.settings.login.smtpAddr, _job.noti.settings.login.mail,
+                            _job.noti.settings.login.password, _job.noti.settings.login.port);
+                    }
+                    else
+                    {
+                        // use global notifiaction settings
+                        NotificationSystem.SendMail(new MailAddress[1] { new MailAddress(MadConf.conf.defaultMailAddr) },
+                            _mailSubject, _mailContent, 2);
                     }
                 }
             }
 
-            // After this line, the scedule will notice this current job again.
             _job.state = Job.JobState.Waiting;
+            _job.jobLock.ExitWriteLock(); // Unlock job.
 
             return null;
         }

@@ -163,6 +163,7 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
+            _js.nodesLock.EnterReadLock();
             foreach (JobNode _temp in _js.nodes)
             {
                 _tableRow[0] = _temp.id.ToString();
@@ -173,6 +174,7 @@ namespace MAD.CLICore
                 _tableRow[5] = _temp.jobs.Count.ToString();
                 output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             }
+            _js.nodesLock.ExitReadLock();
 
             return output;
         }
@@ -336,7 +338,7 @@ namespace MAD.CLICore
             }
             catch(Exception e)
             {
-                return "<color><red>XML: " + e.Message;
+                return "<color><red>EX: " + e.Message;
             }
         }
     }
@@ -378,9 +380,14 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
+            _js.nodesLock.EnterReadLock();
             foreach (JobNode _temp in _js.nodes)
+            {
+                _temp.jobsLock.EnterReadLock();
                 foreach (Job _temp2 in _temp.jobs)
                 {
+                    _temp2.jobLock.EnterReadLock();
+
                     _tableRow[0] = _temp.id.ToString();
                     _tableRow[1] = _temp2.id.ToString();
                     _tableRow[2] = _temp2.name;
@@ -389,8 +396,15 @@ namespace MAD.CLICore
                     _tableRow[5] = _temp2.time.type.ToString();
                     _tableRow[6] = _temp2.time.GetValues();
                     _tableRow[7] = _temp2.outp.outState.ToString();
+
+                    _temp2.jobLock.ExitReadLock();
+
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
+                _temp.jobsLock.ExitReadLock();
+            }
+            _js.nodesLock.ExitReadLock();
+
             return output;
         }
     }
@@ -461,10 +475,20 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
+            _js.nodesLock.EnterReadLock();
             Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
             if (_job == null)
+            {
+                _js.nodesLock.ExitReadLock();
                 throw new Exception("Job does not exist!");
+            }
+
+            _job.jobLock.EnterWriteLock();
             _job.noti.settings = ParseJobNotificationSettings(pars);
+            _job.jobLock.ExitWriteLock();
+
+            _js.nodesLock.ExitReadLock();
+
             return "<color><green>Notification-Settings set.";
         }
     }
@@ -481,10 +505,20 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
+            _js.nodesLock.EnterReadLock();
             Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
             if (_job == null)
+            {
+                _js.nodesLock.ExitReadLock();
                 throw new Exception("Job does not exist!");
+            }
+
+            _job.jobLock.EnterWriteLock();
             _job.noti.rules = ParseJobNotificationRules(pars, _job.outp);
+            _job.jobLock.ExitWriteLock();
+
+            _js.nodesLock.ExitReadLock();
+
             return "<color><green>Rules set.";
         }
     }
@@ -502,22 +536,42 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
+            _js.nodesLock.EnterReadLock();
+
             if (OParUsed("id"))
             {
                 Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
                 if (_job != null)
-                    return GetJobInfo(_job);
+                {
+                    _job.jobLock.EnterReadLock();
+                    output = GetJobInfo(_job);
+                    _job.jobLock.ExitReadLock();
+
+                    _js.nodesLock.ExitReadLock();
+                    return output;
+                }
                 else
+                {
+                    _js.nodesLock.ExitReadLock();
                     return "<color><red>Job does not exist!";
+                }
             }
             else
-            { 
-                foreach(JobNode _node in _js.nodes)
+            {
+                foreach (JobNode _node in _js.nodes)
+                {
+                    _node.jobsLock.EnterReadLock();
                     foreach (Job _job in _node.jobs)
                     {
+                        _job.jobLock.EnterReadLock();
                         output += GetJobInfo(_job);
+                        _job.jobLock.ExitReadLock();
                         output += "\n";
                     }
+                    _node.jobsLock.ExitReadLock();
+                }
+
+                _js.nodesLock.ExitReadLock();
                 return output;
             }
         }
@@ -525,53 +579,51 @@ namespace MAD.CLICore
         private string GetJobInfo(Job job)
         {
             string output = "";
-            lock (job.jobLock)
+
+            output += "<color><yellow>[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
+            output += "Name: <color><white>" + job.name + "\n<color><yellow>";
+            output += "Type: <color><white>" + job.type.ToString() + "\n<color><yellow>";
+            output += "Time-Type: <color><white>" + job.time.type.ToString() + "\n<color><yellow>";
+            output += "Time-Value(s): <color><white>" + job.time.GetValues() + "<color><yellow>\n\n";
+
+            output += "<color><yellow>OutDescriptors:";
+
+            foreach (OutputDescriptor _desc in job.outp.outputs)
             {
-                output += "<color><yellow>[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
-                output += "Name: <color><white>" + job.name + "\n<color><yellow>";
-                output += "Type: <color><white>" + job.type.ToString() + "\n<color><yellow>";
-                output += "Time-Type: <color><white>" + job.time.type.ToString() + "\n<color><yellow>";
-                output += "Time-Value(s): <color><white>" + job.time.GetValues() + "<color><yellow>\n\n";
-
-                output += "<color><yellow>OutDescriptors:";
-
-                foreach (OutputDescriptor _desc in job.outp.outputs)
-                {
-                    output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
-                    output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString();
-                }
-
-                output += "\n\n<color><yellow>Notification-Settings: <color><white>";
-                if (job.noti.settings != null)
-                {
-                    output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.noti.settings.login.smtpAddr;
-                    output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.noti.settings.login.port;
-                    output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.noti.settings.login.mail;
-                    output += "\n  <color><yellow>Password: <color><white>" + job.noti.settings.login.password;
-                    output += "\n  <color><yellow>Mails to send to: <color><white>";
-
-                    foreach (MailAddress _addr in job.noti.settings.mailAddr)
-                        output += _addr.ToString() + " ";
-                }
-                else
-                    output += "NULL";
-
-                output += "\n\n<color><yellow>Notification-Rules:";
-
-                if (job.noti.rules == null)
-                    output += " <color><white>NULL";
-                else
-                {
-                    if (job.noti.rules.Count != 0)
-                        foreach (JobRule _rule in job.noti.rules)
-                        {
-                            output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
-                            output += "\n  <color><yellow>Operation: <color><white>" + _rule.oper.ToString();
-                            output += "\n  <color><yellow>Compare value: <color><white>" + _rule.compareValue.ToString();
-                        }
-                }
-                return output;
+                output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
+                output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString();
             }
+
+            output += "\n\n<color><yellow>Notification-Settings: <color><white>";
+            if (job.noti.settings != null)
+            {
+                output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.noti.settings.login.smtpAddr;
+                output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.noti.settings.login.port;
+                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.noti.settings.login.mail;
+                output += "\n  <color><yellow>Password: <color><white>" + job.noti.settings.login.password;
+                output += "\n  <color><yellow>Mails to send to: <color><white>";
+
+                foreach (MailAddress _addr in job.noti.settings.mailAddr)
+                    output += _addr.ToString() + " ";
+            }
+            else
+                output += "NULL";
+
+            output += "\n\n<color><yellow>Notification-Rules:";
+
+            if (job.noti.rules == null)
+                output += " <color><white>NULL";
+            else
+            {
+                if (job.noti.rules.Count != 0)
+                    foreach (JobRule _rule in job.noti.rules)
+                    {
+                        output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
+                        output += "\n  <color><yellow>Operation: <color><white>" + _rule.oper.ToString();
+                        output += "\n  <color><yellow>Compare value: <color><white>" + _rule.compareValue.ToString();
+                    }
+            }
+            return output;
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
+using System.Threading;
 
 using Newtonsoft.Json;
 
@@ -14,7 +15,7 @@ namespace MAD.JobSystemCore
         public enum JobState { Inactive, Waiting, Working, Exception }
 
         [JsonIgnore]
-        public object jobLock = new object();
+        public ReaderWriterLockSlim jobLock = new ReaderWriterLockSlim();
         [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]

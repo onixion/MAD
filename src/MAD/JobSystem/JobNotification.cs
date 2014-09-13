@@ -9,7 +9,7 @@ namespace MAD.JobSystemCore
 {
     public class JobNotification
     {
-        public bool useNotification = true;
+        public bool useNotification = false;
 
         public JobNotificationSettings settings = null;
         public List<JobRule> rules = null;

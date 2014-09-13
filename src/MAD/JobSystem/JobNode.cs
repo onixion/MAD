@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading;
 
 using MAD.Notification;
 
@@ -16,9 +17,7 @@ namespace MAD.JobSystemCore
         public enum State { Active, Inactive, Exception }
 
         [JsonIgnore]
-        public object nodeLock = new object();
-        [JsonIgnore]
-        public object jobsLock = new object();
+        public ReaderWriterLockSlim nodeLock = new ReaderWriterLockSlim();
         [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
