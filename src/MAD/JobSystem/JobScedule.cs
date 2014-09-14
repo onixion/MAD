@@ -92,8 +92,6 @@ namespace MAD.JobSystemCore
 
                     if (_node.state == JobNode.State.Active)
                     {
-                        _node.jobsLock.EnterReadLock();
-
                         foreach (Job _job in _node.jobs)
                         {
                             _job.jobLock.EnterReadLock();
@@ -102,9 +100,7 @@ namespace MAD.JobSystemCore
                             {
                                 if (_job.type != Job.JobType.NULL)
                                 {
-                                    JobTime _time = _job.time;
-
-                                    if (_time.type == JobTime.TimeMethod.Relative)
+                                    if (_job.time.type == JobTime.TimeMethod.Relative)
                                     {
                                         _job.jobLock.ExitReadLock();
                                         _job.jobLock.EnterWriteLock();
@@ -115,10 +111,13 @@ namespace MAD.JobSystemCore
 
                                             // Job is ready to be executed.
                                             _job.state = Job.JobState.Working;
-                                            
+
+                                            _holder.node = _node;
                                             _holder.job = _job;
                                             _holder.targetAddress = _node.ipAddress;
 
+                                            _nodesLock.EnterReadLock(); // this lock is important!
+                                            _node.nodeLock.EnterReadLock();
                                             JobInvoke(_holder);
 
                                             // not exit the lock -> thread will do this.
@@ -129,9 +128,9 @@ namespace MAD.JobSystemCore
                                             _job.jobLock.ExitWriteLock();
                                         }
                                     }
-                                    else if (_time.type == JobTime.TimeMethod.Absolute)
+                                    else if (_job.time.type == JobTime.TimeMethod.Absolute)
                                     {
-                                        JobTimeHandler _timeHandler = _time.GetJobTimeHandler(_nowTime);
+                                        JobTimeHandler _timeHandler = _job.time.GetJobTimeHandler(_nowTime);
 
                                         if (_timeHandler != null)
                                         {
@@ -147,9 +146,11 @@ namespace MAD.JobSystemCore
                                                     // Job is ready to be executed.
                                                     _job.state = Job.JobState.Working;
 
+                                                    _holder.node = _node;
                                                     _holder.job = _job;
                                                     _holder.targetAddress = _node.ipAddress;
 
+                                                    _nodesLock.EnterReadLock(); // this lock is important!
                                                     JobInvoke(_holder);
 
                                                     // not exit the lock -> thread will do this.
@@ -172,8 +173,6 @@ namespace MAD.JobSystemCore
                             else
                                 _job.jobLock.ExitReadLock();
                         }
-
-                        _node.jobsLock.ExitReadLock();
                     }
 
                     _node.nodeLock.ExitReadLock();
@@ -196,6 +195,7 @@ namespace MAD.JobSystemCore
         private object JobInvoke(object holder)
         {
             JobHolder _holder = (JobHolder)holder;
+            JobNode _node = _holder.node;
             Job _job = _holder.job;
 
             _job.tStart = DateTime.Now;
@@ -241,6 +241,8 @@ namespace MAD.JobSystemCore
 
             _job.state = Job.JobState.Waiting;
             _job.jobLock.ExitWriteLock(); // Unlock job.
+            _node.nodeLock.ExitReadLock();
+            _nodesLock.EnterReadLock(); // Unlock nodes.
 
             return null;
         }
@@ -294,7 +296,8 @@ namespace MAD.JobSystemCore
     }
 
     public class JobHolder
-    { 
+    {
+        public JobNode node;
         public Job job;
         public System.Net.IPAddress targetAddress;
     }

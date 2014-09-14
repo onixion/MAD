@@ -331,9 +331,7 @@ namespace MAD.CLICore
 
             try
             {
-                JobNode _node = _js.LoadNode(_fileName);
-                _js.AddNode(_node);
-
+                _js.LoadNode(_fileName);
                 return "<color><green>Node loaded.";
             }
             catch(Exception e)
@@ -383,7 +381,7 @@ namespace MAD.CLICore
             _js.nodesLock.EnterReadLock();
             foreach (JobNode _temp in _js.nodes)
             {
-                _temp.jobsLock.EnterReadLock();
+                _temp.nodeLock.EnterReadLock();
                 foreach (Job _temp2 in _temp.jobs)
                 {
                     _temp2.jobLock.EnterReadLock();
@@ -401,7 +399,7 @@ namespace MAD.CLICore
 
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
-                _temp.jobsLock.ExitReadLock();
+                _temp.nodeLock.ExitReadLock();
             }
             _js.nodesLock.ExitReadLock();
 
@@ -475,21 +473,28 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.nodesLock.EnterReadLock();
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job == null)
+            JobNode _node;
+            Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
+            if (_job != null)
             {
-                _js.nodesLock.ExitReadLock();
-                throw new Exception("Job does not exist!");
+                JobNotificationSettings _sett = null;
+
+                try { _sett = ParseJobNotificationSettings(pars); }
+                catch (Exception e)
+                {
+                    _js.JobUnlockedGlobal(_node);
+                    throw e;
+                }
+
+                _js.JobLockWrite(_job);
+                _job.noti.settings = _sett;
+                _js.JobUnlockWrite(_job);
+                _js.JobUnlockedGlobal(_node);
+
+                return "<color><green>Rules set.";
             }
-
-            _job.jobLock.EnterWriteLock();
-            _job.noti.settings = ParseJobNotificationSettings(pars);
-            _job.jobLock.ExitWriteLock();
-
-            _js.nodesLock.ExitReadLock();
-
-            return "<color><green>Notification-Settings set.";
+            else
+                return "<color><red>Job does not exist!";
         }
     }
 
@@ -505,21 +510,30 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.nodesLock.EnterReadLock();
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job == null)
+            JobNode _node;
+            Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
+            if (_job != null)
             {
-                _js.nodesLock.ExitReadLock();
-                throw new Exception("Job does not exist!");
+                List<JobRule> _rules = null;
+
+                _js.JobLockRead(_job);
+                try { _rules = ParseJobNotificationRules(pars, _job.outp); }
+                catch(Exception e) 
+                {
+                    _js.JobUnlockRead(_job);
+                    _js.JobUnlockedGlobal(_node);
+                    throw e;
+                }
+                _js.JobUnlockRead(_job);
+                _js.JobLockWrite(_job);
+                _job.noti.rules = _rules;
+                _js.JobUnlockWrite(_job);
+                _js.JobUnlockedGlobal(_node);
+
+                return "<color><green>Rules set.";
             }
-
-            _job.jobLock.EnterWriteLock();
-            _job.noti.rules = ParseJobNotificationRules(pars, _job.outp);
-            _job.jobLock.ExitWriteLock();
-
-            _js.nodesLock.ExitReadLock();
-
-            return "<color><green>Rules set.";
+            else
+                return "<color><red>Job does not exist!";
         }
     }
 
@@ -536,31 +550,27 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.nodesLock.EnterReadLock();
-
             if (OParUsed("id"))
             {
-                Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
+                JobNode _node;
+                Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
                 if (_job != null)
                 {
                     _job.jobLock.EnterReadLock();
                     output = GetJobInfo(_job);
                     _job.jobLock.ExitReadLock();
-
-                    _js.nodesLock.ExitReadLock();
+                    _js.JobUnlockedGlobal(_node);
                     return output;
                 }
                 else
-                {
-                    _js.nodesLock.ExitReadLock();
                     return "<color><red>Job does not exist!";
-                }
             }
             else
             {
+                _js.nodesLock.EnterReadLock();
                 foreach (JobNode _node in _js.nodes)
                 {
-                    _node.jobsLock.EnterReadLock();
+                    _node.nodeLock.EnterReadLock();
                     foreach (Job _job in _node.jobs)
                     {
                         _job.jobLock.EnterReadLock();
@@ -568,9 +578,8 @@ namespace MAD.CLICore
                         _job.jobLock.ExitReadLock();
                         output += "\n";
                     }
-                    _node.jobsLock.ExitReadLock();
+                    _node.nodeLock.ExitReadLock();
                 }
-
                 _js.nodesLock.ExitReadLock();
                 return output;
             }
