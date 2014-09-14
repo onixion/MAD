@@ -107,20 +107,19 @@ namespace MAD.JobSystemCore
 
                                         if (_job.time.jobDelay.CheckTime())
                                         {
-                                            _job.time.jobDelay.Reset(); // reset delay
+                                            _job.time.jobDelay.Reset();
 
                                             // Job is ready to be executed.
+
                                             _job.state = Job.JobState.Working;
 
                                             _holder.node = _node;
                                             _holder.job = _job;
                                             _holder.targetAddress = _node.ipAddress;
 
-                                            _nodesLock.EnterReadLock(); // this lock is important!
-                                            _node.nodeLock.EnterReadLock();
-                                            JobInvoke(_holder);
+                                            JobThreadStart(_holder);
 
-                                            // not exit the lock -> thread will do this.
+                                            _job.jobLock.ExitWriteLock();
                                         }
                                         else
                                         {
@@ -144,16 +143,16 @@ namespace MAD.JobSystemCore
                                                     _timeHandler.minuteAtBlock = _nowTime.Minute;
 
                                                     // Job is ready to be executed.
+
                                                     _job.state = Job.JobState.Working;
 
                                                     _holder.node = _node;
                                                     _holder.job = _job;
                                                     _holder.targetAddress = _node.ipAddress;
 
-                                                    _nodesLock.EnterReadLock(); // this lock is important!
-                                                    JobInvoke(_holder);
+                                                    JobThreadStart(_holder);
 
-                                                    // not exit the lock -> thread will do this.
+                                                    _job.jobLock.ExitWriteLock();
                                                 }
                                                 else
                                                     _job.jobLock.ExitReadLock();
@@ -189,7 +188,7 @@ namespace MAD.JobSystemCore
 
         private void JobThreadStart(JobHolder holder)
         {
-            _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke),holder);
+            _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke), holder);
         }
 
         private object JobInvoke(object holder)
@@ -198,8 +197,15 @@ namespace MAD.JobSystemCore
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
+            _nodesLock.EnterReadLock();
+            _node.nodeLock.EnterReadLock();
+            _job.jobLock.EnterWriteLock();
+
             _job.tStart = DateTime.Now;
-            try { _job.Execute(_holder.targetAddress); }
+            try 
+            {
+                _job.Execute(_holder.targetAddress);
+            }
             catch (Exception)
             {
                 _job.state = Job.JobState.Exception;
@@ -240,10 +246,12 @@ namespace MAD.JobSystemCore
             }
 
             _job.state = Job.JobState.Waiting;
-            _job.jobLock.ExitWriteLock(); // Unlock job.
-            _node.nodeLock.ExitReadLock();
-            _nodesLock.EnterReadLock(); // Unlock nodes.
 
+            // Job execution finished.
+
+            _job.jobLock.ExitWriteLock();
+            _node.nodeLock.ExitReadLock();
+            _nodesLock.EnterReadLock(); 
             return null;
         }
 

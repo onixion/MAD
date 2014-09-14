@@ -54,7 +54,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             _js.SaveTable((string)pars.GetPar("file").argValues[0]);
-            return "<color><green>Table saved (contains " + _js.nodes.Count + " Nodes).";
+            return "<color><green>Table saved.";
         }
     }
 
@@ -163,8 +163,8 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            _js.nodesLock.EnterReadLock();
-            foreach (JobNode _temp in _js.nodes)
+            List<JobNode> _nodes = _js.GetNodesLockedRead();
+            foreach (JobNode _temp in _nodes)
             {
                 _tableRow[0] = _temp.id.ToString();
                 _tableRow[1] = _temp.name;
@@ -174,7 +174,7 @@ namespace MAD.CLICore
                 _tableRow[5] = _temp.jobs.Count.ToString();
                 output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             }
-            _js.nodesLock.ExitReadLock();
+            _js.UnlockNodesRead();
 
             return output;
         }
@@ -378,8 +378,8 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            _js.nodesLock.EnterReadLock();
-            foreach (JobNode _temp in _js.nodes)
+            List<JobNode> _nodes = _js.GetNodesLockedRead();
+            foreach (JobNode _temp in _nodes)
             {
                 _temp.nodeLock.EnterReadLock();
                 foreach (Job _temp2 in _temp.jobs)
@@ -401,7 +401,7 @@ namespace MAD.CLICore
                 }
                 _temp.nodeLock.ExitReadLock();
             }
-            _js.nodesLock.ExitReadLock();
+            _js.UnlockNodesRead();
 
             return output;
         }
@@ -567,8 +567,8 @@ namespace MAD.CLICore
             }
             else
             {
-                _js.nodesLock.EnterReadLock();
-                foreach (JobNode _node in _js.nodes)
+                List<JobNode> _nodes = _js.GetNodesLockedRead();
+                foreach (JobNode _node in _nodes)
                 {
                     _node.nodeLock.EnterReadLock();
                     foreach (Job _job in _node.jobs)
@@ -581,6 +581,7 @@ namespace MAD.CLICore
                     _node.nodeLock.ExitReadLock();
                 }
                 _js.nodesLock.ExitReadLock();
+                _js.UnlockNodesRead();
                 return output;
             }
         }
