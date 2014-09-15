@@ -77,14 +77,14 @@ namespace MAD
             conf.DEBUG_MODE = true;
             conf.LOG_MODE = true;
             
-            // default notification settings
             conf.cliServerPort = 2222;
+            conf.serverHeader = "MAD-CLIServer YUHU!";
+
             conf.smtpServer = "smtp-mail.outlook.com";
             conf.smtpPort = 587;
             conf.username = "mad.group@outlook.com";
             conf.password = "Mad-21436587";
-
-            conf.defaultMailAddr = "alin.porcic@gmail.com";
+            conf.defaultMailAddr = "alin.porcic@gmail.com"; // mail
         }
 
         #endregion
@@ -94,17 +94,21 @@ namespace MAD
 
     public class MadConfigFile
     {
-        // Global vars
+        // global vars
         public bool DEBUG_MODE;
         public bool LOG_MODE;
 
+        // cliserver vars
+        public string serverHeader;
         public int cliServerPort;
+        public byte[] rsaPrivate;
+        public byte[] rsaPublic;
 
+        // notification vars
         public string smtpServer;
         public int smtpPort;
         public string username;
         public string password;
-
         public string defaultMailAddr;
     }
 }

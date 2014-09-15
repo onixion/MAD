@@ -891,6 +891,8 @@ namespace MAD.CLICore
 
     #endregion
 
+    #region parsing job parameters
+
     public class JobCommand : Command
     {
         public const string JOB_NAME = "n";
@@ -1128,6 +1130,8 @@ namespace MAD.CLICore
             }
         }
     }
+
+    #endregion
 
     #endregion
 }

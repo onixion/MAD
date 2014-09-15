@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.Security;
+using System.Security.Cryptography;
 using System.Text;
 using System.IO;
+using System.Xml;
 
 using MAD.JobSystemCore;
 using MAD.CLICore;
-
 using MadNet;
 
 namespace MAD.CLIServerCore
@@ -19,31 +19,45 @@ namespace MAD.CLIServerCore
 
         public const string HEADER = "MAD CLI-Server";
         public const string VERSION = "v2.4";
-        public readonly bool DEBUG_MODE;
-        public readonly bool LOG_MODE;
-        public readonly int ACCEPTED_RSA_MODULUS_LENGTH = 2048;
-        public readonly int AES_PASS_LENGTH = 20;
+        public const bool DEBUG_MODE = true;
+        public const bool LOG_MODE = false;
+
+        private TcpListener _serverListener;
+
+        private byte[] SERVER_RSA_PRIVATE;
+        private byte[] SERVER_RSA_PUBLIC;
 
         private string _user = "root";
         private string _pass = MD5Hashing.GetHash("rofl123");
         private bool _userOnline = false;
 
-        private TcpListener _serverListener;
-
+        
         private JobSystem _js;
 
         #endregion
 
         #region constructor
 
-        public CLIServer(int port, bool debug, bool log, JobSystem js)
+        public CLIServer(int port, JobSystem js)
         {
             serverPort = port;
-
-            DEBUG_MODE = debug;
-            LOG_MODE = log;
+            InitNewKeyPairs();
 
             _js = js;
+        }
+
+        public CLIServer(int port, byte[] rsaPrivate, byte[] rsaPublic, JobSystem js)
+        {
+            serverPort = port;
+            if (rsaPrivate == null || rsaPublic == null)
+                InitNewKeyPairs();
+            _js = js;
+        }
+
+        private void InitNewKeyPairs()
+        {
+            RSA _rsa = RSACryptoServiceProvider.Create();
+            string _keys = _rsa.ToXmlString(true);
         }
 
         #endregion
@@ -106,7 +120,6 @@ namespace MAD.CLIServerCore
                     _dataP.ReceivePacket();
                     _rsa.LoadPublicFromXml(_dataP.data);
                 }
-                string _pass = GenRandomPassUnicode(AES_PASS_LENGTH);
 
                 byte[] _encrypted = _rsa.PublicEncryption(Encoding.UTF8.GetBytes(_pass));
 

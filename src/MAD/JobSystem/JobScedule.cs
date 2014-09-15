@@ -31,6 +31,8 @@ namespace MAD.JobSystemCore
         private List<JobNode> _jobNodes;
         private ReaderWriterLockSlim _nodesLock;
 
+        private ManualResetEvent _lockSwitch = new ManualResetEvent(false);
+
         #endregion
 
         #region constructor
@@ -94,7 +96,7 @@ namespace MAD.JobSystemCore
                     {
                         foreach (Job _job in _node.jobs)
                         {
-                            _job.jobLock.EnterReadLock();
+                            _job.jobLock.EnterWriteLock();
 
                             if (_job.state == Job.JobState.Waiting)
                             {
@@ -102,9 +104,6 @@ namespace MAD.JobSystemCore
                                 {
                                     if (_job.time.type == JobTime.TimeMethod.Relative)
                                     {
-                                        _job.jobLock.ExitReadLock();
-                                        _job.jobLock.EnterWriteLock();
-
                                         if (_job.time.jobDelay.CheckTime())
                                         {
                                             _job.time.jobDelay.Reset();
@@ -118,6 +117,10 @@ namespace MAD.JobSystemCore
                                             _holder.targetAddress = _node.ipAddress;
 
                                             JobThreadStart(_holder);
+
+                                            // wait for Job to lock necessary locks.
+                                            _lockSwitch.WaitOne();
+                                            _lockSwitch.Reset();
 
                                             _job.jobLock.ExitWriteLock();
                                         }
@@ -137,9 +140,6 @@ namespace MAD.JobSystemCore
                                             {
                                                 if (_timeHandler.CheckTime(_nowTime))
                                                 {
-                                                    _job.jobLock.ExitReadLock();
-                                                    _job.jobLock.EnterWriteLock();
-
                                                     _timeHandler.minuteAtBlock = _nowTime.Minute;
 
                                                     // Job is ready to be executed.
@@ -152,25 +152,30 @@ namespace MAD.JobSystemCore
 
                                                     JobThreadStart(_holder);
 
+                                                    // wait for Job to lock necessary locks.
+                                                    
                                                     _job.jobLock.ExitWriteLock();
+
+                                                    _lockSwitch.WaitOne();
+                                                    _lockSwitch.Reset();
                                                 }
                                                 else
-                                                    _job.jobLock.ExitReadLock();
+                                                    _job.jobLock.ExitWriteLock();
                                             }
                                             else
-                                                _job.jobLock.ExitReadLock();
+                                                _job.jobLock.ExitWriteLock();
                                         }
                                         else
-                                            _job.jobLock.ExitReadLock();
+                                            _job.jobLock.ExitWriteLock();
                                     }
                                     else
-                                        _job.jobLock.ExitReadLock();
+                                        _job.jobLock.ExitWriteLock();
                                 }
                                 else
-                                    _job.jobLock.ExitReadLock();
+                                    _job.jobLock.ExitWriteLock();
                             }
                             else
-                                _job.jobLock.ExitReadLock();
+                                _job.jobLock.ExitWriteLock();
                         }
                     }
 
@@ -197,8 +202,12 @@ namespace MAD.JobSystemCore
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
+            // lock nodes and node read-only
             _nodesLock.EnterReadLock();
             _node.nodeLock.EnterReadLock();
+
+            _lockSwitch.Set();
+
             _job.jobLock.EnterWriteLock();
 
             _job.tStart = DateTime.Now;
@@ -251,7 +260,7 @@ namespace MAD.JobSystemCore
 
             _job.jobLock.ExitWriteLock();
             _node.nodeLock.ExitReadLock();
-            _nodesLock.EnterReadLock(); 
+            _nodesLock.ExitReadLock(); 
             return null;
         }
 
@@ -305,6 +314,8 @@ namespace MAD.JobSystemCore
 
     public class JobHolder
     {
+        public ReaderWriterLock _te;
+
         public JobNode node;
         public Job job;
         public System.Net.IPAddress targetAddress;
