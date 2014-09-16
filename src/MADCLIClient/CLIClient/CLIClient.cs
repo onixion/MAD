@@ -63,26 +63,44 @@ namespace CLIClient
                     {
                         _serverInfoP.ReceivePacket();
 
-                        Console.WriteLine("SERVER-HEADER: " + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
-                        Console.WriteLine("SERVER-VERSION: " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
+                        Console.WriteLine("".PadLeft(Console.BufferWidth, '_'));
+                        Console.WriteLine("SERVER-HEADER:      " + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
+                        Console.WriteLine("SERVER-VERSION:     " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
+                        Console.WriteLine("SERVER-FINGERPRING: " + Encoding.ASCII.GetString(_serverInfoP.fingerprint));
+                        Console.WriteLine("".PadLeft(Console.BufferWidth, '_'));
                     }
 
-                    // RSA-KEY-EXCHANGE
-
-                    RSACryptoServiceProvider _rsaProvider = new RSACryptoServiceProvider();
-                    RSAEncryption _rsa = new RSAEncryption();
-                    _rsa.LoadPrivateFromXml(_rsaProvider.ToXmlString(true));
-                    using (DataStringPacket _dataP = new DataStringPacket(_stream, null, _rsaProvider.ToXmlString(false)))
-                        _dataP.SendPacket();
-
-                    string _aesPass = null;
-                    using (DataPacket dataP = new DataPacket(_stream, null))
+                    ConsoleKeyInfo _key;
+                    while (true)
                     {
-                        dataP.ReceivePacket();
-                        _aesPass = Encoding.UTF8.GetString(_rsa.PrivateDecryption(dataP.data));
+                        Console.WriteLine("Are you sure that you want to connect to this server? Y(es) / N(o)");
+
+                        _key = Console.ReadKey(true);
+                        if (_key.Key == ConsoleKey.Y)
+                            break;
+                        else if (_key.Key == ConsoleKey.N)
+                            throw new Exception();
                     }
 
-                    AES _aes = new AES(_aesPass);
+                    string _xml;
+                    using (DataPacket _rsaP = new DataPacket(_stream, null))
+                    {
+                        _rsaP.ReceivePacket();
+                        _xml = Encoding.UTF8.GetString(_rsaP.data);
+                    }
+
+                    RSAEncryption _r = new RSAEncryption();
+                    _r.LoadPublicFromXml(_xml);
+
+                    string _randomPASS = "TESTLOLWAS";
+
+                    using (DataPacket _sData = new DataPacket(_stream, null))
+                    {
+                        _sData.data = _r.PublicEncryption(Encoding.UTF8.GetBytes(_randomPASS));
+                        _sData.SendPacket();
+                    }
+
+                    AES _aes = new AES(_randomPASS);
 
                     byte[] _username = Encoding.Unicode.GetBytes(username);
                     byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);

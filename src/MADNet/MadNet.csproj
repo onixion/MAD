@@ -46,6 +46,8 @@
     <Compile Include="Packet\DataPacket.cs" />
     <Compile Include="MD5Hashing.cs" />
     <Compile Include="Packet\DataStringPacket.cs" />
+    <Compile Include="Packet\RSAPacket.cs" />
+    <Compile Include="SHA.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Packet\Packet.cs" />
     <Compile Include="Packet\PacketException.cs" />

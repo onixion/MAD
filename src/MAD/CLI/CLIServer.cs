@@ -22,15 +22,19 @@ namespace MAD.CLIServerCore
         public const bool DEBUG_MODE = true;
         public const bool LOG_MODE = false;
 
-        private TcpListener _serverListener;
+        // rsa
+        private const int RSA_KEY_SIZE = 2048;
+        private RSAParameters RSA_PARS;
+        private RSAEncryption RSA = new RSAEncryption();
+        private string RSA_FINGERPRINT;
 
-        private byte[] SERVER_RSA_PRIVATE;
-        private byte[] SERVER_RSA_PUBLIC;
+        private string RSA_XML_PUBLIC; // surrounded by idiots *facepalm*
+
+        private TcpListener _serverListener;
 
         private string _user = "root";
         private string _pass = MD5Hashing.GetHash("rofl123");
         private bool _userOnline = false;
-
         
         private JobSystem _js;
 
@@ -51,13 +55,19 @@ namespace MAD.CLIServerCore
             serverPort = port;
             if (rsaPrivate == null || rsaPublic == null)
                 InitNewKeyPairs();
+
             _js = js;
         }
 
         private void InitNewKeyPairs()
         {
             RSA _rsa = RSACryptoServiceProvider.Create();
-            string _keys = _rsa.ToXmlString(true);
+            _rsa.KeySize = RSA_KEY_SIZE;
+            RSA_PARS = _rsa.ExportParameters(true);
+            RSA.LoadPrivateFromXml(_rsa.ToXmlString(true));
+            RSA_FINGERPRINT = SHA.GenFingerPrint(SHA.ComputeSHA1(RSA_PARS.Modulus));
+
+            RSA_XML_PUBLIC = _rsa.ToXmlString(false);
         }
 
         #endregion
@@ -103,31 +113,38 @@ namespace MAD.CLIServerCore
                 if (LOG_MODE)
                     Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
 
+                if (_userOnline)
+                    throw new Exception("User already online!");
+
+                // send server info
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
                     _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(HEADER);
                     _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(VERSION);
+                    _serverInfoP.fingerprint = Encoding.ASCII.GetBytes(RSA_FINGERPRINT);
                     _serverInfoP.SendPacket();
                 }
 
-                if (_userOnline)
-                    throw new Exception("User already online!");
+                // send rsa public key
+                //using (RSAPacket _rsaP = new RSAPacket(_stream, null, RSA_PARS.Modulus, RSA_PARS.Exponent))
+                //    _rsaP.SendPacket();
+                using (DataPacket _p = new DataPacket(_stream, null, Encoding.UTF8.GetBytes(RSA_XML_PUBLIC)))
+                    _p.SendPacket();
 
-                RSAEncryption _rsa = new RSAEncryption();
 
-                using (DataStringPacket _dataP = new DataStringPacket(_stream, null))
+                // receive aes pass from client
+                byte[] _aesKey = null;
+                using (DataPacket _dataP = new DataPacket(_stream, null))
                 {
                     _dataP.ReceivePacket();
-                    _rsa.LoadPublicFromXml(_dataP.data);
+                    _aesKey = _dataP.data;
                 }
 
-                byte[] _encrypted = _rsa.PublicEncryption(Encoding.UTF8.GetBytes(_pass));
+                // encrypt it an set aes pass
+                byte[] _encrypted = RSA.PrivateDecryption(_aesKey);
+                AES _aes = new AES(Encoding.UTF8.GetString(_encrypted));
 
-                using (DataPacket _dataP = new DataPacket(_stream, null, _encrypted))
-                        _dataP.SendPacket();
-               
-                AES _aes = new AES(_pass);
-
+                // receive login packet
                 bool _loginSuccess;
                 using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
                 {
