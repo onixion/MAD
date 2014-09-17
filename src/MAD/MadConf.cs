@@ -101,8 +101,7 @@ namespace MAD
         // cliserver vars
         public string serverHeader;
         public int cliServerPort;
-        public byte[] rsaPrivate;
-        public byte[] rsaPublic;
+        public string rsaKeys;
 
         // notification vars
         public string smtpServer;

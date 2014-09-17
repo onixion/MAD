@@ -81,35 +81,4 @@ namespace MAD.CLICore
             return output;
         }
     }
-
-    public class CLIChangePort : Command
-    {
-        private CLIServer _cliServer;
-
-        public CLIChangePort(object[] args)
-            : base()
-        {
-            _cliServer = (CLIServer)args[0];
-
-            rPar.Add(new ParOption("p", "<PORT>", "The specific port.", false, false, new Type[] { typeof(int) }));
-
-            description = "This command changes the port on which the server listens.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            try
-            {
-                int _port = (int)pars.GetPar("p").argValues[0];
-
-                _cliServer.ChangePort(_port);
-
-                return "<color><green>Port changed to '" + _port + "'.";
-            }
-            catch (Exception)
-            { 
-                return "<color><red>Could not change server port, because server is running!";
-            }
-        }
-    }
 }

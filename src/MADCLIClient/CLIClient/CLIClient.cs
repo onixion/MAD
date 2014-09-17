@@ -3,10 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
-using System.Xml;
-
-using System.Security.Cryptography;
-using System.Security.Cryptography.Xml;
 
 using MadNet;
 using CLIIO;
@@ -18,20 +14,23 @@ namespace CLIClient
         #region member
         
         private IPEndPoint _serverEndPoint;
-        
         private TcpClient _client;
         private NetworkStream _stream;
 
-        private int _RSAModulusLength = 2048;
-        private string _aesPassFromServer { get; set; }
+        private RSA _RSA;
+        
+        private string _username;
+        private string _passwordMD5;
 
         #endregion
 
         #region constructor
 
-        public CLIClient(IPEndPoint serverEndPoint)
+        public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
         {
             _serverEndPoint = serverEndPoint;
+            _username = username;
+            _passwordMD5 = passwordMD5;
         }
 
         #endregion
@@ -41,105 +40,107 @@ namespace CLIClient
         public void Connect()
         {
             _client = new TcpClient();
-            
+
             try
             {
                 _client.Connect(_serverEndPoint);
                 _stream = _client.GetStream();
+
+                LoginToServer();
+                _client.Close();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                throw new Exception("Could not connect to server.");
+                throw new Exception("Could not connect to server. E:" + e.Message);
             }
         }
 
-        public void LoginToRemoteCLI(string username, string passwordMD5)
+        private void LoginToServer()
         {
-            if (_client.Connected)
+            try
             {
-                try
+                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
-                    using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
-                    {
-                        _serverInfoP.ReceivePacket();
+                    _serverInfoP.ReceivePacket();
 
-                        Console.WriteLine("".PadLeft(Console.BufferWidth, '_'));
-                        Console.WriteLine("SERVER-HEADER:      " + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
-                        Console.WriteLine("SERVER-VERSION:     " + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
-                        Console.WriteLine("SERVER-FINGERPRING: " + Encoding.ASCII.GetString(_serverInfoP.fingerprint));
-                        Console.WriteLine("".PadLeft(Console.BufferWidth, '_'));
-                    }
-
-                    ConsoleKeyInfo _key;
-                    while (true)
-                    {
-                        Console.WriteLine("Are you sure that you want to connect to this server? Y(es) / N(o)");
-
-                        _key = Console.ReadKey(true);
-                        if (_key.Key == ConsoleKey.Y)
-                            break;
-                        else if (_key.Key == ConsoleKey.N)
-                            throw new Exception();
-                    }
-
-                    string _xml;
-                    using (DataPacket _rsaP = new DataPacket(_stream, null))
-                    {
-                        _rsaP.ReceivePacket();
-                        _xml = Encoding.UTF8.GetString(_rsaP.data);
-                    }
-
-                    RSAEncryption _r = new RSAEncryption();
-                    _r.LoadPublicFromXml(_xml);
-
-                    string _randomPASS = "TESTLOLWAS";
-
-                    using (DataPacket _sData = new DataPacket(_stream, null))
-                    {
-                        _sData.data = _r.PublicEncryption(Encoding.UTF8.GetBytes(_randomPASS));
-                        _sData.SendPacket();
-                    }
-
-                    AES _aes = new AES(_randomPASS);
-
-                    byte[] _username = Encoding.Unicode.GetBytes(username);
-                    byte[] _passwordMD5 = Encoding.Unicode.GetBytes(passwordMD5);
-
-                    using (LoginPacket _loginP = new LoginPacket(_stream, _aes, _username, _passwordMD5))
-                        _loginP.SendPacket();
-
-                    string _serverAnswer;
-                    using(DataPacket _dataP2 = new DataPacket(_stream, _aes))
-                    {
-                        _dataP2.ReceivePacket();
-                        _serverAnswer = Encoding.Unicode.GetString(_dataP2.data);
-                    }
-  
-                    Console.WriteLine("SERVER-REPLY: " + _serverAnswer);
-
-                    if (_serverAnswer == "LOGIN_SUCCESS")
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("\nServer accepted login-data.");
-                        Console.ForegroundColor = ConsoleColor.White;
-
-                        StartRemoteConsole(_stream, _aes);
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("\nServer refused login-data.");
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
+                    CLIOutput.WriteToConsole("<color><yellow>" + ("".PadLeft(Console.BufferWidth, '_')));
+                    CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER:      <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
+                    CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:     <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
+                    CLIOutput.WriteToConsole("<color><yellow>SERVER-FINGERPRING: <color><white>" + Encoding.ASCII.GetString(_serverInfoP.fingerprint));
+                    CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_'));
                 }
-                catch (Exception e)
+
+                ConsoleKeyInfo _key;
+                while (true)
                 {
-                    throw new Exception("Lost connection to server.", e);
+                    CLIOutput.WriteToConsole("<color><red>Are you sure you want to connect to this server? Y(es) / N(o)");
+                    _key = Console.ReadKey(true);
+                    if (_key.Key == ConsoleKey.Y)
+                        break;
+                    else if (_key.Key == ConsoleKey.N)
+                        throw new Exception();
+                }
+
+                // receive modulus
+                byte[] _modulus = null;
+                using (DataPacket _dataP = new DataPacket(_stream, null))
+                {
+                    _dataP.ReceivePacket();
+                    _modulus = _dataP.data;
+                }
+
+                // receive exponent
+                byte[] _exponent = null;
+                using (DataPacket _dataP = new DataPacket(_stream, null))
+                {
+                    _dataP.ReceivePacket();
+                    _exponent = _dataP.data;
+                }
+
+                _RSA = new RSA(_modulus, _exponent);
+
+                // generate / send random pass 
+                string _aesPass = "TESTLOLWASISTDENNHIERLOS?";//MadNetHelper.GetUnicodeRandom(20); <- UNICODE DO NOT WORK WITH RSA
+                using (DataPacket _sData = new DataPacket(_stream, null))
+                {
+                    _sData.data = _RSA.EncryptPublic(Encoding.UTF8.GetBytes(_aesPass));
+                    _sData.SendPacket();
+                }
+
+                // set aes
+                AES _aes = new AES(_aesPass);
+
+                // send login-packet
+                using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
+                {
+                    _loginP.user = Encoding.Unicode.GetBytes(_username);
+                    _loginP.passMD5 = Encoding.Unicode.GetBytes(_passwordMD5);
+
+                    _loginP.SendPacket();
+                }
+
+                string _serverAnswer;
+                using (DataPacket _dataP2 = new DataPacket(_stream, _aes))
+                {
+                    _dataP2.ReceivePacket();
+                    _serverAnswer = Encoding.Unicode.GetString(_dataP2.data);
+                }
+
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-REPLY: <color><white>" + _serverAnswer);
+
+                if (_serverAnswer == "LOGIN_SUCCESS")
+                {
+                    CLIOutput.WriteToConsole("<color><green>Server accepted login-data.");
+                    StartRemoteConsole(_stream, _aes);
+                }
+                else
+                {
+                    CLIOutput.WriteToConsole("<color><red>Server refused login-data.");
                 }
             }
-            else
+            catch (Exception e)
             {
-                throw new Exception("Not connected to server!");
+                throw new Exception("Lost connection to server.", e);
             }
         }
 
@@ -151,6 +152,10 @@ namespace CLIClient
             CLIPacket _cliP = new CLIPacket(stream, aes);
             string _cursor = "MAD-CLIENT> ";
 
+            _dataP.ReceivePacket();
+            CLIOutput.WriteToConsole(Encoding.Unicode.GetString(_dataP.data));
+            _dataP.data = null;
+
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
@@ -159,17 +164,20 @@ namespace CLIClient
 
                 _cliInput = CLIInput.ReadInput(_cursor.Length);
 
-                _cliP.consoleWidth = Console.BufferWidth;
-                _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);
-                _cliP.SendPacket();
+                if (_cliInput != "")
+                {
+                    _cliP.consoleWidth = Console.BufferWidth;
+                    _cliP.cliInput = Encoding.Unicode.GetBytes(_cliInput);
+                    _cliP.SendPacket();
 
-                _dataP.ReceivePacket();
-                _serverResponse = Encoding.Unicode.GetString(_dataP.data);
+                    _dataP.ReceivePacket();
+                    _serverResponse = Encoding.Unicode.GetString(_dataP.data);
 
-                if (_serverResponse == "CLI_EXIT")
-                    break;
+                    if (_serverResponse == "EXIT_CLI")
+                        break;
 
-                CLIOutput.WriteToConsole(_serverResponse);
+                    CLIOutput.WriteToConsole(_serverResponse);
+                }
             }
 
             _dataP.Dispose();

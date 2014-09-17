@@ -129,6 +129,9 @@ namespace MAD.CLIServerCore
                 _dataP = new DataPacket(_stream, _aes);
                 _cliP = new CLIPacket(_stream, _aes);
 
+                _dataP.data = Encoding.Unicode.GetBytes(GetBanner());
+                _dataP.SendPacket();
+
                 while (true)
                 {
                     _cliP.ReceivePacket();
@@ -150,7 +153,7 @@ namespace MAD.CLIServerCore
             catch (Exception e)
             {
                 if (MadConf.conf.DEBUG_MODE)
-                    Console.WriteLine("CLI-Session: EX: ");
+                    Console.WriteLine("CLI-Session: Lost connection.");
                 if (MadConf.conf.LOG_MODE)
                     Logger.Log("CLI-Session: EX: " + e.Message, Logger.MessageType.WARNING);
             }
