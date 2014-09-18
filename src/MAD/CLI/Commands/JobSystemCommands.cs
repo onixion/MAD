@@ -152,13 +152,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += "\n";
             output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAXNODES + "\n";
             output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
             output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
-            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth); 
+            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+
+            string[] _tableRow = _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
@@ -211,7 +212,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StartNode((int)pars.GetPar("id").argValues[0]);
+            _js.StopNode((int)pars.GetPar("id").argValues[0]);
             return "<color><green>Node is inactive.";
         }
     }
@@ -362,18 +363,27 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
+
+            oPar.Add(new ParOption("more", "", "Show more infos.", true, false, null));
             description = "This command prints a table with all initialized jobs.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
             output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXNODES * JobNode.MAX_JOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+
+            string[] _tableRow = null;
+
+            if (!OParUsed("more"))
+                _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
+            else
+                _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Last-Started", "Last-Stopped", "Last-Delta", "Output-State" };
+
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
@@ -393,7 +403,16 @@ namespace MAD.CLICore
                     _tableRow[4] = _temp2.state.ToString();
                     _tableRow[5] = _temp2.time.type.ToString();
                     _tableRow[6] = _temp2.time.GetValues();
-                    _tableRow[7] = _temp2.outp.outState.ToString();
+
+                    if (!OParUsed("more"))
+                        _tableRow[7] = _temp2.outp.outState.ToString();
+                    else
+                    {
+                        _tableRow[7] = _temp2.tStart.ToString();
+                        _tableRow[8] = _temp2.tStop.ToString();
+                        _tableRow[7] = _temp2.tSpan.ToString();
+                        _tableRow[10] = _temp2.outp.outState.ToString();
+                    }
 
                     _temp2.jobLock.ExitReadLock();
 
@@ -580,7 +599,6 @@ namespace MAD.CLICore
                     }
                     _node.nodeLock.ExitReadLock();
                 }
-                _js.nodesLock.ExitReadLock();
                 _js.UnlockNodesRead();
                 return output;
             }

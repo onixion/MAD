@@ -204,13 +204,13 @@ namespace MAD.CLICore
                 if (_tempOptions.argEmpty)
                 {
                     // Check if the arg is not null.
-                    if (_temp.argValues != null)
+                    if (_temp.argValues.Length != 0)
                         return CLIError.Error(CLIError.ErrorType.argError, "The parameter '" + _temp.par + "' does not need any args!", true);
                 }
                 else
                 {
                     // Check if arg is null
-                    if (_temp.argValues == null)
+                    if (_temp.argValues.Length == 0)
                         return CLIError.Error(CLIError.ErrorType.argError, "The par '" + _temp.par + "' needs one or more args!", true);
 
                     // Check if multiple args are supported for this par

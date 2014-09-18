@@ -82,7 +82,7 @@ namespace MadNet
 
         public bool CheckSignature(byte[] Data, byte[] Signature) { return _RSA.VerifyData(Data, _SHA1, Signature); }
 
-        public  byte[] CombineByteArrays(byte[] Array1, byte[] Array2)
+        public byte[] CombineByteArrays(byte[] Array1, byte[] Array2)
         {
             byte[] resultArray = new byte[Array1.Length + Array2.Length];
             Array.Copy(Array1, resultArray, Array1.Length);

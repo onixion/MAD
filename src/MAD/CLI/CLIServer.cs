@@ -35,6 +35,23 @@ namespace MAD.CLIServerCore
 
         #region constructor
 
+        public CLIServer(int port, string confPath, JobSystem js)
+        {
+            serverPort = port;
+            _js = js;
+
+            try
+            {
+                _RSA.LoadKeys(confPath);
+                Console.WriteLine("RSA-Config loaded successfully.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Could not load rsa keys.");
+                Console.WriteLine("RSA-keys will be generated on the first incoming connection .. This may take some time so stay calm ...");
+            }
+        }
+
         public CLIServer(int port, JobSystem js)
         {
             serverPort = port;
@@ -92,7 +109,6 @@ namespace MAD.CLIServerCore
                 {
                     _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(HEADER);
                     _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(VERSION);
-                    _serverInfoP.fingerprint = Encoding.ASCII.GetBytes(_RSA.GetFingerprint());
                     _serverInfoP.SendPacket();
                 }
 
@@ -183,6 +199,11 @@ namespace MAD.CLIServerCore
         private string GetTimeStamp()
         {
             return DateTime.Now.ToString("[dd.mm.yyyy|hh:MM.ss]");
+        }
+
+        public void SaveRSAKeys(string filePath)
+        {
+            _RSA.SaveKeys(filePath);
         }
 
         #endregion

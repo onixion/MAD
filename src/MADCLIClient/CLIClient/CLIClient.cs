@@ -65,21 +65,10 @@ namespace CLIClient
 
                     CLIOutput.WriteToConsole("<color><yellow>" + ("".PadLeft(Console.BufferWidth, '_')));
                     CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER:      <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverHeader));
-                    CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:     <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverVersion));
-                    CLIOutput.WriteToConsole("<color><yellow>SERVER-FINGERPRING: <color><white>" + Encoding.ASCII.GetString(_serverInfoP.fingerprint));
-                    CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_'));
+                    CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:     <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverVersion) + "\n");
                 }
 
-                ConsoleKeyInfo _key;
-                while (true)
-                {
-                    CLIOutput.WriteToConsole("<color><red>Are you sure you want to connect to this server? Y(es) / N(o)");
-                    _key = Console.ReadKey(true);
-                    if (_key.Key == ConsoleKey.Y)
-                        break;
-                    else if (_key.Key == ConsoleKey.N)
-                        throw new Exception();
-                }
+                
 
                 // receive modulus
                 byte[] _modulus = null;
@@ -95,6 +84,24 @@ namespace CLIClient
                 {
                     _dataP.ReceivePacket();
                     _exponent = _dataP.data;
+                }
+
+                // Generate fingerprint
+
+                string _fingerprint = BitConverter.ToString(MadNetHelper.ToSHA1(MadNetHelper.CombineByteArrays(_modulus, _exponent)));
+
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-FINGERPRING: <color><white>" + _fingerprint.Replace('-',':'));
+                CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_'));
+
+                ConsoleKeyInfo _key;
+                while (true)
+                {
+                    CLIOutput.WriteToConsole("<color><red>Are you sure you want to connect to this server? Y(es) / N(o)");
+                    _key = Console.ReadKey(true);
+                    if (_key.Key == ConsoleKey.Y)
+                        break;
+                    else if (_key.Key == ConsoleKey.N)
+                        throw new Exception();
                 }
 
                 _RSA = new RSA(_modulus, _exponent);

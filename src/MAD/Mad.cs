@@ -34,7 +34,7 @@ namespace MAD
                 {
                     Console.WriteLine("Config could not be loaded: " + e.Message);
 
-                    MadConf.SetToDefault();
+                    MadConf.SetToDefault(DATADIR);
                     Console.WriteLine("Loaded default config.");
                 }
             }
@@ -42,7 +42,7 @@ namespace MAD
             {
                 Console.WriteLine("No config file found.");
                 
-                MadConf.SetToDefault();
+                MadConf.SetToDefault(DATADIR);
                 Console.WriteLine("Loaded default config.");
             }
 
@@ -78,13 +78,17 @@ namespace MAD
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
 
-                        CLIServer cliServer = new CLIServer(MadConf.conf.cliServerPort, js);
+                        CLIServer cliServer = new CLIServer(MadConf.conf.cliServerPort, Path.Combine(DATADIR, "rsa.conf"), js);
                         cliServer.Start();
 
                         Console.WriteLine("Server running on port "  + MadConf.conf.cliServerPort  + " ... press any key to stop server.");
                         Console.ReadKey();
 
                         cliServer.Stop();
+                        Console.WriteLine("Saving RSA-Config ...");
+                        cliServer.SaveRSAKeys(Path.Combine(DATADIR, "rsa.conf"));
+                        Console.WriteLine("Saved.");
+
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);

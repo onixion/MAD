@@ -72,19 +72,19 @@ namespace MAD
             }
         }
 
-        public static void SetToDefault()
+        public static void SetToDefault(string dirPath)
         {
             conf.DEBUG_MODE = true;
             conf.LOG_MODE = true;
             
-            conf.cliServerPort = 2222;
-            conf.serverHeader = "MAD-CLIServer YUHU!";
-
             conf.smtpServer = "smtp-mail.outlook.com";
             conf.smtpPort = 587;
             conf.username = "mad.group@outlook.com";
             conf.password = "Mad-21436587";
             conf.defaultMailAddr = "alin.porcic@gmail.com"; // mail
+
+            conf.cliServerPort = 2222;
+            conf.serverHeader = "MAD-CLIServer YUHU!";
         }
 
         #endregion
@@ -98,16 +98,15 @@ namespace MAD
         public bool DEBUG_MODE;
         public bool LOG_MODE;
 
-        // cliserver vars
-        public string serverHeader;
-        public int cliServerPort;
-        public string rsaKeys;
-
         // notification vars
         public string smtpServer;
         public int smtpPort;
         public string username;
         public string password;
         public string defaultMailAddr;
+
+        // cliserver vars
+        public string serverHeader;
+        public int cliServerPort;
     }
 }

@@ -38,6 +38,14 @@ namespace MadNet
 
         #endregion
 
+        public static byte[] CombineByteArrays(byte[] Array1, byte[] Array2)
+        {
+            byte[] resultArray = new byte[Array1.Length + Array2.Length];
+            Array.Copy(Array1, resultArray, Array1.Length);
+            Array.Copy(Array2, 0, resultArray, Array1.Length, Array2.Length);
+            return resultArray;
+        }
+
         public static string GetUnicodeRandom(int length)
         {
             _rand = new Random((int)DateTime.Now.Ticks);

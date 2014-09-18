@@ -187,7 +187,7 @@ namespace MAD.JobSystemCore
                 if (_state == State.StopRequest)
                     break;
 
-                //Thread.Sleep(_cycleTime);
+                Thread.Sleep(_cycleTime);
             }
         }
 
