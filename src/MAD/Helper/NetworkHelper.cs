@@ -48,6 +48,14 @@ namespace MAD.Helper
         #endregion
 
         #region Methods
+
+        public static uint GetHosts(uint subnet)
+        {
+            uint hosts = 2 ^ (32 - subnet);
+
+            return hosts; 
+        }
+
         public Byte[] GetHosts(IPAddress subnet)                                    //returns the maximal number of hosts for a given subnetmask INCLUSIVE Netaddress and Broadcastaddress!!!
         {
             byte[] subnetBytes = subnet.GetAddressBytes();

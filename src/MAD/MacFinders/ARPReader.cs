@@ -1,22 +1,30 @@
 ﻿using System;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 
 using SharpPcap;
 using PacketDotNet;
 
 using MAD.Logging;
+using MAD.Helper;
 
 namespace MAD.MacFinders
 {
     class ARPReader
     {
         private bool _running = false;
-        private uint _networkInterface;
+        private CaptureDeviceList _list; 
+
+        public uint networkInterface;
+        public uint subnetMask;
+        public string netAddress; 
 
         public string Start()
         {
             if (!_running)
             {
+                _list = CaptureDeviceList.Instance;
                 Thread send = new Thread(sendRequests);
             }
         }
@@ -25,11 +33,11 @@ namespace MAD.MacFinders
         {
             Logger.Log("Listed Interfaces for ArpReader", Logger.MessageType.INFORM);
 
-            CaptureDeviceList list = CaptureDeviceList.Instance;
+            _list = CaptureDeviceList.Instance;
 
             string _buffer = "";
 
-            if (list.Count < 1)
+            if (_list.Count < 1)
             {
                 _buffer += "No Devices";
                 return _buffer;
@@ -39,23 +47,21 @@ namespace MAD.MacFinders
             _buffer += "\n";
             _buffer += "-----------------------------------------------------";
 
-            foreach (ICaptureDevice dev in list)
+            foreach (ICaptureDevice dev in _list)
                 _buffer += dev.ToString() + "\n";
 
             return _buffer;
-
-        }
-
-        public string SetInterface(uint netInterface)
-        {
-            _networkInterface = netInterface;
         }
 
         private void sendRequests()
         {
+            uint _hosts = NetworkHelper.GetHosts(subnetMask);
+            ICaptureDevice _dev = _list[(int) networkInterface];
+            PhysicalAddress _sourceHW = _dev.MacAddress;
 
+            EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
+
+            
         }
-
-
     }
 }
