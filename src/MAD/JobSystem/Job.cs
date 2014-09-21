@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Net;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 
 using Newtonsoft.Json;
@@ -35,16 +35,15 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public TimeSpan tSpan { get; set; }
 
-        // job components (this components are required for execution)
-        public string name = null;
+        // general
+        public string name { get; set; }
         public JobType type { get; set; }
         public JobTime time { get; set; }
 
-        // (this on is optional, if it is not set, the JobScedule will
-        // try use the global notification-settings; if there is no
-        // global notification-settings set; he will not be able to send
-        // any notification)
-        public JobNotification noti { get; set; }
+        // notification
+        public bool notiFlag = true;
+        public JobNotificationSettings settings { get; set; }
+        public List<JobRule> rules = new List<JobRule>();
 
         #endregion
 
@@ -56,7 +55,6 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.outp = new JobOutput();
             this.time = new JobTime();
-            this.noti = new JobNotification();
         }
 
         protected Job(string name, JobType type)
@@ -66,17 +64,16 @@ namespace MAD.JobSystemCore
             this.type = type;
             this.outp = new JobOutput();
             this.time = new JobTime();
-            this.noti = new JobNotification();
         }
 
-        protected Job(string name, JobType type, JobTime time, JobOutput outp, JobNotification noti)
+        protected Job(string name, JobType type, JobTime time, JobOutput outp)
         {
             InitJob();
             this.name = name;
             this.type = type;
             this.outp = outp;
             this.time = time;
-            this.noti = noti;
+            this.settings = new JobNotificationSettings();
         }
 
         #endregion
@@ -96,6 +93,10 @@ namespace MAD.JobSystemCore
 
         #region for CLI only
 
+        /* Is this really a good idea?
+         * Maybe create a command, which determines JobTyes ...
+         * Because this method is more complicated and takes more affort ...
+         */
         public string Status()
         {
             string _temp = "\n";

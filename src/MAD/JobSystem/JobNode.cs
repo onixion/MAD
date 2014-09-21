@@ -4,8 +4,6 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 
-using MAD.Notification;
-
 using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
@@ -28,8 +26,6 @@ namespace MAD.JobSystemCore
         public int id { get { return _id; } }
         [JsonIgnore]
         public State state = State.Inactive;
-        [JsonIgnore]
-        public const int MAX_JOBS = 100;
         
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; } // sns

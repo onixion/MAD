@@ -7,6 +7,7 @@ using System.Net.Mail;
 
 using MAD;
 using MAD.Notification;
+using MAD.Logging;
 
 using Amib.Threading;
 
@@ -202,7 +203,6 @@ namespace MAD.JobSystemCore
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
-            // lock nodes and node read-only
             _nodesLock.EnterReadLock();
             _node.nodeLock.EnterReadLock();
 
@@ -222,9 +222,9 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
-            if (_job.noti.useNotification)
+            if (_job.notiFlag)
             {
-                List<JobRule> _bRules = _job.noti.GetBrokenRules(_job.outp);
+                List<JobRule> _bRules = GetBrokenRules(_job);
 
                 // check if notification is neseccary.
                 if (_job.outp.outState == JobOutput.OutState.Exception ||
@@ -234,29 +234,40 @@ namespace MAD.JobSystemCore
                     string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
                         + "') finished with a not expected result!");
 
-                    string _mailContent = GenJobInfo(_job);
+                    string _mailContent = "";
+                    _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
+                    _mailContent += "JobNode-IP:  '" + _node.ipAddress.ToString() + "'\n";
+                    _mailContent += "JobNode-MAC: '" + _node.macAddress.ToString() + "'\n\n";
+                    _mailContent += GenJobInfo(_job);
                     _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                    if (_job.noti.settings != null)
+                    if (_job.settings != null)
                     {
                         // This is not the perfect solution. Need to create a class, which
                         // can stack notifications, so we do not lose precious time here ...
-                        NotificationSystem.SendMail(_job.noti.settings.mailAddr, _mailSubject, _mailContent, 2,
-                            _job.noti.settings.login.smtpAddr, _job.noti.settings.login.mail,
-                            _job.noti.settings.login.password, _job.noti.settings.login.port);
+                        NotificationSystem.SendMail(_job.settings.mailAddr, _mailSubject, _mailContent, 2,
+                            _job.settings.login.smtpAddr, _job.settings.login.mail,
+                            _job.settings.login.password, _job.settings.login.port);
                     }
                     else
                     {
-                        // use global notifiaction settings
-                        NotificationSystem.SendMail(new MailAddress[1] { new MailAddress(MadConf.conf.defaultMailAddr) },
-                            _mailSubject, _mailContent, 2);
+                        if (MadConf.conf.defaultMailAddr != null || MadConf.conf.defaultMailAddr != "")
+                        {
+                            // Same like above.
+                            // Here we use global-settings instead of job-settings.
+                            NotificationSystem.SendMail(new MailAddress[1] { new MailAddress(MadConf.conf.defaultMailAddr) },
+                                _mailSubject, _mailContent, 2);
+                        }
+                        else
+                        { 
+                            // No notification is possible, because the Job has no settings and the global settings are empty.
+                            Logger.Log("No notification possible! Job has no settings and no global settings set!", Logger.MessageType.ERROR);
+                        }
                     }
                 }
             }
 
             _job.state = Job.JobState.Waiting;
-
-            // Job execution finished.
 
             _job.jobLock.ExitWriteLock();
             _node.nodeLock.ExitReadLock();
@@ -281,10 +292,7 @@ namespace MAD.JobSystemCore
                 if (_data == null)
                     _data = (string)"NULL";
 
-                _buffer += _count + ".) Rule\n";
-                _buffer += "-> Rule Equation:    " + _rule.outDescName + " <" + _rule.oper.ToString() + "> '" + _rule.compareValue.ToString() + "' = TRUE\n";
-                _buffer += "-> Current Equation: '" + _data.ToString() + "' <" + _rule.oper.ToString() + "> '" + _rule.compareValue.ToString() + "' = FALSE\n\n";
-
+                _buffer += "#" + _count + ".) Broken-Rule\n";
                 _buffer += "-> OutDescriptor: " + _rule.outDescName + "\n";
                 _buffer += "-> Operation:     " + _rule.oper.ToString() + "\n";
                 _buffer += "-> CompareValue:  '" + _rule.compareValue.ToString() + "'\n";
@@ -301,10 +309,25 @@ namespace MAD.JobSystemCore
             _buffer += "Job-Name:     '" + job.name + "'\n";
             _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";
             _buffer += "Job-OutState: '" + job.outp.outState.ToString() + "'.\n";
-            _buffer += "Job-TStart:   '" + job.tStart + "'\n";
-            _buffer += "Job-TStop:    '" + job.tStop + "'\n";
-            _buffer += "Job-TSpan:    '" + job.tSpan + "'\n\n";
+            _buffer += "Job-TStart:   '" + job.tStart.ToString("dd.MM.yyyy HH:mm:ss") + "'\n";
+            _buffer += "Job-TStop:    '" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "'\n";
+            _buffer += "Job-TSpan:    '" + job.tSpan.Seconds + "s" + job.tSpan.Milliseconds + "ms'\n\n";
             return _buffer;
+        }
+
+        #endregion
+
+        #region get broken rules
+
+        private List<JobRule> GetBrokenRules(Job job)
+        {
+            List<JobRule> _bRules = new List<JobRule>();
+
+            foreach (JobRule _rule in job.rules)
+                if (!_rule.CheckRuleValidity(job.outp))
+                    _bRules.Add(_rule);
+
+            return _bRules;
         }
 
         #endregion
@@ -314,8 +337,6 @@ namespace MAD.JobSystemCore
 
     public class JobHolder
     {
-        public ReaderWriterLock _te;
-
         public JobNode node;
         public Job job;
         public System.Net.IPAddress targetAddress;

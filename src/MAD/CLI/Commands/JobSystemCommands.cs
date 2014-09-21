@@ -27,10 +27,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>\n JOBSYSTEM version " + JobSystem.VERSION + "\n\n";
-            output += " Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES * JobNode.MAX_JOBS + ")\n";
-            output += "\n\n Scedule-State: ";
+            output += "\n";
+            output += "<color><yellow> JOBSYSTEM VERSION <color><white>" + JobSystem.VERSION + "\n\n";
+            output += "<color><yellow> Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
+            output += "<color><yellow> Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXJOBS + ")\n\n";
+            output += "<color><yellow> Nodes active: <color><white>" + _js.NodesActive() + "\n";
+            output += "<color><yellow> Jobs  active: <color><white>" + _js.JobsActive() + "\n\n";
+
+            output += "<color><yellow> Scedule-State: ";
             if (_js.sceduleState == JobScedule.State.Active)
                 output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
             else
@@ -78,28 +82,6 @@ namespace MAD.CLICore
     #endregion
 
     #region commands for SCEUDLE
-
-    public class JobSceduleCommand : Command
-    { 
-        JobSystem _js;
-
-        public JobSceduleCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            description = "This command shows the current state of the scedule.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            output = "<color><yellow>Scedule-state: ";
-            if (_js.sceduleState == JobScedule.State.Active)
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            else
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            return output;
-        }
-    }
 
     public class JobSceduleStartCommand : Command
     {
@@ -371,7 +353,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             output += "\n";
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXNODES * JobNode.MAX_JOBS + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
@@ -408,14 +390,13 @@ namespace MAD.CLICore
                         _tableRow[7] = _temp2.outp.outState.ToString();
                     else
                     {
-                        _tableRow[7] = _temp2.tStart.ToString();
-                        _tableRow[8] = _temp2.tStop.ToString();
-                        _tableRow[7] = _temp2.tSpan.ToString();
+                        _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
+                        _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
+                        _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s " + _temp2.tSpan.Milliseconds + "ms";
                         _tableRow[10] = _temp2.outp.outState.ToString();
                     }
 
                     _temp2.jobLock.ExitReadLock();
-
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
                 _temp.nodeLock.ExitReadLock();
@@ -506,7 +487,7 @@ namespace MAD.CLICore
                 }
 
                 _js.JobLockWrite(_job);
-                _job.noti.settings = _sett;
+                _job.settings = _sett;
                 _js.JobUnlockWrite(_job);
                 _js.JobUnlockedGlobal(_node);
 
@@ -543,9 +524,10 @@ namespace MAD.CLICore
                     _js.JobUnlockedGlobal(_node);
                     throw e;
                 }
+
                 _js.JobUnlockRead(_job);
                 _js.JobLockWrite(_job);
-                _job.noti.rules = _rules;
+                _job.rules = _rules;
                 _js.JobUnlockWrite(_job);
                 _js.JobUnlockedGlobal(_node);
 
@@ -623,15 +605,15 @@ namespace MAD.CLICore
             }
 
             output += "\n\n<color><yellow>Notification-Settings: <color><white>";
-            if (job.noti.settings != null)
+            if (job.settings != null)
             {
-                output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.noti.settings.login.smtpAddr;
-                output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.noti.settings.login.port;
-                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.noti.settings.login.mail;
-                output += "\n  <color><yellow>Password: <color><white>" + job.noti.settings.login.password;
+                output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.settings.login.smtpAddr;
+                output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.settings.login.port;
+                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.settings.login.mail;
+                output += "\n  <color><yellow>Password: <color><white>" + job.settings.login.password;
                 output += "\n  <color><yellow>Mails to send to: <color><white>";
 
-                foreach (MailAddress _addr in job.noti.settings.mailAddr)
+                foreach (MailAddress _addr in job.settings.mailAddr)
                     output += _addr.ToString() + " ";
             }
             else
@@ -639,12 +621,12 @@ namespace MAD.CLICore
 
             output += "\n\n<color><yellow>Notification-Rules:";
 
-            if (job.noti.rules == null)
+            if (job.rules == null)
                 output += " <color><white>NULL";
             else
             {
-                if (job.noti.rules.Count != 0)
-                    foreach (JobRule _rule in job.noti.rules)
+                if (job.rules.Count != 0)
+                    foreach (JobRule _rule in job.rules)
                     {
                         output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
                         output += "\n  <color><yellow>Operation: <color><white>" + _rule.oper.ToString();

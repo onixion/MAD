@@ -40,8 +40,11 @@ namespace MAD.JobSystemCore
 
                 NameValueCollection _headers = _response.Headers;
 
-                //for (int i = 0; i < _headers.Count; i++)
-                //    Console.WriteLine(_headers[i]);
+                for (int i = 0; i < _headers.Count; i++)
+                {
+                    Console.WriteLine(_headers.GetKey(i));
+                    Console.WriteLine(_headers[i]);
+                }
 
                 outp.outState = JobOutput.OutState.Success;
 

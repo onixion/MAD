@@ -15,13 +15,13 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPort()
-            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput(), new JobNotification())
+            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput())
         {
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, JobNotification noti, int port)
-            : base(jobName, jobType, jobTime, outp, noti)
+        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, int port)
+            : base(jobName, jobType, jobTime, outp)
         {
             this.port = port;
         }
@@ -33,7 +33,6 @@ namespace MAD.JobSystemCore
         public override void Execute(IPAddress targetAddress)
         {
             Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));
