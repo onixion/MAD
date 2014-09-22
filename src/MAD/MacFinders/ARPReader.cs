@@ -18,7 +18,7 @@ namespace MAD.MacFinders
 
         public uint networkInterface;
         public uint subnetMask;
-        public string netAddress; 
+        public IPAddress netAddress; 
 
         public string Start()
         {
@@ -56,11 +56,28 @@ namespace MAD.MacFinders
         private void sendRequests()
         {
             uint _hosts = NetworkHelper.GetHosts(subnetMask);
+
+            byte[] _netPartBytes = netAddress.GetAddressBytes();
+            if (BitConverter.IsLittleEndian)
+                Array.Reverse(_netPartBytes);
+
+            uint _netPartInt = BitConverter.ToUInt32(_netPartBytes, 0);
+
             ICaptureDevice _dev = _list[(int) networkInterface];
             PhysicalAddress _sourceHW = _dev.MacAddress;
+            IPAddress _sourceIP = _dev.IP
 
             EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
 
+            for (int i = 1; i < _hosts - 1; i++)
+            {
+                byte[] _targetBytes = BitConverter.GetBytes(_netPartInt + i);
+                Array.Reverse(_targetBytes);
+
+                IPAddress _target = new IPAddress(_targetBytes);
+
+                ARPPacket _arppac = new ARPPacket(ARPOperation.Request, System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"), _target, _sourceHW, IPAddress.Parse("192.168.1.114"));
+            }
             
         }
     }
