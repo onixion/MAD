@@ -506,6 +506,7 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("notiEnable", "NOT. ENABLE-FLAG", "Enables the job to use notification.", true, false, null));
         }
 
         public override string Execute(int consoleWidth)
@@ -546,6 +547,11 @@ namespace MAD.CLICore
                     throw e;
                 }
             }
+
+            if (OParUsed("notiEnable"))
+                _job.notiFlag = true;
+            else
+                _job.notiFlag = false;
 
             _js.JobUnlockWrite(_job);
             _js.JobUnlockedGlobal(_node);
