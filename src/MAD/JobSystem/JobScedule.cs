@@ -19,7 +19,6 @@ namespace MAD.JobSystemCore
 
         private Thread _cycleThread;
         private int _cycleTime = 100;
-        private object _cycleThreadLock = new object();
 
         private SmartThreadPool _workerPool;
         private int _maxThreads = 10;
@@ -51,31 +50,25 @@ namespace MAD.JobSystemCore
 
         public void Start()
         {
-            lock (_cycleThreadLock)
+            if (_state == State.Inactive)
             {
-                if (_state == State.Inactive)
-                {
-                    _state = State.Active;
-                    _cycleThread = new Thread(CycleJobTracker);
-                    _cycleThread.Start();
-                }
+                _state = State.Active;
+                _cycleThread = new Thread(CycleJobTracker);
+                _cycleThread.Start();
             }
         }
 
         public void Stop()
         {
-            lock (_cycleThreadLock)
+            if (_state == State.Active)
             {
-                if (_state == State.Active)
-                {
-                    _state = State.StopRequest;
-                    
-                    _cycleThread.Join();
-                    _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
-                    _workerPool.Cancel();
+                _state = State.StopRequest;
 
-                    _state = State.Inactive;
-                }
+                _cycleThread.Join();
+                _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
+                _workerPool.Cancel();
+
+                _state = State.Inactive;
             }
         }
 
@@ -282,6 +275,17 @@ namespace MAD.JobSystemCore
             return "[MAD][ERROR] - Job (JOB-ID: '" + job.id + "'): " + message;
         }
 
+        private List<JobRule> GetBrokenRules(Job job)
+        {
+            List<JobRule> _bRules = new List<JobRule>();
+
+            foreach (JobRule _rule in job.rules)
+                if (!_rule.CheckRuleValidity(job.outp))
+                    _bRules.Add(_rule);
+
+            return _bRules;
+        }
+
         private string GenBrokenRulesText(JobOutput outp, List<JobRule> bRules)
         {
             string _buffer = "";
@@ -301,7 +305,7 @@ namespace MAD.JobSystemCore
             }
             return _buffer;
         }
-            
+
         private string GenJobInfo(Job job)
         {
             string _buffer = "";
@@ -313,21 +317,6 @@ namespace MAD.JobSystemCore
             _buffer += "Job-TStop:    '" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "'\n";
             _buffer += "Job-TSpan:    '" + job.tSpan.Seconds + "s" + job.tSpan.Milliseconds + "ms'\n\n";
             return _buffer;
-        }
-
-        #endregion
-
-        #region get broken rules
-
-        private List<JobRule> GetBrokenRules(Job job)
-        {
-            List<JobRule> _bRules = new List<JobRule>();
-
-            foreach (JobRule _rule in job.rules)
-                if (!_rule.CheckRuleValidity(job.outp))
-                    _bRules.Add(_rule);
-
-            return _bRules;
         }
 
         #endregion

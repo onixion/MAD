@@ -45,7 +45,7 @@ namespace MAD.CLIServerCore
                 _RSA.LoadKeys(confPath);
                 Console.WriteLine("RSA-Config loaded successfully.");
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine("Could not load rsa keys.");
                 Console.WriteLine("RSA-keys will be generated on the first incoming connection .. This may take some time so stay calm ...");
@@ -96,9 +96,9 @@ namespace MAD.CLIServerCore
                 NetworkStream _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                if (DEBUG_MODE)
+                if (MadConf.conf.DEBUG_MODE)
                     Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
-                if (LOG_MODE)
+                if (MadConf.conf.LOG_MODE)
                     Logger.Log((GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected."), Logger.MessageType.INFORM);
 
                 if (_userOnline)
@@ -166,15 +166,15 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (DEBUG_MODE)
+                if (MadConf.conf.DEBUG_MODE)
                     Console.WriteLine(GetTimeStamp() + " EX: " + e.Message);
-                if (LOG_MODE)
+                if (MadConf.conf.LOG_MODE)
                     Logger.Log(" EX: " + e.Message, Logger.MessageType.INFORM);
             }
 
-            if (DEBUG_MODE)
+            if (MadConf.conf.DEBUG_MODE)
                 Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
-            if (LOG_MODE)
+            if (MadConf.conf.LOG_MODE)
                 Logger.Log(" Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
 
             return null;

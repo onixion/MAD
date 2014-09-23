@@ -26,7 +26,9 @@ namespace MAD.JobSystemCore
         public int id { get { return _id; } }
         [JsonIgnore]
         public State state = State.Inactive;
-        
+        [JsonIgnore]
+        public const int MAXJOBS = 100;
+
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; } // sns
         public IPAddress ipAddress { get; set; } // sns

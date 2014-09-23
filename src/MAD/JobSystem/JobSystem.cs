@@ -16,10 +16,9 @@ namespace MAD.JobSystemCore
 
         public const string VERSION = "v2.9.0.0";
         public const int MAXNODES = 100;
-        public const int MAXJOBS = 1000;
 
         private JobScedule _scedule { get; set; }
-        public JobScedule.State sceduleState { get { return _scedule.state; } }
+        private object _sceduleLock = new object();
 
         private ReaderWriterLockSlim _nodesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private List<JobNode> _nodes = new List<JobNode>();
@@ -47,9 +46,9 @@ namespace MAD.JobSystemCore
         /// <param name="filepath">Path to file (Execption will be thrown if directory does not exists or if the file already exists!).</param>
         public void SaveTable(string filepath)
         {
-            _nodesLock.EnterReadLock();
+            _nodesLock.EnterWriteLock();
             JSSerializer.SerializeTable(filepath, _nodes);
-            _nodesLock.ExitReadLock();
+            _nodesLock.ExitWriteLock();
         }
 
         /// <summary>
@@ -59,9 +58,10 @@ namespace MAD.JobSystemCore
         /// <returns>Path to file.</returns>
         public int LoadTable(string filepath)
         {
-            List<JobNode> _nodes = JSSerializer.DeserializeTable(filepath);
+            List<JobNode> _loadNodes = JSSerializer.DeserializeTable(filepath);
             _nodesLock.EnterWriteLock();
-            _nodes.AddRange(_nodes);
+            if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
+                _nodes.AddRange(_loadNodes);
             _nodesLock.ExitWriteLock();
             return _nodes.Count;
         }
@@ -80,20 +80,25 @@ namespace MAD.JobSystemCore
 
         public void StartScedule()
         {
-            _scedule.Start();
+            lock(_sceduleLock)
+                _scedule.Start();
         }
 
         public void StopScedule()
         {
-            _scedule.Stop();
+            lock(_sceduleLock)
+                _scedule.Stop();
         }
 
         public bool IsSceduleActive()
         {
-            if (_scedule.state == JobScedule.State.Active)
-                return true;
-            else
-                return false;
+            lock (_sceduleLock)
+            { 
+                if(_scedule.state == JobScedule.State.Active)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         #endregion
@@ -433,7 +438,7 @@ namespace MAD.JobSystemCore
             {
                 _node.nodeLock.EnterWriteLock();
 
-                if (MAXJOBS > _node.jobs.Count)
+                if (JobNode.MAXJOBS > _node.jobs.Count)
                 {
                     _node.jobs.Add(job);
 

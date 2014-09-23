@@ -30,15 +30,16 @@ namespace MAD.CLICore
             output += "\n";
             output += "<color><yellow> JOBSYSTEM VERSION <color><white>" + JobSystem.VERSION + "\n\n";
             output += "<color><yellow> Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += "<color><yellow> Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXJOBS + ")\n\n";
+            output += "<color><yellow> Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
             output += "<color><yellow> Nodes active: <color><white>" + _js.NodesActive() + "\n";
             output += "<color><yellow> Jobs  active: <color><white>" + _js.JobsActive() + "\n\n";
 
             output += "<color><yellow> Scedule-State: ";
-            if (_js.sceduleState == JobScedule.State.Active)
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
+            if (_js.IsSceduleActive())
+                output += "<color><green>Active";
             else
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
+                output += "<color><red>Inactive";
+            
             output += "\n";
 
             return output;
@@ -244,6 +245,47 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemEditNodeCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemEditNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to edit.", false, false, new Type[] { typeof(Int32) }));
+            oPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            oPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            description = "This command edits a node. ";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobNode _node = _js.GetNodeLocked((Int32)pars.GetPar("id").argValues[0]);
+            if (_node != null)
+            {
+                _js.NodeLockWrite(_node);
+
+                if (OParUsed("n"))
+                    _node.name = (string)pars.GetPar("n").argValues[0];
+
+                if (OParUsed("mac"))
+                    _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+
+                if (OParUsed("ip"))
+                    _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+
+                _js.NodeUnlockWrite(_node);
+                _js.NodeUnlock();
+                return "<color><green>Node edited.";
+            }
+            else
+            {
+                return "<color><red>Node does not exist!";
+            }
+        }
+    }
+
     public class JobSystemSyncNodeCommand : Command
     {
         private JobSystem _js;
@@ -324,15 +366,6 @@ namespace MAD.CLICore
         }
     }
 
-    // TODO
-    public class JobSystemEditNode : Command
-    {
-        public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     #endregion
 
     #region commands for jobs
@@ -353,7 +386,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             output += "\n";
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXJOBS + "\n";
+            output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
             output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
             output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
@@ -461,6 +494,182 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemEditJobCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemEditJobCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job to edit.", false, false, new Type[] { typeof(Int32) }));
+            oPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobNode _node = null;
+            Job _job = _js.GetJobLockedGlobal((Int32)pars.GetPar("id").argValues[0], out _node);
+
+            _js.JobLockWrite(_job);
+
+            if (OParUsed("n"))
+                _job.name = (string)pars.GetPar("n").argValues[0];
+
+            if (OParUsed("t"))
+            {
+                try
+                {
+                    _job.time = ParseJobTime(this);
+                }
+                catch (Exception e)
+                {
+                    _js.JobUnlockWrite(_job);
+                    _js.JobUnlockedGlobal(_node);
+                    throw e;
+                }
+            }
+
+            if (OParUsed("rule"))
+            {
+                try
+                {
+                    List<JobRule> _rules = ParseJobNotificationRules(pars, _job.outp);
+                    _job.rules = _rules;
+                }
+                catch (Exception e)
+                {
+                    _js.JobUnlockWrite(_job);
+                    _js.JobUnlockedGlobal(_node);
+                    throw e;
+                }
+            }
+
+            _js.JobUnlockWrite(_job);
+            _js.JobUnlockedGlobal(_node);
+
+            return "<color><green>Job updated.";
+        }
+
+        public static JobTime ParseJobTime(Command c)
+        {
+            JobTime _buffer = new JobTime();
+            if (c.OParUsed("t"))
+            {
+                Type _argType = c.GetArgType("t");
+
+                if (_argType == typeof(int))
+                {
+                    _buffer.type = JobTime.TimeMethod.Relative;
+                    _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar("t").argValues[0]);
+                }
+                else if (_argType == typeof(string))
+                {
+                    _buffer.type = JobTime.TimeMethod.Absolute;
+                    _buffer.jobTimes = JobTime.ParseStringArray(c.pars.GetPar("t").argValues);
+                }
+            }
+            else
+            {
+                // default settings
+                _buffer.jobDelay = new JobDelayHandler(20000);
+                _buffer.type = JobTime.TimeMethod.Relative;
+            }
+            return _buffer;
+        }
+
+        public static List<JobRule> ParseJobNotificationRules(ParInput pars, JobOutput outp)
+        {
+            List<JobRule> _rules = new List<JobRule>();
+
+            object[] _args = pars.GetPar("rule").argValues;
+            string _temp;
+
+            foreach (object _arg in _args)
+            {
+                _temp = (string)_arg;
+
+                // parse rule.
+                JobRule _rule = ParseRule(_temp);
+
+                // then check if there is a outdescriptor matching the name
+                OutputDescriptor _desc = outp.GetOutputDesc(_rule.outDescName);
+                if (_desc == null)
+                    throw new Exception("No OutputDescriptor with the name '" + _rule.outDescName + "' found!");
+
+                // then check if the type is supported
+                if (!_rule.IsOperatorSupported(_desc.dataType))
+                    throw new Exception("OutputDescriptor-Type is not supported!");
+
+                _rules.Add(_rule);
+            }
+            return _rules;
+        }
+
+        public static JobRule ParseRule(string data)
+        {
+            JobRule _rule = new JobRule();
+            bool _operatorKnown = false;
+
+            string[] _buffer;
+
+            while (true)
+            {
+                _buffer = SplitByOperator(data, "=");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Equal;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                _buffer = SplitByOperator(data, "!=");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.NotEqual;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                _buffer = SplitByOperator(data, "<");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Smaller;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                _buffer = SplitByOperator(data, ">");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Bigger;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                break;
+            }
+
+            if (_buffer.Length == 2)
+            {
+                _rule.outDescName = _buffer[0];
+                _rule.compareValue = _buffer[1];
+            }
+
+
+            if (_operatorKnown == false)
+                throw new Exception("Operation not known!");
+            return _rule;
+        }
+
+        private static string[] SplitByOperator(string toSplit, string i)
+        {
+            return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
+        }
+    }
+
     public class JobSystemSetJobMailSettingsCommand : NotificationConCommand
     {
         private JobSystem _js;
@@ -488,46 +697,6 @@ namespace MAD.CLICore
 
                 _js.JobLockWrite(_job);
                 _job.settings = _sett;
-                _js.JobUnlockWrite(_job);
-                _js.JobUnlockedGlobal(_node);
-
-                return "<color><green>Rules set.";
-            }
-            else
-                return "<color><red>Job does not exist!";
-        }
-    }
-
-    public class JobSystemSetJobRulesCommand : NotificationRuleCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemSetJobRulesCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobNode _node;
-            Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
-            if (_job != null)
-            {
-                List<JobRule> _rules = null;
-
-                _js.JobLockRead(_job);
-                try { _rules = ParseJobNotificationRules(pars, _job.outp); }
-                catch(Exception e) 
-                {
-                    _js.JobUnlockRead(_job);
-                    _js.JobUnlockedGlobal(_node);
-                    throw e;
-                }
-
-                _js.JobUnlockRead(_job);
-                _js.JobLockWrite(_job);
-                _job.rules = _rules;
                 _js.JobUnlockWrite(_job);
                 _js.JobUnlockedGlobal(_node);
 
@@ -909,7 +1078,6 @@ namespace MAD.CLICore
             
             // TIME
             oPar.Add(new ParOption(JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
-
         }
 
         public override string Execute(int consoleWidth)
@@ -942,112 +1110,6 @@ namespace MAD.CLICore
                 _buffer.type = JobTime.TimeMethod.Relative;
             }
             return _buffer;
-        }
-    }
-
-    // for JobNotification
-    public class NotificationRuleCommand : Command
-    {
-        public const string JOB_NOTI_RULE = "rule";
-
-        public NotificationRuleCommand()
-            : base()
-        {
-            rPar.Add(new ParOption(JOB_NOTI_RULE, "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
-        }
-
-        public static List<JobRule> ParseJobNotificationRules(ParInput pars, JobOutput outp)
-        {
-            List<JobRule> _rules = new List<JobRule>();
-
-            object[] _args = pars.GetPar(JOB_NOTI_RULE).argValues;
-            string _temp;
-
-            foreach (object _arg in _args)
-            {
-                _temp = (string)_arg;
-
-                // parse rule.
-                JobRule _rule = ParseRule(_temp);
-
-                // then check if there is a outdescriptor matching the name
-                OutputDescriptor _desc = outp.GetOutputDesc(_rule.outDescName);
-                if (_desc == null)
-                    throw new Exception("No OutputDescriptor with the name '" + _rule.outDescName + "' found!");
-
-                // then check if the type is supported
-                if (!_rule.IsOperatorSupported(_desc.dataType))
-                    throw new Exception("OutputDescriptor-Type is not supported!");
-
-                _rules.Add(_rule);
-            }
-            return _rules;
-        }
-
-        public static JobRule ParseRule(string data)
-        {
-            JobRule _rule = new JobRule();
-            bool _operatorKnown = false;
-
-            string[] _buffer;
-
-            while (true)
-            {
-                _buffer = SplitByOperator(data, "=");
-                if (_buffer.Length == 2)
-                {
-                    _rule.oper = JobRule.Operation.Equal;
-                    _operatorKnown = true;
-                    break;
-                }
-
-                _buffer = SplitByOperator(data, "!=");
-                if (_buffer.Length == 2)
-                {
-                    _rule.oper = JobRule.Operation.NotEqual;
-                    _operatorKnown = true;
-                    break;
-                }
-
-                _buffer = SplitByOperator(data, "<");
-                if (_buffer.Length == 2)
-                {
-                    _rule.oper = JobRule.Operation.Smaller;
-                    _operatorKnown = true;
-                    break;
-                }
-
-                _buffer = SplitByOperator(data, ">");
-                if (_buffer.Length == 2)
-                {
-                    _rule.oper = JobRule.Operation.Bigger;
-                    _operatorKnown = true;
-                    break;
-                }
-
-                break;
-            }
-
-            if (_buffer.Length == 2)
-            {
-                _rule.outDescName = _buffer[0];
-                _rule.compareValue = _buffer[1];
-            }
-
-
-            if (_operatorKnown == false)
-                throw new Exception("Operation not known!");
-            return _rule;
-        }
-
-        private static string[] SplitByOperator(string toSplit, string i)
-        {
-            return toSplit.Split(new string[] { i }, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 

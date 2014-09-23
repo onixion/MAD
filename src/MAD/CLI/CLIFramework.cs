@@ -95,7 +95,6 @@ namespace MAD.CLICore
             ParInput _temp = new ParInput();
 
             string[] _buffer = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            string _buffer2 = null;
 
             Parameter _par = null;
             List<string> _args = new List<string>();

@@ -64,6 +64,7 @@ namespace MAD.CLICore
             // NODES
             commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { js }));
+            commands.Add(new CommandOptions("node edit", typeof(JobSystemEditNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { js }));
             commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
@@ -76,8 +77,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));
 
+            commands.Add(new CommandOptions("job edit", typeof(JobSystemEditJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job setmail", typeof(JobSystemSetJobMailSettingsCommand), new object[] { js }));
-            commands.Add(new CommandOptions("job setrules", typeof(JobSystemSetJobRulesCommand), new object[] { js }));
 
             commands.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
