@@ -58,16 +58,6 @@ namespace MAD.JobSystemCore
                 outp.outState = JobOutput.OutState.Failed;
         }
 
-        protected override string JobStatus()
-        {
-            string _temp = "";
-
-            _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
-            _temp += "<color><yellow>Timeout: <color><white>" + timeout.ToString() + "\n";
-
-            return _temp;
-        }
-
         #endregion
     }
 }

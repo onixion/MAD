@@ -21,24 +21,6 @@ namespace MAD.JobSystemCore
             : base(JobType.ServiceCheck)
         { }
 
-        protected override string JobStatus()
-        {
-            string _tmp = "";
-
-            if (_working)
-            {
-                _tmp += "SNMP is working";
-                outp.outState = JobOutput.OutState.Success;
-            }
-            else
-            {
-                _tmp += "SNMP seems to be dead";
-                outp.outState = JobOutput.OutState.Failed;
-            }
-
-            return (_tmp);
-        }
-
         public override void Execute(System.Net.IPAddress targetAddress)
         {
             UdpTarget _target = new UdpTarget(targetAddress, 161, 5000, 3);

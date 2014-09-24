@@ -215,14 +215,14 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
+            _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
+
             if (_job.notiFlag)
             {
                 List<JobRule> _bRules = GetBrokenRules(_job);
 
                 // check if notification is neseccary.
-                if (_job.outp.outState == JobOutput.OutState.Exception ||
-                    _job.outp.outState == JobOutput.OutState.Failed ||
-                    _bRules.Count != 0)
+                if (_bRules.Count != 0)
                 {
                     string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
                         + "') finished with a not expected result!");

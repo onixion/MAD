@@ -150,7 +150,6 @@ namespace MAD.CLICore
         public InfoCommand()
             :base()
         {
-            oPar.Add(new ParOption("hack", null, null, true, false, null));
             description = "This command shows informations about the program.";
         }
 
@@ -159,11 +158,6 @@ namespace MAD.CLICore
             output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
             output += "<color><yellow>Program written by: \n";
             output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
-
-            if (OParUsed("hack"))
-            {
- 
-            }
 
             return output;
         }

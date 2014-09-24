@@ -14,7 +14,7 @@ namespace MAD.JobSystemCore
 
         public JobOutput()
         {
-
+            outputs.Add(new OutputDescriptor("OutState", typeof(string)));
         }
 
         public OutputDescriptor GetOutputDesc(string name)

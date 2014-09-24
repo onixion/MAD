@@ -58,9 +58,10 @@ namespace CLIIO
                         {
                             if (_key.Modifiers == ConsoleModifiers.Control)
                             {
+
                                 ClearInput();
 
-                                _VINPUT = "Jack was here ...";
+                                _VINPUT = "KASE JA WC HER";
 
                                 SetCursor(_HEAD);
                                 Console.Write(_VINPUT);

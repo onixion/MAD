@@ -16,25 +16,6 @@ namespace MAD.JobSystemCore
             : base(JobType.ServiceCheck)
         { }
 
-
-        protected override string JobStatus()
-        {
-            string _tmp = "";
-
-            if (_working)
-            {
-                _tmp += "DNS is working";
-                outp.outState = JobOutput.OutState.Success;
-            }
-            else
-            {
-                _tmp += "DNS seems to be dead";
-                outp.outState = JobOutput.OutState.Failed;
-            }
-
-            return (_tmp);
-        }
-
         public override void Execute(System.Net.IPAddress targetAddress)
         {
             try

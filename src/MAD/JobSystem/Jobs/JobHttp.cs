@@ -56,15 +56,6 @@ namespace MAD.JobSystemCore
             }
         }
 
-        protected override string JobStatus()
-        {
-            string _temp = "";
-
-            _temp += "<color><yellow>TARGET-PORT: <color><white>" + port.ToString() + "\n";
-
-            return _temp;
-        }
-
         #endregion
     }
 }

@@ -36,11 +36,6 @@ namespace MAD.JobSystemCore
         #endregion
 
         #region FromJob
-        protected override string JobStatus()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void Execute(IPAddress _targetAddress)
         {
             UdpTarget _target = new UdpTarget(_targetAddress, 161, 5000, 3);

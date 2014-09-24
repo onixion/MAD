@@ -17,24 +17,6 @@ namespace MAD.JobSystemCore
             : base(JobType.ServiceCheck)
         { }
 
-        protected override string JobStatus()
-        {
-            string _tmp = "";
-
-            if (_working)
-            {
-                _tmp += "FTP is working";
-                outp.outState = JobOutput.OutState.Success;
-            }
-            else
-            {
-                _tmp += "FTP seems to be dead";
-                outp.outState = JobOutput.OutState.Failed;
-            }
-
-            return (_tmp);
-        }
-
         public override void Execute(IPAddress targetAddress)
         {
             FtpWebRequest _requestDir = (FtpWebRequest)FtpWebRequest.Create(new Uri("ftp://" + targetAddress.ToString()));

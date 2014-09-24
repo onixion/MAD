@@ -425,7 +425,7 @@ namespace MAD.CLICore
                     {
                         _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
                         _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
-                        _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s " + _temp2.tSpan.Milliseconds + "ms";
+                        _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
                         _tableRow[10] = _temp2.outp.outState.ToString();
                     }
 
@@ -437,6 +437,123 @@ namespace MAD.CLICore
             _js.UnlockNodesRead();
 
             return output;
+        }
+    }
+
+    public class JobInfoCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobInfoCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows useful informations about jobs.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            if (OParUsed("id"))
+            {
+                JobNode _node;
+                Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
+                if (_job != null)
+                {
+                    _job.jobLock.EnterReadLock();
+                    output = GetJobInfo(_job);
+                    _job.jobLock.ExitReadLock();
+                    _js.JobUnlockedGlobal(_node);
+                    return output;
+                }
+                else
+                    return "<color><red>Job does not exist!";
+            }
+            else
+            {
+                List<JobNode> _nodes = _js.GetNodesLockedRead();
+                foreach (JobNode _node in _nodes)
+                {
+                    _node.nodeLock.EnterReadLock();
+                    foreach (Job _job in _node.jobs)
+                    {
+                        _job.jobLock.EnterReadLock();
+                        output += GetJobInfo(_job);
+                        output += GetJobSpecificInfo(_job);
+                        _job.jobLock.ExitReadLock();
+                        output += "\n";
+                    }
+                    _node.nodeLock.ExitReadLock();
+                }
+                _js.UnlockNodesRead();
+                return output;
+            }
+        }
+
+        private string GetJobInfo(Job job)
+        {
+            string output = "";
+
+            output += "<color><yellow>[<color><white>JOB ID='" + job.id + "']\n\n";
+            output += "<color><yellow>Name:          <color><white>" + job.name + "\n";
+            output += "<color><yellow>Type:          <color><white>" + job.type.ToString() + "\n";
+            output += "<color><yellow>Time-Type:     <color><white>" + job.time.type.ToString() + "\n";
+            output += "<color><yellow>Time-Value(s): <color><white>" + job.time.GetValues() + "\n\n";
+
+            output += "<color><yellow>Last-Started:  <color><white>" + job.tStart.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            output += "<color><yellow>Last-Stopped:  <color><white>" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            output += "<color><yellow>Last-Span:     <color><white>" + "+" + job.tSpan.Seconds + "s " + job.tSpan.Milliseconds + "ms" + "\n\n";
+
+            output += "<color><yellow>OutDescriptors:";
+
+            foreach (OutputDescriptor _desc in job.outp.outputs)
+            {
+                output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
+                output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString() + "\n";
+            }
+
+            output += "\n\n<color><yellow>Notification-Rules:";
+
+            if (job.rules == null)
+                output += " <color><white>NULL";
+            else
+            {
+                if (job.rules.Count != 0)
+                    foreach (JobRule _rule in job.rules)
+                    {
+                        output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
+                        output += "\n  <color><yellow> Operation:       <color><white>" + _rule.oper.ToString();
+                        output += "\n  <color><yellow> Compare value:   <color><white>" + _rule.compareValue.ToString() + "\n";
+                    }
+                else
+                    output += "<color><white>EMPTY";
+            }
+
+            output += "\n\n<color><yellow>Notification-Settings: <color><white>";
+            if (job.settings != null)
+            {
+                output += "\n  <color><yellow>Smtp-Address:      <color><white>" + job.settings.login.smtpAddr;
+                output += "\n  <color><yellow>Smtp-Port:         <color><white>" + job.settings.login.port;
+                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.settings.login.mail;
+                output += "\n  <color><yellow>Password:          <color><white>" + job.settings.login.password;
+                output += "\n  <color><yellow>Mails to send to:  <color><white>";
+
+                foreach (MailAddress _addr in job.settings.mailAddr)
+                    output += _addr.ToString() + " ";
+            }
+            else
+                output += "NULL";
+
+            return output;
+        }
+
+        private string GetJobSpecificInfo(Job job)
+        {
+            switch (job.type)
+            { 
+                    // TO DO
+                default:
+                    return "";
+            }
         }
     }
 
@@ -713,105 +830,6 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobInfoCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobInfoCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-            oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] {typeof(int)}));
-            description = "This command shows useful informations about jobs.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            if (OParUsed("id"))
-            {
-                JobNode _node;
-                Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
-                if (_job != null)
-                {
-                    _job.jobLock.EnterReadLock();
-                    output = GetJobInfo(_job);
-                    _job.jobLock.ExitReadLock();
-                    _js.JobUnlockedGlobal(_node);
-                    return output;
-                }
-                else
-                    return "<color><red>Job does not exist!";
-            }
-            else
-            {
-                List<JobNode> _nodes = _js.GetNodesLockedRead();
-                foreach (JobNode _node in _nodes)
-                {
-                    _node.nodeLock.EnterReadLock();
-                    foreach (Job _job in _node.jobs)
-                    {
-                        _job.jobLock.EnterReadLock();
-                        output += GetJobInfo(_job);
-                        _job.jobLock.ExitReadLock();
-                        output += "\n";
-                    }
-                    _node.nodeLock.ExitReadLock();
-                }
-                _js.UnlockNodesRead();
-                return output;
-            }
-        }
-
-        private string GetJobInfo(Job job)
-        {
-            string output = "";
-
-            output += "<color><yellow>[<color><white>JOB ID='" + job.id + "'<color><yellow>]\n\n";
-            output += "Name: <color><white>" + job.name + "\n<color><yellow>";
-            output += "Type: <color><white>" + job.type.ToString() + "\n<color><yellow>";
-            output += "Time-Type: <color><white>" + job.time.type.ToString() + "\n<color><yellow>";
-            output += "Time-Value(s): <color><white>" + job.time.GetValues() + "<color><yellow>\n\n";
-
-            output += "<color><yellow>OutDescriptors:";
-
-            foreach (OutputDescriptor _desc in job.outp.outputs)
-            {
-                output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
-                output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString();
-            }
-
-            output += "\n\n<color><yellow>Notification-Settings: <color><white>";
-            if (job.settings != null)
-            {
-                output += "\n  <color><yellow>Smtp-Address: <color><white>" + job.settings.login.smtpAddr;
-                output += "\n  <color><yellow>Smtp-Port: <color><white>" + job.settings.login.port;
-                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.settings.login.mail;
-                output += "\n  <color><yellow>Password: <color><white>" + job.settings.login.password;
-                output += "\n  <color><yellow>Mails to send to: <color><white>";
-
-                foreach (MailAddress _addr in job.settings.mailAddr)
-                    output += _addr.ToString() + " ";
-            }
-            else
-                output += "NULL";
-
-            output += "\n\n<color><yellow>Notification-Rules:";
-
-            if (job.rules == null)
-                output += " <color><white>NULL";
-            else
-            {
-                if (job.rules.Count != 0)
-                    foreach (JobRule _rule in job.rules)
-                    {
-                        output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
-                        output += "\n  <color><yellow>Operation: <color><white>" + _rule.oper.ToString();
-                        output += "\n  <color><yellow>Compare value: <color><white>" + _rule.compareValue.ToString();
-                    }
-            }
-            return output;
-        }
-    }
-
     #region commands for adding jobs
 
     public class JobSystemAddPingCommand : JobCommand
@@ -1060,12 +1078,6 @@ namespace MAD.CLICore
 
     #endregion
 
-    #region commands for editing jobs
-
-    // TODO
-
-    #endregion
-
     #region parsing job parameters
 
     public class JobCommand : Command
@@ -1074,7 +1086,6 @@ namespace MAD.CLICore
         public const string JOB_ID = "id";
         public const string JOB_TIME_PAR = "t";
  
-
         public JobCommand()
             : base()
         {
