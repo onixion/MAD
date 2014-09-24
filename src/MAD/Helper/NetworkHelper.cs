@@ -100,7 +100,7 @@ namespace MAD.Helper
             return false;
         }
 
-        public string getMacString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
+        public static string getMacString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";

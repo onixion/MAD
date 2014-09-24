@@ -13,20 +13,29 @@ namespace MAD.MacFinders
 {
     class ARPReader
     {
-        private bool _running = false;
-        private CaptureDeviceList _list; 
+        private CaptureDeviceList _list;
+        private ICaptureDevice _dev;
+        private ICaptureDevice _listenDev;
 
         public uint networkInterface;
         public uint subnetMask;
-        public IPAddress netAddress; 
+        public IPAddress netAddress;
+        public IPAddress srcAddress;
 
-        public string Start()
+        public void Start()
         {
-            if (!_running)
-            {
-                _list = CaptureDeviceList.Instance;
-                Thread send = new Thread(sendRequests);
-            }
+            Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
+            _list = CaptureDeviceList.Instance;
+            Thread _send = new Thread(SendRequests);
+            Thread _listen = new Thread(ListenForRequests);
+            _listen.Start();
+            Thread.Sleep(10);
+            _send.Start();
+            _send.Join();
+            _listen.Join();
+            _dev.Close();
+            Thread.Sleep(100);
+            _listenDev.Close();
         }
 
         public string ListInterfaces()
@@ -53,8 +62,9 @@ namespace MAD.MacFinders
             return _buffer;
         }
 
-        private void sendRequests()
+        private void SendRequests()
         {
+            Logger.Log("Sending ArpRequest flood..", Logger.MessageType.INFORM);
             uint _hosts = NetworkHelper.GetHosts(subnetMask);
 
             byte[] _netPartBytes = netAddress.GetAddressBytes();
@@ -63,9 +73,8 @@ namespace MAD.MacFinders
 
             uint _netPartInt = BitConverter.ToUInt32(_netPartBytes, 0);
 
-            ICaptureDevice _dev = _list[(int) networkInterface];
+            _dev = _list[(int) networkInterface];
             PhysicalAddress _sourceHW = _dev.MacAddress;
-            IPAddress _sourceIP = _dev.IP
 
             EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
 
@@ -76,9 +85,74 @@ namespace MAD.MacFinders
 
                 IPAddress _target = new IPAddress(_targetBytes);
 
-                ARPPacket _arppac = new ARPPacket(ARPOperation.Request, System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"), _target, _sourceHW, IPAddress.Parse("192.168.1.114"));
-            }
+                ARPPacket _arppac = new ARPPacket(ARPOperation.Request, 
+                                                    System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"), 
+                                                    _target, 
+                                                    _sourceHW, 
+                                                    srcAddress);
+                _ethpac.ParentPacket = _arppac;
+
+                try
+                {
+                    _dev.SendPacket(_ethpac);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
+                }
+            }   
+        }
+
+        private void ListenForRequests()
+        {
+            Logger.Log("Started listening for Responses on ArpFlood..", Logger.MessageType.INFORM);
+            _listenDev = _list[(int)networkInterface];
+
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ParseArpPackets);
+            _listenDev.Open(DeviceMode.Normal);
+            _listenDev.StartCapture();
             
+        }
+
+        private void ParseArpPackets(object sender, CaptureEventArgs packet)
+        {
+            byte[] data = packet.Packet.Data;
+            byte[] arpheader = new byte[4];
+            arpheader[0] = data[12];
+            arpheader[1] = data[13];
+            arpheader[2] = data[20];
+            arpheader[3] = data[21];
+
+            if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
+                ReadAddresses(data);                                                                                        //Ersetezen mit funktion zum host hinzufügen
+        }
+
+        private string ReadAddresses(byte[] data)                                                                           //passend machen
+        {
+            byte[] HWAddress = new byte[6];
+            byte[] IPAddress = new byte[4];
+
+            uint hwOffset = 22;
+            uint ipOffset = 28;
+
+            for (int i = 0; i < 6; i++)
+            {
+                HWAddress[i] = data[hwOffset + i];
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                IPAddress[i] = data[ipOffset + i];
+            }
+
+            string macAddress = NetworkHelper.getMacString(HWAddress);
+
+            IPAddress ipadr = new IPAddress(IPAddress);
+            string ipAddress = ipadr.ToString();
+
+            string buffer = macAddress + "\n" + ipAddress;
+
+            return buffer; 
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using MAD.DHCPReader;
+using MAD.MacFinders;
 
 namespace MAD.CLICore
 {
+    #region DHCPReader
     public class CatchBasicInfoStartCommand : Command
     {
         private MACFeeder _feeder;
@@ -85,4 +87,13 @@ namespace MAD.CLICore
             return "<color><blue>" + _tmp;
         }
     }
+    #endregion
+
+    #region ARPReader
+    public class PrintArpReadyInterfaces : Command
+    {
+        private ARPReader _reader;                                          //alin fragen wegen erben von macfeeder warum und wieso und waht the fak 
+
+    }
+    #endregion 
 }
