@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+
 using MAD.DHCPReader;
 using MAD.MacFinders;
 
@@ -92,8 +94,47 @@ namespace MAD.CLICore
     #region ARPReader
     public class PrintArpReadyInterfaces : Command
     {
-        private ARPReader _reader;                                          //alin fragen wegen erben von macfeeder warum und wieso und waht the fak 
+        private ARPReader _reader = new ARPReader();                                          //alin fragen wegen erben von macfeeder warum und wieso und waht the fak 
 
+        public PrintArpReadyInterfaces()
+            : base()
+        {
+            description = "Prints all the interfaces who are ready for arp requesting (needed for the actual command)";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            string _tmp = _reader.ListInterfaces();
+
+            return "<color><blue>" + _tmp;
+        }
+    }
+
+    public class ArpReaderStart : Command
+    {
+        private ARPReader _reader = new ARPReader();
+
+        public ArpReaderStart()
+            : base()
+        {
+            rPar.Add(new ParOption("i", "INTERFACE", "The Networkinterface to use, check with arp reader list interfaces for the right one", false, false, new Type[] { typeof(uint) }));
+            rPar.Add(new ParOption("l", "SOURCE-IP", "The IPAddress of the used Network Interface", false, false, new Type[] { typeof(IPAddress) }));
+            rPar.Add(new ParOption("s", "SUBNETMASK", "The Subnetmask of the Network. ie 16 for a /16 subnet", false, false, new Type[] { typeof(uint) }));
+            rPar.Add(new ParOption("n", "NETWORK", "The Network Address. Something like 192.168.1.0", false, false, new Type[] { typeof(IPAddress) }));
+
+            description = "Starts looking for hosts via ARP";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            _reader.srcAddress = (IPAddress) pars.GetPar("l").argValues[0];
+            _reader.networkInterface = (uint)pars.GetPar("i").argValues[0] - 1;
+            _reader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
+            _reader.subnetMask = (uint)pars.GetPar("s").argValues[0];
+
+            _reader.Start();
+            return "<color><blue>Successfully performed Scan";
+        }
     }
     #endregion 
 }

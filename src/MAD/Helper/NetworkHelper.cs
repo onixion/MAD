@@ -100,7 +100,7 @@ namespace MAD.Helper
             return false;
         }
 
-        public static string getMacString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
+        public static string getMacStringFromDhcp(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";
@@ -110,6 +110,21 @@ namespace MAD.Helper
                 macBytes[i - 28] = data[i];
                 macAddress += String.Format("{0:X02}", macBytes[i - 28]);
                 if (i < (28 + 5))
+                    macAddress += ":";
+            }
+            return macAddress;
+        }
+
+        public static string getMacStringFromArp(byte[] data)                                     //Filters the MAC Address out of a arp packet (therefor it should be only used if already checkt wether it is a arp packet or not) 
+        {
+            byte[] macBytes = new byte[6];
+            string macAddress = "";
+
+            for (uint i = 0; i < 6; i++)
+            {
+                macBytes[i] = data[i];
+                macAddress += String.Format("{0:X02}", macBytes[i]);
+                if (i < 5)
                     macAddress += ":";
             }
             return macAddress;

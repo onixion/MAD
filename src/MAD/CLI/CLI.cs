@@ -49,6 +49,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
             commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
             commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("arp reader list interfaces", typeof(PrintArpReadyInterfaces), null));
+            commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), null));
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));

@@ -55,6 +55,7 @@ namespace MAD.MacFinders
             _buffer += "The following devices are available on this machine:";
             _buffer += "\n";
             _buffer += "-----------------------------------------------------";
+            _buffer += "\n";
 
             foreach (ICaptureDevice dev in _list)
                 _buffer += dev.ToString() + "\n";
@@ -78,9 +79,12 @@ namespace MAD.MacFinders
 
             EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
 
+            byte[] _targetBytes = new byte[4];
+
             for (int i = 1; i < _hosts - 1; i++)
             {
-                byte[] _targetBytes = BitConverter.GetBytes(_netPartInt + i);
+                _targetBytes = BitConverter.GetBytes(_netPartInt + i);
+                Array.Resize(ref _targetBytes, 4);
                 Array.Reverse(_targetBytes);
 
                 IPAddress _target = new IPAddress(_targetBytes);
@@ -116,15 +120,18 @@ namespace MAD.MacFinders
 
         private void ParseArpPackets(object sender, CaptureEventArgs packet)
         {
-            byte[] data = packet.Packet.Data;
-            byte[] arpheader = new byte[4];
-            arpheader[0] = data[12];
-            arpheader[1] = data[13];
-            arpheader[2] = data[20];
-            arpheader[3] = data[21];
+            if (packet.Packet.Data.Length >= 42)
+            {
+                byte[] data = packet.Packet.Data;
+                byte[] arpheader = new byte[4];
+                arpheader[0] = data[12];
+                arpheader[1] = data[13];
+                arpheader[2] = data[20];
+                arpheader[3] = data[21];
 
-            if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
-                ReadAddresses(data);                                                                                        //Ersetezen mit funktion zum host hinzufügen
+                if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
+                    ReadAddresses(data);                                                                                        //Ersetezen mit funktion zum host hinzufügen
+            }
         }
 
         private string ReadAddresses(byte[] data)                                                                           //passend machen
@@ -145,7 +152,7 @@ namespace MAD.MacFinders
                 IPAddress[i] = data[ipOffset + i];
             }
 
-            string macAddress = NetworkHelper.getMacString(HWAddress);
+            string macAddress = NetworkHelper.getMacStringFromArp(HWAddress);
 
             IPAddress ipadr = new IPAddress(IPAddress);
             string ipAddress = ipadr.ToString();
