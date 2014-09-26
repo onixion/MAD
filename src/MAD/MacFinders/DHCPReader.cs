@@ -26,7 +26,7 @@ namespace MAD.DHCPReader
 
         private static bool _running = false;
 
-        public static List<ModelHost> _dummyList = new List<ModelHost>();
+        
 
         private Thread _check;
         private Thread _start;
@@ -202,18 +202,18 @@ namespace MAD.DHCPReader
                         }
                     }
 
-                    var _found = _dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac));
+                    var _found = NetworkHelper._dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac));
                     if (_found == null)
                     {
-                        _dummyList.Add(_tmpModel);
+                        NetworkHelper._dummyList.Add(_tmpModel);
                         _tmpModel.ManuallyIncreaseCount();
                     }
                     else
                     {
-                        ModelHost _tmptmpModel = _dummyList.Find(x=>x.hostMac.Contains(_tmpModel.hostMac));
+                        ModelHost _tmptmpModel = NetworkHelper._dummyList.Find(x=>x.hostMac.Contains(_tmpModel.hostMac));
                         _tmpModel.ID = _tmptmpModel.ID;
-                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
-                        _dummyList.Add(_tmpModel);
+                        NetworkHelper._dummyList.Remove(NetworkHelper._dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
+                        NetworkHelper._dummyList.Add(_tmpModel);
                     }
                 }
             }
@@ -230,11 +230,11 @@ namespace MAD.DHCPReader
                 Thread.Sleep((int)_sleepFor);
                 bool _active;
 
-                if (_dummyList != null)
+                if (NetworkHelper._dummyList != null)
                 {
-                    for (int i = 0; i < _dummyList.Count; i++)
+                    for (int i = 0; i < NetworkHelper._dummyList.Count; i++)
                     {
-                        ModelHost _dummy = _dummyList[i];
+                        ModelHost _dummy = NetworkHelper._dummyList[i];
                         if (_dummy.hostIP != null)
                         {
                             Ping _ping = new Ping();
@@ -259,7 +259,7 @@ namespace MAD.DHCPReader
 
                             if (!_active)
                             {
-                                _dummyList.Remove(_dummy);
+                                NetworkHelper._dummyList.Remove(_dummy);
                                 _dummy.ManuallyDecreaseCount();
                             }
                         }
@@ -272,9 +272,9 @@ namespace MAD.DHCPReader
         {
             string _output = "";
 
-            if (_dummyList != null)
+            if (NetworkHelper._dummyList != null)
             {
-                foreach (ModelHost _dummy in _dummyList)
+                foreach (ModelHost _dummy in NetworkHelper._dummyList)
                 {
                     _output += "Host " + _dummy.ID.ToString();
                     _output += "\n MAC-Address: " + _dummy.hostMac;

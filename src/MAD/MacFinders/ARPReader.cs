@@ -17,6 +17,12 @@ namespace MAD.MacFinders
         private ICaptureDevice _dev;
         private ICaptureDevice _listenDev;
 
+        private struct Addresses
+        {
+            string macAddress;
+            IPAddress ipAddress;
+        }
+
         public uint networkInterface;
         public uint subnetMask;
         public IPAddress netAddress;
@@ -75,6 +81,7 @@ namespace MAD.MacFinders
             uint _netPartInt = BitConverter.ToUInt32(_netPartBytes, 0);
 
             _dev = _list[(int) networkInterface];
+            _dev.Open();
             PhysicalAddress _sourceHW = _dev.MacAddress;
 
             EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
@@ -94,7 +101,7 @@ namespace MAD.MacFinders
                                                     _target, 
                                                     _sourceHW, 
                                                     srcAddress);
-                _ethpac.ParentPacket = _arppac;
+                _ethpac.PayloadPacket = _arppac;
 
                 try
                 {
@@ -160,6 +167,11 @@ namespace MAD.MacFinders
             string buffer = macAddress + "\n" + ipAddress;
 
             return buffer; 
+        }
+
+        private void SyncModelHosts(Addresses addrs)
+        {
+
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Generic;
 
 using SnmpSharpNet;
 
@@ -22,6 +23,8 @@ namespace MAD.Helper
         public const string SNMP_COMMUNITY_STRING = "public";                       //community String for snmp requests in MAD
         public const string SNMP_AUTH_SECRET = "MADMADMAD";                         //authentification Secret -"-
         public const string SNMP_PRIV_SECRET = "MADMADMAD";                         //privacy Secret -"-
+
+        public static List<ModelHost> _dummyList = new List<ModelHost>();
 
         public enum snmpProtocols                                                   //an enumeration with the kinds of supported Protocols
         {
@@ -51,7 +54,7 @@ namespace MAD.Helper
 
         public static uint GetHosts(uint subnet)
         {
-            uint hosts = 2 ^ (32 - subnet);
+            uint hosts = (uint) Math.Pow(2, 32 - subnet);
 
             return hosts; 
         }
