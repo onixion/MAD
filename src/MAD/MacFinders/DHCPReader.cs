@@ -202,6 +202,8 @@ namespace MAD.DHCPReader
                         }
                     }
 
+					//Aufräumen mit neuer ModelHost Klasse
+
                     var _found = NetworkHelper._dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac));
                     if (_found == null)
                     {
@@ -266,33 +268,6 @@ namespace MAD.DHCPReader
                     }
                 }
             }
-        }
-
-        public string PrintLists()
-        {
-            string _output = "";
-
-            if (NetworkHelper._dummyList != null)
-            {
-                foreach (ModelHost _dummy in NetworkHelper._dummyList)
-                {
-                    _output += "Host " + _dummy.ID.ToString();
-                    _output += "\n MAC-Address: " + _dummy.hostMac;
-
-                    if (_dummy.hostName != null)
-                        _output += "\n Host Name: " + _dummy.hostName;
-                    else
-                        _output += "\n Host Name: NA..";
-
-                    if (_dummy.hostIP != null)
-                        _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                    else
-                        _output += "\n IP-Address: NA..";
-
-                    _output += "\n \n";
-                }
-            }
-            return _output;
         }
         #endregion
         #endregion

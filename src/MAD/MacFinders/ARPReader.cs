@@ -17,12 +17,6 @@ namespace MAD.MacFinders
         private ICaptureDevice _dev;
         private ICaptureDevice _listenDev;
 
-        private struct Addresses
-        {
-            string macAddress;
-            IPAddress ipAddress;
-        }
-
         public uint networkInterface;
         public uint subnetMask;
         public IPAddress netAddress;
@@ -136,42 +130,59 @@ namespace MAD.MacFinders
                 arpheader[2] = data[20];
                 arpheader[3] = data[21];
 
-                if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
-                    ReadAddresses(data);                                                                                        //Ersetezen mit funktion zum host hinzufügen
+				if (arpheader [0] == 8 && arpheader [1] == 6 && arpheader [2] == 0 && arpheader [3] == 2)
+					SyncModelHosts (ReadAddresses(data));                                                                                      //Ersetezen mit funktion zum host hinzufügen
             }
         }
 
-        private string ReadAddresses(byte[] data)                                                                           //passend machen
+		private ModelHost ReadAddresses(byte[] data)                                                                           //passend machen
         {
-            byte[] HWAddress = new byte[6];
-            byte[] IPAddress = new byte[4];
+			byte[] hwAddress = new byte[6];
+			byte[] ipAddress = new byte[4];
 
             uint hwOffset = 22;
             uint ipOffset = 28;
 
             for (int i = 0; i < 6; i++)
             {
-                HWAddress[i] = data[hwOffset + i];
+				hwAddress[i] = data[hwOffset + i];
             }
 
             for (int i = 0; i < 4; i++)
             {
-                IPAddress[i] = data[ipOffset + i];
+				ipAddress[i] = data[ipOffset + i];
             }
 
-            string macAddress = NetworkHelper.getMacStringFromArp(HWAddress);
+			string _name = TryGetName (ipAddress);
 
-            IPAddress ipadr = new IPAddress(IPAddress);
-            string ipAddress = ipadr.ToString();
+			if (String.IsNullOrEmpty (_name))
+				ModelHost _tmp = new ModelHost(hwAddress, ipAddress);
+			else
+				ModelHost _tmp = new ModelHost(hwAddress, ipAddress, name);
 
-            string buffer = macAddress + "\n" + ipAddress;
-
-            return buffer; 
+			return _tmp; 
         }
 
-        private void SyncModelHosts(Addresses addrs)
+		private void SyncModelHosts(ModelHost _dummy)
         {
-
+			if (ModelHost.Exists (_dummy))
+				ModelHost.UpdateHost (_dummy, _dummy);
+			else
+				ModelHost.AddToList (_dummy);
         }
+
+		private string TryGetName(IPAddress ipAddr)
+		{
+			string hostName = ""; 
+
+			try
+			{
+				hostName = Dns.GetHostEntry(ipAddr);
+			}
+			catch (Exception ex) 
+			{ }
+
+			return hostName; 
+		}
     }
 }
