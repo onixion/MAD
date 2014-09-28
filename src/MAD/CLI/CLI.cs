@@ -13,7 +13,7 @@ namespace MAD.CLICore
     {
         #region members
 
-        public string cursor = "MAD> ";
+        private string _cursor = "MAD> ";
         private ConsoleColor _cursorColor = ConsoleColor.Cyan;
         private ConsoleColor _inputColor = ConsoleColor.White;
 
@@ -104,39 +104,29 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            CLIOutput.WriteToConsole(GetBanner());
+            CLIOutput.WriteToConsole(GetBanner(Console.BufferWidth));
 
             while (true)
             {
                 Command _command = null;
 
-                // This was the old method to read input from cli.
-                //string _cliInput = Console.ReadLine();
-
                 Console.ForegroundColor = _cursorColor;
-                Console.Write(cursor);
-
+                Console.Write(_cursor);
                 Console.ForegroundColor = _inputColor;
                 string _cliInput = CLIInput.ReadInput(Console.CursorLeft);
 
-                _cliInput = _cliInput.Trim();
+                // This is the old method to read input from cli.
+                //string _cliInput = Console.ReadLine();
 
+                _cliInput = _cliInput.Trim();
                 if (_cliInput != "")
                 {
-                    // It is not necessery to use 'ref', but then
-                    // it is obvious that the command-object gets
-                    // modified.
                     string response = CLIInterpreter(ref _command, _cliInput);
-
-                    // Check if the par and args are valid.
                     if (response == "VALID_PARAMETERS")
                     {
                         try
                         {
-                            // Execute command and get response from command.
                             response = _command.Execute(Console.BufferWidth);
-
-                            // When command response with 'EXIT_CLI' the CLI closes.
                             if (response == "EXIT_CLI")
                                 break;
                         }
@@ -144,15 +134,9 @@ namespace MAD.CLICore
                         {
                             response = "<color><red>" + e.Message;
                         }
-
-                        // Write output to console.
-                        CLIOutput.WriteToConsole(response);
                     }
-                    else
-                    {
-                        // Something must be wrong with the input (par does not exist, to many args, ..).
-                        CLIOutput.WriteToConsole(response);
-                    }
+                    
+                    CLIOutput.WriteToConsole(response);
                 }
             }
         }

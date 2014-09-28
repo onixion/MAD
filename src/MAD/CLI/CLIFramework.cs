@@ -184,11 +184,11 @@ namespace MAD.CLICore
 
                 // Check if the parameter is known.
                 if(_tempOptions == null)
-                    return CLIError.Error(CLIError.ErrorType.parError, "Parameter '" + _temp.par + "' does not exist for this command!", true);
+                    return CLIError.Error(CLIError.ErrorType.ParameterError, "Parameter '" + _temp.par + "' does not exist for this command!", true);
 
                 // Check if parameter has been used befor.
                 if(_tempOptions.IsUsed)
-                    return CLIError.Error(CLIError.ErrorType.parError, "Parameter '" + _temp.par + "' used multiple times!", true);
+                    return CLIError.Error(CLIError.ErrorType.ParameterError, "Parameter '" + _temp.par + "' cannot be used multiple times!", true);
 
                 // Mark the parameter as 'used'.
                 _tempOptions.SetUsedFlag();
@@ -204,20 +204,18 @@ namespace MAD.CLICore
                 {
                     // Check if the arg is not null.
                     if (_temp.argValues.Length != 0)
-                        return CLIError.Error(CLIError.ErrorType.argError, "The parameter '" + _temp.par + "' does not need any args!", true);
+                        return CLIError.Error(CLIError.ErrorType.SyntaxError, "The parameter '" + _temp.par + "' does not need any args!", true);
                 }
                 else
                 {
-                    // Check if arg is null
                     if (_temp.argValues.Length == 0)
-                        return CLIError.Error(CLIError.ErrorType.argError, "The par '" + _temp.par + "' needs one or more args!", true);
+                        return CLIError.Error(CLIError.ErrorType.SyntaxError, "The par '" + _temp.par + "' needs one or more args!", true);
 
-                    // Check if multiple args are supported for this par
                     if (!_tempOptions.multiargs)
                     {
                         // Check if more than one arg is given.
                         if (_temp.argValues.Length > 1)
-                            return CLIError.Error(CLIError.ErrorType.argError, "The par '" + _temp.par + "' can't have multiple args!", true);
+                            return CLIError.Error(CLIError.ErrorType.SyntaxError, "The par '" + _temp.par + "' can't have multiple args!", true);
                     }
 
                     /* Try to convert the given args into the specific types.
@@ -252,9 +250,8 @@ namespace MAD.CLICore
                     }
 
                     if (!_allArgsConverted)
-                    {
-                        return CLIError.Error(CLIError.ErrorType.argTypeError, "The arg of the par '" + _temp.par + "' could not be parsed!", true);
-                    }
+                        return CLIError.Error(CLIError.ErrorType.ArgumentTypeError, 
+                            "The argument of the parameter '" + _temp.par + "' could not be parsed correctly!", true);
 
                     _temp.argValues = _args;
                 }
@@ -262,7 +259,7 @@ namespace MAD.CLICore
 
             // Check if all required pars has been found.
             if (_rPar.Count != _requiredArgsFound)
-                return CLIError.Error(CLIError.ErrorType.parError, "Some required parameters are missing!", true);
+                return CLIError.Error(CLIError.ErrorType.SyntaxError, "Some required parameters are missing!", true);
 
             return "VALID_PARAMETERS";
         }
@@ -304,20 +301,12 @@ namespace MAD.CLICore
         public static ParOption GetParOptions(List<ParOption> rPar, List<ParOption> oPar, string par)
         {
             foreach (ParOption _temp in rPar)
-            {
                 if (_temp.par == par)
-                {
                     return _temp;
-                }
-            }
 
             foreach (ParOption _temp in oPar)
-            {
                 if (_temp.par == par)
-                {
                     return _temp;
-                }
-            }
 
             return null;
         }
@@ -327,24 +316,26 @@ namespace MAD.CLICore
             foreach (ParOption _temp in rPar)
                 if (_temp.par == par.par)
                     return true;
+
             return false;
         }
 
-        #endregion
-
-
-        protected string GetBanner()
+        protected string GetBanner(int consoleWidth)
         {
             string _buffer = "";
 
-            _buffer += @"<color><cyan> ___  ___  ___ ______ " + "\n";
-            _buffer += @"<color><cyan> |  \/  | / _ \|  _  \" + "\n";
-            _buffer += @"<color><cyan> |      |/ /_\ \ | | |" + "\n";
-            _buffer += @"<color><cyan> | |\/| ||  _  | | | | <color><yellow>VERSION <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
-            _buffer += @"<color><cyan> | |  | || | | | |_/ | <color><yellow>TIME: <color><white>" + DateTime.Now.ToString("HH:mm:ss") + " <color><yellow>DATE: <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
-            _buffer += @"<color><cyan> \_|  |_/\_| |_/_____/_________________________________" + "\n";
+            _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
+            _buffer += @"<color><cyan>  __  __   ___   _____" + "\n";
+            _buffer += @"<color><cyan> |  \/  | / _ \ |  _  \" + "\n";
+            _buffer += @"<color><cyan> |      |/ /_\ \| | \ | <color><yellow>VERSION" + "\t<color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
+            _buffer += @"<color><cyan> | |\/| ||  _  || | | | <color><yellow>DATE" + "\t<color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
+            _buffer += @"<color><cyan> | |  | || | | || |_/ | <color><yellow>TIME" + "\t<color><white>" + DateTime.Now.ToString("HH:mm:ss") + "\n";
+            _buffer += @"<color><cyan> |_|  |_||_| |_||_____/" + "\n";
+            _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
 
             return _buffer;
         }
+
+        #endregion
     }
 }

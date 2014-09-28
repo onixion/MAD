@@ -8,27 +8,23 @@ namespace MadNet
     public class RSA : IDisposable
     {
         private bool _Private;
-        private RSACryptoServiceProvider _RSA = new RSACryptoServiceProvider(4096);
+        private RSACryptoServiceProvider _RSA = new RSACryptoServiceProvider(2048);
         private SHA1CryptoServiceProvider _SHA1 = new SHA1CryptoServiceProvider();
 
         public RSA() { _Private = true; }
-        public RSA(string File) { LoadKeys(File); }
+        public RSA(string keys) { LoadKeysXML(keys); }
         public RSA(byte[] Modulus, byte[] Exponent) { SetPublicKey(Modulus, Exponent); }
 
         public void Dispose() { _RSA.Dispose(); }
 
-        public void SaveKeys(string File)
+        public string GetKeysXML()
         {
-            using (FileStream fs = new FileStream(File, FileMode.Create, FileAccess.Write, FileShare.Read))
-            using (StreamWriter writer = new StreamWriter(fs, Encoding.ASCII))
-                writer.WriteLine(_RSA.ToXmlString(_Private).Replace("><", ">" + Environment.NewLine + "<"));
+            return _RSA.ToXmlString(true);
         }
 
-        public void LoadKeys(string File)
+        public void LoadKeysXML(string keys)
         {
-            using (FileStream fs = new FileStream(File, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (StreamReader reader = new StreamReader(fs, Encoding.ASCII))
-                _RSA.FromXmlString(reader.ReadToEnd());
+            _RSA.FromXmlString(keys);
             _Private = !_RSA.PublicOnly;
         }
 

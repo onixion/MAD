@@ -1165,7 +1165,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse SMTP-Port!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse SMTP-Port!", true));
                 }
             }
             else
@@ -1180,7 +1180,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse MailAddress!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse MailAddress!", true));
                 }
 
                 _settings.login.password = _temp2[1];

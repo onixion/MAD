@@ -15,46 +15,47 @@ namespace MAD
     class Mad
     {
         public static readonly string DATADIR = Path.Combine("data");
-        public static readonly string CONFFILE = Path.Combine(DATADIR, "configure.json");
+        public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
 
         [STAThread]
         static int Main(string[] args)
         {
-            Console.WriteLine("WARNING! THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
+            Console.WriteLine("(WARNING) THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
+            Console.WriteLine("(WARNING) DO NOT RELY ON THIS SOFTWARE!");
             
             MadConf.TryCreateDir(DATADIR);
-            if (MadConf.ConfExist(CONFFILE))
+            if (File.Exists(CONFFILE))
             {
                 try
                 {
                     MadConf.LoadConf(CONFFILE);
-                    Console.WriteLine("Config loaded.");
+                    Console.WriteLine("(CONFIG) Config loaded.");
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Config could not be loaded: " + e.Message);
-
-                    MadConf.SetToDefault(DATADIR);
-                    Console.WriteLine("Loaded default config.");
+                    Console.WriteLine("(CONFIG) Config could not be loaded: " + e.Message);
+                    MadConf.SetToDefault();
+                    Console.WriteLine("(CONFIG) Loaded default config.");
+                    Console.WriteLine("(CONFIG) Default config does not use all possible features!");
                 }
             }
             else
             {
-                Console.WriteLine("No config file found.");
-                
-                MadConf.SetToDefault(DATADIR);
-                Console.WriteLine("Loaded default config.");
+                Console.WriteLine("(CONFIG) No config file found!");
+                MadConf.SetToDefault();
+                Console.WriteLine("(CONFIG) Loaded default config.");
+                Console.WriteLine("(CONFIG) Default config does not use all possible features!");
             }
-
-            JobSystem js = new JobSystem();
-            MACFeeder macFeeder = new MACFeeder();
 
             if (Logger.PathFileExists())
                 Logger.ReadPathToLogFile();
             else
                 Logger.CreateNewPathFile();
 
-            NotificationSystem.SetOrigin(MadConf.conf.smtpServer, new System.Net.Mail.MailAddress(MadConf.conf.username), MadConf.conf.password, MadConf.conf.smtpPort);
+
+            JobSystem js = new JobSystem();
+            MACFeeder macFeeder = new MACFeeder();
+            //NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
 
             if (args.Length == 0)
             { 
@@ -71,29 +72,18 @@ namespace MAD
                 {
                     case "-cli":
                         Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
-
                         CLI cli = new CLI(js, macFeeder);
                         cli.Start();
                         break;
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
-
-                        CLIServer cliServer = new CLIServer(MadConf.conf.cliServerPort, Path.Combine(DATADIR, "rsa.conf"), js);
+                        CLIServer cliServer = new CLIServer(js);
                         cliServer.Start();
-
-                        Console.WriteLine("Server running on port "  + MadConf.conf.cliServerPort  + " ... press any key to stop server.");
                         Console.ReadKey();
-
-                        cliServer.Stop();
-                        Console.WriteLine("Saving RSA-Config ...");
-                        cliServer.SaveRSAKeys(Path.Combine(DATADIR, "rsa.conf"));
-                        Console.WriteLine("Saved.");
-
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
                         Logger.ForceWriteToLog();
-
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");
                         Console.ReadKey();
                         return 1;
@@ -103,21 +93,15 @@ namespace MAD
             {
                 Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
                 Logger.ForceWriteToLog();
-
                 Console.WriteLine("ERROR! Too many arguments!\nPress any key to close ...");
                 Console.ReadKey();
                 return 1;
             }
 
-            Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
-            Logger.ForceWriteToLog();
-
             js.Shutdown();
 
-            // try to save current config.
-            try { MadConf.SaveConf(CONFFILE); }
-            catch (Exception)
-            { }
+            Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
+            Logger.ForceWriteToLog();
 
             return 0;
         }

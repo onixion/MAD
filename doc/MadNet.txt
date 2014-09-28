@@ -1,0 +1,1 @@
+Die MadNet-Libary ist eine Ansammlung an Klassen, die für Netzwerkkommunikation benötigt wird.

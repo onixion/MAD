@@ -17,10 +17,10 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        public const string HEADER = "MAD CLI-Server";
-        public const string VERSION = "v2.4";
-        public const bool DEBUG_MODE = true;
-        public const bool LOG_MODE = false;
+        private bool _debugMode;
+        private bool _logMode;
+        private string _serverHeader;
+        private string _serverVer = "v2.0";
 
         private TcpListener _serverListener;
         private RSA _RSA = new RSA();
@@ -35,27 +35,26 @@ namespace MAD.CLIServerCore
 
         #region constructor
 
-        public CLIServer(int port, string confPath, JobSystem js)
+        public CLIServer(JobSystem js)
         {
-            serverPort = port;
+            LoadConfig();
             _js = js;
-
-            try
-            {
-                _RSA.LoadKeys(confPath);
-                Console.WriteLine("RSA-Config loaded successfully.");
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Could not load rsa keys.");
-                Console.WriteLine("RSA-keys will be generated on the first incoming connection .. This may take some time so stay calm ...");
-            }
         }
 
-        public CLIServer(int port, JobSystem js)
+        // This method loads the current config.
+        private void LoadConfig()
         {
-            serverPort = port;
-            _js = js;
+            MadConfigFile _conf = MadConf.GetLockedConfRead();
+            _logMode = _conf.LOG_MODE;
+            _debugMode = _conf.DEBUG_MODE;
+            _serverHeader = _conf.SERVER_HEADER;
+            serverPort = _conf.SERVER_PORT;
+
+            try { _RSA.LoadKeysXML(_conf.SERVER_RSA_KEYS); }
+            catch (Exception)
+            { }
+
+            MadConf.UnlockConfRead();
         }
 
         #endregion
@@ -96,10 +95,10 @@ namespace MAD.CLIServerCore
                 NetworkStream _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                if (MadConf.conf.DEBUG_MODE)
+                if (_debugMode)
                     Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
-                if (MadConf.conf.LOG_MODE)
-                    Logger.Log((GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected."), Logger.MessageType.INFORM);
+                if (_logMode)
+                    Logger.Log("Client (" + _clientEndPoint.Address + ") connected.", Logger.MessageType.INFORM);
 
                 if (_userOnline)
                     throw new Exception("User already online!");
@@ -107,8 +106,8 @@ namespace MAD.CLIServerCore
                 // send server info
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
-                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(HEADER);
-                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(VERSION);
+                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_serverHeader);
+                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_serverVer);
                     _serverInfoP.SendPacket();
                 }
 
@@ -166,16 +165,16 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (MadConf.conf.DEBUG_MODE)
-                    Console.WriteLine(GetTimeStamp() + " EX: " + e.Message);
-                if (MadConf.conf.LOG_MODE)
-                    Logger.Log(" EX: " + e.Message, Logger.MessageType.INFORM);
+                if (_debugMode)
+                    Console.WriteLine(GetTimeStamp() + " CLISERVER: " + e.Message);
+                if (_logMode)
+                    Logger.Log("CLISERVER: " + e.Message, Logger.MessageType.INFORM);
             }
 
-            if (MadConf.conf.DEBUG_MODE)
-                Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
-            if (MadConf.conf.LOG_MODE)
-                Logger.Log(" Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
+            if (_debugMode)
+                Console.WriteLine(GetTimeStamp() + "CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.");
+            if (_logMode)
+                Logger.Log("CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
 
             return null;
         }
@@ -199,11 +198,6 @@ namespace MAD.CLIServerCore
         private string GetTimeStamp()
         {
             return DateTime.Now.ToString("[dd.mm.yyyy|hh:MM.ss]");
-        }
-
-        public void SaveRSAKeys(string filePath)
-        {
-            _RSA.SaveKeys(filePath);
         }
 
         #endregion

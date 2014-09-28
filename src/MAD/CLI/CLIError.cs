@@ -9,11 +9,8 @@ namespace MAD.CLICore
         {
             SyntaxError,
             CommandError,
-            parError,
-            argError,
-            argTypeError,
-            inputError,
-            outputError
+            ParameterError,
+            ArgumentTypeError
         }
 
         public static string Error(ErrorType type, string errorText, bool colorEnable)
@@ -24,30 +21,21 @@ namespace MAD.CLICore
                 _buffer = "<color><" + _colorTag +">";
 
             switch (type)
-            { 
-                case ErrorType.SyntaxError:
-                    return _buffer + "Syntax error: " + errorText;
-
+            {
                 case ErrorType.CommandError:
                     return _buffer + "Command error: " + errorText;
 
-                case ErrorType.parError:
+                case ErrorType.SyntaxError:
+                    return _buffer + "Syntax error: " + errorText;
+
+                case ErrorType.ParameterError:
                     return _buffer + "Parameter error: " + errorText;
 
-                case ErrorType.argError:
-                    return _buffer + "Argument error: " + errorText;
-
-                case ErrorType.argTypeError:
+                case ErrorType.ArgumentTypeError:
                     return _buffer + "Argument-type error: " + errorText;
 
-                case ErrorType.inputError:
-                    return _buffer + "Input error: " + errorText;
-
-                case ErrorType.outputError:
-                    return _buffer + "Output error: " + errorText;
-
                 default:
-                    return "";
+                    return "Error: " + errorText;
             }
         }
     }

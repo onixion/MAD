@@ -143,11 +143,6 @@ Wenn der JobScedule läuft, die JobNode, der Job aktiv sind UND die JobTime des j
 
 __
 
-Das JobSystem, sowie JobScedule und andere Klassen sind mit Locks vor Multi-threading Problemen geschützt. Jedoch wird
-nicht empfohlen meherer Clients gleichzeitig auf das JobSystem zugreifen zu lassen, da unvorhersehebare Fehler auftreten
-können.
-
-Falls der JobScedule gerade läuft und die Jobs abarbeitet werden, kann ohne Besorgnis ein Job oder auch eine Node entfernt werden.
-
-
+Das JobSystem, sowie JobScedule und andere Klassen sind mit ReadWrite-Locks geschützt. D.h. sie können von mehreren Threads
+gleichzeitig verwendet werden. Mehrere Threads können zugleich lesen, aber nur Einer kann schreiben.
 

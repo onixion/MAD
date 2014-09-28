@@ -17,6 +17,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
+        public enum State { Active, Inactive, StopRequest }
+
         private Thread _cycleThread;
         private int _cycleTime = 100;
 
@@ -24,7 +26,6 @@ namespace MAD.JobSystemCore
         private int _maxThreads = 10;
         private int _maxTimeToWaitForIdle = 5000;
 
-        public enum State { Active, Inactive, StopRequest }
         private State _state = State.Inactive;
         public State state { get { return _state; } }
 
@@ -202,16 +203,10 @@ namespace MAD.JobSystemCore
             _lockSwitch.Set();
 
             _job.jobLock.EnterWriteLock();
-
             _job.tStart = DateTime.Now;
-            try 
-            {
-                _job.Execute(_holder.targetAddress);
-            }
+            try { _job.Execute(_holder.targetAddress); }
             catch (Exception)
-            {
-                _job.state = Job.JobState.Exception;
-            }
+            { _job.state = Job.JobState.Exception; }
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
@@ -219,45 +214,53 @@ namespace MAD.JobSystemCore
 
             if (_job.notiFlag)
             {
-                List<JobRule> _bRules = GetBrokenRules(_job);
-
-                // check if notification is neseccary.
-                if (_bRules.Count != 0)
+                MadConfigFile _conf = MadConf.GetLockedConfRead();
+                if (_conf.NOTI_ENABLE == true)
                 {
-                    string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
-                        + "') finished with a not expected result!");
-
-                    string _mailContent = "";
-                    _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
-                    _mailContent += "JobNode-IP:  '" + _node.ipAddress.ToString() + "'\n";
-                    _mailContent += "JobNode-MAC: '" + _node.macAddress.ToString() + "'\n\n";
-                    _mailContent += GenJobInfo(_job);
-                    _mailContent += GenBrokenRulesText(_job.outp, _bRules);
-
-                    if (_job.settings != null)
+                    List<JobRule> _bRules = GetBrokenRules(_job);
+                    if (_bRules.Count != 0)
                     {
-                        // This is not the perfect solution. Need to create a class, which
-                        // can stack notifications, so we do not lose precious time here ...
-                        NotificationSystem.SendMail(_job.settings.mailAddr, _mailSubject, _mailContent, 2,
-                            _job.settings.login.smtpAddr, _job.settings.login.mail,
-                            _job.settings.login.password, _job.settings.login.port);
-                    }
-                    else
-                    {
-                        if (MadConf.conf.defaultMailAddr != null || MadConf.conf.defaultMailAddr != "")
+                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
+                            + "') finished with a not expected result!");
+
+                        string _mailContent = "";
+                        _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
+                        _mailContent += "JobNode-IP:  '" + _node.ipAddress.ToString() + "'\n";
+                        _mailContent += "JobNode-MAC: '" + _node.macAddress.ToString() + "'\n\n";
+                        _mailContent += GenJobInfo(_job);
+                        _mailContent += GenBrokenRulesText(_job.outp, _bRules);
+
+                        if (_job.settings != null)
                         {
-                            // Same like above.
-                            // Here we use global-settings instead of job-settings.
-                            NotificationSystem.SendMail(new MailAddress[1] { new MailAddress(MadConf.conf.defaultMailAddr) },
-                                _mailSubject, _mailContent, 2);
+                            // This is not the perfect solution. Need to create a class, which
+                            // can stack notifications, so we do not lose precious time here ...
+                            NotificationSystem.SendMail(_job.settings.mailAddr, _mailSubject, _mailContent, 2,
+                                _job.settings.login.smtpAddr, _job.settings.login.mail,
+                                _job.settings.login.password, _job.settings.login.port);
                         }
                         else
-                        { 
-                            // No notification is possible, because the Job has no settings and the global settings are empty.
-                            Logger.Log("No notification possible! Job has no settings and no global settings set!", Logger.MessageType.ERROR);
+                        {
+                            if (_conf.MAIL_DEFAULT != null || _conf.MAIL_DEFAULT.Length != 0)
+                            {
+                                // Use global notification-settings.
+
+                                /* The JobScedule does not know if the SMTP-Login works. */
+
+                                NotificationSystem.SendMail(_conf.MAIL_DEFAULT,
+                                    _mailSubject, _mailContent, 2);
+                            }
+                            else
+                            {
+                                // No notification is possible, because the Job has no settings and the default
+                                // mail-addresses are not set.
+                                Logger.Log("No notification possible! Job has no settings and no global settings set!", Logger.MessageType.ERROR);
+                            }
                         }
                     }
+                    MadConf.UnlockConfRead();
                 }
+                else
+                    MadConf.UnlockConfRead();
             }
 
             _job.state = Job.JobState.Waiting;
