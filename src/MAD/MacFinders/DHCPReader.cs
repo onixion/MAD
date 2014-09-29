@@ -8,6 +8,7 @@ using System.Threading;
 
 using MAD.Helper;
 using MAD.Logging;
+using MAD.MacFinders;
 using MAD.JobSystemCore;
 
 using Amib.Threading; 
@@ -202,20 +203,16 @@ namespace MAD.DHCPReader
                         }
                     }
 
-					//Aufräumen mit neuer ModelHost Klasse
-
-                    var _found = NetworkHelper._dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac));
-                    if (_found == null)
+                    if (ModelHost.Exists(_tmpModel))
                     {
-                        NetworkHelper._dummyList.Add(_tmpModel);
-                        _tmpModel.ManuallyIncreaseCount();
+                        if (_tmpModel.nameGiven)
+                            ModelHost.UpdateHost(_tmpModel, _tmpModel.hostIP, _tmpModel.hostName);
+                        else
+                            ModelHost.UpdateHost(_tmpModel, _tmpModel.hostIP);
                     }
                     else
                     {
-                        ModelHost _tmptmpModel = NetworkHelper._dummyList.Find(x=>x.hostMac.Contains(_tmpModel.hostMac));
-                        _tmpModel.ID = _tmptmpModel.ID;
-                        NetworkHelper._dummyList.Remove(NetworkHelper._dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
-                        NetworkHelper._dummyList.Add(_tmpModel);
+                        ModelHost.AddToList(_tmpModel);
                     }
                 }
             }
@@ -225,18 +222,18 @@ namespace MAD.DHCPReader
             }
         }
 
-        private void UpdateLists()
+        private void UpdateLists()                                                                                  //keat überarbeitet, is in progress
         {
             while (true)
             {
                 Thread.Sleep((int)_sleepFor);
                 bool _active;
 
-                if (NetworkHelper._dummyList != null)
+                if (ModelHost.hostList != null)
                 {
-                    for (int i = 0; i < NetworkHelper._dummyList.Count; i++)
+                    for (int i = 0; i < ModelHost.hostList.Count; i++)
                     {
-                        ModelHost _dummy = NetworkHelper._dummyList[i];
+                        ModelHost _dummy = ModelHost.hostList[i];
                         if (_dummy.hostIP != null)
                         {
                             Ping _ping = new Ping();

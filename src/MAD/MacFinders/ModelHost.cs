@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 namespace MAD.MacFinders
 {
-	public static List<ModelHost> _dummyList = new List<ModelHost>();
-
 	public class ModelHost                                                         //A class which provides all importand information for a host - feel free to put more in it!
 	{
 		#region member
 		public IPAddress hostIP;
 		public string hostName;
 		public string hostMac;
-
-		public bool nameGiven, macGiven, ipGiven;
+        
+        public static List<ModelHost> hostList = new List<ModelHost>();
+		
+        public bool nameGiven, macGiven, ipGiven;
 
 		public static uint _count = 0;
 		#endregion
@@ -70,12 +70,13 @@ namespace MAD.MacFinders
 		#endregion
 
 		#region privateFunctions
-		private void IncreaseCount()
+
+		private static void IncreaseCount()
 		{
 			_count++;
 		}
 
-		private void DecreaseCount()
+		private static void DecreaseCount()
 		{
 			_count--;
 		}
@@ -87,34 +88,34 @@ namespace MAD.MacFinders
 		public static bool Exists(string macAddr)
 		{
 			bool _exists; 
-			var _foo = _dummyList.Find(x => x.hostMac.Contains(macAddr));
+			var _foo = hostList.Find(x => x.hostMac.Contains(macAddr));
 
 			if(_foo == null)
 				_exists = false;
 			else
 				_exists = true;
 
-			return _exists
+            return _exists;
 		}
 
 		public static bool Exists(ModelHost dummy)
 		{
 			bool _exists; 
-			var _foo = _dummyList.Find(x => x.hostMac.Contains(dummy.hostMac));
+			var _foo = hostList.Find(x => x.hostMac.Contains(dummy.hostMac));
 
 			if(_foo == null)
 				_exists = false;
 			else
 				_exists = true;
 
-			return _exists
+            return _exists;
 		}
 		#endregion
 
 		#region AddToList
 		public static void AddToList(ModelHost dummy)
 		{
-			_dummyList.Add(dummy);
+			hostList.Add(dummy);
 			if(!Exists(dummy))
 				IncreaseCount();
 		}
@@ -122,7 +123,7 @@ namespace MAD.MacFinders
 		public static void AddToList(string macAddr)
 		{
 			ModelHost _dummy = new ModelHost(macAddr);
-			_dummyList.Add(_dummy);
+			hostList.Add(_dummy);
 			if(!Exists(_dummy))
 				IncreaseCount();
 		}
@@ -130,7 +131,7 @@ namespace MAD.MacFinders
 		public static void AddToList(string macAddr, IPAddress ipAddr)
 		{
 			ModelHost _dummy = new ModelHost(macAddr, ipAddr);
-			_dummyList.Add(_dummy);
+			hostList.Add(_dummy);
 			if(!Exists(_dummy))
 				IncreaseCount();
 		}
@@ -138,7 +139,7 @@ namespace MAD.MacFinders
 		public static void AddToList(string macAddr, string hostName)
 		{
 			ModelHost _dummy = new ModelHost(macAddr, hostName);
-			_dummyList.Add(_dummy);
+			hostList.Add(_dummy);
 			if(!Exists(_dummy))
 				IncreaseCount();
 		}
@@ -146,7 +147,7 @@ namespace MAD.MacFinders
 		public static void AddToList(string macAddr, IPAddress ipAddr, string hostName)
 		{
 			ModelHost _dummy = new ModelHost(macAddr, ipAddr, hostName);
-			_dummyList.Add(_dummy);
+			hostList.Add(_dummy);
 			if(!Exists(_dummy))
 				IncreaseCount();
 		}
@@ -158,7 +159,7 @@ namespace MAD.MacFinders
 			if(Exists(dummy))
 			{
 				DecreaseCount();
-				_dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(dummy.hostMac)));
+				hostList.Remove(hostList.Find(x => x.hostMac.Contains(dummy.hostMac)));
 			}
 		}
 
@@ -167,7 +168,7 @@ namespace MAD.MacFinders
 			if(Exists(macAddr))
 			{
 				DecreaseCount();
-				_dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(macAddr)));
+				hostList.Remove(hostList.Find(x => x.hostMac.Contains(macAddr)));
 			}
 		}
 		#endregion
@@ -282,9 +283,9 @@ namespace MAD.MacFinders
 		{
 			string _output = "";
 
-			if (_dummyList != null)
+			if (hostList != null)
 			{
-				foreach (ModelHost _dummy in _dummyList)
+				foreach (ModelHost _dummy in hostList)
 				{
 					_output += "\n MAC-Address: " + _dummy.hostMac;
 

@@ -153,12 +153,16 @@ namespace MAD.MacFinders
 				ipAddress[i] = data[ipOffset + i];
             }
 
-			string _name = TryGetName (ipAddress);
+            string hwAddr = NetworkHelper.getMacStringFromArp(hwAddress);
+            IPAddress ipAddr = new IPAddress(ipAddress);
+			string _name = TryGetName (ipAddr);
+
+            ModelHost _tmp; 
 
 			if (String.IsNullOrEmpty (_name))
-				ModelHost _tmp = new ModelHost(hwAddress, ipAddress);
+				_tmp = new ModelHost(hwAddr, ipAddr);
 			else
-				ModelHost _tmp = new ModelHost(hwAddress, ipAddress, name);
+				_tmp = new ModelHost(hwAddr, ipAddr, _name);
 
 			return _tmp; 
         }
@@ -173,13 +177,14 @@ namespace MAD.MacFinders
 
 		private string TryGetName(IPAddress ipAddr)
 		{
-			string hostName = ""; 
-
+			string hostName = "";
+            IPHostEntry ipEntry;
 			try
 			{
-				hostName = Dns.GetHostEntry(ipAddr);
+				ipEntry = Dns.GetHostEntry(ipAddr);
+                hostName = ipEntry.HostName;
 			}
-			catch (Exception ex) 
+			catch (Exception) 
 			{ }
 
 			return hostName; 
