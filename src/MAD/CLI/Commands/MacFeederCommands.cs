@@ -84,7 +84,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string _tmp = _feeder.PrintLists();
+            string _tmp = ModelHost.PrintLists();
 
             return "<color><blue>" + _tmp;
         }

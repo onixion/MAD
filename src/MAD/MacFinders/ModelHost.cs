@@ -1,6 +1,10 @@
 ﻿using System;
-using System.Net; 
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Collections.Generic;
+
+using SharpPcap;
+using PacketDotNet;
 
 namespace MAD.MacFinders
 {
@@ -279,7 +283,7 @@ namespace MAD.MacFinders
 		}
 		#endregion 
 
-		public string PrintLists()
+		public static string PrintLists()
 		{
 			string _output = "";
 
@@ -304,6 +308,55 @@ namespace MAD.MacFinders
 			}
 			return _output;
 		}
+
+        public static void PingThroughList()
+        {
+               if (ModelHost.hostList != null)
+               {
+                   for (int i = 0; i < ModelHost.hostList.Count; i++)
+                   {
+                      ModelHost _dummy = ModelHost.hostList[i];
+                       if (_dummy.hostIP != null)
+                       {
+                           Ping _ping = new Ping();
+
+                           try
+                           {
+                               PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                               if (_reply.Status != IPStatus.Success)
+                               {
+                                   if (_reply.Status == IPStatus.DestinationHostUnreachable)
+                                       _dummy.hostName += " (Host Unreachable)";
+                                   else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
+                                       _dummy.hostName += " (Network Unreachable)";
+                                   else if (_reply.Status == IPStatus.DestinationPortUnreachable)
+                                       _dummy.hostName += " (Port Unreachable)";
+                                   else if (_reply.Status == IPStatus.DestinationUnreachable)
+                                       _dummy.hostName += " (Unreachable)";
+                                   else if (_reply.Status == IPStatus.TimedOut)
+                                       _dummy.hostName += " (Ping Time Out)";
+                                   else if (_reply.Status == IPStatus.Unknown)
+                                       _dummy.hostName += " (Unknown Ping Error)";
+                                   else
+                                       _dummy.hostName += " (Unknown Ping Error)";
+
+                                   ModelHost.hostList[i] = _dummy;
+                                   return;
+                               }
+                               else
+                                   return;
+                           }
+                           catch
+                           {
+                               _dummy.hostName += " (Unknown Ping Error)";
+                               ModelHost.hostList[i] = _dummy;
+                               return;
+                           }
+                       }
+                   }
+               }
+        }
 
 		#endregion
 	}

@@ -85,6 +85,9 @@ namespace MAD
 
             conf.cliServerPort = 2222;
             conf.serverHeader = "MAD-CLIServer YUHU!";
+
+            conf.arpInterface = 4;
+            conf.snmpInterface = 0;
         }
 
         #endregion
@@ -108,5 +111,9 @@ namespace MAD
         // cliserver vars
         public string serverHeader;
         public int cliServerPort;
+
+        // networking vars
+        public uint arpInterface;
+        public uint snmpInterface;
     }
 }

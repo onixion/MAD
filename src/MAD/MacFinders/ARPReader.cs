@@ -6,6 +6,7 @@ using System.Threading;
 using SharpPcap;
 using PacketDotNet;
 
+using MAD;
 using MAD.Logging;
 using MAD.Helper;
 
@@ -17,7 +18,7 @@ namespace MAD.MacFinders
         private ICaptureDevice _dev;
         private ICaptureDevice _listenDev;
 
-        public uint networkInterface;
+        public uint networkInterface = MadConf.conf.arpInterface;
         public uint subnetMask;
         public IPAddress netAddress;
         public IPAddress srcAddress;

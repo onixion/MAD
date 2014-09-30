@@ -262,6 +262,7 @@ namespace MAD.CLICore
         }
     }
 
+    /*                                                                                                                          Auskommentiert für die Implementierung durch Alin
     public class JobSystemSyncNodeCommand : Command
     {
         private JobSystem _js;
@@ -286,7 +287,8 @@ namespace MAD.CLICore
             return output;
         }
     }
-
+    */
+      
     public class JobSystemSaveNodeCommand : Command
     { 
         private JobSystem _js;

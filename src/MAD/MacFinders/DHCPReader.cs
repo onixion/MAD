@@ -222,48 +222,12 @@ namespace MAD.DHCPReader
             }
         }
 
-        private void UpdateLists()                                                                                  //keat überarbeitet, is in progress
+        private void UpdateLists()
         {
             while (true)
             {
                 Thread.Sleep((int)_sleepFor);
-                bool _active;
-
-                if (ModelHost.hostList != null)
-                {
-                    for (int i = 0; i < ModelHost.hostList.Count; i++)
-                    {
-                        ModelHost _dummy = ModelHost.hostList[i];
-                        if (_dummy.hostIP != null)
-                        {
-                            Ping _ping = new Ping();
-
-                            try
-                            {
-                                PingReply _reply = _ping.Send(_dummy.hostIP);
-
-                                if (_reply.Status == IPStatus.Success)
-                                {
-                                    _active = true;
-                                }
-                                else
-                                {
-                                    _active = false;
-                                }
-                            }
-                            catch
-                            {
-                                _active = false;
-                            }
-
-                            if (!_active)
-                            {
-                                NetworkHelper._dummyList.Remove(_dummy);
-                                _dummy.ManuallyDecreaseCount();
-                            }
-                        }
-                    }
-                }
+                ModelHost.PingThroughList();
             }
         }
         #endregion
