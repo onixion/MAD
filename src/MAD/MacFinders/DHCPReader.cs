@@ -13,9 +13,9 @@ using MAD.JobSystemCore;
 
 using Amib.Threading; 
 
-namespace MAD.DHCPReader
+namespace MAD.MacFinders
 {
-    public class MACFeeder                                                          //need to do something about that name.. 
+    public class DHCPReader                                                          //need to do something about that name.. 
     {
         #region member
 
@@ -41,7 +41,7 @@ namespace MAD.DHCPReader
 
         #region Constructor
 
-        public MACFeeder()
+        public DHCPReader()
         {
             _sleepFor = 25000;                                                      //default value will be changeable
         }

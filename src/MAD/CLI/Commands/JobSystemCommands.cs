@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.IO; 
 
 using MAD.JobSystemCore;
-using MAD.DHCPReader;
+using MAD.MacFinders;
 using MAD.Notification;
 using MAD.Helper;
 

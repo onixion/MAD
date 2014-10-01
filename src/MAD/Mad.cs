@@ -6,7 +6,7 @@ using System.Security.AccessControl;
 using MAD.JobSystemCore;
 using MAD.CLICore;
 using MAD.CLIServerCore;
-using MAD.DHCPReader;
+using MAD.MacFinders;
 using MAD.Logging;
 using MAD.Notification;
 
@@ -47,7 +47,7 @@ namespace MAD
             }
 
             JobSystem js = new JobSystem();
-            MACFeeder macFeeder = new MACFeeder();
+            DHCPReader dhcpReader = new DHCPReader();
 
             if (Logger.PathFileExists())
                 Logger.ReadPathToLogFile();
@@ -72,7 +72,7 @@ namespace MAD
                     case "-cli":
                         Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
 
-                        CLI cli = new CLI(js, macFeeder);
+                        CLI cli = new CLI(js, dhcpReader);
                         cli.Start();
                         break;
                     case "-cliserver":

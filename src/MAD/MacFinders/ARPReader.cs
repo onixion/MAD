@@ -132,11 +132,11 @@ namespace MAD.MacFinders
                 arpheader[3] = data[21];
 
 				if (arpheader [0] == 8 && arpheader [1] == 6 && arpheader [2] == 0 && arpheader [3] == 2)
-					SyncModelHosts (ReadAddresses(data));                                                                                      //Ersetezen mit funktion zum host hinzufügen
+					SyncModelHosts (ReadAddresses(data));
             }
         }
 
-		private ModelHost ReadAddresses(byte[] data)                                                                           //passend machen
+		private ModelHost ReadAddresses(byte[] data)
         {
 			byte[] hwAddress = new byte[6];
 			byte[] ipAddress = new byte[4];

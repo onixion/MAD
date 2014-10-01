@@ -4,7 +4,7 @@ using System.IO;
 
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
-using MAD.DHCPReader;
+using MAD.MacFinders;
 using CLIIO;
 
 namespace MAD.CLICore
@@ -21,7 +21,7 @@ namespace MAD.CLICore
 
         #region constructor
 
-        public CLI(JobSystem js, MACFeeder macFeeder)
+        public CLI(JobSystem js, DHCPReader dhcpReader)
             :base()
         {
             // GENERAL
@@ -45,12 +45,13 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("change logName", typeof(ChangeLogFileName), null));
 
             // MAC AND IP READER
-            commands.Add(new CommandOptions("mac finder start", typeof(CatchBasicInfoStartCommand), new object[] { macFeeder }));
-            commands.Add(new CommandOptions("mac finder stop", typeof(CatchBasicInfoStopCommand), new object[] { macFeeder }));
-            commands.Add(new CommandOptions("mac finder set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { macFeeder }));
-            commands.Add(new CommandOptions("mac finder print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { macFeeder }));
+            commands.Add(new CommandOptions("dhcp reader start", typeof(CatchBasicInfoStartCommand), new object[] { dhcpReader }));
+            commands.Add(new CommandOptions("dhcp reader stop", typeof(CatchBasicInfoStopCommand), new object[] { dhcpReader }));
+            commands.Add(new CommandOptions("dhcp reader set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { dhcpReader }));
+            commands.Add(new CommandOptions("print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { dhcpReader }));
             commands.Add(new CommandOptions("arp reader list interfaces", typeof(PrintArpReadyInterfaces), null));
             commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), null));
+            commands.Add(new CommandOptions("check list", typeof(CheckList), null));
 
             // JOBSYSTEM
             commands.Add(new CommandOptions("js", typeof(JobSystemStatusCommand), new object[] { js }));

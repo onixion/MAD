@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using SharpPcap;
 using PacketDotNet;
 
+using MAD.Logging;
+
 namespace MAD.MacFinders
 {
 	public class ModelHost                                                         //A class which provides all importand information for a host - feel free to put more in it!
@@ -14,10 +16,12 @@ namespace MAD.MacFinders
 		public IPAddress hostIP;
 		public string hostName;
 		public string hostMac;
+        public string status; 
         
         public static List<ModelHost> hostList = new List<ModelHost>();
 		
         public bool nameGiven, macGiven, ipGiven;
+        public bool reachable; 
 
 		public static uint _count = 0;
 		#endregion
@@ -285,25 +289,45 @@ namespace MAD.MacFinders
 
 		public static string PrintLists()
 		{
+            Logger.Log("Printing list of hosts", Logger.MessageType.INFORM); 
 			string _output = "";
 
 			if (hostList != null)
 			{
 				foreach (ModelHost _dummy in hostList)
 				{
-					_output += "\n MAC-Address: " + _dummy.hostMac;
+                    if (_dummy.reachable)
+                    {
+                        _output += "\n MAC-Address: " + _dummy.hostMac;
 
-					if (_dummy.hostName != null)
-						_output += "\n Host Name: " + _dummy.hostName;
-					else
-						_output += "\n Host Name: NA..";
+                        if (_dummy.hostName != null)
+                            _output += "\n Host Name: " + _dummy.hostName;
+                        else
+                            _output += "\n Host Name: NA..";
 
-					if (_dummy.hostIP != null)
-						_output += "\n IP-Address: " + _dummy.hostIP.ToString();
-					else
-						_output += "\n IP-Address: NA..";
+                        if (_dummy.hostIP != null)
+                            _output += "\n IP-Address: " + _dummy.hostIP.ToString();
+                        else
+                            _output += "\n IP-Address: NA..";
 
-					_output += "\n \n";
+                        _output += "\n \n";
+                    }
+                    else
+                    {
+                        _output += "\n MAC-Address: " + _dummy.hostMac + _dummy.status;
+
+                        if (_dummy.hostName != null)
+                            _output += "\n Host Name: " + _dummy.hostName;
+                        else
+                            _output += "\n Host Name: NA..";
+
+                        if (_dummy.hostIP != null)
+                            _output += "\n IP-Address: " + _dummy.hostIP.ToString();
+                        else
+                            _output += "\n IP-Address: NA..";
+
+                        _output += "\n \n";
+                    }
 				}
 			}
 			return _output;
@@ -311,51 +335,57 @@ namespace MAD.MacFinders
 
         public static void PingThroughList()
         {
-               if (ModelHost.hostList != null)
-               {
-                   for (int i = 0; i < ModelHost.hostList.Count; i++)
-                   {
-                      ModelHost _dummy = ModelHost.hostList[i];
-                       if (_dummy.hostIP != null)
-                       {
-                           Ping _ping = new Ping();
+            Logger.Log("Pinging through host list..", Logger.MessageType.INFORM);
+            if (ModelHost.hostList != null)
+            {
+                for (int i = 0; i < ModelHost.hostList.Count; i++)
+                {
+                   ModelHost _dummy = ModelHost.hostList[i];
+                    if (_dummy.hostIP != null)
+                    {
+                        Ping _ping = new Ping();
 
-                           try
-                           {
-                               PingReply _reply = _ping.Send(_dummy.hostIP);
+                        try
+                        {
+                            PingReply _reply = _ping.Send(_dummy.hostIP);
 
-                               if (_reply.Status != IPStatus.Success)
-                               {
-                                   if (_reply.Status == IPStatus.DestinationHostUnreachable)
-                                       _dummy.hostName += " (Host Unreachable)";
-                                   else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
-                                       _dummy.hostName += " (Network Unreachable)";
-                                   else if (_reply.Status == IPStatus.DestinationPortUnreachable)
-                                       _dummy.hostName += " (Port Unreachable)";
-                                   else if (_reply.Status == IPStatus.DestinationUnreachable)
-                                       _dummy.hostName += " (Unreachable)";
-                                   else if (_reply.Status == IPStatus.TimedOut)
-                                       _dummy.hostName += " (Ping Time Out)";
-                                   else if (_reply.Status == IPStatus.Unknown)
-                                       _dummy.hostName += " (Unknown Ping Error)";
-                                   else
-                                       _dummy.hostName += " (Unknown Ping Error)";
+                            if (_reply.Status != IPStatus.Success)
+                            {
+                                _dummy.reachable = false;
 
-                                   ModelHost.hostList[i] = _dummy;
-                                   return;
-                               }
-                               else
-                                   return;
-                           }
-                           catch
-                           {
-                               _dummy.hostName += " (Unknown Ping Error)";
-                               ModelHost.hostList[i] = _dummy;
-                               return;
-                           }
-                       }
-                   }
-               }
+                                if (_reply.Status == IPStatus.DestinationHostUnreachable)
+                                    _dummy.status = " (Host Unreachable)";
+                                else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
+                                    _dummy.status = " (Network Unreachable)";
+                                else if (_reply.Status == IPStatus.DestinationPortUnreachable)
+                                    _dummy.status = " (Port Unreachable)";
+                                else if (_reply.Status == IPStatus.DestinationUnreachable)
+                                    _dummy.status = " (Unreachable)";
+                                else if (_reply.Status == IPStatus.TimedOut)
+                                    _dummy.status = " (Ping Time Out)";
+                                else if (_reply.Status == IPStatus.Unknown)
+                                    _dummy.status = " (Unknown Ping Error)";
+                                else
+                                    _dummy.status = " (Unknown Ping Error)";
+
+                                ModelHost.hostList[i] = _dummy;
+                            }
+                            else
+                            {
+                                _dummy.reachable = true;
+
+                                ModelHost.hostList[i] = _dummy; 
+                            }
+                        }
+                        catch
+                        {
+                            _dummy.reachable = false; 
+                            _dummy.status = " (Unknown Ping Error)";
+                            ModelHost.hostList[i] = _dummy;
+                        }
+                    }
+                }
+            }
         }
 
 		#endregion
