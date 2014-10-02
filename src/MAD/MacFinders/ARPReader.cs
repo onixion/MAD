@@ -154,7 +154,7 @@ namespace MAD.MacFinders
 				ipAddress[i] = data[ipOffset + i];
             }
 
-            string hwAddr = NetworkHelper.getMacStringFromArp(hwAddress);
+            string hwAddr = NetworkHelper.getPhysicalAddressStringFromArp(hwAddress);
             IPAddress ipAddr = new IPAddress(ipAddress);
 			string _name = TryGetName (ipAddr);
 

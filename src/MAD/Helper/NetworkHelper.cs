@@ -76,7 +76,7 @@ namespace MAD.Helper
             return (subnetBytes);
         }
 
-        public bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
+        public static bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
         {
             if (data[DHCP_COOKIE_POSITION] == DHCP_COOKIE_BYTE0_VALUE 
                 && data[DHCP_COOKIE_POSITION + 1] == DHCP_COOKIE_BYTE1_VALUE 
@@ -88,7 +88,7 @@ namespace MAD.Helper
             else return false;
         }
 
-        public bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
+        public static bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
         {
             for (uint i = DHCP_COOKIE_POSITION; i < data.Length; i++)
             {
@@ -131,7 +131,7 @@ namespace MAD.Helper
             return macAddress;
         }
 
-        public string getPhysicalAddressString(byte[] data)                         // same as ^ but without doubledots, so PhysicalAddress Class can parse it
+        public static string getPhysicalAddressStringFromDhcp(byte[] data)                         // same as ^ but without doubledots, so PhysicalAddress Class can parse it
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";
@@ -140,6 +140,20 @@ namespace MAD.Helper
             {
                 macBytes[i - 28] = data[i];
                 macAddress += String.Format("{0:X02}", macBytes[i - 28]);
+                macAddress.ToUpperInvariant();
+            }
+            return macAddress;
+        }
+
+        public static string getPhysicalAddressStringFromArp(byte[] data)
+        {
+            byte[] macBytes = new byte[6];
+            string macAddress = "";
+
+            for (uint i = 0; i < 6; i++)
+            {
+                macBytes[i] = data[i];
+                macAddress += String.Format("{0:X02}", macBytes[i]);
                 macAddress.ToUpperInvariant();
             }
             return macAddress;

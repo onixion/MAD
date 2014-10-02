@@ -18,8 +18,6 @@ namespace MAD.MacFinders
     public class DHCPReader                                                          //need to do something about that name.. 
     {
         #region member
-
-        private static NetworkHelper _helper = new NetworkHelper();
         
         private byte[] _data;
 
@@ -151,10 +149,10 @@ namespace MAD.MacFinders
         {
             try
             {
-                if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
+                if (NetworkHelper.IsDhcp(_data) && NetworkHelper.IsDhcpRequest(_data))
                 {
                     ModelHost _tmpModel = new ModelHost();
-                    _tmpModel.hostMac = _helper.getPhysicalAddressString(_data);
+                    _tmpModel.hostMac = NetworkHelper.getPhysicalAddressStringFromDhcp(_data);
                     _tmpModel.macGiven = true;
 
                     for (uint i = NetworkHelper.DHCP_COOKIE_POSITION; i < _data.Length; i++)
