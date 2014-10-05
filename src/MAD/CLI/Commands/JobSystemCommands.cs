@@ -388,8 +388,8 @@ namespace MAD.CLICore
             output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
-            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
+            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.JobsActive() + "\n";
+            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.JobsInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = null;
@@ -832,7 +832,7 @@ namespace MAD.CLICore
 
     #region commands for adding jobs
 
-    public class JobSystemAddPingCommand : JobCommand
+    public class JobSystemAddPingCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -866,7 +866,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddHttpCommand : JobCommand
+    public class JobSystemAddHttpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -892,7 +892,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddPortCommand : JobCommand
+    public class JobSystemAddPortCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -918,7 +918,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddHostDetectCommand : JobCommand
+    public class JobSystemAddHostDetectCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -945,7 +945,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckSnmpCommand : JobCommand
+    public class JobSystemAddCheckSnmpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1025,7 +1025,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckFtpCommand : JobCommand
+    public class JobSystemAddCheckFtpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1053,7 +1053,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckDnsCommand : JobCommand
+    public class JobSystemAddCheckDnsCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1080,21 +1080,18 @@ namespace MAD.CLICore
 
     #region parsing job parameters
 
-    public class JobCommand : Command
+    public class JobAddCommand : Command
     {
         public const string JOB_NAME = "n";
         public const string JOB_ID = "id";
         public const string JOB_TIME_PAR = "t";
  
-        public JobCommand()
+        public JobAddCommand()
             : base()
         {
-            // GENERAL
-            rPar.Add(new ParOption(JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            
-            // TIME
-            oPar.Add(new ParOption(JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            rPar.Add(new ParOption(JOB_NAME, "<JOB-NAME>", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JOB_ID, "<NODE-ID>", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption(JOB_TIME_PAR, "<TIME>", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
@@ -1140,14 +1137,14 @@ namespace MAD.CLICore
         public NotificationConCommand()
             :base()
         {
-            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "SMTP-ADDR>:<SMTP-PORT", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "TO-MAIL-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "<SMTP-ADDR>:<SMTP-PORT>", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "<SMTP-MAIL>:<SMTP-PASS>", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "<TO-MAIL-ADDR>", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
         }
 
         public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
+        { 
+            return null; 
         }
 
         public JobNotificationSettings ParseJobNotificationSettings(ParInput pars)
