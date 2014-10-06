@@ -52,10 +52,13 @@ namespace MAD
             else
                 Logger.CreateNewPathFile();
 
+            MadConfigFile _confLocked = MadConf.GetLockedConfRead();
 
             JobSystem js = new JobSystem();
             MACFeeder macFeeder = new MACFeeder();
-            //NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
+            NotificationSystem.SetOrigin(_confLocked.SMTP_SERVER, new System.Net.Mail.MailAddress(_confLocked.SMTP_USER), _confLocked.SMTP_PASS, _confLocked.SERVER_PORT);
+
+            MadConf.UnlockConfRead();
 
             if (args.Length == 0)
             { 

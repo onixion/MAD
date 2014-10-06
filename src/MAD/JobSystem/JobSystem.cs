@@ -24,6 +24,8 @@ namespace MAD.JobSystemCore
         private List<JobNode> _nodes = new List<JobNode>();
 
         public event EventHandler OnNodeCountChanged = null;
+        public event EventHandler OnJobCountChanged = null;
+        public event EventHandler OnShutdown = null;
         
         #endregion
 
@@ -43,11 +45,19 @@ namespace MAD.JobSystemCore
         /// <summary>
         /// Save all current nodes into a json-file.
         /// </summary>
-        /// <param name="filepath">Path to file (Execption will be thrown if directory does not exists or if the file already exists!).</param>
+        /// <param name="filepath">Path to file (Execption will be thrown if directory does not exist or if the file already exist!).</param>
         public void SaveTable(string filepath)
         {
             _nodesLock.EnterWriteLock();
-            JSSerializer.SerializeTable(filepath, _nodes);
+            try
+            {
+                JSSerializer.SerializeTable(filepath, _nodes);
+            }
+            catch (Exception e)
+            {
+                _nodesLock.ExitWriteLock();
+                throw e;
+            }
             _nodesLock.ExitWriteLock();
         }
 
@@ -55,7 +65,7 @@ namespace MAD.JobSystemCore
         /// Load nodes from json-file.
         /// </summary>
         /// <param name="filepath"></param>
-        /// <returns>Path to file.</returns>
+        /// <returns>Path to file (Execption will be thrown if file does not exist!).</returns>
         public int LoadTable(string filepath)
         {
             List<JobNode> _loadNodes = JSSerializer.DeserializeTable(filepath);
@@ -72,6 +82,9 @@ namespace MAD.JobSystemCore
         public void Shutdown()
         {
             _scedule.Stop();
+
+            if (OnShutdown != null)
+                OnShutdown.Invoke(null, null);
         }
 
         #endregion
@@ -328,28 +341,66 @@ namespace MAD.JobSystemCore
             return false;
         }
 
-        // not working
-        public void UpdateNodeName(int nodeID, string name)
+        public bool UpdateNodeName(int nodeID, string name)
         {
-            
+            JobNode _node = GetNodeLocked(nodeID);
+            if (_node != null)
+            {
+                _node.nodeLock.EnterWriteLock();
+                _node.name = name;
+                _node.nodeLock.ExitWriteLock();
+                _nodesLock.ExitReadLock();
+                return true;
+            }
+            else
+                return false;
         }
 
-        // not working
-        public void UpdateNodeMac(int nodeID, PhysicalAddress mac)
+        public bool UpdateNodeMac(int nodeID, PhysicalAddress mac)
         {
-            
+            JobNode _node = GetNodeLocked(nodeID);
+            if (_node != null)
+            {
+                _node.nodeLock.EnterWriteLock();
+                _node.macAddress = mac;
+                _node.nodeLock.ExitWriteLock();
+                _nodesLock.ExitReadLock();
+                return true;
+            }
+            else
+                return false;
         }
 
-        // not working
-        public void UpdateNodeIP(int nodeID, IPAddress ip)
+        public bool UpdateNodeIP(int nodeID, IPAddress ip)
         {
-            
+            JobNode _node = GetNodeLocked(nodeID);
+            if (_node != null)
+            {
+                _node.nodeLock.EnterWriteLock();
+                _node.ipAddress = ip;
+                _node.nodeLock.ExitWriteLock();
+                _nodesLock.ExitReadLock();
+                return true;
+            }
+            else
+                return false;
         }
 
-        // not working
+        // not finished yet
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
-            return null;
+            SyncResult _result = new SyncResult();
+
+            _nodesLock.EnterWriteLock();
+            for (int i = 0; i < currentHosts.Count; i++)
+            { 
+                
+            
+            
+            }
+            _nodesLock.ExitWriteLock();
+
+            return _result;
         }
 
         #endregion

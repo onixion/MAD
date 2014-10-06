@@ -29,10 +29,11 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public const int MAXJOBS = 100;
 
+        // general
+        public Guid guid { get; set; }
         public string name { get; set; }
         public PhysicalAddress macAddress { get; set; } // sns
         public IPAddress ipAddress { get; set; } // sns
-
         public List<Job> jobs = new List<Job>();
 
         #endregion
@@ -42,11 +43,14 @@ namespace MAD.JobSystemCore
         public JobNode()
         {
             InitID();
+            this.guid = new Guid();
         }
 
         public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
+
+            this.guid = new Guid();
             this.name = nodeName;
             this.macAddress = macAddress;
             this.ipAddress = ipAddress;
