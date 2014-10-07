@@ -20,7 +20,7 @@ namespace MAD.JobSystemCore
         private JobScedule _scedule { get; set; }
         private object _sceduleLock = new object();
 
-        private ReaderWriterLockSlim _nodesLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+        public object jsLock = new object();
         private List<JobNode> _nodes = new List<JobNode>();
 
         public event EventHandler OnNodeCountChanged = null;
@@ -33,7 +33,7 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
-            _scedule = new JobScedule(_nodesLock, _nodes);
+            _scedule = new JobScedule(jsLock, _nodes);
         }
 
         #endregion
@@ -48,17 +48,8 @@ namespace MAD.JobSystemCore
         /// <param name="filepath">Path to file (Execption will be thrown if directory does not exist or if the file already exist!).</param>
         public void SaveTable(string filepath)
         {
-            _nodesLock.EnterWriteLock();
-            try
-            {
+            lock(jsLock)
                 JSSerializer.SerializeTable(filepath, _nodes);
-            }
-            catch (Exception e)
-            {
-                _nodesLock.ExitWriteLock();
-                throw e;
-            }
-            _nodesLock.ExitWriteLock();
         }
 
         /// <summary>
@@ -69,10 +60,11 @@ namespace MAD.JobSystemCore
         public int LoadTable(string filepath)
         {
             List<JobNode> _loadNodes = JSSerializer.DeserializeTable(filepath);
-            _nodesLock.EnterWriteLock();
-            if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
-                _nodes.AddRange(_loadNodes);
-            _nodesLock.ExitWriteLock();
+            lock (jsLock)
+            {
+                if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
+                    _nodes.AddRange(_loadNodes);
+            }
             return _nodes.Count;
         }
 
@@ -121,103 +113,81 @@ namespace MAD.JobSystemCore
         public int NodesActive()
         {
             int _count = 0;
-
-            _nodesLock.EnterReadLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                _nodes[i].nodeLock.EnterReadLock();
-                if (_nodes[i].state == JobNode.State.Active)
-                    _count++;
-                _nodes[i].nodeLock.ExitReadLock();
+                for (int i = 0; i < _nodes.Count; i++)
+                {
+                    if (_nodes[i].state == JobNode.State.Active)
+                        _count++;
+                }
             }
-            _nodesLock.ExitReadLock();
-
             return _count;
         }
 
         public int NodesInactive()
         {
             int _count = 0;
-
-            _nodesLock.EnterReadLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                _nodes[i].nodeLock.EnterReadLock();
-                if (_nodes[i].state == JobNode.State.Inactive)
-                    _count++;
-                _nodes[i].nodeLock.ExitReadLock();
+                for (int i = 0; i < _nodes.Count; i++)
+                {
+                    if (_nodes[i].state == JobNode.State.Inactive)
+                        _count++;
+                }
             }
-            _nodesLock.ExitReadLock();
-
             return _count;
         }
 
         public int NodesInitialized()
         {
-            _nodesLock.EnterReadLock();
-            int _count = _nodes.Count;
-            _nodesLock.ExitReadLock();
-
+            int _count = 0;
+            lock(jsLock)
+                _count = _nodes.Count;
             return _count;
         }
 
         public int JobsActive()
         {
             int _count = 0;
-
-            _nodesLock.EnterReadLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                _nodes[i].nodeLock.EnterReadLock();
-                foreach (Job _job in _nodes[i].jobs)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    _job.jobLock.EnterReadLock();
-                    if (_job.state == Job.JobState.Waiting)
-                        _count++;
-                    _job.jobLock.ExitReadLock();
+                    foreach (Job _job in _nodes[i].jobs)
+                    {
+                        if (_job.state == Job.JobState.Waiting)
+                            _count++;
+                    }
                 }
-                _nodes[i].nodeLock.ExitReadLock();
             }
-            _nodesLock.ExitReadLock();
-
             return _count;
         }
 
         public int JobsInactive()
         {
             int _count = 0;
-
-            _nodesLock.EnterReadLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                _nodes[i].nodeLock.EnterReadLock();
-                foreach (Job _job in _nodes[i].jobs)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    _job.jobLock.EnterReadLock();
-                    if (_job.state == Job.JobState.Inactive)
-                        _count++;
-                    _job.jobLock.ExitReadLock();
+                    foreach (Job _job in _nodes[i].jobs)
+                    {
+                        if (_job.state == Job.JobState.Inactive)
+                            _count++;
+                    }
                 }
-                _nodes[i].nodeLock.ExitReadLock();
             }
-            _nodesLock.ExitReadLock();
-
             return _count;
         }
 
         public int JobsInitialized()
         {
             int _count = 0;
-
-            _nodesLock.EnterReadLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                _nodes[i].nodeLock.EnterReadLock();
-                _count = _count + _nodes[i].jobs.Count;
-                _nodes[i].nodeLock.ExitReadLock();
+                for (int i = 0; i < _nodes.Count; i++)
+                    _count = _count + _nodes[i].jobs.Count;
             }
-            _nodesLock.ExitReadLock();
-
             return _count;
         }
 
@@ -225,71 +195,67 @@ namespace MAD.JobSystemCore
 
         #region nodes handling
 
+        public List<JobNode> UnsafeGetNodes()
+        {
+            return _nodes;
+        }
+
+        public JobNode UnsafeGetNode(int id)
+        {
+            for (int i = 0; i < _nodes.Count; i++)
+                if (_nodes[i].id == id)
+                    return _nodes[i];
+            return null;
+        }
+
         public void StartNode(int id)
         {
-            JobNode _node = GetNodeLocked(id);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterReadLock();
-                if (_node.state == JobNode.State.Inactive)
+                JobNode _node = UnsafeGetNode(id);
+                if (_node != null)
                 {
-                    _node.nodeLock.ExitReadLock();
-                    _node.nodeLock.EnterWriteLock();
-                    _node.state = JobNode.State.Active;
-                    _node.nodeLock.ExitWriteLock();
-                    NodeUnlock();
+                    if (_node.state == JobNode.State.Inactive)
+                        _node.state = JobNode.State.Active;
+                    else
+                        throw new JobNodeException("Node already active or has an exception!", null);
                 }
                 else
-                {
-                    _node.nodeLock.ExitReadLock();
-                    NodeUnlock();
-                    throw new JobNodeException("Node already active or has an exception!", null);
-                }
+                    throw new JobNodeException("Node does not exist!", null);
             }
-            else
-                throw new JobNodeException("Node does not exist!", null);
         }
 
         public void StopNode(int id)
         {
-            JobNode _node = GetNodeLocked(id);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterReadLock();
-                if (_node.state == JobNode.State.Active)
+                JobNode _node = UnsafeGetNode(id);
+                if (_node != null)
                 {
-                    _node.nodeLock.ExitReadLock();
-                    _node.nodeLock.EnterWriteLock();
-                    _node.state = JobNode.State.Inactive;
-                    _node.nodeLock.ExitWriteLock();
-                    NodeUnlock();
+                    if (_node.state == JobNode.State.Active)
+                        _node.state = JobNode.State.Inactive;
+                    else
+                        throw new JobNodeException("Node already inactive or has an exception!", null);
                 }
                 else
-                {
-                    _node.nodeLock.ExitReadLock();
-                    NodeUnlock();
-                    throw new JobNodeException("Node already inactive or has an exception!", null);
-                }
+                    throw new JobNodeException("Node does not exist!", null);
             }
-            else
-                throw new JobNodeException("Node does not exist!", null);
         }
 
         public void AddNode(JobNode node)
         {
-            _nodesLock.EnterWriteLock();
-            if (MAXNODES > _nodes.Count)
+            lock (jsLock)
             {
-                _nodes.Add(node);
-                _nodesLock.ExitWriteLock();
+                if (MAXNODES > _nodes.Count)
+                {
 
-                if (OnNodeCountChanged != null)
-                    OnNodeCountChanged.Invoke(null, null);
-            }
-            else
-            {
-                _nodesLock.ExitWriteLock();
-                throw new JobSystemException("Node limit reached!", null);
+                    _nodes.Add(node);
+
+                    if (OnNodeCountChanged != null)
+                        OnNodeCountChanged.Invoke(null, null);
+                }
+                else
+                    throw new JobSystemException("Node limit reached!", null);
             }
         }
 
@@ -297,34 +263,31 @@ namespace MAD.JobSystemCore
         {
             bool _success = false;
 
-            _nodesLock.EnterWriteLock();
-            for (int i = 0; i < _nodes.Count; i++)
+            lock (jsLock)
             {
-                if (_nodes[i].id == id)
+                for (int i = 0; i < _nodes.Count; i++)
                 {
-                    _nodes.RemoveAt(i);
-                    _nodesLock.ExitWriteLock();
+                    if (_nodes[i].id == id)
+                    {
+                        _nodes.RemoveAt(i);
 
-                    if (OnNodeCountChanged != null)
-                        OnNodeCountChanged.Invoke(null, null);
+                        if (OnNodeCountChanged != null)
+                            OnNodeCountChanged.Invoke(null, null);
 
-                    _success = true;
-                    break;
+                        _success = true;
+                        break;
+                    }
                 }
             }
 
             if (!_success)
-            {
-                _nodesLock.ExitWriteLock();
                 throw new JobNodeException("Node does not exist!", null);
-            }
         }
 
         public void RemoveAllNodes()
         {
-            _nodesLock.EnterWriteLock();
-            _nodes.Clear();
-            _nodesLock.ExitWriteLock();
+            lock(jsLock)
+                _nodes.Clear();
 
             if(OnNodeCountChanged != null)
                 OnNodeCountChanged.Invoke(null, null);
@@ -332,73 +295,65 @@ namespace MAD.JobSystemCore
 
         public bool NodeExist(int id)
         {
-            JobNode _node = GetNodeLocked(id);
-            if (_node != null)
+            lock (jsLock)
             {
-                NodeUnlock();
-                return true;
+                JobNode _node = UnsafeGetNode(id);
+                if (_node != null)
+                    return true;
+                else
+                    return false;
             }
-            return false;
         }
 
         public bool UpdateNodeName(int nodeID, string name)
         {
-            JobNode _node = GetNodeLocked(nodeID);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterWriteLock();
-                _node.name = name;
-                _node.nodeLock.ExitWriteLock();
-                _nodesLock.ExitReadLock();
-                return true;
+                JobNode _node = UnsafeGetNode(nodeID);
+                if (_node != null)
+                {
+                    _node.name = name;
+                    return true;
+                }
+                else
+                    return false;
             }
-            else
-                return false;
         }
 
         public bool UpdateNodeMac(int nodeID, PhysicalAddress mac)
         {
-            JobNode _node = GetNodeLocked(nodeID);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterWriteLock();
-                _node.macAddress = mac;
-                _node.nodeLock.ExitWriteLock();
-                _nodesLock.ExitReadLock();
-                return true;
+                JobNode _node = UnsafeGetNode(nodeID);
+                if (_node != null)
+                {
+                    _node.macAddress = mac;
+                    return true;
+                }
+                else
+                    return false;
             }
-            else
-                return false;
         }
 
         public bool UpdateNodeIP(int nodeID, IPAddress ip)
         {
-            JobNode _node = GetNodeLocked(nodeID);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterWriteLock();
-                _node.ipAddress = ip;
-                _node.nodeLock.ExitWriteLock();
-                _nodesLock.ExitReadLock();
-                return true;
+                JobNode _node = UnsafeGetNode(nodeID);
+                if (_node != null)
+                {
+                    _node.ipAddress = ip;
+                    return true;
+                }
+                else
+                    return false;
             }
-            else
-                return false;
         }
 
         // not finished yet
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
             SyncResult _result = new SyncResult();
-
-            _nodesLock.EnterWriteLock();
-            for (int i = 0; i < currentHosts.Count; i++)
-            { 
-                
-            
-            
-            }
-            _nodesLock.ExitWriteLock();
 
             return _result;
         }
@@ -409,370 +364,124 @@ namespace MAD.JobSystemCore
 
         public void SaveNode(string fileName, int id)
         {
-            JobNode _node = GetNodeLocked(id);
-            if (_node != null)
+            lock (jsLock)
             {
-                NodeLockRead(_node);
-                JSSerializer.SerializeNode(fileName, _node);
-                NodeUnlockRead(_node);
-                NodeUnlock();
+                JobNode _node = UnsafeGetNode(id);
+                if (_node != null)
+                    JSSerializer.SerializeNode(fileName, _node);
+                else
+                    throw new JobNodeException("Node does not exist!", null);
             }
-            else
-                throw new JobNodeException("Node does not exist!", null);
         }
 
         public void LoadNode(string fileName)
         {
             JobNode _node = JSSerializer.DeserializeNode(fileName);
 
-            _nodesLock.EnterWriteLock();
-            _nodes.Add(_node);
-            _nodesLock.ExitWriteLock();
+            lock(jsLock)
+                _nodes.Add(_node);
         }
 
         #endregion
 
         #region jobs handling
 
+        public Job UnsafeGetJob(int id, out JobNode node)
+        {
+            for (int i = 0; i < _nodes.Count; i++)
+                for (int i2 = 0; i2 < _nodes[i].jobs.Count; i2++)
+                    if (_nodes[i].jobs[i2].id == id)
+                    {
+                        node = _nodes[i];
+                        return _nodes[i].jobs[i2];
+                    }
+            node = null;
+            return null;
+        }
+
         public void StartJob(int id)
         {
-            JobNode node;
-            Job _job = GetJobLockedGlobal(id, out node);
-            if (_job != null)
+            lock (jsLock)
             {
-                JobLockWrite(_job);
-                if (_job.state == Job.JobState.Inactive)
-                {
-                    _job.state = Job.JobState.Waiting;
-                    JobUnlockWrite(_job);
-                    JobUnlockedGlobal(node);
-                }
+                JobNode _node;
+                Job _job = UnsafeGetJob(id, out _node);
+                if (_job != null)
+                    if (_job.state == Job.JobState.Inactive)
+                        _job.state = Job.JobState.Waiting;
+                    else
+                        throw new JobException("Job already active!", null);
                 else
-                {
-                    JobUnlockWrite(_job);
-                    JobUnlockedGlobal(node);
-                    throw new JobException("Job already active!", null);
-                }
+                    throw new JobException("Job does not exist!", null);
             }
-            else
-                throw new JobException("Job does not exist!", null);
         }
 
         public void StopJob(int id)
         {
-            JobNode node;
-            Job _job = GetJobLockedGlobal(id, out node);
-            if (_job != null)
+            lock (jsLock)
             {
-                JobLockWrite(_job);
-                if (_job.state == Job.JobState.Waiting)
-                {
-                    _job.state = Job.JobState.Inactive;
-                    JobUnlockWrite(_job);
-                    JobUnlockedGlobal(node);
-                }
+                JobNode _node;
+                Job _job = UnsafeGetJob(id, out _node);
+                if (_job != null)
+                    if (_job.state == Job.JobState.Waiting)
+                        _job.state = Job.JobState.Inactive;
+                    else
+                        throw new JobException("Job already inactive!", null);
                 else
-                {
-                    JobUnlockWrite(_job);
-                    JobUnlockedGlobal(node);
-                    throw new JobException("Job already inactive!", null);
-                }
+                    throw new JobException("Job does not exist!", null);
             }
-            else
-                throw new JobException("Job does not exist!", null);
         }
 
         public void AddJobToNode(int nodeId, Job job)
         {
-            JobNode _node = GetNodeLocked(nodeId);
-            if (_node != null)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterWriteLock();
-
-                if (JobNode.MAXJOBS > _node.jobs.Count)
+                JobNode _node = UnsafeGetNode(nodeId);
+                if (_node != null)
                 {
-                    _node.jobs.Add(job);
-
-                    _node.nodeLock.ExitWriteLock();
-                    NodeUnlock();
+                    if (JobNode.MAXJOBS > _node.jobs.Count)
+                        _node.jobs.Add(job);
+                    else
+                        throw new JobSystemException("Jobs limit reached!", null);
                 }
                 else
-                {
-                    _node.nodeLock.ExitWriteLock();
-                    NodeUnlock();
-
-                    throw new JobSystemException("Jobs limit reached!", null);
-                }
-            }
-            else
-            {
-                throw new JobNodeException("Node does not exist!", null);
+                    throw new JobNodeException("Node does not exist!", null);
             }
         }
 
         public void RemoveJob(int id)
         {
-            _nodesLock.EnterReadLock();
-            foreach (JobNode _node in _nodes)
+            lock (jsLock)
             {
-                _node.nodeLock.EnterWriteLock();
-                for(int i = 0; i < _node.jobs.Count; i++)
+                bool _success = false;
+                foreach (JobNode _node in _nodes)
                 {
-                    if (_node.jobs[i].id == id)
+                    for (int i = 0; i < _node.jobs.Count; i++)
                     {
-                        _node.jobs.RemoveAt(i);
-                        break;
+                        if (_node.jobs[i].id == id)
+                        {
+                            _node.jobs.RemoveAt(i);
+                            _success = true;
+                            break;
+                        }
                     }
                 }
-                _node.nodeLock.ExitWriteLock();
+                if(_success != false)
+                    throw new JobException("Job does not exist!", null);
             }
-            _nodesLock.ExitReadLock();
         }
 
         public bool JobExist(int id)
         {
-            JobNode _node;
-            Job _job = GetJobLockedGlobal(id, out _node);
-            if (_job != null)
+            lock (jsLock)
             {
-                JobUnlockedGlobal(_node);
-                return true;
-            }
-            else
-                return false;
-        }
-
-        #endregion
-
-        #region write/read or read-only access to JobNodes and Jobs
-
-        #region Nodes reference handling (with locks)
-
-        /// <summary>
-        /// Returns a locked read-only reference of all nodes.
-        /// </summary>
-        /// <returns>A list of nodes (DO NOT ADD OR REMOVE ANY ITEMS OF THIS LIST -> READ-ONLY).</returns>
-        public List<JobNode> GetNodesLockedRead()
-        {
-            _nodesLock.EnterReadLock();
-            return _nodes;
-        }
-
-        /// <summary>
-        /// Unlocks a read-only list of nodes.
-        /// </summary>
-        public void UnlockNodesRead()
-        {
-            _nodesLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Retruns a locked read/write reference of all nodes (BEWARE: After the execution of this method the whole JobSystem is blocked!
-        /// No jobs can be executed, no information can be read, nothing! Use this method only if you really need it!).
-        /// </summary>
-        /// <returns>A list of nodes.</returns>
-        public List<JobNode> GetNodesLockedWrite()
-        {
-            _nodesLock.EnterWriteLock();
-            return _nodes;
-        }
-
-        /// <summary>
-        /// Unlocks a read/write list of nodes.
-        /// </summary>
-        public void UnlockNodesWrite()
-        {
-            _nodesLock.ExitWriteLock();
-        }
-
-        #endregion
-
-        #region Node reference handling (with locks)
-
-        /// <summary>
-        /// Returns a locked node reference.
-        /// </summary>
-        /// <param name="id">Id of the node.</param>
-        /// <returns>If it returns null, the node does not exist (no locks need to be unlocked).
-        /// If it returns a reference, it is locked and needs to get unlocked after usage (NodeUnlock(..)).</returns>
-        public JobNode GetNodeLocked(int id)
-        {
-            _nodesLock.EnterReadLock();
-            foreach (JobNode node in _nodes)
-            {
-                node.nodeLock.EnterReadLock();
-                if (node.id == id)
-                {
-                    node.nodeLock.ExitReadLock();
-                    return node;
-                }
+                JobNode _node;
+                Job _job = UnsafeGetJob(id, out _node);
+                if (_job != null)
+                    return true;
                 else
-                    node.nodeLock.ExitReadLock();
+                    return false;
             }
-            _nodesLock.ExitReadLock();
-            return null;
         }
-
-        /// <summary>
-        /// Unlocks a locked node reference.
-        /// </summary>
-        public void NodeUnlock()
-        {
-            _nodesLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Locks a node reference for read-only.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void NodeLockRead(JobNode node)
-        {
-            node.nodeLock.EnterReadLock();
-        }
-
-        /// <summary>
-        /// Unlocks a node reference for read-only.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void NodeUnlockRead(JobNode node)
-        {
-            node.nodeLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Locks a node reference for read/write.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void NodeLockWrite(JobNode node)
-        {
-            node.nodeLock.EnterWriteLock();
-        }
-
-        /// <summary>
-        /// Unlocks a node reference for read/write.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void NodeUnlockWrite(JobNode node)
-        {
-            node.nodeLock.ExitWriteLock();
-        }
-
-        #endregion
-
-        #region Job reference handling (with locks)
-
-        /// <summary>
-        /// Returns a locked job reference.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        /// <param name="id">Id of the job.</param>
-        /// <returns>If it returns null, the job does not exits (no locks need to be unlocked).
-        /// If it returns a reference, it is locked and need to be unlocked after usage (JobUnlock(..)).</returns>
-        public Job GetJobLocked(JobNode node, int id)
-        {
-            node.nodeLock.EnterReadLock();
-            foreach (Job job in node.jobs)
-            {
-                job.jobLock.EnterReadLock();
-                if (job.id == id)
-                {
-                    job.jobLock.ExitReadLock();
-                    return job; // lock remains open!
-                }
-                else
-                    job.jobLock.ExitReadLock();
-            }
-            node.nodeLock.ExitReadLock();
-            return null;
-        }
-
-        /// <summary>
-        /// Unlocks a job reference.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void JobUnlock(JobNode node)
-        {
-            node.nodeLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Returns a job reference.
-        /// </summary>
-        /// <param name="id">Id of the job.</param>
-        /// <param name="node">Reference to a node.</param>
-        /// <returns>If it returns null and the node reference is null, job does not exits (no locks need to be unlocked).
-        /// If it returns a reference, the job needs to be unlock after usage (JobUnlockGlobal(..)).</returns>
-        public Job GetJobLockedGlobal(int id, out JobNode node)
-        {
-            _nodesLock.EnterReadLock();
-            foreach (JobNode _node in _nodes)
-            {
-                _node.nodeLock.EnterReadLock();
-                foreach (Job _job in _node.jobs)
-                {
-                    _job.jobLock.EnterReadLock();
-                    if (_job.id == id)
-                    {
-                        _job.jobLock.ExitReadLock();
-                        node = _node;
-                        return _job;
-                    }
-                    _job.jobLock.ExitReadLock();
-                }
-                _node.nodeLock.ExitReadLock();
-            }
-            _nodesLock.ExitReadLock();
-            node = null;
-            return null;
-        }
-
-        /// <summary>
-        /// Unlocks a job reference.
-        /// </summary>
-        /// <param name="node">Reference of the node.</param>
-        public void JobUnlockedGlobal(JobNode node)
-        {
-            node.nodeLock.ExitReadLock();
-            _nodesLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Locks a job for read-only.
-        /// </summary>
-        /// <param name="job">Reference of the job.</param>
-        public void JobLockRead(Job job)
-        {
-            job.jobLock.EnterReadLock();
-        }
-
-        /// <summary>
-        /// Unlocks a job for read-only.
-        /// </summary>
-        /// <param name="job">Reference of the job.</param>
-        public void JobUnlockRead(Job job)
-        {
-            job.jobLock.ExitReadLock();
-        }
-
-        /// <summary>
-        /// Locks a job for read/write.
-        /// </summary>
-        /// <param name="job">Reference of the job.</param>
-        public void JobLockWrite(Job job)
-        {
-            job.jobLock.EnterWriteLock();
-        }
-
-        /// <summary>
-        /// Unlocks a job for read/write.
-        /// </summary>
-        /// <param name="job">Reference of the job.</param>
-        public void JobUnlockWrite(Job job)
-        {
-            job.jobLock.ExitWriteLock();
-        }
-
-        #endregion
 
         #endregion
 

@@ -15,8 +15,6 @@ namespace MAD.JobSystemCore
         public enum JobState { Inactive, Waiting, Working, Exception }
 
         [JsonIgnore]
-        public ReaderWriterLockSlim jobLock = new ReaderWriterLockSlim();
-        [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
         private static int _jobsCount = 0;

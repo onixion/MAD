@@ -15,8 +15,6 @@ namespace MAD.JobSystemCore
         public enum State { Active, Inactive, Exception }
 
         [JsonIgnore]
-        public ReaderWriterLockSlim nodeLock = new ReaderWriterLockSlim();
-        [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
         private static int _nodesCount = 0;

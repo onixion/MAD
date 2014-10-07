@@ -32,15 +32,15 @@ namespace MAD.JobSystemCore
         private List<JobNode> _jobNodes;
         private ReaderWriterLockSlim _nodesLock;
 
-        private ManualResetEvent _lockSwitch = new ManualResetEvent(false);
+        private object _jsLock = new object();
 
         #endregion
 
         #region constructor
 
-        public JobScedule(ReaderWriterLockSlim nodesLock, List<JobNode> jobNodes)
+        public JobScedule(object jsLock, List<JobNode> jobNodes)
         {
-            _nodesLock = nodesLock;
+            _jsLock = jsLock;
             _jobNodes = jobNodes;
             _workerPool = new SmartThreadPool(_maxThreads);
         }
@@ -83,93 +83,68 @@ namespace MAD.JobSystemCore
 
                 try
                 {
-                    _nodesLock.EnterReadLock();
-                    foreach (JobNode _node in _jobNodes)
+                    lock (_jsLock)
                     {
-                        _node.nodeLock.EnterReadLock();
-                        if (_node.state == JobNode.State.Active)
+                        foreach (JobNode _node in _jobNodes)
                         {
-                            foreach (Job _job in _node.jobs)
+                            if (_node.state == JobNode.State.Active)
                             {
-                                _job.jobLock.EnterWriteLock();
-                                if (_job.state == Job.JobState.Waiting)
+                                foreach (Job _job in _node.jobs)
                                 {
-                                    if (_job.type != Job.JobType.NULL)
+                                    if (_job.state == Job.JobState.Waiting)
                                     {
-                                        if (_job.time.type == JobTime.TimeMethod.Relative)
+                                        if (_job.type != Job.JobType.NULL)
                                         {
-                                            if (_job.time.jobDelay.CheckTime())
+                                            if (_job.time.type == JobTime.TimeMethod.Relative)
                                             {
-                                                _job.time.jobDelay.Reset();
-
-                                                // Job is ready to be executed.
-                                                _job.state = Job.JobState.Working;
-
-                                                _holder.node = _node;
-                                                _holder.job = _job;
-                                                _holder.targetAddress = _node.ipAddress;
-
-                                                JobThreadStart(_holder);
-                                                _job.jobLock.ExitWriteLock();
-
-                                                // wait for Job to lock necessary locks.
-                                                _lockSwitch.WaitOne();
-                                                _lockSwitch.Reset();
-                                            }
-                                            else
-                                            {
-                                                _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
-                                                _job.jobLock.ExitWriteLock();
-                                            }
-                                        }
-                                        else if (_job.time.type == JobTime.TimeMethod.Absolute)
-                                        {
-                                            JobTimeHandler _timeHandler = _job.time.GetJobTimeHandler(_nowTime);
-
-                                            if (_timeHandler != null)
-                                            {
-                                                if (!_timeHandler.IsBlocked(_nowTime))
+                                                if (_job.time.jobDelay.CheckTime())
                                                 {
-                                                    if (_timeHandler.CheckTime(_nowTime))
-                                                    {
-                                                        _timeHandler.minuteAtBlock = _nowTime.Minute;
+                                                    _job.time.jobDelay.Reset();
 
-                                                        // Job is ready to be executed.
-                                                        _job.state = Job.JobState.Working;
+                                                    // Job is ready to be executed.
+                                                    _job.state = Job.JobState.Working;
 
-                                                        _holder.node = _node;
-                                                        _holder.job = _job;
-                                                        _holder.targetAddress = _node.ipAddress;
+                                                    _holder.node = _node;
+                                                    _holder.job = _job;
+                                                    _holder.targetAddress = _node.ipAddress;
 
-                                                        JobThreadStart(_holder);
-                                                        _job.jobLock.ExitWriteLock();
-
-                                                        // wait for Job to lock necessary locks.
-                                                        _lockSwitch.WaitOne();
-                                                        _lockSwitch.Reset();
-                                                    }
-                                                    else
-                                                        _job.jobLock.ExitWriteLock();
+                                                    JobThreadStart(_holder);
                                                 }
                                                 else
-                                                    _job.jobLock.ExitWriteLock();
+                                                {
+                                                    _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                                                }
                                             }
-                                            else
-                                                _job.jobLock.ExitWriteLock();
+                                            else if (_job.time.type == JobTime.TimeMethod.Absolute)
+                                            {
+                                                JobTimeHandler _timeHandler = _job.time.GetJobTimeHandler(_nowTime);
+
+                                                if (_timeHandler != null)
+                                                {
+                                                    if (!_timeHandler.IsBlocked(_nowTime))
+                                                    {
+                                                        if (_timeHandler.CheckTime(_nowTime))
+                                                        {
+                                                            _timeHandler.minuteAtBlock = _nowTime.Minute;
+
+                                                            // Job is ready to be executed.
+                                                            _job.state = Job.JobState.Working;
+
+                                                            _holder.node = _node;
+                                                            _holder.job = _job;
+                                                            _holder.targetAddress = _node.ipAddress;
+
+                                                            JobThreadStart(_holder);
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
-                                        else
-                                            _job.jobLock.ExitWriteLock();
                                     }
-                                    else
-                                        _job.jobLock.ExitWriteLock();
                                 }
-                                else
-                                    _job.jobLock.ExitWriteLock();
                             }
                         }
-                        _node.nodeLock.ExitReadLock();
                     }
-                    _nodesLock.ExitReadLock();
 
                 }
                 catch (Exception e)
@@ -182,7 +157,11 @@ namespace MAD.JobSystemCore
                 }
 
                 if (_state == State.StopRequest)
+                {
+                    Thread.Sleep(300);
+                    _workerPool.Cancel(true);
                     break;
+                }
 
                 Thread.Sleep(_cycleTime);
             }
@@ -199,16 +178,6 @@ namespace MAD.JobSystemCore
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
-            // Those locks here need to be set, before the scedule continues with working.
-            // Because there is a rare chance, that the job could be removed, while 
-            // this thread tries to execute it. So after these locks has been set, the scedule
-            // can proceed.
-
-            _nodesLock.EnterReadLock();
-            _node.nodeLock.EnterReadLock();
-            _lockSwitch.Set();
-
-            _job.jobLock.EnterWriteLock();
             _job.tStart = DateTime.Now;
             try { _job.Execute(_holder.targetAddress); }
             catch (Exception)
@@ -270,10 +239,6 @@ namespace MAD.JobSystemCore
             }
 
             _job.state = Job.JobState.Waiting;
-
-            _job.jobLock.ExitWriteLock();
-            _node.nodeLock.ExitReadLock();
-            _nodesLock.ExitReadLock(); 
             return null;
         }
 
