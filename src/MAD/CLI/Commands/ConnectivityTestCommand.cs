@@ -50,14 +50,15 @@ namespace MAD.CLICore
             try
             {
                _reply = _ping.Send(IPAddress.Parse("8.8.8.8"));
+
                if (_reply.Status == IPStatus.Success)
                 return "<color><blue> (1/1) worked! You seem to be connected!";
                else
-                return "<color><red> (0/1) worked.. You seem to have a problem.. ErrorStatus: " + _reply.Status.ToString();
+					return "<color><red> (0/1) worked.. You seem to have a problem.. \n ErrorStatus: " + _reply.Status.ToString();
             }
             catch (Exception ex)
             {
-                return "<color><red> (0/1) worked.. You seem to have a problem.. ErrorStatus: " + ex.Data.ToString();
+				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString();
             }
 
             
@@ -65,19 +66,63 @@ namespace MAD.CLICore
 
         private static string Intensity2Check()
         {
-            PingReply _reply;
+			PingReply _reply1;
+			PingReply _reply2;
+			ushort _success = 0;
+
             try
             {
-                _reply = _ping.Send(IPAddress.Parse("8.8.8.8"));
-            }
-            catch (Exception)
-            { }
+				_reply1 = _ping.Send(IPAddress.Parse("8.8.8.8"));
+				_reply2 = _ping.Send(IPAddress.Parse("8.8.4.4"));
+				if(_reply1.Status == IPStatus.Success)
+					_success++;
+				if(_reply2.Status == IPStatus.Success)
+					_success++);
 
-            if (_reply.Status == IPStatus.Success)
-                return "<color><blue> (1/1) worked! You seem to be connected!";
-            else
-                return "<color><red> (0/1) worked.. You seem to have a problem.. ErrorStatus: " + _reply.Status.ToString();
+				if(_success == 2)
+					return "<color><blue> (2/2) worked! You seem to be connected!"; 
+				else
+					return "<color><red> (" + _success.ToString() + "/2) worked.. You seem to have a problem.. " +
+						"\n Ping 1: " + _reply1.Status.ToString() +
+						"\n Ping 2: " + _reply2.Status.ToString();
+            }
+			catch (Exception ex)
+            { 
+				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString(); 
+			}
         }
+
+		private static string Intensity3Check()
+		{
+			PingReply _reply1;
+			PingReply _reply2;
+			PingReply _reply3; 
+			ushort _success = 0;
+
+			try
+			{
+				_reply1 = _ping.Send(IPAddress.Parse("8.8.8.8"));
+				_reply2 = _ping.Send(IPAddress.Parse("8.8.4.4"));
+				_reply3 = _ping.Send(IPAddress.Parse("23.0.160.32"));
+
+				if(_reply1.Status == IPStatus.Success)
+					_success++;
+				if(_reply2.Status == IPStatus.Success)
+					_success++);
+
+				if(_success == 2)
+					return "<color><blue> (2/2) worked! You seem to be connected!"; 
+				else
+					return "<color><red> (" + _success.ToString() + "/2) worked.. You seem to have a problem.. " +
+						"\n Ping 1: " + _reply1.Status.ToString() +
+						"\n Ping 2: " + _reply2.Status.ToString();
+			}
+			catch (Exception ex)
+			{ 
+				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString(); 
+			}
+		}
         #endregion
     }
 }
+	
