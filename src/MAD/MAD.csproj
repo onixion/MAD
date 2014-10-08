@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\Commands\ConnectivityTestCommand.cs" />
     <Compile Include="CLI\Commands\LoggerCommands.cs" />
     <Compile Include="CLI\Commands\MacFeederCommands.cs" />
     <Compile Include="CLI\CLI.cs" />
