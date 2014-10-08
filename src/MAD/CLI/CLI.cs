@@ -39,6 +39,9 @@ namespace MAD.CLICore
             // MAIL-SETTINGS GLOBAL
             commands.Add(new CommandOptions("set-mail", typeof(SetMailSettingsCommand), null));
 
+            // INTERNET CONECTIVITY
+            commands.Add(new CommandOptions("check connection", typeof(ConnectivityTestCommand), null));
+
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
             commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
@@ -95,7 +98,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("cliserver", typeof(CLIServerInfo), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver start", typeof(CLIServerStart), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
-            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));*/
+            commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
+            */
         }
 
         #endregion

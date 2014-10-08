@@ -2,6 +2,8 @@
 using System.Net;
 using System.Net.NetworkInformation;
 
+using MAD.Logging;
+
 namespace MAD.CLICore
 {
     class ConnectivityTestCommand : Command 
@@ -26,21 +28,35 @@ namespace MAD.CLICore
             switch (_intensity)
             {
                 case 1:
+                    Logger.Log("Intensity 1 check for internet started", Logger.MessageType.INFORM);
                     return Intensity1Check();
-                    break;
                 case 2:
-                    Intensity2Check();
-                    break;
+                    Logger.Log("Intensity 2 check for internet started", Logger.MessageType.INFORM);
+                    return Intensity2Check();
                 case 3:
-                    Intensity3Check();
-                    break;
+                    Logger.Log("Intensity 3 check for internet started", Logger.MessageType.INFORM);
+                    return Intensity3Check();
                 case 4:
-                    Intensity4Check();
-                    break;
+                    Logger.Log("Intensity 4 check for internet started", Logger.MessageType.INFORM);
+                    return Intensity4Check();
                 case 5:
-                    Intensity5Check();
-                    break;
+                    Logger.Log("Intensity 5 check for internet started", Logger.MessageType.INFORM);
+                    string _ipString = "";
+                    try
+                    {
+                        _ipString = (string)pars.GetPar("ip").argValues[0];
+                    }
+                    catch (Exception)
+                    { }
+                    if (String.IsNullOrEmpty(_ipString))
+                    {
+                        Logger.Log("Intensity 5 check missed ip address.. aborted", Logger.MessageType.ERROR);
+                        return "<color><red>Please give an additional IP Address via the -ip parameter";
+                    }
+                    else
+                        return Intensity5Check(_ipString);
                 default:
+                    Logger.Log("Wanted to start connectivity check, but used wrong parameter", Logger.MessageType.ERROR);
                     return "<color><red>Please choose a number between 1 and 5!";
             }
         }
@@ -50,19 +66,24 @@ namespace MAD.CLICore
             PingReply _reply;
             try
             {
-               _reply = _ping.Send(IPAddress.Parse("8.8.8.8"));
+                _reply = _ping.Send(IPAddress.Parse("8.8.8.8"));
 
-               if (_reply.Status == IPStatus.Success)
-                return "<color><blue> (1/1) worked! You seem to be connected!";
-               else
-					return "<color><red> (0/1) worked.. You seem to have a problem.. \n ErrorStatus: " + _reply.Status.ToString();
+                if (_reply.Status == IPStatus.Success)
+                {
+                    Logger.Log("Connectivity check succseeded", Logger.MessageType.INFORM);
+                    return "<color><blue> (1/1) worked! You seem to be connected!";
+                }
+                else
+                {
+                    Logger.Log("Internet Conectivity seems to be disturbed", Logger.MessageType.ERROR);
+                    return "<color><red> (0/1) worked.. You seem to have a problem.. \n ErrorStatus: " + _reply.Status.ToString();
+                }
             }
             catch (Exception ex)
             {
+                Logger.Log("Connectivity Check: An Error occured: " + ex.Data.ToString(), Logger.MessageType.ERROR);
 				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString();
             }
-
-            
         }
 
         private static string Intensity2Check()
@@ -80,15 +101,22 @@ namespace MAD.CLICore
 				if(_reply2.Status == IPStatus.Success)
 					_success++;
 
-				if(_success == 2)
-					return "<color><blue> (2/2) worked! You seem to be connected!"; 
-				else
-					return "<color><red> (" + _success.ToString() + "/2) worked.. You seem to have a problem.. " +
-						"\n Ping 1: " + _reply1.Status.ToString() +
-						"\n Ping 2: " + _reply2.Status.ToString();
+                if (_success == 2)
+                {
+                    Logger.Log("Connectivity check succseeded", Logger.MessageType.INFORM);
+                    return "<color><blue> (2/2) worked! You seem to be connected!";
+                }
+                else
+                {
+                    Logger.Log("Connectivity check reports: " + _success.ToString() + "/2) worked..", Logger.MessageType.WARNING);
+                    return "<color><red> (" + _success.ToString() + "/2) worked.. You seem to have a problem.. " +
+                        "\n Ping 1: " + _reply1.Status.ToString() +
+                        "\n Ping 2: " + _reply2.Status.ToString();
+                }
             }
 			catch (Exception ex)
             { 
+                Logger.Log("Connectivity Check: An Error occured: " + ex.Data.ToString(), Logger.MessageType.ERROR);
 				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString(); 
 			}
         }
@@ -113,16 +141,23 @@ namespace MAD.CLICore
 				if(_reply3.Status == IPStatus.Success)
 					_success++;
 
-				if(_success == 3)
-					return "<color><blue> (3/3) worked! You seem to be connected!"; 
-				else
-					return "<color><red> (" + _success.ToString() + "/3) worked.. You seem to have a problem.. " +
-						"\n Ping 1: " + _reply1.Status.ToString() +
-						"\n Ping 2: " + _reply2.Status.ToString() +
-						"\n Ping 3: " + _reply3.Status.ToString();
+                if (_success == 3)
+                {
+                    Logger.Log("Connectivity check succseeded", Logger.MessageType.INFORM);
+                    return "<color><blue> (3/3) worked! You seem to be connected!";
+                }
+                else
+                {
+                    Logger.Log("Connectivity check reports: " + _success.ToString() + "/3) worked..", Logger.MessageType.WARNING);
+                    return "<color><red> (" + _success.ToString() + "/3) worked.. You seem to have a problem.. " +
+                        "\n Ping 1: " + _reply1.Status.ToString() +
+                        "\n Ping 2: " + _reply2.Status.ToString() +
+                        "\n Ping 3: " + _reply3.Status.ToString();
+                }
 			}
 			catch (Exception ex)
 			{ 
+                Logger.Log("Connectivity Check: An Error occured: " + ex.Data.ToString(), Logger.MessageType.ERROR);
 				return "<color><red> A Error occured! \n ErrorStatus: " + ex.Data.ToString(); 
 			}
 		}
@@ -160,26 +195,33 @@ namespace MAD.CLICore
 					_success++;
 				if(_reply3.Status == IPStatus.Success)
 					_success++;
-					
-				if(_success == 4)
-					return "<color><blue> (4/4) worked! You seem to be connected!"; 
-				else
-					return "<color><red> (" + _success.ToString() + "/4) worked.. You seem to have a problem.. " +
-						"\n Ping 1: " + _reply1.Status.ToString() +
-						"\n Ping 2: " + _reply2.Status.ToString() +
-						"\n Ping 3: " + _reply3.Status.ToString() +
-						"\n HTTP: " + _httpExceptionMessage;
+
+                if (_success == 4)
+                {
+                    Logger.Log("Connectivity check succseeded", Logger.MessageType.INFORM);
+                    return "<color><blue> (4/4) worked! You seem to be connected!";
+                }
+                else
+                {
+                    Logger.Log("Connectivity check reports: " + _success.ToString() + "/4) worked..", Logger.MessageType.WARNING);
+                    return "<color><red> (" + _success.ToString() + "/4) worked.. You seem to have a problem.. " +
+                        "\n Ping 1: " + _reply1.Status.ToString() +
+                        "\n Ping 2: " + _reply2.Status.ToString() +
+                        "\n Ping 3: " + _reply3.Status.ToString() +
+                        "\n HTTP: " + _httpExceptionMessage;
+                }
 			}
 			catch (Exception ex)
 			{ 
+                Logger.Log("Connectivity Check: An Error occured: " + ex.Data.ToString(), Logger.MessageType.ERROR);
 				return "<color><red> A Error with the Ping occured! \n ErrorStatus: " + ex.Data.ToString(); 
 			}
 		}
 
-		private static string Intensity5Check()
+		private static string Intensity5Check(string _ipString)
 		{
 			string _httpExceptionMessage = "";
-			IPAddress _ipAddr = IPAddress.Parse((string) pars.GetPar("ip").argValues[0]);
+			IPAddress _ipAddr = IPAddress.Parse(_ipString);
 
 			PingReply _reply1;
 			PingReply _reply2;
@@ -218,18 +260,25 @@ namespace MAD.CLICore
 				if(_reply4.Status == IPStatus.Success)
 					_success++;
 
-				if(_success == 5)
-					return "<color><blue> (5/5) worked! You seem to be connected!"; 
-				else
-					return "<color><red> (" + _success.ToString() + "/4) worked.. You seem to have a problem.. " +
-						"\n Ping 1: " + _reply1.Status.ToString() +
-						"\n Ping 2: " + _reply2.Status.ToString() +
-						"\n Ping 3: " + _reply3.Status.ToString() +
-						"\n Ping 4: " + _reply4.Status.ToString() +
-						"\n HTTP: " + _httpExceptionMessage;
+                if (_success == 5)
+                {
+                    Logger.Log("Connectivity check succseeded", Logger.MessageType.INFORM);
+                    return "<color><blue> (5/5) worked! You seem to be connected!";
+                }
+                else
+                {
+                    Logger.Log("Connectivity check reports: " + _success.ToString() + "/2) worked..", Logger.MessageType.WARNING);
+                    return "<color><red> (" + _success.ToString() + "/5) worked.. You seem to have a problem.. " +
+                        "\n Ping 1: " + _reply1.Status.ToString() +
+                        "\n Ping 2: " + _reply2.Status.ToString() +
+                        "\n Ping 3: " + _reply3.Status.ToString() +
+                        "\n Ping 4: " + _reply4.Status.ToString() +
+                        "\n HTTP: " + _httpExceptionMessage;
+                }
 			}
 			catch (Exception ex)
-			{ 
+			{
+                Logger.Log("Connectivity Check: An Error occured: " + ex.Data.ToString(), Logger.MessageType.ERROR);
 				return "<color><red> A Error with the Ping occured! \n ErrorStatus: " + ex.Data.ToString(); 
 			}
 		}
