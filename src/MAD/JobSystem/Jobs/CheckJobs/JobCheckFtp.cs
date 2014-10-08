@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Net;
 
+using MAD.Logging;
+
 namespace MAD.JobSystemCore
 {
     class JobCheckFtp : Job
@@ -26,11 +28,13 @@ namespace MAD.JobSystemCore
             try
             {
                 FtpWebResponse _response = (FtpWebResponse)_requestDir.GetResponse();
+                Logger.Log("FTP Service seems to work", Logger.MessageType.INFORM);
                 _working = true;
             }
 
             catch (Exception)
             {
+                Logger.Log("FTP Service seems to be dead", Logger.MessageType.ERROR);
                 _working = false;
             }
         }

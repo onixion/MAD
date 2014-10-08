@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 
-using MAD.Helper;
+using MAD.MacFinders;
 
 using Newtonsoft.Json;
 

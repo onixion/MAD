@@ -8,17 +8,16 @@ using System.Threading;
 
 using MAD.Helper;
 using MAD.Logging;
+using MAD.MacFinders;
 using MAD.JobSystemCore;
 
 using Amib.Threading; 
 
-namespace MAD.DHCPReader
+namespace MAD.MacFinders
 {
-    public class MACFeeder                                                          //need to do something about that name.. 
+    public class DHCPReader                                                          //need to do something about that name.. 
     {
         #region member
-
-        private static NetworkHelper _helper = new NetworkHelper();
         
         private byte[] _data;
 
@@ -26,7 +25,7 @@ namespace MAD.DHCPReader
 
         private static bool _running = false;
 
-        public static List<ModelHost> _dummyList = new List<ModelHost>();
+        
 
         private Thread _check;
         private Thread _start;
@@ -40,7 +39,7 @@ namespace MAD.DHCPReader
 
         #region Constructor
 
-        public MACFeeder()
+        public DHCPReader()
         {
             _sleepFor = 25000;                                                      //default value will be changeable
         }
@@ -150,10 +149,10 @@ namespace MAD.DHCPReader
         {
             try
             {
-                if (_helper.IsDhcp(_data) && _helper.IsDhcpRequest(_data))
+                if (NetworkHelper.IsDhcp(_data) && NetworkHelper.IsDhcpRequest(_data))
                 {
                     ModelHost _tmpModel = new ModelHost();
-                    _tmpModel.hostMac = _helper.getPhysicalAddressString(_data);
+                    _tmpModel.hostMac = NetworkHelper.getPhysicalAddressStringFromDhcp(_data);
                     _tmpModel.macGiven = true;
 
                     for (uint i = NetworkHelper.DHCP_COOKIE_POSITION; i < _data.Length; i++)
@@ -202,18 +201,16 @@ namespace MAD.DHCPReader
                         }
                     }
 
-                    var _found = _dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac));
-                    if (_found == null)
+                    if (ModelHost.Exists(_tmpModel))
                     {
-                        _dummyList.Add(_tmpModel);
-                        _tmpModel.ManuallyIncreaseCount();
+                        if (_tmpModel.nameGiven)
+                            ModelHost.UpdateHost(_tmpModel, _tmpModel.hostIP, _tmpModel.hostName);
+                        else
+                            ModelHost.UpdateHost(_tmpModel, _tmpModel.hostIP);
                     }
                     else
                     {
-                        ModelHost _tmptmpModel = _dummyList.Find(x=>x.hostMac.Contains(_tmpModel.hostMac));
-                        _tmpModel.ID = _tmptmpModel.ID;
-                        _dummyList.Remove(_dummyList.Find(x => x.hostMac.Contains(_tmpModel.hostMac)));
-                        _dummyList.Add(_tmpModel);
+                        ModelHost.AddToList(_tmpModel);
                     }
                 }
             }
@@ -228,71 +225,8 @@ namespace MAD.DHCPReader
             while (true)
             {
                 Thread.Sleep((int)_sleepFor);
-                bool _active;
-
-                if (_dummyList != null)
-                {
-                    for (int i = 0; i < _dummyList.Count; i++)
-                    {
-                        ModelHost _dummy = _dummyList[i];
-                        if (_dummy.hostIP != null)
-                        {
-                            Ping _ping = new Ping();
-
-                            try
-                            {
-                                PingReply _reply = _ping.Send(_dummy.hostIP);
-
-                                if (_reply.Status == IPStatus.Success)
-                                {
-                                    _active = true;
-                                }
-                                else
-                                {
-                                    _active = false;
-                                }
-                            }
-                            catch
-                            {
-                                _active = false;
-                            }
-
-                            if (!_active)
-                            {
-                                _dummyList.Remove(_dummy);
-                                _dummy.ManuallyDecreaseCount();
-                            }
-                        }
-                    }
-                }
+                ModelHost.PingThroughList();
             }
-        }
-
-        public string PrintLists()
-        {
-            string _output = "";
-
-            if (_dummyList != null)
-            {
-                foreach (ModelHost _dummy in _dummyList)
-                {
-                    _output += "Host " + _dummy.ID.ToString();
-                    _output += "\n MAC-Address: " + _dummy.hostMac;
-
-                    if (_dummy.hostName != null)
-                        _output += "\n Host Name: " + _dummy.hostName;
-                    else
-                        _output += "\n Host Name: NA..";
-
-                    if (_dummy.hostIP != null)
-                        _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                    else
-                        _output += "\n IP-Address: NA..";
-
-                    _output += "\n \n";
-                }
-            }
-            return _output;
         }
         #endregion
         #endregion

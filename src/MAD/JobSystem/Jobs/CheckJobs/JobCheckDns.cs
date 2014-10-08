@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Net;
 
+using MAD.Logging;
+
 namespace MAD.JobSystemCore
 {
     class JobCheckDns : Job
@@ -21,10 +23,12 @@ namespace MAD.JobSystemCore
             try
             {
                 IPHostEntry _tmp = Dns.GetHostEntry("www.google.com");
+                Logger.Log("DNS Service seems to work", Logger.MessageType.INFORM);
                 _working = true;
             }
             catch (Exception)
             {
+                Logger.Log("DNS Service seems to be dead", Logger.MessageType.ERROR);
                 _working = false;
             }
         }

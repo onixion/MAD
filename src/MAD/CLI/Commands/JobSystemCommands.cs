@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.IO; 
 
 using MAD.JobSystemCore;
-using MAD.DHCPReader;
+using MAD.MacFinders;
 using MAD.Notification;
 using MAD.Helper;
 
@@ -286,6 +286,7 @@ namespace MAD.CLICore
         }
     }
 
+    /*                                                                                                                          Auskommentiert für die Implementierung durch Alin
     public class JobSystemSyncNodeCommand : Command
     {
         private JobSystem _js;
@@ -310,7 +311,8 @@ namespace MAD.CLICore
             return output;
         }
     }
-
+    */
+      
     public class JobSystemSaveNodeCommand : Command
     { 
         private JobSystem _js;
