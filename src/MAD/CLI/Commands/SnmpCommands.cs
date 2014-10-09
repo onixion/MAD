@@ -321,4 +321,29 @@ namespace MAD.CLICore
         #endregion 
         #endregion
     }
+
+    public class JobSystemAddReadTrafficCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemAddReadTrafficCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use, choose between 2 or 3", false, false, new Type[] { typeof(uint) }));
+            rPar.Add(new ParOption("i", "INTERFACE", "The Interface to use, use snmpinterface command to choose one", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("p", "PRIV-PROTOCOL", "Privacy Protocol, use either aes or des", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "Authenticity Protocol, use either sha or md5", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("s", "SECURITY-LEVEL", "Level of Security, choose between noAuthNoPriv and authNoPriv, authPriv", false, false, new Type[] { typeof(string) }));
+
+            description = "This Command will try to read the outgoing traffic out of a host. Don't forget to set the credentials to public, MADMADMAD and MADMADMAD again.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobSnmp _job = new JobSnmp();
+            
+        }
+    }
 }

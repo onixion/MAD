@@ -10,9 +10,6 @@ namespace MAD.JobSystemCore
     {
         #region fields
         public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
-        public uint expectedIfNr = 10;                                                  //optional Parameter default (wie zu sehen) ist 10
-
-        public bool interfaceParUsed;                                                   //required Parameter, irgendwie a option -i oder sowas.. wenn der Parameter vorkimmt wead a Auflistung von Interfaces ausgegeben und zwar in der Menge von expectedIfNr
 
         public string ifEntryNr;                                                        //required Parameter sofern !interfaceParUsed
 
