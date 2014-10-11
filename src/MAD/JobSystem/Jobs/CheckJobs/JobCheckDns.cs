@@ -24,12 +24,12 @@ namespace MAD.JobSystemCore
             {
                 IPHostEntry _tmp = Dns.GetHostEntry("www.google.com");
                 Logger.Log("DNS Service seems to work", Logger.MessageType.INFORM);
-                _working = true;
+                outp.outState = JobOutput.OutState.Success;
             }
             catch (Exception)
             {
                 Logger.Log("DNS Service seems to be dead", Logger.MessageType.ERROR);
-                _working = false;
+                outp.outState = JobOutput.OutState.Failed;
             }
         }
     }

@@ -17,7 +17,9 @@ namespace MAD.JobSystemCore
 
         public JobCheckFtp()
             : base(JobType.ServiceCheck)
-        { }
+        {
+            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string)));
+        }
 
         public override void Execute(IPAddress targetAddress)
         {
@@ -29,13 +31,15 @@ namespace MAD.JobSystemCore
             {
                 FtpWebResponse _response = (FtpWebResponse)_requestDir.GetResponse();
                 Logger.Log("FTP Service seems to work", Logger.MessageType.INFORM);
-                _working = true;
+                outp.outState = JobOutput.OutState.Success;
+                outp.GetOutputDesc("Additional Information").dataObject = _response.StatusDescription;
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
                 Logger.Log("FTP Service seems to be dead", Logger.MessageType.ERROR);
-                _working = false;
+                outp.outState = JobOutput.OutState.Exception;
+                outp.GetOutputDesc("Additional Information").dataObject = ex.Data.ToString();
             }
         }
     }

@@ -13,17 +13,20 @@ namespace MAD.JobSystemCore
 {
     class JobCheckSnmp : Job
     {
+        #region fields
         public uint version; //required parameter
         public NetworkHelper.securityModel secModel; //required Parameter if version == 3
+        #endregion
 
-        private bool _working;
-
-        private JobSnmp _foo;
-
+        #region constructor
         public JobCheckSnmp()
             : base(JobType.ServiceCheck)
-        { }
+        {
+            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string)));
+        }
+        #endregion
 
+        #region functions
         public override void Execute(System.Net.IPAddress targetAddress)
         {
             Logger.Log("Executing SNMP Check", Logger.MessageType.INFORM);
@@ -33,7 +36,8 @@ namespace MAD.JobSystemCore
             switch (version)
             {
                 case 1:
-                    //NotImplemented Fehlermeldung
+                    outp.outState = JobOutput.OutState.Exception;
+                    outp.GetOutputDesc("Additional Information").dataObject = "Version 1 is not Supported!";
                     Logger.Log("SNMPv1 is NOT Supportet!", Logger.MessageType.ERROR);
                     break;
                 case 2:
@@ -43,7 +47,7 @@ namespace MAD.JobSystemCore
                     if (NetworkHelper.GetSNMPV3Param(_target, NetworkHelper.SNMP_COMMUNITY_STRING, secModel) != null)
                         ExecuteRequest(_target, NetworkHelper.GetSNMPV3Param(_target, NetworkHelper.SNMP_COMMUNITY_STRING, secModel));
                     else
-                        _working = false; 
+                        outp.outState = JobOutput.OutState.Failed;
                     break;
             }
         }
@@ -61,19 +65,19 @@ namespace MAD.JobSystemCore
 
                 if (_nameResult.Pdu.VbList[0].Value.ToString().ToLowerInvariant() == System.Environment.MachineName.ToLowerInvariant())
                 {
-                    _working = true;
+                    outp.outState = JobOutput.OutState.Success;
                     Logger.Log("SNMP Service seems to work", Logger.MessageType.INFORM);
                 }
                 else
                 {
                     Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                    _working = false;
+                    outp.outState = JobOutput.OutState.Failed;
                 }
             }
             catch (Exception)
             {
                 Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                _working = false;
+                outp.outState = JobOutput.OutState.Exception;
             }
         }
 
@@ -91,19 +95,20 @@ namespace MAD.JobSystemCore
                 if (nameResult.ScopedPdu.VbList[0].Value.ToString().ToLowerInvariant() == System.Environment.MachineName.ToLowerInvariant())
                 {
                     Logger.Log("SNMP Service seems to work", Logger.MessageType.INFORM);
-                    _working = true;
+                    outp.outState = JobOutput.OutState.Success;
                 }
                 else
                 {
                     Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                    _working = false;
+                    outp.outState = JobOutput.OutState.Failed;
                 }
             }
             catch (Exception)
             {
                 Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                _working = false;
+                outp.outState = JobOutput.OutState.Exception;
             }
         }
+        #endregion
     }
 }
