@@ -955,7 +955,7 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
             oPar.Add(new ParOption("l", "SECURITY-LEVEL", "Level of used security", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "Protocol for authentification", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("p", "PRIV-PROTCOL", "Protocol for privacy", false, false, new Type[] { typeof(string) }));

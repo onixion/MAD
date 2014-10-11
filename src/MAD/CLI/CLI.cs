@@ -88,6 +88,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("job add ping", typeof(JobSystemAddPingCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add http", typeof(JobSystemAddHttpCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add port", typeof(JobSystemAddPortCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job add read traffic", typeof(JobSystemAddReadTrafficCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add hostdetect", typeof(JobSystemAddHostDetectCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add ftpcheck", typeof(JobSystemAddCheckFtpCommand), new object[] { js }));
             commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { js }));
