@@ -24,6 +24,8 @@ namespace MAD.MacFinders
         public bool reachable; 
 
 		public static uint _count = 0;
+
+        private static Object lockObj = new Object();
 		#endregion
 
 		#region constructors
@@ -123,41 +125,56 @@ namespace MAD.MacFinders
 		#region AddToList
 		public static void AddToList(ModelHost dummy)
 		{
-			hostList.Add(dummy);
-			if(!Exists(dummy))
-				IncreaseCount();
+            lock (lockObj)
+            {
+                hostList.Add(dummy);
+                if (!Exists(dummy))
+                    IncreaseCount();
+            }
 		}
 
 		public static void AddToList(string macAddr)
 		{
-			ModelHost _dummy = new ModelHost(macAddr);
-			hostList.Add(_dummy);
-			if(!Exists(_dummy))
-				IncreaseCount();
-		}
+            lock (lockObj)
+            {
+                ModelHost _dummy = new ModelHost(macAddr);
+                hostList.Add(_dummy);
+                if (!Exists(_dummy))
+                    IncreaseCount();
+            }		
+        }
 
 		public static void AddToList(string macAddr, IPAddress ipAddr)
 		{
-			ModelHost _dummy = new ModelHost(macAddr, ipAddr);
-			hostList.Add(_dummy);
-			if(!Exists(_dummy))
-				IncreaseCount();
+            lock (lockObj)
+            {
+                ModelHost _dummy = new ModelHost(macAddr, ipAddr);
+                hostList.Add(_dummy);
+                if (!Exists(_dummy))
+                    IncreaseCount();
+            }
 		}
 
 		public static void AddToList(string macAddr, string hostName)
 		{
-			ModelHost _dummy = new ModelHost(macAddr, hostName);
-			hostList.Add(_dummy);
-			if(!Exists(_dummy))
-				IncreaseCount();
+            lock (lockObj)
+            {
+                ModelHost _dummy = new ModelHost(macAddr, hostName);
+                hostList.Add(_dummy);
+                if (!Exists(_dummy))
+                    IncreaseCount();
+            }
 		}
 
 		public static void AddToList(string macAddr, IPAddress ipAddr, string hostName)
 		{
-			ModelHost _dummy = new ModelHost(macAddr, ipAddr, hostName);
-			hostList.Add(_dummy);
-			if(!Exists(_dummy))
-				IncreaseCount();
+            lock (lockObj)
+            {
+                ModelHost _dummy = new ModelHost(macAddr, ipAddr, hostName);
+                hostList.Add(_dummy);
+                if (!Exists(_dummy))
+                    IncreaseCount();
+            }
 		}
 		#endregion 
 
@@ -166,8 +183,11 @@ namespace MAD.MacFinders
 		{
 			if(Exists(dummy))
 			{
-				DecreaseCount();
-				hostList.Remove(hostList.Find(x => x.hostMac.Contains(dummy.hostMac)));
+                lock (lockObj)
+                {
+                    DecreaseCount();
+                    hostList.Remove(hostList.Find(x => x.hostMac.Contains(dummy.hostMac)));
+                }
 			}
 		}
 
@@ -175,8 +195,11 @@ namespace MAD.MacFinders
 		{
 			if(Exists(macAddr))
 			{
-				DecreaseCount();
-				hostList.Remove(hostList.Find(x => x.hostMac.Contains(macAddr)));
+                lock (lockObj)
+                {
+                    DecreaseCount();
+                    hostList.Remove(hostList.Find(x => x.hostMac.Contains(macAddr)));
+                }
 			}
 		}
 		#endregion
@@ -184,106 +207,130 @@ namespace MAD.MacFinders
 		#region UpdateHosts
 		public static void UpdateHost(string macAddr, IPAddress ipAddr)
 		{
-			if(Exists(macAddr))
-			{
-				RemoveFromList(macAddr);
-				AddToList(macAddr, ipAddr);
-			}
-			else
-			{
-				AddToList(macAddr, ipAddr);
-			}
+            lock (lockObj)
+            {
+                if (Exists(macAddr))
+                {
+                    RemoveFromList(macAddr);
+                    AddToList(macAddr, ipAddr);
+                }
+                else
+                {
+                    AddToList(macAddr, ipAddr);
+                }
+            }
 		}
 
 		public static void UpdateHost(string macAddr, string hostName)
 		{
-			if(Exists(macAddr))
-			{
-				RemoveFromList(macAddr);
-				AddToList(macAddr, hostName);
-			}
-			else
-			{
-				AddToList(macAddr, hostName);
-			}
+            lock (lockObj)
+            {
+                if (Exists(macAddr))
+                {
+                    RemoveFromList(macAddr);
+                    AddToList(macAddr, hostName);
+                }
+                else
+                {
+                    AddToList(macAddr, hostName);
+                }
+            }
 		}
 
 		public static void UpdateHost(string macAddr, IPAddress ipAddr, string hostName)
 		{
-			if(Exists(macAddr))
-			{
-				RemoveFromList(macAddr);
-				AddToList(macAddr, ipAddr, hostName);
-			}
-			else
-			{
-				AddToList(macAddr, ipAddr, hostName);
-			}
+            lock (lockObj)
+            {
+                if (Exists(macAddr))
+                {
+                    RemoveFromList(macAddr);
+                    AddToList(macAddr, ipAddr, hostName);
+                }
+                else
+                {
+                    AddToList(macAddr, ipAddr, hostName);
+                }
+            }
 		}
 
 		public static void UpdateHost(string macAddr, ModelHost replacement)
 		{
-			if(Exists(macAddr))
-			{
-				RemoveFromList(macAddr);
-				AddToList(replacement);
-			}
-			else
-			{
-				AddToList(replacement);
-			}
+            lock (lockObj)
+            {
+                if (Exists(macAddr))
+                {
+                    RemoveFromList(macAddr);
+                    AddToList(replacement);
+                }
+                else
+                {
+                    AddToList(replacement);
+                }
+            }
 		}
 
 		public static void UpdateHost(ModelHost dummy, IPAddress ipAddr)
 		{
-			if(Exists(dummy))
-			{
-				RemoveFromList(dummy);
-				AddToList(dummy.hostMac, ipAddr);
-			}
-			else
-			{
-				AddToList(dummy.hostMac, ipAddr);
-			}
+            lock (lockObj)
+            {
+                if (Exists(dummy))
+                {
+                    RemoveFromList(dummy);
+                    AddToList(dummy.hostMac, ipAddr);
+                }
+                else
+                {
+                    AddToList(dummy.hostMac, ipAddr);
+                }
+            }
 		}
 
 		public static void UpdateHost(ModelHost dummy, string hostName)
 		{
-			if(Exists(dummy))
-			{
-				RemoveFromList(dummy);
-				AddToList(dummy.hostMac, hostName);
-			}
-			else
-			{
-				AddToList(dummy.hostMac, hostName);
-			}
+            lock (lockObj)
+            {
+                if (Exists(dummy))
+                {
+                    RemoveFromList(dummy);
+                    AddToList(dummy.hostMac, hostName);
+                }
+                else
+                {
+                    AddToList(dummy.hostMac, hostName);
+                }
+            }
 		}
 
 		public static void UpdateHost(ModelHost dummy, IPAddress ipAddr, string hostName)
 		{
-			if(Exists(dummy))
-			{
-				RemoveFromList(dummy);
-				AddToList(dummy.hostMac, ipAddr, hostName);
-			}
-			else
-			{
-				AddToList(dummy.hostMac, ipAddr, hostName);
-			}
+            lock (lockObj)
+            {
+                if (Exists(dummy))
+                {
+                    RemoveFromList(dummy);
+                    AddToList(dummy.hostMac, ipAddr, hostName);
+                }
+                else
+                {
+                    AddToList(dummy.hostMac, ipAddr, hostName);
+                }
+            }
 		}
 
 		public static void UpdateHost(ModelHost dummy, ModelHost replacement)
 		{
-			if(Exists(dummy))
-			{
-				RemoveFromList(dummy);
-				AddToList(replacement);
-			}
-			else
-			{
-				AddToList(replacement);
-			}
+            lock (lockObj)
+            {
+                if (Exists(dummy))
+                {
+                    RemoveFromList(dummy);
+                    AddToList(replacement);
+                }
+                else
+                {
+                    AddToList(replacement);
+                }
+            }
 		}
 		#endregion 
 
@@ -294,41 +341,44 @@ namespace MAD.MacFinders
 
 			if (hostList != null)
 			{
-				foreach (ModelHost _dummy in hostList)
-				{
-                    if (_dummy.reachable)
+                lock (lockObj)
+                {
+                    foreach (ModelHost _dummy in hostList)
                     {
-                        _output += "\n MAC-Address: " + _dummy.hostMac;
+                        if (_dummy.reachable)
+                        {
+                            _output += "\n MAC-Address: " + _dummy.hostMac;
 
-                        if (_dummy.hostName != null)
-                            _output += "\n Host Name: " + _dummy.hostName;
+                            if (_dummy.hostName != null)
+                                _output += "\n Host Name: " + _dummy.hostName;
+                            else
+                                _output += "\n Host Name: NA..";
+
+                            if (_dummy.hostIP != null)
+                                _output += "\n IP-Address: " + _dummy.hostIP.ToString();
+                            else
+                                _output += "\n IP-Address: NA..";
+
+                            _output += "\n \n";
+                        }
                         else
-                            _output += "\n Host Name: NA..";
+                        {
+                            _output += "\n MAC-Address: " + _dummy.hostMac + _dummy.status;
 
-                        if (_dummy.hostIP != null)
-                            _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                        else
-                            _output += "\n IP-Address: NA..";
+                            if (_dummy.hostName != null)
+                                _output += "\n Host Name: " + _dummy.hostName;
+                            else
+                                _output += "\n Host Name: NA..";
 
-                        _output += "\n \n";
+                            if (_dummy.hostIP != null)
+                                _output += "\n IP-Address: " + _dummy.hostIP.ToString();
+                            else
+                                _output += "\n IP-Address: NA..";
+
+                            _output += "\n \n";
+                        }
                     }
-                    else
-                    {
-                        _output += "\n MAC-Address: " + _dummy.hostMac + _dummy.status;
-
-                        if (_dummy.hostName != null)
-                            _output += "\n Host Name: " + _dummy.hostName;
-                        else
-                            _output += "\n Host Name: NA..";
-
-                        if (_dummy.hostIP != null)
-                            _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                        else
-                            _output += "\n IP-Address: NA..";
-
-                        _output += "\n \n";
-                    }
-				}
+                }
 			}
 			return _output;
 		}
@@ -336,52 +386,55 @@ namespace MAD.MacFinders
         public static void PingThroughList()
         {
             Logger.Log("Pinging through host list..", Logger.MessageType.INFORM);
-            if (ModelHost.hostList != null)
+            lock (lockObj)
             {
-                for (int i = 0; i < ModelHost.hostList.Count; i++)
+                if (ModelHost.hostList != null)
                 {
-                   ModelHost _dummy = ModelHost.hostList[i];
-                    if (_dummy.hostIP != null)
+                    for (int i = 0; i < ModelHost.hostList.Count; i++)
                     {
-                        Ping _ping = new Ping();
-
-                        try
+                        ModelHost _dummy = ModelHost.hostList[i];
+                        if (_dummy.hostIP != null)
                         {
-                            PingReply _reply = _ping.Send(_dummy.hostIP);
+                            Ping _ping = new Ping();
 
-                            if (_reply.Status != IPStatus.Success)
+                            try
+                            {
+                                PingReply _reply = _ping.Send(_dummy.hostIP);
+
+                                if (_reply.Status != IPStatus.Success)
+                                {
+                                    _dummy.reachable = false;
+
+                                    if (_reply.Status == IPStatus.DestinationHostUnreachable)
+                                        _dummy.status = " (Host Unreachable)";
+                                    else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
+                                        _dummy.status = " (Network Unreachable)";
+                                    else if (_reply.Status == IPStatus.DestinationPortUnreachable)
+                                        _dummy.status = " (Port Unreachable)";
+                                    else if (_reply.Status == IPStatus.DestinationUnreachable)
+                                        _dummy.status = " (Unreachable)";
+                                    else if (_reply.Status == IPStatus.TimedOut)
+                                        _dummy.status = " (Ping Time Out)";
+                                    else if (_reply.Status == IPStatus.Unknown)
+                                        _dummy.status = " (Unknown Ping Error)";
+                                    else
+                                        _dummy.status = " (Unknown Ping Error)";
+
+                                    ModelHost.hostList[i] = _dummy;
+                                }
+                                else
+                                {
+                                    _dummy.reachable = true;
+
+                                    ModelHost.hostList[i] = _dummy;
+                                }
+                            }
+                            catch
                             {
                                 _dummy.reachable = false;
-
-                                if (_reply.Status == IPStatus.DestinationHostUnreachable)
-                                    _dummy.status = " (Host Unreachable)";
-                                else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
-                                    _dummy.status = " (Network Unreachable)";
-                                else if (_reply.Status == IPStatus.DestinationPortUnreachable)
-                                    _dummy.status = " (Port Unreachable)";
-                                else if (_reply.Status == IPStatus.DestinationUnreachable)
-                                    _dummy.status = " (Unreachable)";
-                                else if (_reply.Status == IPStatus.TimedOut)
-                                    _dummy.status = " (Ping Time Out)";
-                                else if (_reply.Status == IPStatus.Unknown)
-                                    _dummy.status = " (Unknown Ping Error)";
-                                else
-                                    _dummy.status = " (Unknown Ping Error)";
-
+                                _dummy.status = " (Unknown Ping Error)";
                                 ModelHost.hostList[i] = _dummy;
                             }
-                            else
-                            {
-                                _dummy.reachable = true;
-
-                                ModelHost.hostList[i] = _dummy; 
-                            }
-                        }
-                        catch
-                        {
-                            _dummy.reachable = false; 
-                            _dummy.status = " (Unknown Ping Error)";
-                            ModelHost.hostList[i] = _dummy;
                         }
                     }
                 }
