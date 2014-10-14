@@ -11,7 +11,7 @@ namespace MAD.JobSystemCore
         #region fields
         public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
 
-        public string ifEntryNr;                                                        //required Parameter sofern !interfaceParUsed
+		public string ifEntryNr = MadConf.conf.snmpInterface;
 
         public NetworkHelper.securityModel secModel;                                    //required Parameter if version == 3
 
