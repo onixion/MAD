@@ -343,9 +343,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption(JobCommand.JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
             oPar.Add(new ParOption(JobCommand.JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
 
-            rPar.Add(new ParOption("i", "INTERFACE", "The Interface to use, use snmpinterface command to choose one", false, false, new Type[] { typeof(string) }));
-
-            description = "This Command will try to read the outgoing traffic out of a host. Don't forget to set the credentials to public, MADMADMAD and MADMADMAD again.";
+			description = "This Command will try to read the outgoing traffic out of a host. Don't forget to set the credentials to public, MADMADMAD and MADMADMAD again. \n Also if it doesn't work, you may check the interface in the config file and compare it to the snmpinterface command";
         }
 
         public override string Execute(int consoleWidth)
@@ -360,10 +358,7 @@ namespace MAD.CLICore
                 return ex.Data.ToString();
             }
 
-            string _interface = (string) pars.GetPar("i").argValues[0];
-
             _job.secModel = secModel;
-            _job.ifEntryNr = _interface;
             _job.version = version;
 
             _job.name = (string)pars.GetPar("n").argValues[0];
