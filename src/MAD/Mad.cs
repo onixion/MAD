@@ -19,7 +19,7 @@ namespace MAD
 
         [STAThread]
         static int Main(string[] args)
-        {
+       {
             Console.WriteLine("(WARNING) THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
             Console.WriteLine("(WARNING) DO NOT RELY ON THIS SOFTWARE!");
             

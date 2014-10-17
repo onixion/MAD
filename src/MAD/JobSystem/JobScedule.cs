@@ -240,6 +240,7 @@ namespace MAD.JobSystemCore
                         }
                         else
                         {
+                            // WORKIN ON THIS!!!
                             /*
                             if (_conf.MAIL_DEFAULT != null || _conf.MAIL_DEFAULT.Length != 0)
                             {

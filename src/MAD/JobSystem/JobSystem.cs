@@ -208,6 +208,14 @@ namespace MAD.JobSystemCore
             return null;
         }
 
+        public JobNode UnsafeGetNode(PhysicalAddress mac)
+        {
+            for (int i = 0; i < _nodes.Count; i++)
+                if (_nodes[i].macAddress == mac)
+                    return _nodes[i];
+            return null;
+        }
+
         public void StartNode(int id)
         {
             lock (jsLock)
@@ -354,6 +362,33 @@ namespace MAD.JobSystemCore
         {
             SyncResult _result = new SyncResult();
 
+            lock (jsLock)
+            {
+                foreach (ModelHost _host in currentHosts)
+                {
+                    JobNode _node = null;
+                    try
+                    {
+                        _node = UnsafeGetNode(PhysicalAddress.Parse(_host.hostMac));
+                        if (_node != null)
+                        {
+                            // Node does exist with this mac -> update IP and HOST
+                            _node.name = _host.hostName;
+                            _node.ipAddress = _host.hostIP;
+                            _result.nodesUpdated++;
+                        }
+                        else
+                        {
+                            // Node with this mac does not exist -> make new node.
+                            JobNode _newNode = new JobNode(_host.hostName, PhysicalAddress.Parse(_host.hostMac), _host.hostIP, new List<Job>());
+                            _nodes.Add(_newNode);
+                            _result.nodesAdded++;
+                        }
+                    }
+                    catch(Exception)
+                    { }
+                }
+            }
             return _result;
         }
 
