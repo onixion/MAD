@@ -37,6 +37,7 @@ namespace MAD.MacFinders
             _dev.Close();
             Thread.Sleep(100);
             _listenDev.Close();
+
         }
 
         public string ListInterfaces()

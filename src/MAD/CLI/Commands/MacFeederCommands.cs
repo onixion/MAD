@@ -2,6 +2,7 @@
 using System.Net;
 
 using MAD.MacFinders;
+using MAD.JobSystemCore;
 
 namespace MAD.CLICore
 {
@@ -112,10 +113,12 @@ namespace MAD.CLICore
     public class ArpReaderStart : Command
     {
         private ARPReader _reader = new ARPReader();
-
-        public ArpReaderStart()
+        private JobSystem _js; 
+        public ArpReaderStart(object[] args)
             : base()
         {
+            _js = (JobSystem) args[0];
+
             rPar.Add(new ParOption("i", "INTERFACE", "The Networkinterface to use, check with arp reader list interfaces for the right one", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("l", "SOURCE-IP", "The IPAddress of the used Network Interface", false, false, new Type[] { typeof(IPAddress) }));
             rPar.Add(new ParOption("s", "SUBNETMASK", "The Subnetmask of the Network. ie 16 for a /16 subnet", false, false, new Type[] { typeof(uint) }));
@@ -132,6 +135,7 @@ namespace MAD.CLICore
             _reader.subnetMask = (uint)pars.GetPar("s").argValues[0];
 
             _reader.Start();
+            _js.SyncNodes(ModelHost.hostList);
             return "<color><blue>Successfully performed Scan";
         }
     }

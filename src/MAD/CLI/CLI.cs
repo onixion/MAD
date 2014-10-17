@@ -53,7 +53,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("dhcp reader set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { dhcpReader }));
             commands.Add(new CommandOptions("print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { dhcpReader }));
             commands.Add(new CommandOptions("arp reader list interfaces", typeof(PrintArpReadyInterfaces), null));
-            commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), null));
+            commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), new object[] { js }));
             commands.Add(new CommandOptions("check list", typeof(CheckList), null));
 
             // JOBSYSTEM

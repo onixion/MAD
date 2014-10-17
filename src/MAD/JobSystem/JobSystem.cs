@@ -208,10 +208,10 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public JobNode UnsafeGetNode(PhysicalAddress mac)
+        public JobNode UnsafeGetNode(string mac)
         {
             for (int i = 0; i < _nodes.Count; i++)
-                if (_nodes[i].macAddress == mac)
+                if (_nodes[i].macAddress.ToString() == mac)
                     return _nodes[i];
             return null;
         }
@@ -368,7 +368,7 @@ namespace MAD.JobSystemCore
                     JobNode _node = null;
                     try
                     {
-                        _node = UnsafeGetNode(PhysicalAddress.Parse(_host.hostMac));
+                        _node = UnsafeGetNode(_host.hostMac);
                         if (_node != null)
                         {
                             // Node does exist with this mac -> update IP and HOST
