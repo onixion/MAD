@@ -1,0 +1,3 @@
+Die MadNet-Libary ist eine Ansammlung an Klassen, die für Netzwerkkommunikation benötigt wird.
+
+Diese Klasse kümmert sich um AES/RSA - Verschlüsselungen, Senden/Empfangen von Paketen und dergleich.

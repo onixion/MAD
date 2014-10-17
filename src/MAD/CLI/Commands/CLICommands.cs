@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Mail;
 
 using CLIIO;
 
@@ -203,12 +204,12 @@ namespace MAD.CLICore
             : base()
         {
             description = "This command load a conf file from another path.";
-            rPar.Add(new ParOption("p", "PATH-TO-CONF", "File to load from.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("f", "CONFIG-FILE", "File to load from.", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string _filepath = (string)pars.GetPar("p").argValues[0];
+            string _filepath = (string)pars.GetPar("f").argValues[0];
 
             try
             {
@@ -231,15 +232,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            try
-            {
-                MadConf.LoadConf(Mad.CONFFILE);
-                return "<color><green>Default config loaded.";
-            }
-            catch (Exception e)
-            {
-                return "<color><red>Could not load default config: " + e.Message;
-            }
+            MadConf.SetToDefault();
+            return "<color><green>Default config loaded.";
         }
     }
 
@@ -248,21 +242,21 @@ namespace MAD.CLICore
         public SaveConfigCommand()
         {
             description = "This command saves the current conf file.";
-            rPar.Add(new ParOption("p", "PATH-TO-CONF", "File to load from.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("f", "CONFIG-FILE", "File to save to.", false, false, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
-            string _filepath = (string)pars.GetPar("p").argValues[0];
+            string _filepath = (string)pars.GetPar("f").argValues[0];
 
             try
             {
                 MadConf.SaveConf(_filepath);
-                return "<color><green>Config saved.";
+                return "<color><green>Config saved to '" + _filepath + "'.";
             }
             catch (Exception e)
             {
-                return "<color><red>Could not save conf file: " + e.Message;
+                return "<color><red>Could not save config file: " + e.Message;
             }
         }
     }
@@ -276,7 +270,24 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            //output = "<color><yellow>VERSION: <color><white>" + MadConf.conf.VERSION + "\n";
+            lock (MadConf.confLock)
+            {
+                output += "<color><yellow>DEBUG_MODE:\t<color><white>" + MadConf.conf.DEBUG_MODE + "\n";
+                output += "<color><yellow>LOG_MODE:\t<color><white>" + MadConf.conf.LOG_MODE + "\n";
+                output += "<color><yellow>SERVER_HEADER:\t<color><white>" + MadConf.conf.SERVER_HEADER + "\n";
+                output += "<color><yellow>SERVER_PORT:\t<color><white>" + MadConf.conf.SERVER_PORT + "\n";
+                output += "<color><yellow>SERVER_RSA:\t<color><white>" + MadConf.conf.SERVER_RSA_KEYS + "\n";
+                output += "<color><yellow>SMTP_SERVER:\t<color><white>" + MadConf.conf.SMTP_SERVER + "\n";
+                output += "<color><yellow>SMTP_PORT:\t<color><white>" + MadConf.conf.SMTP_PORT + "\n";
+                output += "<color><yellow>SMTP_USER:\t<color><white>" + MadConf.conf.SMTP_USER + "\n";
+                output += "<color><yellow>SMTP_PASS:\t<color><white>" + MadConf.conf.SMTP_PASS + "\n";
+                output += "<color><yellow>DEFAULT_MAILS:\t<color><white>";
+
+                if (MadConf.conf.MAIL_DEFAULT != null || MadConf.conf.MAIL_DEFAULT.Length != 0)
+                    foreach (MailAddress _mail in MadConf.conf.MAIL_DEFAULT)
+                        output += _mail.Address + " ";
+                output += "\n";
+            }
 
             return output;
         }

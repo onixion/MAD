@@ -339,9 +339,9 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
 
-            rPar.Add(new ParOption(JobCommand.JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(JobCommand.JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            oPar.Add(new ParOption(JobCommand.JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            rPar.Add(new ParOption(JobAddCommand.JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JobAddCommand.JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption(JobAddCommand.JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
 
 			description = "This Command will try to read the outgoing traffic out of a host. Don't forget to set the credentials to public, MADMADMAD and MADMADMAD again. \n Also if it doesn't work, you may check the interface in the config file and compare it to the snmpinterface command";
         }
@@ -362,7 +362,7 @@ namespace MAD.CLICore
             _job.version = version;
 
             _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = JobCommand.ParseJobTime(this);
+            _job.time = JobAddCommand.ParseJobTime(this);
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);

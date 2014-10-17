@@ -5,13 +5,16 @@ Findet er diese Datei im Verzeichnis 'data' nicht, so erstellt er die 'MadConfFi
 (siehe Methode-SetDefault). Findet er die Config-File versucht er sie mithilfe von Json sie zu deserializieren.
 Scheitert er an der Deserializierung, erstellt er die Klasse einfach mit default-Werten.
 
-Es gibt derzeitig drei Befehle:
+Es gibt derzeitig vier Befehle:
 
-	-> 'conf -p <PFAD>' : ladet eine neue Config-Datei.
+	-> 'conf -f <CONFIG-FILE>' : ladet eine neue Config-Datei. // Ist derzeitig Implemenitert aber nicht sinnvoll
 	-> 'conf-default' : ladet die default-Werte.
 	-> 'conf-save' : speichert die aktuelle Config-Datei.
 	-> 'conf-show' : gibt eine Liste mit den geladen Variablen und deren Werte aus.
 
-Bei Komponente, die sensible Variablen aus Config-Dateien laden, muss auf jeden Fall eine Methode bereitgestellt werden,
-um auf das Event 'OnConfChange' zu reagieren. Denn wie bereits oben beschrieben, kann während der Laufzeit neue Config-
-Dateien hereingeladen werden und da müssen alle Komponenten die benötigten Variablen "nachladen".
+Wird eine neue Config-Datei geladen, so werden sie nicht gleich übernommen. Das liegt daran, dass die Komponenten schon
+im Einsatz sind und nicht einfach eine neue Konfiguration laden können. Daher muss das Programm neugestartet werden, damit
+er die neue Konfiguration laden kann. Theoretisch kann jede beliebige Konfiguration geladen werden, aber wie gesagt, wird die
+Konfiguration nicht von jeder Klasse gleich oder überhaupt übernommen. Die Konfiguration muss im Data-Ordner unter dem Namen
+"Mad.conf" abgespeichert werden, damit beim Programmstart die Konfiguration geladen wird. In der Konsole wird am Programmstart
+genau angezeigt was für Konfigruation geladen worden ist.

@@ -15,8 +15,6 @@ namespace MAD.JobSystemCore
         public enum JobState { Inactive, Waiting, Working, Exception }
 
         [JsonIgnore]
-        public ReaderWriterLockSlim jobLock = new ReaderWriterLockSlim();
-        [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
         private static int _jobsCount = 0;
@@ -24,6 +22,9 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
+        [JsonIgnore]
+        public bool uFlag = false;
+
         [JsonIgnore]
         public JobOutput outp { get; set; }
         [JsonIgnore]
@@ -36,6 +37,7 @@ namespace MAD.JobSystemCore
         public TimeSpan tSpan { get; set; }
 
         // general
+        public Guid guid { get; set; }
         public string name { get; set; }
         public JobType type { get; set; }
         public JobTime time { get; set; }
@@ -52,6 +54,8 @@ namespace MAD.JobSystemCore
         protected Job(JobType type)
         {
             InitJob();
+
+            this.guid = new Guid();
             this.type = type;
             this.outp = new JobOutput();
             this.time = new JobTime();
@@ -60,6 +64,8 @@ namespace MAD.JobSystemCore
         protected Job(string name, JobType type)
         {
             InitJob();
+
+            this.guid = new Guid();
             this.name = name;
             this.type = type;
             this.outp = new JobOutput();
@@ -69,6 +75,8 @@ namespace MAD.JobSystemCore
         protected Job(string name, JobType type, JobTime time, JobOutput outp)
         {
             InitJob();
+
+            this.guid = new Guid();
             this.name = name;
             this.type = type;
             this.outp = outp;

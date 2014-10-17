@@ -147,18 +147,20 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            List<JobNode> _nodes = _js.GetNodesLockedRead();
-            foreach (JobNode _temp in _nodes)
+            lock (_js.jsLock)
             {
-                _tableRow[0] = _temp.id.ToString();
-                _tableRow[1] = _temp.name;
-                _tableRow[2] = _temp.state.ToString();
-                _tableRow[3] = _temp.macAddress.ToString();
-                _tableRow[4] = _temp.ipAddress.ToString();
-                _tableRow[5] = _temp.jobs.Count.ToString();
-                output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
+                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                foreach (JobNode _temp in _nodes)
+                {
+                    _tableRow[0] = _temp.id.ToString();
+                    _tableRow[1] = _temp.name;
+                    _tableRow[2] = _temp.state.ToString();
+                    _tableRow[3] = _temp.macAddress.ToString();
+                    _tableRow[4] = _temp.ipAddress.ToString();
+                    _tableRow[5] = _temp.jobs.Count.ToString();
+                    output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
+                }
             }
-            _js.UnlockNodesRead();
 
             return output;
         }
@@ -261,27 +263,24 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            JobNode _node = _js.GetNodeLocked((Int32)pars.GetPar("id").argValues[0]);
-            if (_node != null)
+            lock (_js.jsLock)
             {
-                _js.NodeLockWrite(_node);
+                JobNode _node = _js.UnsafeGetNode((Int32)pars.GetPar("id").argValues[0]);
+                if (_node != null)
+                {
+                    if (OParUsed("n"))
+                        _node.name = (string)pars.GetPar("n").argValues[0];
 
-                if (OParUsed("n"))
-                    _node.name = (string)pars.GetPar("n").argValues[0];
+                    if (OParUsed("mac"))
+                        _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
 
-                if (OParUsed("mac"))
-                    _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+                    if (OParUsed("ip"))
+                        _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
 
-                if (OParUsed("ip"))
-                    _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
-
-                _js.NodeUnlockWrite(_node);
-                _js.NodeUnlock();
-                return "<color><green>Node edited.";
-            }
-            else
-            {
-                return "<color><red>Node does not exist!";
+                    return "<color><green>Node edited.";
+                }
+                else
+                    return "<color><red>Node does not exist!";
             }
         }
     }
@@ -390,8 +389,8 @@ namespace MAD.CLICore
             output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
-            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
+            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.JobsActive() + "\n";
+            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.JobsInactive() + "\n\n";
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = null;
@@ -405,40 +404,35 @@ namespace MAD.CLICore
             output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            List<JobNode> _nodes = _js.GetNodesLockedRead();
-            foreach (JobNode _temp in _nodes)
+            lock (_js.jsLock)
             {
-                _temp.nodeLock.EnterReadLock();
-                foreach (Job _temp2 in _temp.jobs)
+                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                foreach (JobNode _temp in _nodes)
                 {
-                    _temp2.jobLock.EnterReadLock();
-
-                    _tableRow[0] = _temp.id.ToString();
-                    _tableRow[1] = _temp2.id.ToString();
-                    _tableRow[2] = _temp2.name;
-                    _tableRow[3] = _temp2.type.ToString();
-                    _tableRow[4] = _temp2.state.ToString();
-                    _tableRow[5] = _temp2.time.type.ToString();
-                    _tableRow[6] = _temp2.time.GetValues();
-
-                    if (!OParUsed("more"))
-                        _tableRow[7] = _temp2.outp.outState.ToString();
-                    else
+                    foreach (Job _temp2 in _temp.jobs)
                     {
-                        _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
-                        _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
-                        _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
-                        _tableRow[10] = _temp2.outp.outState.ToString();
+                        _tableRow[0] = _temp.id.ToString();
+                        _tableRow[1] = _temp2.id.ToString();
+                        _tableRow[2] = _temp2.name;
+                        _tableRow[3] = _temp2.type.ToString();
+                        _tableRow[4] = _temp2.state.ToString();
+                        _tableRow[5] = _temp2.time.type.ToString();
+                        _tableRow[6] = _temp2.time.GetValues();
+
+                        if (!OParUsed("more"))
+                            _tableRow[7] = _temp2.outp.outState.ToString();
+                        else
+                        {
+                            _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
+                            _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
+                            _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
+                            _tableRow[10] = _temp2.outp.outState.ToString();
+                        }
+                        output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                     }
-
-                    _temp2.jobLock.ExitReadLock();
-                    output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
-                _temp.nodeLock.ExitReadLock();
+                return output;
             }
-            _js.UnlockNodesRead();
-
-            return output;
         }
     }
 
@@ -457,37 +451,35 @@ namespace MAD.CLICore
         {
             if (OParUsed("id"))
             {
-                JobNode _node;
-                Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
-                if (_job != null)
+                lock (_js.jsLock)
                 {
-                    _job.jobLock.EnterReadLock();
-                    output = GetJobInfo(_job);
-                    _job.jobLock.ExitReadLock();
-                    _js.JobUnlockedGlobal(_node);
-                    return output;
+                    JobNode _node;
+                    Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                    if (_job != null)
+                    {
+                        output = GetJobInfo(_job);
+                        return output;
+                    }
+                    else
+                        return "<color><red>Job does not exist!";
                 }
-                else
-                    return "<color><red>Job does not exist!";
             }
             else
             {
-                List<JobNode> _nodes = _js.GetNodesLockedRead();
-                foreach (JobNode _node in _nodes)
+                lock (_js.jsLock)
                 {
-                    _node.nodeLock.EnterReadLock();
-                    foreach (Job _job in _node.jobs)
+                    List<JobNode> _nodes = _js.UnsafeGetNodes();
+                    foreach (JobNode _node in _nodes)
                     {
-                        _job.jobLock.EnterReadLock();
-                        output += GetJobInfo(_job);
-                        output += GetJobSpecificInfo(_job);
-                        _job.jobLock.ExitReadLock();
-                        output += "\n";
+                        foreach (Job _job in _node.jobs)
+                        {
+                            output += GetJobInfo(_job);
+                            output += GetJobSpecificInfo(_job);
+                            output += "\n";
+                        }
                     }
-                    _node.nodeLock.ExitReadLock();
+                    return output;
                 }
-                _js.UnlockNodesRead();
-                return output;
             }
         }
 
@@ -504,14 +496,6 @@ namespace MAD.CLICore
             output += "<color><yellow>Last-Started:  <color><white>" + job.tStart.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             output += "<color><yellow>Last-Stopped:  <color><white>" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             output += "<color><yellow>Last-Span:     <color><white>" + "+" + job.tSpan.Seconds + "s " + job.tSpan.Milliseconds + "ms" + "\n\n";
-
-            output += "<color><yellow>OutDescriptors:";
-
-            foreach (OutputDescriptor _desc in job.outp.outputs)
-            {
-                output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
-                output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString() + "\n";
-            }
 
             output += "\n\n<color><yellow>Notification-Rules:";
 
@@ -555,6 +539,38 @@ namespace MAD.CLICore
                     // TO DO
                 default:
                     return "";
+            }
+        }
+    }
+
+    public class JobOutDescInfoCommand : Command
+    { 
+        private JobSystem _js;
+
+        public JobOutDescInfoCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows the out-Descriptors of a job.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            lock(_js.jsLock)
+            {
+                JobNode _node = null;
+                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                if(_job != null)
+                {
+                    foreach(OutputDescriptor _desc in _job.outp.outputs)
+                    {
+                        output += "<color><yellow>>OutDesc.: <color><white>" + _desc.name + "\n";
+                        output += "<color><yellow> Type:     <color><white>" + _desc.dataType.ToString() + "\n\n";
+                    }
+                    return output;
+                }
+                else
+                    throw new JobException("Job does not exist!", null);
             }
         }
     }
@@ -630,52 +646,30 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            JobNode _node = null;
-            Job _job = _js.GetJobLockedGlobal((Int32)pars.GetPar("id").argValues[0], out _node);
-
-            _js.JobLockWrite(_job);
-
-            if (OParUsed("n"))
-                _job.name = (string)pars.GetPar("n").argValues[0];
-
-            if (OParUsed("t"))
+            lock (_js.jsLock)
             {
-                try
-                {
+                JobNode _node = null;
+                Job _job = _js.UnsafeGetJob((Int32)pars.GetPar("id").argValues[0], out _node);
+
+                if (OParUsed("n"))
+                    _job.name = (string)pars.GetPar("n").argValues[0];
+
+                if (OParUsed("t"))
                     _job.time = ParseJobTime(this);
-                }
-                catch (Exception e)
-                {
-                    _js.JobUnlockWrite(_job);
-                    _js.JobUnlockedGlobal(_node);
-                    throw e;
-                }
-            }
 
-            if (OParUsed("rule"))
-            {
-                try
+                if (OParUsed("rule"))
                 {
                     List<JobRule> _rules = ParseJobNotificationRules(pars, _job.outp);
                     _job.rules = _rules;
                 }
-                catch (Exception e)
-                {
-                    _js.JobUnlockWrite(_job);
-                    _js.JobUnlockedGlobal(_node);
-                    throw e;
-                }
+
+                if (OParUsed("notiEnable"))
+                    _job.notiFlag = true;
+                else
+                    _job.notiFlag = false;
+
+                return "<color><green>Job updated.";
             }
-
-            if (OParUsed("notiEnable"))
-                _job.notiFlag = true;
-            else
-                _job.notiFlag = false;
-
-            _js.JobUnlockWrite(_job);
-            _js.JobUnlockedGlobal(_node);
-
-            return "<color><green>Job updated.";
         }
 
         public static JobTime ParseJobTime(Command c)
@@ -807,34 +801,24 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            JobNode _node;
-            Job _job = _js.GetJobLockedGlobal((int)pars.GetPar("id").argValues[0], out _node);
-            if (_job != null)
+            lock (_js.jsLock)
             {
-                JobNotificationSettings _sett = null;
-
-                try { _sett = ParseJobNotificationSettings(pars); }
-                catch (Exception e)
+                JobNode _node;
+                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                if (_job != null)
                 {
-                    _js.JobUnlockedGlobal(_node);
-                    throw e;
+                    _job.settings = ParseJobNotificationSettings(pars);
+                    return "<color><green>Rules set.";
                 }
-
-                _js.JobLockWrite(_job);
-                _job.settings = _sett;
-                _js.JobUnlockWrite(_job);
-                _js.JobUnlockedGlobal(_node);
-
-                return "<color><green>Rules set.";
+                else
+                    return "<color><red>Job does not exist!";
             }
-            else
-                return "<color><red>Job does not exist!";
         }
     }
 
     #region commands for adding jobs
 
-    public class JobSystemAddPingCommand : JobCommand
+    public class JobSystemAddPingCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -868,7 +852,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddHttpCommand : JobCommand
+    public class JobSystemAddHttpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -894,7 +878,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddPortCommand : JobCommand
+    public class JobSystemAddPortCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -920,7 +904,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddHostDetectCommand : JobCommand
+    public class JobSystemAddHostDetectCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -947,7 +931,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckSnmpCommand : JobCommand
+    public class JobSystemAddCheckSnmpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1027,7 +1011,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckFtpCommand : JobCommand
+    public class JobSystemAddCheckFtpCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1055,7 +1039,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemAddCheckDnsCommand : JobCommand
+    public class JobSystemAddCheckDnsCommand : JobAddCommand
     {
         private JobSystem _js;
 
@@ -1082,21 +1066,18 @@ namespace MAD.CLICore
 
     #region parsing job parameters
 
-    public class JobCommand : Command
+    public class JobAddCommand : Command
     {
         public const string JOB_NAME = "n";
         public const string JOB_ID = "id";
         public const string JOB_TIME_PAR = "t";
  
-        public JobCommand()
+        public JobAddCommand()
             : base()
         {
-            // GENERAL
-            rPar.Add(new ParOption(JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            
-            // TIME
-            oPar.Add(new ParOption(JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            rPar.Add(new ParOption(JOB_NAME, "<JOB-NAME>", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JOB_ID, "<NODE-ID>", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption(JOB_TIME_PAR, "<TIME>", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
@@ -1142,14 +1123,14 @@ namespace MAD.CLICore
         public NotificationConCommand()
             :base()
         {
-            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "SMTP-ADDR>:<SMTP-PORT", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "TO-MAIL-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "<SMTP-ADDR>:<SMTP-PORT>", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "<SMTP-MAIL>:<SMTP-PASS>", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "<TO-MAIL-ADDR>", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
         }
 
         public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
+        { 
+            return null; 
         }
 
         public JobNotificationSettings ParseJobNotificationSettings(ParInput pars)
@@ -1167,7 +1148,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse SMTP-Port!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse SMTP-Port!", true));
                 }
             }
             else
@@ -1182,7 +1163,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse MailAddress!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse MailAddress!", true));
                 }
 
                 _settings.login.password = _temp2[1];

@@ -16,10 +16,9 @@ Die Verwaltung des JobSystems kann von drei Komponenten des Programmes übernomme
 
 Diese Komponente können sich mit dem JobSystem verständigen und z.B. einen Job zu starten/stoppen.
 
-Das System ist aber NICHT multithreading-fähig, d.h. das die Methoden des JobSystems nicht von vielen
-Threads gleichzeitig verwendet werden dürfen, da es sonst zu internen Schwierigkeiten kommen kann.
-Es wurde versucht dieses Funktion einzubauen, damit mehrere Leute gleichzeitig am JobSystem arbeiten 
-können, doch aus betimment Gründen wurde diese Idee verworfen (Sehr schwierig zum Debuggen, Fehlersuche, ...).
+Das JobSystem, sowie JobScedule und andere Klassen sind mit ReadWrite-Locks geschützt. D.h. sie können von mehreren Threads
+gleichzeitig verwendet werden. Mehrere Threads können zugleich lesen, aber nur Einer kann schreiben. Bei der Implementierung
+von neuen Funktionen muss man ganz genau aufpassen, ja keine Fehler mit den Locks zu machen, da sonst DEADLOCKS enstehen.
 
 Das JobSystem unterstützt die Nutzung von Events. Für das Hinzufügen und Entfernen von Nodes und Jobs können
 EventHandler definiert werden, um bei bestimmen Ereignissen benachrichtigt zu werden.
@@ -142,12 +141,4 @@ Damit ein Job ausgeführt wird, müssen vier Dinge zutreffen:
 Wenn der JobScedule läuft, die JobNode, der Job aktiv sind UND die JobTime des jeweiligen Jobs ein 'OK' gibt, erst dann wird der Job ausgeführt.
 
 __
-
-Das JobSystem, sowie JobScedule und andere Klassen sind mit Locks vor Multi-threading Problemen geschützt. Jedoch wird
-nicht empfohlen meherer Clients gleichzeitig auf das JobSystem zugreifen zu lassen, da unvorhersehebare Fehler auftreten
-können.
-
-Falls der JobScedule gerade läuft und die Jobs abarbeitet werden, kann ohne Besorgnis ein Job oder auch eine Node entfernt werden.
-
-
 

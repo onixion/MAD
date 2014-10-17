@@ -20,15 +20,10 @@ namespace MAD.CLIServerCore
         private static uint _sessionsCount = 0;
         private uint _sessionID;
         public uint sessionID { get { return _sessionID; } }
-
         private object _sessionInitLock = new object();
 
         private NetworkStream _stream;
         private AES _aes;
-
-        private Command _command;
-        private string _clientCLIInput;
-        private string _cliInterpreter;
 
         private JobSystem _js;
 
@@ -125,10 +120,12 @@ namespace MAD.CLIServerCore
 
             try
             {
+                Command _command = null;
+                string _clientCLIInput = null;
+
                 _dataP = new DataPacket(_stream, _aes);
                 _cliP = new CLIPacket(_stream, _aes);
 
-                _dataP.data = Encoding.Unicode.GetBytes(GetBanner());
                 _dataP.SendPacket();
 
                 while (true)
@@ -138,12 +135,18 @@ namespace MAD.CLIServerCore
 
                     if (_clientCLIInput != "")
                     {
-                        _cliInterpreter = CLIInterpreter(ref _command, _clientCLIInput);
+                        _clientCLIInput = CLIInterpreter(ref _command, _clientCLIInput);
 
-                        if (_cliInterpreter == "VALID_PARAMETERS")
-                            _dataP.data = Encoding.Unicode.GetBytes(_command.Execute(_cliP.consoleWidth));
+                        if (_clientCLIInput == "VALID_PARAMETERS")
+                        {
+                            _clientCLIInput = _command.Execute(_cliP.consoleWidth);
+                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
+
+                            if (_clientCLIInput == "EXIT_CLI")
+                                break;
+                        }
                         else
-                            _dataP.data = Encoding.Unicode.GetBytes(_cliInterpreter);
+                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
                     }
 
                     _dataP.SendPacket();
@@ -151,10 +154,9 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (MadConf.conf.DEBUG_MODE)
-                    Console.WriteLine("CLI-Session: Lost connection.");
-                if (MadConf.conf.LOG_MODE)
-                    Logger.Log("CLI-Session: EX: " + e.Message, Logger.MessageType.WARNING);
+                _dataP.Dispose();
+                _cliP.Dispose();
+                throw e;
             }
 
             _dataP.Dispose();
