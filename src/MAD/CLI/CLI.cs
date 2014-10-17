@@ -73,6 +73,7 @@ namespace MAD.CLICore
 
             // JOBS
             commands.Add(new CommandOptions("job info", typeof(JobInfoCommand), new object[] { js }));
+            commands.Add(new CommandOptions("job desc", typeof(JobOutDescInfoCommand), new object[] { js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { js }));

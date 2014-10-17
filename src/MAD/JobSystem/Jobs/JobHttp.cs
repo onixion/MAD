@@ -38,16 +38,7 @@ namespace MAD.JobSystemCore
                 _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
                 _response = _request.GetResponse();
 
-                NameValueCollection _headers = _response.Headers;
-
-                for (int i = 0; i < _headers.Count; i++)
-                {
-                    Console.WriteLine(_headers.GetKey(i));
-                    Console.WriteLine(_headers[i]);
-                }
-
                 outp.outState = JobOutput.OutState.Success;
-
                 _response.Close();
             }
             catch (Exception)

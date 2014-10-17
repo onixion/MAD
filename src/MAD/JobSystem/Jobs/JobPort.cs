@@ -20,12 +20,6 @@ namespace MAD.JobSystemCore
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, int port)
-            : base(jobName, jobType, jobTime, outp)
-        {
-            this.port = port;
-        }
-
         #endregion
 
         #region methodes
@@ -42,7 +36,6 @@ namespace MAD.JobSystemCore
             {
                 outp.outState = JobOutput.OutState.Failed;
             }
-
             _socket.Close();
         }
 

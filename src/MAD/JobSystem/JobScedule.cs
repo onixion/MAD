@@ -75,12 +75,9 @@ namespace MAD.JobSystemCore
 
         private void CycleJobTracker()
         {
-            JobHolder _holder = new JobHolder(); // not very nice, but works for now
-
             while(true)
             {
                 DateTime _nowTime = DateTime.Now;
-
                 try
                 {
                     lock (_jsLock)
@@ -89,58 +86,31 @@ namespace MAD.JobSystemCore
                         {
                             if (_node.state == JobNode.State.Active)
                             {
-                                foreach (Job _job in _node.jobs)
+                                _node.uFlag = true;
+                                try
                                 {
-                                    if (_job.state == Job.JobState.Waiting)
+                                    foreach (Job _job in _node.jobs)
                                     {
-                                        if (_job.type != Job.JobType.NULL)
+                                        if (_job.state == Job.JobState.Waiting)
                                         {
-                                            if (_job.time.type == JobTime.TimeMethod.Relative)
+                                            if (_job.type != Job.JobType.NULL)
                                             {
-                                                if (_job.time.jobDelay.CheckTime())
+                                                if (JobTimeCheck(_job, _nowTime))
                                                 {
-                                                    _job.time.jobDelay.Reset();
-
-                                                    // Job is ready to be executed.
-                                                    _job.state = Job.JobState.Working;
-
+                                                    JobHolder _holder = new JobHolder();
                                                     _holder.node = _node;
                                                     _holder.job = _job;
-                                                    _holder.targetAddress = _node.ipAddress;
 
+                                                    _job.uFlag = true;
                                                     JobThreadStart(_holder);
-                                                }
-                                                else
-                                                {
-                                                    _job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
-                                                }
-                                            }
-                                            else if (_job.time.type == JobTime.TimeMethod.Absolute)
-                                            {
-                                                JobTimeHandler _timeHandler = _job.time.GetJobTimeHandler(_nowTime);
-
-                                                if (_timeHandler != null)
-                                                {
-                                                    if (!_timeHandler.IsBlocked(_nowTime))
-                                                    {
-                                                        if (_timeHandler.CheckTime(_nowTime))
-                                                        {
-                                                            _timeHandler.minuteAtBlock = _nowTime.Minute;
-
-                                                            // Job is ready to be executed.
-                                                            _job.state = Job.JobState.Working;
-
-                                                            _holder.node = _node;
-                                                            _holder.job = _job;
-                                                            _holder.targetAddress = _node.ipAddress;
-
-                                                            JobThreadStart(_holder);
-                                                        }
-                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                }
+                                finally
+                                {
+                                    _node.uFlag = false;
                                 }
                             }
                         }
@@ -167,6 +137,45 @@ namespace MAD.JobSystemCore
             }
         }
 
+        private bool JobTimeCheck(Job job, DateTime time)
+        {
+            if (job.time.type == JobTime.TimeMethod.Relative)
+            {
+                if (job.time.jobDelay.CheckTime())
+                {
+                    job.time.jobDelay.Reset();
+                    return true;
+                }
+                else
+                {
+                    job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                    return false;
+                }
+            }
+            else if (job.time.type == JobTime.TimeMethod.Absolute)
+            {
+                JobTimeHandler _timeHandler = job.time.GetJobTimeHandler(time);
+
+                if (_timeHandler != null)
+                {
+                    if (!_timeHandler.IsBlocked(time))
+                    {
+                        if (_timeHandler.CheckTime(time))
+                        {
+                            _timeHandler.minuteAtBlock = time.Minute;
+                            return true;
+                        }
+                    }
+                    
+                    return false;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
         private void JobThreadStart(JobHolder holder)
         {
             _workerPool.QueueWorkItem(new WorkItemCallback(JobInvoke), holder);
@@ -179,7 +188,7 @@ namespace MAD.JobSystemCore
             Job _job = _holder.job;
 
             _job.tStart = DateTime.Now;
-            try { _job.Execute(_holder.targetAddress); }
+            try { _job.Execute(_node.ipAddress); }
             catch (Exception)
             { _job.state = Job.JobState.Exception; }
             _job.tStop = DateTime.Now;
@@ -195,7 +204,7 @@ namespace MAD.JobSystemCore
                     List<JobRule> _bRules = GetBrokenRules(_job);
                     if (_bRules.Count != 0)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.targetAddress.ToString()
+                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ipAddress.ToString()
                             + "') finished with a not expected result!");
 
                         string _mailContent = "";
@@ -239,6 +248,7 @@ namespace MAD.JobSystemCore
             }
 
             _job.state = Job.JobState.Waiting;
+            _job.uFlag = false;
             return null;
         }
 
@@ -302,6 +312,5 @@ namespace MAD.JobSystemCore
     {
         public JobNode node;
         public Job job;
-        public System.Net.IPAddress targetAddress;
     }
 }

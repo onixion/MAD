@@ -23,6 +23,9 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public int id { get { return _id; } }
         [JsonIgnore]
+        public bool uFlag = false;
+
+        [JsonIgnore]
         public State state = State.Inactive;
         [JsonIgnore]
         public const int MAXJOBS = 100;

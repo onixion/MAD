@@ -248,7 +248,6 @@ namespace MAD.JobSystemCore
             {
                 if (MAXNODES > _nodes.Count)
                 {
-
                     _nodes.Add(node);
 
                     if (OnNodeCountChanged != null)
@@ -406,10 +405,17 @@ namespace MAD.JobSystemCore
                 JobNode _node;
                 Job _job = UnsafeGetJob(id, out _node);
                 if (_job != null)
-                    if (_job.state == Job.JobState.Inactive)
-                        _job.state = Job.JobState.Waiting;
+                {
+                    if (!_job.uFlag)
+                    {
+                        if (_job.state == Job.JobState.Inactive)
+                            _job.state = Job.JobState.Waiting;
+                        else
+                            throw new JobException("Job already active!", null);
+                    }
                     else
-                        throw new JobException("Job already active!", null);
+                        throw new JobException("Job busy.", null);
+                }
                 else
                     throw new JobException("Job does not exist!", null);
             }
@@ -422,10 +428,17 @@ namespace MAD.JobSystemCore
                 JobNode _node;
                 Job _job = UnsafeGetJob(id, out _node);
                 if (_job != null)
-                    if (_job.state == Job.JobState.Waiting)
-                        _job.state = Job.JobState.Inactive;
+                {
+                    if (!_job.uFlag)
+                    {
+                        if (_job.state == Job.JobState.Waiting)
+                            _job.state = Job.JobState.Inactive;
+                        else
+                            throw new JobException("Job already inactive!", null);
+                    }
                     else
-                        throw new JobException("Job already inactive!", null);
+                        throw new JobException("Job busy.", null);
+                }
                 else
                     throw new JobException("Job does not exist!", null);
             }
@@ -439,7 +452,12 @@ namespace MAD.JobSystemCore
                 if (_node != null)
                 {
                     if (JobNode.MAXJOBS > _node.jobs.Count)
-                        _node.jobs.Add(job);
+                    {
+                        if (!_node.uFlag)
+                            _node.jobs.Add(job);
+                        else
+                            throw new JobNodeException("Node busy.", null);
+                    }
                     else
                         throw new JobSystemException("Jobs limit reached!", null);
                 }
@@ -459,9 +477,14 @@ namespace MAD.JobSystemCore
                     {
                         if (_node.jobs[i].id == id)
                         {
-                            _node.jobs.RemoveAt(i);
-                            _success = true;
-                            break;
+                            if (!_node.jobs[i].uFlag)
+                            {
+                                _node.jobs.RemoveAt(i);
+                                _success = true;
+                                break;
+                            }
+                            else
+                                throw new JobException("Job busy.", null);
                         }
                     }
                 }

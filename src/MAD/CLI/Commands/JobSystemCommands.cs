@@ -495,14 +495,6 @@ namespace MAD.CLICore
             output += "<color><yellow>Last-Stopped:  <color><white>" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             output += "<color><yellow>Last-Span:     <color><white>" + "+" + job.tSpan.Seconds + "s " + job.tSpan.Milliseconds + "ms" + "\n\n";
 
-            output += "<color><yellow>OutDescriptors:";
-
-            foreach (OutputDescriptor _desc in job.outp.outputs)
-            {
-                output += "\n  <color><yellow>>Name: <color><white>" + _desc.name;
-                output += "\n  <color><yellow> Type: <color><white>" + _desc.dataType.ToString() + "\n";
-            }
-
             output += "\n\n<color><yellow>Notification-Rules:";
 
             if (job.rules == null)
@@ -545,6 +537,38 @@ namespace MAD.CLICore
                     // TO DO
                 default:
                     return "";
+            }
+        }
+    }
+
+    public class JobOutDescInfoCommand : Command
+    { 
+        private JobSystem _js;
+
+        public JobOutDescInfoCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows the out-Descriptors of a job.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            lock(_js.jsLock)
+            {
+                JobNode _node = null;
+                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                if(_job != null)
+                {
+                    foreach(OutputDescriptor _desc in _job.outp.outputs)
+                    {
+                        output += "<color><yellow>>OutDesc.: <color><white>" + _desc.name + "\n";
+                        output += "<color><yellow> Type:     <color><white>" + _desc.dataType.ToString() + "\n\n";
+                    }
+                    return output;
+                }
+                else
+                    throw new JobException("Job does not exist!", null);
             }
         }
     }
