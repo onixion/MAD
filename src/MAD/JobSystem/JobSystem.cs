@@ -357,7 +357,6 @@ namespace MAD.JobSystemCore
             }
         }
 
-        // not finished yet
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
             SyncResult _result = new SyncResult();
