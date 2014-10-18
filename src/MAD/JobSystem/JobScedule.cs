@@ -114,11 +114,15 @@ namespace MAD.JobSystemCore
                                                     if(_log)
                                                         Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
 
+                                                    // Change job-state.
+                                                    _node.uCounter++;
+                                                    _job.uFlag = true;
+                                                    _job.state = Job.JobState.Working;
+
                                                     JobHolder _holder = new JobHolder();
                                                     _holder.node = _node;
                                                     _holder.job = _job;
 
-                                                    _job.uFlag = true;
                                                     JobThreadStart(_holder);
                                                 }
                                             }
@@ -132,20 +136,17 @@ namespace MAD.JobSystemCore
                             }
                         }
                     }
-
                 }
                 catch (Exception e)
                 { 
-                    // This is just for debugging reasons. If the program works
-                    // as planed, it will never get into this catch. But if someone
-                    // tries to modify Jobs or Nodes without using the locks, this
-                    // execption here can accure.
+                    // This try-catch is just for debugging reasons here. If the program works
+                    // as planed, it will never get into this catch.
                     throw new SystemException("SCEDULE: INTERNAL-EXECPTION: " + e.Message);
                 }
 
                 if (_state == State.StopRequest)
                 {
-                    Thread.Sleep(300);
+                    _workerPool.WaitForIdle(2000);
                     _workerPool.Cancel(true);
                     break;
                 }
@@ -200,14 +201,24 @@ namespace MAD.JobSystemCore
 
         private object JobInvoke(object holder)
         {
+            /* In the worst case scenario the node can be deleted at this point 
+             * and the only variable that prevents it from doing this, is the 
+             * 'uCounter'. Everytime the job starts, it increases the 'uCounter' by 1.
+             * After execution it decreases the counter by 1. Only if the uCounter is
+             * equal to 0 the node can be deleted (or else). */
             JobHolder _holder = (JobHolder)holder;
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
             _job.tStart = DateTime.Now;
-            try { _job.Execute(_node.ipAddress); }
+            try 
+            {
+                _job.Execute(_node.ip); 
+            }
             catch (Exception)
-            { _job.state = Job.JobState.Exception; }
+            { 
+                _job.state = Job.JobState.Exception; 
+            }
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
@@ -220,13 +231,13 @@ namespace MAD.JobSystemCore
                     List<JobRule> _bRules = GetBrokenRules(_job);
                     if (_bRules.Count != 0)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ipAddress.ToString()
+                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ip.ToString()
                             + "') finished with a not expected result!");
 
                         string _mailContent = "";
                         _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
-                        _mailContent += "JobNode-IP:  '" + _node.ipAddress.ToString() + "'\n";
-                        _mailContent += "JobNode-MAC: '" + _node.macAddress.ToString() + "'\n\n";
+                        _mailContent += "JobNode-IP:  '" + _node.ip.ToString() + "'\n";
+                        _mailContent += "JobNode-MAC: '" + _node.mac.ToString() + "'\n\n";
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
@@ -265,8 +276,10 @@ namespace MAD.JobSystemCore
             if (_log)
                 Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
 
+            // Change job-state.
             _job.state = Job.JobState.Waiting;
             _job.uFlag = false;
+            _node.uCounter--;
             return null;
         }
 

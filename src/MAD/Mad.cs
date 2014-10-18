@@ -12,7 +12,7 @@ using MAD.Notification;
 
 namespace MAD
 {
-    class Mad
+    public class Mad
     {
         public static readonly string DATADIR = Path.Combine("data");
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");

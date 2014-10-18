@@ -211,7 +211,7 @@ namespace MAD.JobSystemCore
         public JobNode UnsafeGetNode(string mac)
         {
             for (int i = 0; i < _nodes.Count; i++)
-                if (_nodes[i].macAddress.ToString() == mac)
+                if (_nodes[i].mac.ToString() == mac)
                     return _nodes[i];
             return null;
         }
@@ -262,21 +262,26 @@ namespace MAD.JobSystemCore
                         OnNodeCountChanged.Invoke(null, null);
                 }
                 else
-                    throw new JobSystemException("Node limit reached!", null);
+                    throw new JobSystemException("Nodes limit reached!", null);
             }
         }
 
         public void RemoveNode(int id)
         {
             bool _success = false;
-
             lock (jsLock)
             {
                 for (int i = 0; i < _nodes.Count; i++)
                 {
                     if (_nodes[i].id == id)
                     {
-                        _nodes.RemoveAt(i);
+                        if (!_nodes[i].uFlag)
+                            if (_nodes[i].uCounter == 0)
+                                _nodes.RemoveAt(i);
+                            else
+                                throw new JobNodeException("Node busy.", null);
+                        else
+                            throw new JobNodeException("Node busy.", null);
 
                         if (OnNodeCountChanged != null)
                             OnNodeCountChanged.Invoke(null, null);
@@ -286,18 +291,27 @@ namespace MAD.JobSystemCore
                     }
                 }
             }
-
             if (!_success)
                 throw new JobNodeException("Node does not exist!", null);
         }
 
-        public void RemoveAllNodes()
+        public int RemoveAllNodes()
         {
-            lock(jsLock)
-                _nodes.Clear();
-
+            int _removedNodes = 0;
+            lock (jsLock)
+            {
+                for (int i = 0; i < _nodes.Count; i++)
+                    if (!_nodes[i].uFlag)
+                        if (_nodes[i].uCounter == 0)
+                        {
+                            _nodes.RemoveAt(i);
+                            _removedNodes++;
+                        }
+            }
             if(OnNodeCountChanged != null)
                 OnNodeCountChanged.Invoke(null, null);
+
+            return _removedNodes;
         }
 
         public bool NodeExist(int id)
@@ -334,7 +348,7 @@ namespace MAD.JobSystemCore
                 JobNode _node = UnsafeGetNode(nodeID);
                 if (_node != null)
                 {
-                    _node.macAddress = mac;
+                    _node.mac = mac;
                     return true;
                 }
                 else
@@ -349,7 +363,7 @@ namespace MAD.JobSystemCore
                 JobNode _node = UnsafeGetNode(nodeID);
                 if (_node != null)
                 {
-                    _node.ipAddress = ip;
+                    _node.ip = ip;
                     return true;
                 }
                 else
@@ -360,7 +374,6 @@ namespace MAD.JobSystemCore
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
             SyncResult _result = new SyncResult();
-
             lock (jsLock)
             {
                 foreach (ModelHost _host in currentHosts)
@@ -373,7 +386,7 @@ namespace MAD.JobSystemCore
                         {
                             // Node does exist with this mac -> update IP and HOST
                             _node.name = _host.hostName;
-                            _node.ipAddress = _host.hostIP;
+                            _node.ip = _host.hostIP;
                             _result.nodesUpdated++;
                         }
                         else

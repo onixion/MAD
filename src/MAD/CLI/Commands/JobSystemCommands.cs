@@ -155,8 +155,8 @@ namespace MAD.CLICore
                     _tableRow[0] = _temp.id.ToString();
                     _tableRow[1] = _temp.name;
                     _tableRow[2] = _temp.state.ToString();
-                    _tableRow[3] = _temp.macAddress.ToString();
-                    _tableRow[4] = _temp.ipAddress.ToString();
+                    _tableRow[3] = _temp.mac.ToString();
+                    _tableRow[4] = _temp.ip.ToString();
                     _tableRow[5] = _temp.jobs.Count.ToString();
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
@@ -220,8 +220,8 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
-            _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+            _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+            _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
             _js.AddNode(_node); 
 
@@ -272,10 +272,10 @@ namespace MAD.CLICore
                         _node.name = (string)pars.GetPar("n").argValues[0];
 
                     if (OParUsed("mac"))
-                        _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+                        _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
 
                     if (OParUsed("ip"))
-                        _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+                        _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
                     return "<color><green>Node edited.";
                 }

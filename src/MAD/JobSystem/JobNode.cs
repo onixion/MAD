@@ -12,8 +12,6 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public enum State { Active, Inactive, Exception }
-
         [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
@@ -22,19 +20,26 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
-        [JsonIgnore]
-        public bool uFlag = false;
 
+        public enum State { Active, Inactive, Exception }
         [JsonIgnore]
         public State state = State.Inactive;
         [JsonIgnore]
         public const int MAXJOBS = 100;
 
-        // general
+        /* This flag is true, when the node is in use by the
+         * schedule. If it is true, it can not be used at the
+         * moment. */
+        [JsonIgnore]
+        public bool uFlag = false;
+        /* This counter shows how many jobs are working. */
+        [JsonIgnore]
+        public int uCounter = 0;
+
         public Guid guid { get; set; }
         public string name { get; set; }
-        public PhysicalAddress macAddress { get; set; } // sns
-        public IPAddress ipAddress { get; set; } // sns
+        public PhysicalAddress mac { get; set; } // sns
+        public IPAddress ip { get; set; } // sns
         public List<Job> jobs = new List<Job>();
 
         #endregion
@@ -53,8 +58,8 @@ namespace MAD.JobSystemCore
 
             this.guid = new Guid();
             this.name = nodeName;
-            this.macAddress = macAddress;
-            this.ipAddress = ipAddress;
+            this.mac = macAddress;
+            this.ip = ipAddress;
             this.jobs = jobs;
         }
 
