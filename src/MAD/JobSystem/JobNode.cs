@@ -21,20 +21,16 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public int id { get { return _id; } }
 
-        public enum State { Active, Inactive, Exception }
-        [JsonIgnore]
-        public State state = State.Inactive;
         [JsonIgnore]
         public const int MAXJOBS = 100;
 
-        /* This flag is true, when the node is in use by the
-         * schedule. If it is true, it can not be used at the
-         * moment. */
+        /* This bool represents the state of the node. The node can
+         * be active (state = 1) or inactive (state = 0). */
         [JsonIgnore]
-        public bool uFlag = false;
+        public int state = 0;
         /* This counter shows how many jobs are working. */
         [JsonIgnore]
-        public int uCounter = 0;
+        public int uWorker = 0;
 
         public Guid guid { get; set; }
         public string name { get; set; }

@@ -29,10 +29,13 @@ namespace MAD.CLICore
         {
             output += "\n";
             output += "<color><yellow> JOBSYSTEM VERSION <color><white>" + JobSystem.VERSION + "\n\n";
-            output += "<color><yellow> Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += "<color><yellow> Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
-            output += "<color><yellow> Nodes active: <color><white>" + _js.NodesActive() + "\n";
-            output += "<color><yellow> Jobs  active: <color><white>" + _js.JobsActive() + "\n\n";
+            output += "<color><yellow> Nodes stored in RAM:  <color><white>" + _js.NodesInitialized() + "<color><yellow>\t(MAX=" + JobSystem.MAXNODES + ")\n";
+            output += "<color><yellow> Jobs  stored in RAM:  <color><white>" + _js.JobsInitialized() + "<color><yellow>\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
+            output += "<color><yellow> Nodes active:     <color><white>" + _js.NodesActive() + "\n\n";
+            output += " <color><yellow>Jobs initialized: <color><white>" + _js.JobsInitialized() + "\n";
+            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
+            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
+            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n\n";
 
             output += "<color><yellow> Scedule-State: ";
             if (_js.IsSceduleActive())
@@ -389,8 +392,10 @@ namespace MAD.CLICore
             output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.JobsActive() + "\n";
-            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.JobsInactive() + "\n\n";
+            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
+            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
+            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n";
+            
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = null;

@@ -44,6 +44,8 @@ namespace MAD
                 Console.WriteLine("(CONFIG) No config file found!");
                 MadConf.SetToDefault();
                 Console.WriteLine("(CONFIG) Loaded default config.");
+                MadConf.SaveConf(CONFFILE);
+                Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
                 Console.WriteLine("(CONFIG) Default config does not use all possible features!");
             }
 

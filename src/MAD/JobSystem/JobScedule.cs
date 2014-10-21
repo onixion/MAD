@@ -20,13 +20,16 @@ namespace MAD.JobSystemCore
         private bool _debug = false;
         private bool _log = false;
 
-        public enum State { Active, Inactive, StopRequest }
-
         private Thread _cycleThread;
         private int _cycleTime = 100;
 
-        private State _state = State.Inactive;
-        public State state { get { return _state; } }
+        private object _stateLock = new object();
+        /* state = 0 | inactive
+         * state = 1 | active
+         * state = 2 | stop-request
+         * state = 3 | execption */
+        private int _state = 0;
+        public int state { get { return _state; } }
 
         private SmartThreadPool _workerPool;
         private int _maxThreads = 10;
@@ -65,25 +68,31 @@ namespace MAD.JobSystemCore
 
         public void Start()
         {
-            if (_state == State.Inactive)
+            lock (_stateLock)
             {
-                _state = State.Active;
-                _cycleThread = new Thread(CycleJobTracker);
-                _cycleThread.Start();
+                if (_state == 0)
+                {
+                    _state = 1;
+                    _cycleThread = new Thread(CycleJobTracker);
+                    _cycleThread.Start();
+                }
             }
         }
 
         public void Stop()
         {
-            if (_state == State.Active)
+            lock (_stateLock)
             {
-                _state = State.StopRequest;
+                if (_state == 1)
+                {
+                    _state = 2;
 
-                _cycleThread.Join();
-                _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
-                _workerPool.Cancel();
+                    _cycleThread.Join();
+                    _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
+                    _workerPool.Cancel();
 
-                _state = State.Inactive;
+                    _state = 0;
+                }
             }
         }
 
@@ -98,40 +107,31 @@ namespace MAD.JobSystemCore
                     {
                         foreach (JobNode _node in _jobNodes)
                         {
-                            if (_node.state == JobNode.State.Active)
+                            if (_node.state == 1)
                             {
-                                _node.uFlag = true;
-                                try
+                                foreach (Job _job in _node.jobs)
                                 {
-                                    foreach (Job _job in _node.jobs)
+                                    if (_job.state == 1)
                                     {
-                                        if (_job.state == Job.JobState.Waiting)
+                                        if (_job.type != Job.JobType.NULL)
                                         {
-                                            if (_job.type != Job.JobType.NULL)
+                                            if (JobTimeCheck(_job, _nowTime))
                                             {
-                                                if (JobTimeCheck(_job, _nowTime))
-                                                {
-                                                    if(_log)
-                                                        Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
+                                                if (_log)
+                                                    Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
 
-                                                    // Change job-state.
-                                                    _node.uCounter++;
-                                                    _job.uFlag = true;
-                                                    _job.state = Job.JobState.Working;
+                                                // Change job-state.
+                                                _node.uWorker++;
+                                                _job.state = 2;
 
-                                                    JobHolder _holder = new JobHolder();
-                                                    _holder.node = _node;
-                                                    _holder.job = _job;
+                                                JobHolder _holder = new JobHolder();
+                                                _holder.node = _node;
+                                                _holder.job = _job;
 
-                                                    JobThreadStart(_holder);
-                                                }
+                                                JobThreadStart(_holder);
                                             }
                                         }
                                     }
-                                }
-                                finally
-                                {
-                                    _node.uFlag = false;
                                 }
                             }
                         }
@@ -144,14 +144,10 @@ namespace MAD.JobSystemCore
                     throw new SystemException("SCEDULE: INTERNAL-EXECPTION: " + e.Message);
                 }
 
-                if (_state == State.StopRequest)
-                {
-                    _workerPool.WaitForIdle(2000);
-                    _workerPool.Cancel(true);
+                if (_state == 2)
                     break;
-                }
 
-                Thread.Sleep(_cycleTime);
+                //Thread.Sleep(_cycleTime);
             }
         }
 
@@ -217,7 +213,7 @@ namespace MAD.JobSystemCore
             }
             catch (Exception)
             { 
-                _job.state = Job.JobState.Exception; 
+                _job.state = 3; 
             }
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
@@ -277,9 +273,8 @@ namespace MAD.JobSystemCore
                 Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
 
             // Change job-state.
-            _job.state = Job.JobState.Waiting;
-            _job.uFlag = false;
-            _node.uCounter--;
+            _job.state = 0;
+            _node.uWorker--;
             return null;
         }
 

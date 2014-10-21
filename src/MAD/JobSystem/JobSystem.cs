@@ -23,8 +23,13 @@ namespace MAD.JobSystemCore
         public object jsLock = new object();
         private List<JobNode> _nodes = new List<JobNode>();
 
-        public event EventHandler OnNodeCountChanged = null;
-        public event EventHandler OnJobCountChanged = null;
+        public event EventHandler OnScheduleStateChange = null;
+
+        public event EventHandler OnNodeCountChange = null;
+        public event EventHandler OnNodeStatusChange = null;
+        public event EventHandler OnJobCountChange = null;
+        public event EventHandler OnJobStatusChange = null;
+
         public event EventHandler OnShutdown = null;
         
         #endregion
@@ -64,6 +69,8 @@ namespace MAD.JobSystemCore
             {
                 if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
                     _nodes.AddRange(_loadNodes);
+                else
+                    throw new JobSystemException("Nodes limit reached!", null);
             }
             return _nodes.Count;
         }
@@ -87,19 +94,25 @@ namespace MAD.JobSystemCore
         {
             lock(_sceduleLock)
                 _scedule.Start();
+
+            if (OnScheduleStateChange != null)
+                OnScheduleStateChange.Invoke(null, null);
         }
 
         public void StopScedule()
         {
             lock(_sceduleLock)
                 _scedule.Stop();
+
+            if (OnScheduleStateChange != null)
+                OnScheduleStateChange.Invoke(null, null);
         }
 
         public bool IsSceduleActive()
         {
             lock (_sceduleLock)
             { 
-                if(_scedule.state == JobScedule.State.Active)
+                if(_scedule.state == 1)
                     return true;
                 else
                     return false;
@@ -114,13 +127,9 @@ namespace MAD.JobSystemCore
         {
             int _count = 0;
             lock (jsLock)
-            {
                 for (int i = 0; i < _nodes.Count; i++)
-                {
-                    if (_nodes[i].state == JobNode.State.Active)
+                    if (_nodes[i].state == 1)
                         _count++;
-                }
-            }
             return _count;
         }
 
@@ -128,13 +137,9 @@ namespace MAD.JobSystemCore
         {
             int _count = 0;
             lock (jsLock)
-            {
                 for (int i = 0; i < _nodes.Count; i++)
-                {
-                    if (_nodes[i].state == JobNode.State.Inactive)
+                    if (_nodes[i].state == 0)
                         _count++;
-                }
-            }
             return _count;
         }
 
@@ -146,37 +151,49 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
-        public int JobsActive()
+        public string NodeState(int state)
+        {
+            switch (state)
+            {
+                case 0:
+                    return "Inactive";
+                case 1:
+                    return "Active";
+                default:
+                    return "Not valid state.";
+            }
+        }
+
+        public int JobsWorking()
         {
             int _count = 0;
             lock (jsLock)
-            {
                 for (int i = 0; i < _nodes.Count; i++)
-                {
                     foreach (Job _job in _nodes[i].jobs)
-                    {
-                        if (_job.state == Job.JobState.Waiting)
+                        if (_job.state == 2)
                             _count++;
-                    }
-                }
-            }
             return _count;
         }
 
-        public int JobsInactive()
+        public int JobsWaiting()
         {
             int _count = 0;
             lock (jsLock)
-            {
                 for (int i = 0; i < _nodes.Count; i++)
-                {
                     foreach (Job _job in _nodes[i].jobs)
-                    {
-                        if (_job.state == Job.JobState.Inactive)
+                        if (_job.state == 1)
                             _count++;
-                    }
-                }
-            }
+            return _count;
+        }
+
+        public int JobsStopped()
+        {
+            int _count = 0;
+            lock (jsLock)
+                for (int i = 0; i < _nodes.Count; i++)
+                    foreach (Job _job in _nodes[i].jobs)
+                        if (_job.state == 0)
+                            _count++;
             return _count;
         }
 
@@ -189,6 +206,21 @@ namespace MAD.JobSystemCore
                     _count = _count + _nodes[i].jobs.Count;
             }
             return _count;
+        }
+
+        public string JobState(int state)
+        {
+            switch (state)
+            { 
+                case 0:
+                    return "Stopped";
+                case 1:
+                    return "Waiting";
+                case 2:
+                    return "Exception";
+                default:
+                    return "Not valid state.";
+            }
         }
 
         #endregion
@@ -223,8 +255,8 @@ namespace MAD.JobSystemCore
                 JobNode _node = UnsafeGetNode(id);
                 if (_node != null)
                 {
-                    if (_node.state == JobNode.State.Inactive)
-                        _node.state = JobNode.State.Active;
+                    if (_node.state == 0)
+                        _node.state = 1;
                     else
                         throw new JobNodeException("Node already active or has an exception!", null);
                 }
@@ -240,8 +272,8 @@ namespace MAD.JobSystemCore
                 JobNode _node = UnsafeGetNode(id);
                 if (_node != null)
                 {
-                    if (_node.state == JobNode.State.Active)
-                        _node.state = JobNode.State.Inactive;
+                    if (_node.state == 1)
+                        _node.state = 0;
                     else
                         throw new JobNodeException("Node already inactive or has an exception!", null);
                 }
@@ -255,15 +287,13 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 if (MAXNODES > _nodes.Count)
-                {
                     _nodes.Add(node);
-
-                    if (OnNodeCountChanged != null)
-                        OnNodeCountChanged.Invoke(null, null);
-                }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
             }
+
+            if (OnNodeCountChange != null)
+                OnNodeCountChange.Invoke(null, null);
         }
 
         public void RemoveNode(int id)
@@ -275,17 +305,10 @@ namespace MAD.JobSystemCore
                 {
                     if (_nodes[i].id == id)
                     {
-                        if (!_nodes[i].uFlag)
-                            if (_nodes[i].uCounter == 0)
-                                _nodes.RemoveAt(i);
-                            else
-                                throw new JobNodeException("Node busy.", null);
+                        if (_nodes[i].uWorker == 0)
+                            _nodes.RemoveAt(i);
                         else
-                            throw new JobNodeException("Node busy.", null);
-
-                        if (OnNodeCountChanged != null)
-                            OnNodeCountChanged.Invoke(null, null);
-
+                            throw new JobNodeException("Node busy (" + _nodes[i].uWorker + " Jobs working).", null);
                         _success = true;
                         break;
                     }
@@ -293,6 +316,9 @@ namespace MAD.JobSystemCore
             }
             if (!_success)
                 throw new JobNodeException("Node does not exist!", null);
+
+            if (OnNodeCountChange != null)
+                OnNodeCountChange.Invoke(null, null);
         }
 
         public int RemoveAllNodes()
@@ -301,15 +327,15 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 for (int i = 0; i < _nodes.Count; i++)
-                    if (!_nodes[i].uFlag)
-                        if (_nodes[i].uCounter == 0)
-                        {
-                            _nodes.RemoveAt(i);
-                            _removedNodes++;
-                        }
+                    if (_nodes[i].uWorker == 0)
+                    {
+                        _nodes.RemoveAt(i);
+                        _removedNodes++;
+                    }
             }
-            if(OnNodeCountChanged != null)
-                OnNodeCountChanged.Invoke(null, null);
+
+            if (OnNodeCountChange != null)
+                OnNodeCountChange.Invoke(null, null);
 
             return _removedNodes;
         }
@@ -453,19 +479,17 @@ namespace MAD.JobSystemCore
                 Job _job = UnsafeGetJob(id, out _node);
                 if (_job != null)
                 {
-                    if (!_job.uFlag)
-                    {
-                        if (_job.state == Job.JobState.Inactive)
-                            _job.state = Job.JobState.Waiting;
+                        if (_job.state == 0)
+                            _job.state = 1;
                         else
                             throw new JobException("Job already active!", null);
-                    }
-                    else
-                        throw new JobException("Job busy.", null);
                 }
                 else
                     throw new JobException("Job does not exist!", null);
             }
+
+            if (OnJobStatusChange != null)
+                OnJobStatusChange.Invoke(null, null);
         }
 
         public void StopJob(int id)
@@ -476,19 +500,17 @@ namespace MAD.JobSystemCore
                 Job _job = UnsafeGetJob(id, out _node);
                 if (_job != null)
                 {
-                    if (!_job.uFlag)
-                    {
-                        if (_job.state == Job.JobState.Waiting)
-                            _job.state = Job.JobState.Inactive;
-                        else
-                            throw new JobException("Job already inactive!", null);
-                    }
+                    if (_job.state == 1)
+                        _job.state = 0;
                     else
-                        throw new JobException("Job busy.", null);
+                        throw new JobException("Job already inactive!", null);
                 }
                 else
                     throw new JobException("Job does not exist!", null);
             }
+
+            if (OnJobStatusChange != null)
+                OnJobStatusChange.Invoke(null, null);
         }
 
         public void AddJobToNode(int nodeId, Job job)
@@ -499,18 +521,16 @@ namespace MAD.JobSystemCore
                 if (_node != null)
                 {
                     if (JobNode.MAXJOBS > _node.jobs.Count)
-                    {
-                        if (!_node.uFlag)
-                            _node.jobs.Add(job);
-                        else
-                            throw new JobNodeException("Node busy.", null);
-                    }
+                        _node.jobs.Add(job);
                     else
                         throw new JobSystemException("Jobs limit reached!", null);
                 }
                 else
                     throw new JobNodeException("Node does not exist!", null);
             }
+
+            if (OnJobCountChange != null)
+                OnJobCountChange.Invoke(null, null);
         }
 
         public void RemoveJob(int id)
@@ -524,14 +544,12 @@ namespace MAD.JobSystemCore
                     {
                         if (_node.jobs[i].id == id)
                         {
-                            if (!_node.jobs[i].uFlag)
+                            if (_node.jobs[i].state == 0 || _node.jobs[i].state == 1)
                             {
                                 _node.jobs.RemoveAt(i);
                                 _success = true;
                                 break;
                             }
-                            else
-                                throw new JobException("Job busy.", null);
                         }
                     }
                 }
