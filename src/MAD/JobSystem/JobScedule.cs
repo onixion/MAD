@@ -273,7 +273,7 @@ namespace MAD.JobSystemCore
                 Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
 
             // Change job-state.
-            _job.state = 0;
+            _job.state = 1;
             _node.uWorker--;
             return null;
         }

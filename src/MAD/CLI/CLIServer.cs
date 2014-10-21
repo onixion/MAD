@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
 using System.Text;
 using System.IO;
 using System.Xml;
+using System.Security.Cryptography.X509Certificates;
 
 using MAD.JobSystemCore;
 using MAD.CLICore;
@@ -23,25 +25,26 @@ namespace MAD.CLIServerCore
         private string _serverVer = "v2.0";
 
         private TcpListener _serverListener;
-        private RSA _RSA = new RSA();
+        private X509Certificate2 _certificate;
         
         private bool _userOnline = false;
-        private string _user = "root";
+        private string _user;
         private string _pass = MadNetHelper.ToMD5("rofl123");
-        
+
         private JobSystem _js;
 
         #endregion
 
         #region constructor
 
-        public CLIServer(JobSystem js)
+        public CLIServer(string certfile, JobSystem js)
         {
             LoadConfig();
+            LoadCertificate(certfile);
+
             _js = js;
         }
 
-        // This method loads the current config.
         private void LoadConfig()
         {
             lock (MadConf.confLock)
@@ -50,11 +53,18 @@ namespace MAD.CLIServerCore
                 _debugMode = MadConf.conf.DEBUG_MODE;
                 _serverHeader = MadConf.conf.SERVER_HEADER;
                 serverPort = MadConf.conf.SERVER_PORT;
-
-                try { _RSA.LoadKeysXML(MadConf.conf.SERVER_RSA_KEYS); }
-                catch (Exception)
-                { }
             }
+        }
+
+        private void LoadCertificate(string certfile)
+        {
+            if (File.Exists(certfile))
+            {
+                Console.Write("Pass for certification: ");
+                _certificate = new X509Certificate2(certfile, Console.ReadLine());
+            }
+            else
+                throw new Exception("Certification-file does not exist!");
         }
 
         #endregion
@@ -111,30 +121,9 @@ namespace MAD.CLIServerCore
                     _serverInfoP.SendPacket();
                 }
 
-                // get public key
-                byte[] _modulus = null;
-                byte[] _exponent = null;
-                _RSA.GetPublicKey(out _modulus, out _exponent);
+                // HANDSHAKE
 
-                // send modulus
-                using (DataPacket _p = new DataPacket(_stream, null, _modulus))
-                    _p.SendPacket();
-
-                // send exponent
-                using (DataPacket _p = new DataPacket(_stream, null, _exponent))
-                    _p.SendPacket();
-
-                // receive aes pass from client
-                byte[] _aesEncrypted = null;
-                using (DataPacket _dataP = new DataPacket(_stream, null))
-                {
-                    _dataP.ReceivePacket();
-                    _aesEncrypted = _dataP.data;
-                }
-
-                // encrypt it an set aes
-                byte[] _aesDecrypted = _RSA.DecryptPrivate(_aesEncrypted);
-                AES _aes = new AES(Encoding.UTF8.GetString(_aesDecrypted));
+                AES _aes = new AES("FSDDFSAD");
 
                 // receive login packet
                 bool _loginSuccess;

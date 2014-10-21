@@ -79,9 +79,17 @@ namespace MAD
                         break;
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
-                        CLIServer cliServer = new CLIServer(js);
-                        cliServer.Start();
-                        Console.ReadKey();
+                        try
+                        {
+                            CLIServer cliServer = new CLIServer(Path.Combine(DATADIR, "certificate.ptx"), js);
+                            cliServer.Start();
+                            Console.ReadKey();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Could not start server: " + e.Message);
+                            Console.ReadKey();
+                        }
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);

@@ -420,7 +420,7 @@ namespace MAD.CLICore
                         _tableRow[1] = _temp2.id.ToString();
                         _tableRow[2] = _temp2.name;
                         _tableRow[3] = _temp2.type.ToString();
-                        _tableRow[4] = _temp2.state.ToString();
+                        _tableRow[4] = _js.JobState(_temp2.state);
                         _tableRow[5] = _temp2.time.type.ToString();
                         _tableRow[6] = _temp2.time.GetValues();
 
@@ -428,8 +428,8 @@ namespace MAD.CLICore
                             _tableRow[7] = _temp2.outp.outState.ToString();
                         else
                         {
-                            _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
-                            _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
+                            _tableRow[7] = _temp2.tStart.ToString("HH:mm:ss");
+                            _tableRow[8] = _temp2.tStop.ToString("HH:mm:ss");
                             _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
                             _tableRow[10] = _temp2.outp.outState.ToString();
                         }
