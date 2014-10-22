@@ -19,13 +19,18 @@ namespace MadNet
          * NullPacket       | 0
          * DataPacket       | 1
          * LoginPacket      | 2
-         * RSAPacket        | 3    
+         * SSLPacket        | 3    
          * CLIPacket        | 4
          * ServerInfoPacket | 5
 
          */
 
-        public Packet(NetworkStream stream, AES aes)
+        public Packet(Stream stream)
+        {
+            _streamIO = new StreamIO(stream);
+        }
+
+        public Packet(Stream stream, AES aes)
         {
             _streamIO = new StreamIO(stream);
             _aes = aes;

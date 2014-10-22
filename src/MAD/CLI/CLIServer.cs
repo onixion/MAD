@@ -121,9 +121,18 @@ namespace MAD.CLIServerCore
                     _serverInfoP.SendPacket();
                 }
 
-                // HANDSHAKE
+                SslStream _sStream = new SslStream(_stream);
+                _sStream.AuthenticateAsServer(_certificate);
 
-                AES _aes = new AES("FSDDFSAD");
+                // RECEIVE AES KEY
+                string _aesKey = "";
+                using (SSLPacket _sslP = new SSLPacket(_sStream))
+                { 
+                    _sslP.ReceivePacket();
+                    _aesKey = Encoding.Unicode.GetString(_sslP.data);
+                }
+
+                AES _aes = new AES(_aesKey);
 
                 // receive login packet
                 bool _loginSuccess;
