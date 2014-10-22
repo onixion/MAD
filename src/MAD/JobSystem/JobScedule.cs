@@ -38,28 +38,15 @@ namespace MAD.JobSystemCore
         private List<JobNode> _jobNodes;
         private object _jsLock = new object();
 
-        private bool _notiEnabled = false;
-
         #endregion
 
         #region constructor
 
         public JobScedule(object jsLock, List<JobNode> jobNodes)
         {
-            LoadConf();
             _jsLock = jsLock;
             _jobNodes = jobNodes;
             _workerPool = new SmartThreadPool(_maxThreads);
-        }
-
-        private void LoadConf()
-        {
-            lock (MadConf.confLock)
-            {
-                _debug = MadConf.conf.DEBUG_MODE;
-                _log = MadConf.conf.LOG_MODE;
-                _notiEnabled = MadConf.conf.NOTI_ENABLE;
-            }
         }
 
         #endregion
@@ -220,9 +207,9 @@ namespace MAD.JobSystemCore
 
             _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
 
-            if (_job.notiFlag)
+            if (MadConf.conf.NOTI_ENABLE)
             {
-                if (_notiEnabled)
+                if (_job.notiFlag)
                 {
                     List<JobRule> _bRules = GetBrokenRules(_job);
                     if (_bRules.Count != 0)
@@ -231,9 +218,10 @@ namespace MAD.JobSystemCore
                             + "') finished with a not expected result!");
 
                         string _mailContent = "";
-                        _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
-                        _mailContent += "JobNode-IP:  '" + _node.ip.ToString() + "'\n";
-                        _mailContent += "JobNode-MAC: '" + _node.mac.ToString() + "'\n\n";
+                        _mailContent += "JobNode-GUID: '" + _node.guid + "'\n";
+                        _mailContent += "JobNode-ID:   '" + _node.id + "'\n";
+                        _mailContent += "JobNode-IP:   '" + _node.ip.ToString() + "'\n";
+                        _mailContent += "JobNode-MAC:  '" + _node.mac.ToString() + "'\n\n";
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
@@ -319,6 +307,7 @@ namespace MAD.JobSystemCore
         private string GenJobInfo(Job job)
         {
             string _buffer = "";
+            _buffer += "Job-GUID:     '" + job.guid + "'\n";
             _buffer += "Job-ID:       '" + job.id + "'\n";
             _buffer += "Job-Name:     '" + job.name + "'\n";
             _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";
