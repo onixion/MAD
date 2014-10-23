@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.IO;
 
@@ -68,30 +70,14 @@ namespace CLIClient
                     CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:     <color><white>" + Encoding.Unicode.GetString(_serverInfoP.serverVersion) + "\n");
                 }
 
-                
+                SslStream _sStream = new SslStream(_stream);
+                _sStream.AuthenticateAsClient("test");
+                X509Certificate2 _cert = (X509Certificate2) _sStream.RemoteCertificate;
 
-                // receive modulus
-                byte[] _modulus = null;
-                using (DataPacket _dataP = new DataPacket(_stream, null))
-                {
-                    _dataP.ReceivePacket();
-                    _modulus = _dataP.data;
-                }
-
-                // receive exponent
-                byte[] _exponent = null;
-                using (DataPacket _dataP = new DataPacket(_stream, null))
-                {
-                    _dataP.ReceivePacket();
-                    _exponent = _dataP.data;
-                }
-
-                // Generate fingerprint
-
-                string _fingerprint = BitConverter.ToString(MadNetHelper.ToSHA1(MadNetHelper.CombineByteArrays(_modulus, _exponent)));
-
-                CLIOutput.WriteToConsole("<color><yellow>SERVER-FINGERPRING: <color><white>" + _fingerprint.Replace('-',':'));
-                CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_'));
+                CLIOutput.WriteToConsole("<color><yellow>-- SERVER-CERTIFICATE BEGIN -- \n");
+                CLIOutput.WriteToConsole("<color><yellow>THUMB-PRINT: <color><white>" + _cert.Thumbprint + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>PUBLIC-KEY:  <color><white>" + _cert.GetPublicKeyString() + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>-- SERVER-CERTIFICATE END -- \n");
 
                 ConsoleKeyInfo _key;
                 while (true)
@@ -104,14 +90,11 @@ namespace CLIClient
                         throw new Exception();
                 }
 
-                _RSA = new RSA(_modulus, _exponent);
-
-                // generate / send random pass 
-                string _aesPass = "TESTLOLWASISTDENNHIERLOS?";//MadNetHelper.GetUnicodeRandom(20); <- UNICODE DO NOT WORK WITH RSA
-                using (DataPacket _sData = new DataPacket(_stream, null))
+                string _aesPass = "THIS WILL BE RANDOM";
+                using (SSLPacket _sslP = new SSLPacket(_sStream))
                 {
-                    _sData.data = _RSA.EncryptPublic(Encoding.UTF8.GetBytes(_aesPass));
-                    _sData.SendPacket();
+                    _sslP.data = Encoding.Unicode.GetBytes(_aesPass);
+                    _sslP.SendPacket();
                 }
 
                 // set aes

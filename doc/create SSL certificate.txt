@@ -1,0 +1,15 @@
+1.) RSA Key-File erstellen
+openssl genrsa -des3 -out server.key 1024
+
+2.) CSR File erstellen (+ selber unterschreiben)
+openssl req -new -key server.key -out server.csr
+
+3.) Optional: Key-Phrase der RSA Key-File entfernen
+cp server.key server.key.org
+openssl rsa -in server.key.org -out server.key
+
+4.) ein selbst-unterschriebenes SSL-Zertificat erstellen
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+
+5.) PTX File erstellen
+openssl pkcs12 -export -inkey server.key -in server.crt -out certificat.pfx
