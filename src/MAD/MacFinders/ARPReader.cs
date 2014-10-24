@@ -33,6 +33,7 @@ namespace MAD.MacFinders
             Thread.Sleep(10);
             _send.Start();
             _send.Join();
+            Thread.Sleep(1000);
             _listen.Join();
             _dev.Close();
             Thread.Sleep(100);
@@ -187,7 +188,9 @@ namespace MAD.MacFinders
                 hostName = ipEntry.HostName;
 			}
 			catch (Exception) 
-			{ }
+			{
+                hostName = "N.A.";
+            }
 
 			return hostName; 
 		}
