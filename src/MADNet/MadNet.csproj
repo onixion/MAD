@@ -46,7 +46,7 @@
     <Compile Include="Packet\CLIPacket.cs" />
     <Compile Include="Packet\DataPacket.cs" />
     <Compile Include="Packet\DataStringPacket.cs" />
-    <Compile Include="Packet\RSAPacket.cs" />
+    <Compile Include="Packet\SSLPacket.cs" />
     <Compile Include="RSA.cs" />
     <Compile Include="Packet\LoginPacket.cs" />
     <Compile Include="Packet\Packet.cs" />

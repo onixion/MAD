@@ -1,0 +1,10 @@
+Es gibt ein neues Problem. Das Entfernen der Read/Write Locks hat dazu geführt, dass die JobNodes und Jobs mit Atomic Variablen
+arbeiten müssen.
+
+Atomic Variablen sind variablen, die multithread sicher sind (z.B. Integer, Bool, Char, ...). Bei diesen Variablen muss man sich
+keine Gedanken machen, da "gleichzeitiges" Nutzen auf tiefere Ebene schon nicht möglich ist.
+
+Daher versuche ich diese Idee umzusetzen. Einfacher + Ressourcen sparender + Weniger Fehleranfälliger usw.
+
+
+

@@ -20,13 +20,16 @@ namespace MAD.JobSystemCore
         private bool _debug = false;
         private bool _log = false;
 
-        public enum State { Active, Inactive, StopRequest }
-
         private Thread _cycleThread;
         private int _cycleTime = 100;
 
-        private State _state = State.Inactive;
-        public State state { get { return _state; } }
+        private object _stateLock = new object();
+        /* state = 0 | inactive
+         * state = 1 | active
+         * state = 2 | stop-request
+         * state = 3 | execption */
+        private int _state = 0;
+        public int state { get { return _state; } }
 
         private SmartThreadPool _workerPool;
         private int _maxThreads = 10;
@@ -35,28 +38,15 @@ namespace MAD.JobSystemCore
         private List<JobNode> _jobNodes;
         private object _jsLock = new object();
 
-        private bool _notiEnabled = false;
-
         #endregion
 
         #region constructor
 
         public JobScedule(object jsLock, List<JobNode> jobNodes)
         {
-            LoadConf();
             _jsLock = jsLock;
             _jobNodes = jobNodes;
             _workerPool = new SmartThreadPool(_maxThreads);
-        }
-
-        private void LoadConf()
-        {
-            lock (MadConf.confLock)
-            {
-                _debug = MadConf.conf.DEBUG_MODE;
-                _log = MadConf.conf.LOG_MODE;
-                _notiEnabled = MadConf.conf.NOTI_ENABLE;
-            }
         }
 
         #endregion
@@ -65,25 +55,31 @@ namespace MAD.JobSystemCore
 
         public void Start()
         {
-            if (_state == State.Inactive)
+            lock (_stateLock)
             {
-                _state = State.Active;
-                _cycleThread = new Thread(CycleJobTracker);
-                _cycleThread.Start();
+                if (_state == 0)
+                {
+                    _state = 1;
+                    _cycleThread = new Thread(CycleJobTracker);
+                    _cycleThread.Start();
+                }
             }
         }
 
         public void Stop()
         {
-            if (_state == State.Active)
+            lock (_stateLock)
             {
-                _state = State.StopRequest;
+                if (_state == 1)
+                {
+                    _state = 2;
 
-                _cycleThread.Join();
-                _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
-                _workerPool.Cancel();
+                    _cycleThread.Join();
+                    _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
+                    _workerPool.Cancel();
 
-                _state = State.Inactive;
+                    _state = 0;
+                }
             }
         }
 
@@ -98,59 +94,47 @@ namespace MAD.JobSystemCore
                     {
                         foreach (JobNode _node in _jobNodes)
                         {
-                            if (_node.state == JobNode.State.Active)
+                            if (_node.state == 1)
                             {
-                                _node.uFlag = true;
-                                try
+                                foreach (Job _job in _node.jobs)
                                 {
-                                    foreach (Job _job in _node.jobs)
+                                    if (_job.state == 1)
                                     {
-                                        if (_job.state == Job.JobState.Waiting)
+                                        if (_job.type != Job.JobType.NULL)
                                         {
-                                            if (_job.type != Job.JobType.NULL)
+                                            if (JobTimeCheck(_job, _nowTime))
                                             {
-                                                if (JobTimeCheck(_job, _nowTime))
-                                                {
-                                                    if(_log)
-                                                        Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
+                                                if (_log)
+                                                    Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
 
-                                                    JobHolder _holder = new JobHolder();
-                                                    _holder.node = _node;
-                                                    _holder.job = _job;
+                                                // Change job-state.
+                                                _node.uWorker++;
+                                                _job.state = 2;
 
-                                                    _job.uFlag = true;
-                                                    JobThreadStart(_holder);
-                                                }
+                                                JobHolder _holder = new JobHolder();
+                                                _holder.node = _node;
+                                                _holder.job = _job;
+
+                                                JobThreadStart(_holder);
                                             }
                                         }
                                     }
                                 }
-                                finally
-                                {
-                                    _node.uFlag = false;
-                                }
                             }
                         }
                     }
-
                 }
                 catch (Exception e)
                 { 
-                    // This is just for debugging reasons. If the program works
-                    // as planed, it will never get into this catch. But if someone
-                    // tries to modify Jobs or Nodes without using the locks, this
-                    // execption here can accure.
+                    // This try-catch is just for debugging reasons here. If the program works
+                    // as planed, it will never get into this catch.
                     throw new SystemException("SCEDULE: INTERNAL-EXECPTION: " + e.Message);
                 }
 
-                if (_state == State.StopRequest)
-                {
-                    Thread.Sleep(300);
-                    _workerPool.Cancel(true);
+                if (_state == 2)
                     break;
-                }
 
-                Thread.Sleep(_cycleTime);
+                //Thread.Sleep(_cycleTime);
             }
         }
 
@@ -200,33 +184,44 @@ namespace MAD.JobSystemCore
 
         private object JobInvoke(object holder)
         {
+            /* In the worst case scenario the node can be deleted at this point 
+             * and the only variable that prevents it from doing this, is the 
+             * 'uCounter'. Everytime the job starts, it increases the 'uCounter' by 1.
+             * After execution it decreases the counter by 1. Only if the uCounter is
+             * equal to 0 the node can be deleted (or else). */
             JobHolder _holder = (JobHolder)holder;
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
             _job.tStart = DateTime.Now;
-            try { _job.Execute(_node.ipAddress); }
+            try 
+            {
+                _job.Execute(_node.ip); 
+            }
             catch (Exception)
-            { _job.state = Job.JobState.Exception; }
+            { 
+                _job.state = 3; 
+            }
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
             _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
 
-            if (_job.notiFlag)
+            if (MadConf.conf.NOTI_ENABLE)
             {
-                if (_notiEnabled)
+                if (_job.notiFlag)
                 {
                     List<JobRule> _bRules = GetBrokenRules(_job);
                     if (_bRules.Count != 0)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ipAddress.ToString()
+                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ip.ToString()
                             + "') finished with a not expected result!");
 
                         string _mailContent = "";
-                        _mailContent += "JobNode-ID:  '" + _node.id + "'\n";
-                        _mailContent += "JobNode-IP:  '" + _node.ipAddress.ToString() + "'\n";
-                        _mailContent += "JobNode-MAC: '" + _node.macAddress.ToString() + "'\n\n";
+                        _mailContent += "JobNode-GUID: '" + _node.guid + "'\n";
+                        _mailContent += "JobNode-ID:   '" + _node.id + "'\n";
+                        _mailContent += "JobNode-IP:   '" + _node.ip.ToString() + "'\n";
+                        _mailContent += "JobNode-MAC:  '" + _node.mac.ToString() + "'\n\n";
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
@@ -265,8 +260,9 @@ namespace MAD.JobSystemCore
             if (_log)
                 Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
 
-            _job.state = Job.JobState.Waiting;
-            _job.uFlag = false;
+            // Change job-state.
+            _job.state = 1;
+            _node.uWorker--;
             return null;
         }
 
@@ -311,6 +307,7 @@ namespace MAD.JobSystemCore
         private string GenJobInfo(Job job)
         {
             string _buffer = "";
+            _buffer += "Job-GUID:     '" + job.guid + "'\n";
             _buffer += "Job-ID:       '" + job.id + "'\n";
             _buffer += "Job-Name:     '" + job.name + "'\n";
             _buffer += "Job-Type:     '" + job.type.ToString() + "'\n";

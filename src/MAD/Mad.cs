@@ -12,7 +12,7 @@ using MAD.Notification;
 
 namespace MAD
 {
-    class Mad
+    public class Mad
     {
         public static readonly string DATADIR = Path.Combine("data");
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
@@ -44,6 +44,8 @@ namespace MAD
                 Console.WriteLine("(CONFIG) No config file found!");
                 MadConf.SetToDefault();
                 Console.WriteLine("(CONFIG) Loaded default config.");
+                MadConf.SaveConf(CONFFILE);
+                Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
                 Console.WriteLine("(CONFIG) Default config does not use all possible features!");
             }
 
@@ -77,9 +79,17 @@ namespace MAD
                         break;
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
-                        CLIServer cliServer = new CLIServer(js);
-                        cliServer.Start();
-                        Console.ReadKey();
+                        try
+                        {
+                            CLIServer cliServer = new CLIServer(Path.Combine(DATADIR, "certificate.ptx"), js);
+                            cliServer.Start();
+                            Console.ReadKey();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Could not start server: " + e.Message);
+                            Console.ReadKey();
+                        }
                         break;
                     default:
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);

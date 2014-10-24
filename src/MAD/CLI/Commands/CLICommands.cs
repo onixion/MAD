@@ -198,31 +198,6 @@ namespace MAD.CLICore
         }
     }
 
-    public class LoadConfigFileCommand : Command
-    {
-        public LoadConfigFileCommand()
-            : base()
-        {
-            description = "This command load a conf file from another path.";
-            rPar.Add(new ParOption("f", "CONFIG-FILE", "File to load from.", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            string _filepath = (string)pars.GetPar("f").argValues[0];
-
-            try
-            {
-                MadConf.LoadConf(_filepath);
-                return "<color><green>Config loaded.";
-            }
-            catch (Exception e)
-            {
-                return "<color><red>Could not load config: " + e.Message;
-            }
-        }
-    }
-
     public class LoadDefaultConfigCommand : Command
     {
         public LoadDefaultConfigCommand()
@@ -234,30 +209,6 @@ namespace MAD.CLICore
         {
             MadConf.SetToDefault();
             return "<color><green>Default config loaded.";
-        }
-    }
-
-    public class SaveConfigCommand : Command
-    {
-        public SaveConfigCommand()
-        {
-            description = "This command saves the current conf file.";
-            rPar.Add(new ParOption("f", "CONFIG-FILE", "File to save to.", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            string _filepath = (string)pars.GetPar("f").argValues[0];
-
-            try
-            {
-                MadConf.SaveConf(_filepath);
-                return "<color><green>Config saved to '" + _filepath + "'.";
-            }
-            catch (Exception e)
-            {
-                return "<color><red>Could not save config file: " + e.Message;
-            }
         }
     }
 

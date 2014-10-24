@@ -12,7 +12,6 @@ namespace MAD.JobSystemCore
         #region members
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
-        public enum JobState { Inactive, Waiting, Working, Exception }
 
         [JsonIgnore]
         private static object _idLock = new object();
@@ -22,13 +21,17 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
+        
+        /* This INT represents the state of the job.
+         * state = 0 | stopped
+         * state = 1 | waiting
+         * state = 2 | working
+         * state = 3 | execption */
         [JsonIgnore]
-        public bool uFlag = false;
+        public int state = 0;
 
         [JsonIgnore]
         public JobOutput outp { get; set; }
-        [JsonIgnore]
-        public JobState state = JobState.Inactive;
         [JsonIgnore]
         public DateTime tStart { get; set; }
         [JsonIgnore]

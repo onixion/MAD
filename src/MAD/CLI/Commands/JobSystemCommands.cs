@@ -29,10 +29,13 @@ namespace MAD.CLICore
         {
             output += "\n";
             output += "<color><yellow> JOBSYSTEM VERSION <color><white>" + JobSystem.VERSION + "\n\n";
-            output += "<color><yellow> Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += "<color><yellow> Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
-            output += "<color><yellow> Nodes active: <color><white>" + _js.NodesActive() + "\n";
-            output += "<color><yellow> Jobs  active: <color><white>" + _js.JobsActive() + "\n\n";
+            output += "<color><yellow> Nodes stored in RAM:  <color><white>" + _js.NodesInitialized() + "<color><yellow>\t(MAX=" + JobSystem.MAXNODES + ")\n";
+            output += "<color><yellow> Jobs  stored in RAM:  <color><white>" + _js.JobsInitialized() + "<color><yellow>\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
+            output += "<color><yellow> Nodes active:     <color><white>" + _js.NodesActive() + "\n\n";
+            output += " <color><yellow>Jobs initialized: <color><white>" + _js.JobsInitialized() + "\n";
+            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
+            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
+            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n\n";
 
             output += "<color><yellow> Scedule-State: ";
             if (_js.IsSceduleActive())
@@ -155,8 +158,8 @@ namespace MAD.CLICore
                     _tableRow[0] = _temp.id.ToString();
                     _tableRow[1] = _temp.name;
                     _tableRow[2] = _temp.state.ToString();
-                    _tableRow[3] = _temp.macAddress.ToString();
-                    _tableRow[4] = _temp.ipAddress.ToString();
+                    _tableRow[3] = _temp.mac.ToString();
+                    _tableRow[4] = _temp.ip.ToString();
                     _tableRow[5] = _temp.jobs.Count.ToString();
                     output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                 }
@@ -220,8 +223,8 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
-            _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+            _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+            _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
             _js.AddNode(_node); 
 
@@ -272,10 +275,10 @@ namespace MAD.CLICore
                         _node.name = (string)pars.GetPar("n").argValues[0];
 
                     if (OParUsed("mac"))
-                        _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+                        _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
 
                     if (OParUsed("ip"))
-                        _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+                        _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
                     return "<color><green>Node edited.";
                 }
@@ -389,8 +392,10 @@ namespace MAD.CLICore
             output += "\n";
             output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
             output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.JobsActive() + "\n";
-            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.JobsInactive() + "\n\n";
+            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
+            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
+            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n";
+            
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = null;
@@ -415,7 +420,7 @@ namespace MAD.CLICore
                         _tableRow[1] = _temp2.id.ToString();
                         _tableRow[2] = _temp2.name;
                         _tableRow[3] = _temp2.type.ToString();
-                        _tableRow[4] = _temp2.state.ToString();
+                        _tableRow[4] = _js.JobState(_temp2.state);
                         _tableRow[5] = _temp2.time.type.ToString();
                         _tableRow[6] = _temp2.time.GetValues();
 
@@ -423,8 +428,8 @@ namespace MAD.CLICore
                             _tableRow[7] = _temp2.outp.outState.ToString();
                         else
                         {
-                            _tableRow[7] = _temp2.tStart.ToString("hh:mm:ss");
-                            _tableRow[8] = _temp2.tStop.ToString("hh:mm:ss");
+                            _tableRow[7] = _temp2.tStart.ToString("HH:mm:ss");
+                            _tableRow[8] = _temp2.tStop.ToString("HH:mm:ss");
                             _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
                             _tableRow[10] = _temp2.outp.outState.ToString();
                         }
