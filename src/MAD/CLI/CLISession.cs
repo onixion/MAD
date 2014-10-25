@@ -63,7 +63,6 @@ namespace MAD.CLIServerCore
 
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
-            commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
 
             // MAC AND IP READER
             /*

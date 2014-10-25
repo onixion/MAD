@@ -90,6 +90,8 @@ namespace MAD
 
                 conf.arpInterface = 4;
                 conf.snmpInterface = "12";
+
+                conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
             }
         }
 
@@ -118,6 +120,9 @@ namespace MAD
         // networking vars
         public uint arpInterface;
 		public string snmpInterface;
+
+        // logger var
+        public string LOG_FILE_DIRECTORY;
     }
 
     /* json converters */

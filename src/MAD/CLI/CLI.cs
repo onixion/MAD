@@ -42,7 +42,6 @@ namespace MAD.CLICore
 
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
-            commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
             commands.Add(new CommandOptions("change logName", typeof(ChangeLogFileName), null));
 
             // MAC AND IP READER

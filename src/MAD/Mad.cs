@@ -49,11 +49,6 @@ namespace MAD
                 Console.WriteLine("(CONFIG) Default config does not use all possible features!");
             }
 
-            if (Logger.PathFileExists())
-                Logger.ReadPathToLogFile();
-            else
-                Logger.CreateNewPathFile();
-
             JobSystem js = new JobSystem();
             DHCPReader dhcpReader = new DHCPReader();
 
