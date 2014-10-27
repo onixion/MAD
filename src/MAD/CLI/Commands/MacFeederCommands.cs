@@ -142,15 +142,19 @@ namespace MAD.CLICore
 
     public class CheckList : Command
     {
-        public CheckList()
+        private JobSystem _js;
+
+        public CheckList(object[] args)
             : base()
         {
+            _js = (JobSystem)args[0];
             description = "Pings through the list of the Hosts manually. You only have to use this if didn't use dhcp reader command";
         }
 
         public override string Execute(int consoleWidth)
         {
             ModelHost.PingThroughList();
+            _js.SyncNodes(ModelHost.hostList);
             return "<color><blue>Updated list";
         }
     }

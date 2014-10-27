@@ -438,7 +438,7 @@ namespace MAD.MacFinders
                         }
                     }
                 }
-            }
+            }           
         }
 
 		#endregion
