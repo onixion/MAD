@@ -33,7 +33,10 @@ namespace MAD.MacFinders
             Thread.Sleep(10);
             _send.Start();
             _send.Join();
-            Thread.Sleep(1000);
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                Thread.Sleep(1000);
+            }
             _listen.Join();
             _dev.Close();
             Thread.Sleep(100);
