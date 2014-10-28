@@ -45,14 +45,14 @@ namespace MAD.JobSystemCore
         public JobNode()
         {
             InitID();
-            this.guid = new Guid();
+            this.guid = Guid.NewGuid();
         }
 
         public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
 
-            this.guid = new Guid();
+            this.guid = Guid.NewGuid();
             this.name = nodeName;
             this.mac = macAddress;
             this.ip = ipAddress;

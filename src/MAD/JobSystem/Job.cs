@@ -58,7 +58,7 @@ namespace MAD.JobSystemCore
         {
             InitJob();
 
-            this.guid = new Guid();
+            this.guid = Guid.NewGuid();
             this.type = type;
             this.outp = new JobOutput();
             this.time = new JobTime();
@@ -68,7 +68,7 @@ namespace MAD.JobSystemCore
         {
             InitJob();
 
-            this.guid = new Guid();
+            this.guid = Guid.NewGuid();
             this.name = name;
             this.type = type;
             this.outp = new JobOutput();
@@ -79,7 +79,7 @@ namespace MAD.JobSystemCore
         {
             InitJob();
 
-            this.guid = new Guid();
+            this.guid = Guid.NewGuid();
             this.name = name;
             this.type = type;
             this.outp = outp;
