@@ -7,25 +7,30 @@ using System.Data.SQLite; //include SQLite database library
 using System.IO;  
 using System.Data;
 
+/*
+ //add to main!!
+            DB MADstore = new DB("MAD.sqlite");
+            MADstore.ConnectDB("MAD.sqlite");
+
+            MADstore.CreateDeviceTable();
+            MADstore.CreateEventTable();
+            MADstore.CreateJobTypeTable();
+            MADstore.CreateProtocolTable();
+            MADstore.CreateStatusTable();
+            MADstore.CreateSummaryTable();
+ 
+            MADstore.DisconnectDB();
+ */
+//how to insert e.g. ... 
+/*
+MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("HOST", "YOLO"), new Insert("IP", "192.168.17.17"));
+                          Tablename                column    value ...
+*/
+//reading function will be finished soon
+
+
 namespace MAD
-{
-    /*      //don't forget at the end .sqlite
-            DB MADmemory = new DB("MAD7.sqlite");
-            //connect to DB
-            MADmemory.ConnectDB("MAD7.sqlite");
-     * 
-     *      MADmemory.CreateTable("mac_id", new TableInfo("IP", TableInfo.OType.CHAR20), new TableInfo("PORT", TableInfo.OType.CHAR30), new TableInfo("subnetzmaske", TableInfo.OType.CHAR30));
-
-            MADmemory.InsertToTable("mac_id", new Insert("PORT", "17"), new Insert("IP", "192.168.1.8"));
-
-            DataTable TableTest = MADmemory.ReadTable("mac_id");
-
-            Console.WriteLine();
-
-            MADmemory.AllTables();
-     *
-     * */
-
+{ 
     public class DB
     {
         private string _DBname;
@@ -55,46 +60,55 @@ namespace MAD
             _dbConnection.Close();
         }
 
-        public bool TableCheck(string TabelName)
-        { 
-           // _dbConnection.
-            return true;
-        }
-
-        //check if table excists, create if not and connect
-        public void CreateTable(string TableName, params TableInfo[] tableInfos)
+        public void CreateDeviceTable()
         {
-            string sql = "create table if not exists '" + TableName + "' (";
-            sql += "id INTEGER PRIMERY KEY AUTO_INCREMENT,";
-            for (int i = 0; i < tableInfos.Length; i++)
-            {
-                sql += tableInfos[i].GetCommand();
-                if (i != tableInfos.Length - 1)
-                    sql += ",";
-            }
-            sql += ")";
-            
+            string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID INTEGER, HOST VARCHAR(30), IP VARCHAR(30), MAC VARCHAR(30), Memo1 VARCHAR(30), Memo2 VARCHAR(100));";
+
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-          
+
             command.ExecuteNonQuery();
         }
 
-        public int Insert(string Command)
+        public void CreateEventTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteNonQuery();
+            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID INTEGER, JOBNAME VARCHAR(30), JOBTYPE VARCHAR(30), PROTOCOL VARCHAR(30),Out_State VARCHAR(30), Discription VARCHAR(100), Start_Time VARCHAR(30), Stop_Time VARCHAR(30), Delay_Time VARCHAR(30), Custom1 VARCHAR(30), Custom2 INTEGER);";
+
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
         }
 
-        public DataTable Select(string Command)
+        public void CreateJobTypeTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteReader().GetSchemaTable();
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JOBTYPE VARCHAR(30));";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
         }
 
-        public int Create(string Command)
+        public void CreateProtocolTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteNonQuery();
+            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol VARCHAR(30));";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void CreateStatusTable()
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS Status_Table ( GUID INTEGER, Online INTEGER, Time_of_Execution VARCHAR(30));";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+        }
+
+
+        public void CreateSummaryTable()
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID INTEGER, DATE VARCHAR(30), JOBTYPE INTEGER, PROTOCOL INTEGER, Successful_Outstate_[%] INTEGER, Average_Delay_Time VARCHAR(30), Online_[%] INTEGER);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
         }
 
         //insert data
@@ -122,20 +136,7 @@ namespace MAD
 
             command.ExecuteNonQuery();
         }
-
-        //see all tables
-        
-        public DataTable AllTables()
-        {
-            //string sql = "SELECT name FROM '" + DBName + "'_master WHERE type='table'";
-            string sql = "SELECT name FROM sqlite_master WHERE type = 'table'";
-            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
-        }
-     
+    
 
         //read entire table
         public DataTable ReadTable(string TableName)
@@ -159,53 +160,33 @@ namespace MAD
             TempResult.Load(reader);
             return TempResult;
         }
-
-
     }
 }
 
-       
 
 
 
 
-
+//at the moment useless
 /*
-        public bool CheckTableExists(string TableName)
-        {
-           bool tableExists = false;
-           string query1 = "SELECT name FROM sqlite_master WHERE name ='" + TableName + "';";
+public int Insert(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteNonQuery();
+}
 
-           SQLiteConnection sqlConnection = OpenConnection();
-           SQLiteCommand sqlCommand = new SQLiteCommand(query1, sqlConnection);
-        
-            try
-            {
+public DataTable Select(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteReader().GetSchemaTable();
+}
 
-                SQLiteDataReader sqlDataReader = sqlCommand.ExecuteReader();
-
-                if(sqlDataReader.HasRows)
-                {
-                    tableExists = true;
-                }
-
-               // sqlDataReader.Close();
-               // sqlConnection.Close();
-            }
-      
-            catch (Exception ex)
-            {
-           //exception
-            }
-
-            return tableExists;
-        }
+public int Create(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteNonQuery();
+}
 */
-
-         //write results in the table
-         //  sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
-        //Public Output[] SelectFromTable(string tablename, ) 
-
 
 
 
