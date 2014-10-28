@@ -66,7 +66,7 @@ namespace MAD.CLIServerCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         protected override bool StartListener()
         {

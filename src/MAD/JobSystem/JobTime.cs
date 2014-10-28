@@ -40,7 +40,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public JobTimeHandler GetJobTimeHandler(DateTime time)
         {
@@ -298,7 +298,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public bool IsBlocked(DateTime now)
         {
@@ -389,7 +389,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public bool CheckTime()
         {

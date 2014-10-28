@@ -31,7 +31,7 @@ namespace CLIIO
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public static void WriteToConsole(string data)
         {

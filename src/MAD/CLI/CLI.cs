@@ -61,9 +61,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
 
-            // SCEDULE
-            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { js }));
-            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { js }));
+            // Schedule
+            commands.Add(new CommandOptions("Schedule start", typeof(JobScheduleStartCommand), new object[] { js }));
+            commands.Add(new CommandOptions("Schedule stop", typeof(JobScheduleStopCommand), new object[] { js }));
 
             // NODES
             commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { js }));
@@ -107,7 +107,7 @@ namespace MAD.CLICore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public void Start()
         {

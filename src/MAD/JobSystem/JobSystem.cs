@@ -14,22 +14,20 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public const string VERSION = "v2.9.0.0";
+        public const string VERSION = "v2.9.0.3";
         public const int MAXNODES = 100;
 
-        private JobScedule _scedule { get; set; }
-        private object _sceduleLock = new object();
+        private JobSchedule _Schedule { get; set; }
+        private object _ScheduleLock = new object();
 
         public object jsLock = new object();
         private List<JobNode> _nodes = new List<JobNode>();
 
         public event EventHandler OnScheduleStateChange = null;
-
         public event EventHandler OnNodeCountChange = null;
         public event EventHandler OnNodeStatusChange = null;
         public event EventHandler OnJobCountChange = null;
         public event EventHandler OnJobStatusChange = null;
-
         public event EventHandler OnShutdown = null;
         
         #endregion
@@ -38,12 +36,12 @@ namespace MAD.JobSystemCore
 
         public JobSystem()
         {
-            _scedule = new JobScedule(jsLock, _nodes);
+            _Schedule = new JobSchedule(jsLock, _nodes);
         }
 
         #endregion
 
-        #region methodes
+        #region methods
 
         #region jobsystem handling
 
@@ -80,7 +78,7 @@ namespace MAD.JobSystemCore
         /// </summary>
         public void Shutdown()
         {
-            _scedule.Stop();
+            _Schedule.Stop();
 
             if (OnShutdown != null)
                 OnShutdown.Invoke(null, null);
@@ -88,31 +86,31 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region scedule handling
+        #region Schedule handling
 
-        public void StartScedule()
+        public void StartSchedule()
         {
-            lock(_sceduleLock)
-                _scedule.Start();
+            lock(_ScheduleLock)
+                _Schedule.Start();
 
             if (OnScheduleStateChange != null)
                 OnScheduleStateChange.Invoke(null, null);
         }
 
-        public void StopScedule()
+        public void StopSchedule()
         {
-            lock(_sceduleLock)
-                _scedule.Stop();
+            lock(_ScheduleLock)
+                _Schedule.Stop();
 
             if (OnScheduleStateChange != null)
                 OnScheduleStateChange.Invoke(null, null);
         }
 
-        public bool IsSceduleActive()
+        public bool IsScheduleActive()
         {
-            lock (_sceduleLock)
+            lock (_ScheduleLock)
             { 
-                if(_scedule.state == 1)
+                if(_Schedule.state == 1)
                     return true;
                 else
                     return false;
@@ -160,7 +158,7 @@ namespace MAD.JobSystemCore
                 case 1:
                     return "Active";
                 default:
-                    return "Not valid state.";
+                    throw new Exception("NOT-VALID-NODESTATE");
             }
         }
 
@@ -219,7 +217,7 @@ namespace MAD.JobSystemCore
                 case 2:
                     return "Exception";
                 default:
-                    return "Not valid state.";
+                    throw new Exception("NOT-VALID-JOBSTATE");
             }
         }
 
@@ -569,6 +567,55 @@ namespace MAD.JobSystemCore
                 else
                     return false;
             }
+        }
+
+        #endregion
+
+        #region CLI-only
+
+        public string GetJSStats()
+        {
+            string _output = "";
+            _output += "<color><yellow> JobSystem (VER " + JobSystem.VERSION + ")\n";
+            _output += "<color><yellow> ├─> MAX-NODES: <color><white>" + JobSystem.MAXNODES + "\n";
+            _output += "<color><yellow> ├─> MAX-JOBS:  <color><white>" + JobNode.MAXJOBS + "\n";
+            _output += "<color><yellow> ├─> NODES:     <color><white>" + NodesInitialized() + "\n";
+            _output += "<color><yellow> └─> JOBS:      <color><white>" + JobsInitialized() + "\n";
+            return _output;
+        }
+
+        public string GetJSScheduleStats()
+        {
+            string _output = "";
+            _output += "<color><yellow> JobSchedule\n";
+            _output += "<color><yellow> └─> STATE: ";
+            
+            if(IsScheduleActive())
+                _output += "<color><green>Active";
+            else
+                _output += "<color><red>Inactive";
+
+            _output += "\n";
+            return _output;
+        }
+
+        public string GetNodesStats()
+        {
+            string _output = "";
+            _output += "<color><yellow> Nodes\n";
+            _output += "<color><yellow> ├─> INACTIVE: <color><red>" + NodesInactive() + "\n";
+            _output += "<color><yellow> └─> ACTIVE:   <color><green>" + NodesActive() + "\n";
+            return _output;
+        }
+
+        public string GetJobsStats()
+        {
+            string _output = "";
+            _output += "<color><yellow> Jobs\n";
+            _output += "<color><yellow> ├─> STOPPED: <color><red>" + JobsStopped() + "\n";
+            _output += "<color><yellow> ├─> WAITING: <color><green>" + JobsWaiting() + "\n";
+            _output += "<color><yellow> └─> WORKING: <color><green>" + JobsWorking() + "\n";
+            return _output;
         }
 
         #endregion

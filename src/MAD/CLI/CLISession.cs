@@ -47,7 +47,7 @@ namespace MAD.CLIServerCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public void InitCommands()
         {
@@ -79,9 +79,9 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
 
-            // SCEDULE
-            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
+            // Schedule
+            commands.Add(new CommandOptions("Schedule start", typeof(JobScheduleStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("Schedule stop", typeof(JobScheduleStopCommand), new object[] { _js }));
 
             // NODES
             commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { _js }));

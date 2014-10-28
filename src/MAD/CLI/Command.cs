@@ -30,7 +30,7 @@ namespace MAD.CLICore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public abstract string Execute(int consoleWidth);
 

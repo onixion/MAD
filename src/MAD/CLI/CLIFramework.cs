@@ -15,7 +15,7 @@ namespace MAD.CLICore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         /*
          * This method checks the pars and args of their validity.
@@ -325,12 +325,12 @@ namespace MAD.CLICore
             string _buffer = "";
 
             _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
-            _buffer += @"<color><cyan>  __  __   ___   _____" + "\n";
-            _buffer += @"<color><cyan> |  \/  | / _ \ |  _  \" + "\n";
-            _buffer += @"<color><cyan> |      |/ /_\ \| | \ | <color><yellow>VERSION" + "\t<color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
-            _buffer += @"<color><cyan> | |\/| ||  _  || | | | <color><yellow>DATE" + "\t<color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
-            _buffer += @"<color><cyan> | |  | || | | || |_/ | <color><yellow>TIME" + "\t<color><white>" + DateTime.Now.ToString("HH:mm:ss") + "\n";
-            _buffer += @"<color><cyan> |_|  |_||_| |_||_____/" + "\n";
+            _buffer += @"<color><cyan>  __  __  ___  _____" + "\n";
+            _buffer += @"<color><cyan> |  \/  |/ _ \|  _  \" + "\n";
+            _buffer += @"<color><cyan> |      / /_\ \ | \ | <color><yellow>VER." + "  <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
+            _buffer += @"<color><cyan> | |\/| |  _  | | | | <color><yellow>DATE" + "  <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
+            _buffer += @"<color><cyan> | |  | | | | | |_/ | <color><yellow>TIME" + "  <color><white>" + DateTime.Now.ToString("HH:mm:ss") + "\n";
+            _buffer += @"<color><cyan> |_|  |_|_| |_|_____/ " + "\n";
             _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
 
             return _buffer;

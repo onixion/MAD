@@ -4,7 +4,7 @@ namespace MAD.CLICore
 {
     public static class ConsoleTable
     {
-        #region methodes
+        #region methods
 
         public static string GetSplitline(int width)
         { 
