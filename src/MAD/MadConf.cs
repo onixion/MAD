@@ -24,7 +24,7 @@ namespace MAD
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public static bool TryCreateDir(string dirPath)
         {
@@ -78,10 +78,9 @@ namespace MAD
 
                 conf.SERVER_HEADER = "MAD-CLIServer";
                 conf.SERVER_PORT = 2222;
+                conf.SERVER_CERT = "cert.pfx";
 
                 conf.NOTI_ENABLE = true;
-                // These settings will be removed for the final version.
-                // It does no make sense leaving them here ...
                 conf.SMTP_SERVER = "smtp-mail.outlook.com";
                 conf.SMTP_PORT = 587;
                 conf.SMTP_USER = "mad.group@outlook.com";
@@ -105,12 +104,14 @@ namespace MAD
         public bool DEBUG_MODE;
         public bool LOG_MODE;
 
+        // cliserver
         public string SERVER_HEADER;
         public int SERVER_PORT;
-        public string SERVER_RSA_KEYS;
+        public string SERVER_CERT; // ssl certificate for CLIServer
 
+        // notification
         public bool NOTI_ENABLE;
-        // default notification-settings
+        // global notification
         public string SMTP_SERVER;
         public int SMTP_PORT;
         public string SMTP_USER;

@@ -27,24 +27,10 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "\n";
-            output += "<color><yellow> JOBSYSTEM VERSION <color><white>" + JobSystem.VERSION + "\n\n";
-            output += "<color><yellow> Nodes stored in RAM:  <color><white>" + _js.NodesInitialized() + "<color><yellow>\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += "<color><yellow> Jobs  stored in RAM:  <color><white>" + _js.JobsInitialized() + "<color><yellow>\t(MAX=" + JobNode.MAXJOBS + ")\n\n";
-            output += "<color><yellow> Nodes active:     <color><white>" + _js.NodesActive() + "\n\n";
-            output += " <color><yellow>Jobs initialized: <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
-            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
-            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n\n";
-
-            output += "<color><yellow> Scedule-State: ";
-            if (_js.IsSceduleActive())
-                output += "<color><green>Active";
-            else
-                output += "<color><red>Inactive";
-            
-            output += "\n";
-
+            output += _js.GetJSStats() + "\n";
+            output += _js.GetJSScheduleStats() + "\n";
+            output += _js.GetNodesStats() + "\n";
+            output += _js.GetJobsStats();
             return output;
         }
     }
@@ -87,11 +73,11 @@ namespace MAD.CLICore
 
     #region commands for SCEUDLE
 
-    public class JobSceduleStartCommand : Command
+    public class JobScheduleStartCommand : Command
     {
         JobSystem _js;
 
-        public JobSceduleStartCommand(object[] args)
+        public JobScheduleStartCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
@@ -99,16 +85,16 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StartScedule();
-            return "<color><green>Scedule started.";
+            _js.StartSchedule();
+            return "<color><green>Schedule started.";
         }
     }
 
-    public class JobSceduleStopCommand : Command
+    public class JobScheduleStopCommand : Command
     {
         JobSystem _js;
 
-        public JobSceduleStopCommand(object[] args)
+        public JobScheduleStopCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
@@ -116,8 +102,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StopScedule();
-            return "<color><green>Scedule stopped.";
+            _js.StopSchedule();
+            return "<color><green>Schedule stopped.";
         }
     }
 
@@ -138,11 +124,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "\n";
-            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAXNODES + "\n";
-            output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
-            output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
-            output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
+            output += _js.GetNodesStats();
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
@@ -157,7 +139,7 @@ namespace MAD.CLICore
                 {
                     _tableRow[0] = _temp.id.ToString();
                     _tableRow[1] = _temp.name;
-                    _tableRow[2] = _temp.state.ToString();
+                    _tableRow[2] = _js.NodeState(_temp.state);
                     _tableRow[3] = _temp.mac.ToString();
                     _tableRow[4] = _temp.ip.ToString();
                     _tableRow[5] = _temp.jobs.Count.ToString();
@@ -389,13 +371,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "\n";
-            output += " <color><yellow>Jobs max:             <color><white>" + JobNode.MAXJOBS + "\n";
-            output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>|-> STOPPED: <color><red>" + _js.JobsStopped() + "\n";
-            output += " <color><yellow>|-> WAITING: <color><green>" + _js.JobsWaiting() + "\n";
-            output += " <color><yellow>|-> WORKING: <color><green>" + _js.JobsWorking() + "\n";
-            
+            output += _js.GetJobsStats();
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
 
             string[] _tableRow = null;

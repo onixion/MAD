@@ -106,7 +106,7 @@
     <Compile Include="JobSystem\Jobs\CheckJobs\JobCheckDns.cs" />
     <Compile Include="JobSystem\Jobs\JobSnmp.cs" />
     <Compile Include="JobSystem\JSSerializer.cs" />
-    <Compile Include="JobSystem\JobScedule.cs" />
+    <Compile Include="JobSystem\JobSchedule.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\OutputDescriptor.cs" />

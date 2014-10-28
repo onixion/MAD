@@ -25,11 +25,6 @@ OutDescriptors:
 	DESCRIPTION: TTL remaining.
 	POSSIBLE VALUES: 0 <= TTL <= INT32.MAX
 	
-	NAME: 'RounttripTime'
-	TYPE: 'long'
-	DESCRIPTION: Travel-time of the ping packet in ms.
-	POSSIBLE VALUES: 0 <= RoundTripTime <= LONG.MAX
-	
 _______
 JobPort
 

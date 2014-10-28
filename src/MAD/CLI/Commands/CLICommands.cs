@@ -227,7 +227,7 @@ namespace MAD.CLICore
                 output += "<color><yellow>LOG_MODE:\t<color><white>" + MadConf.conf.LOG_MODE + "\n";
                 output += "<color><yellow>SERVER_HEADER:\t<color><white>" + MadConf.conf.SERVER_HEADER + "\n";
                 output += "<color><yellow>SERVER_PORT:\t<color><white>" + MadConf.conf.SERVER_PORT + "\n";
-                output += "<color><yellow>SERVER_RSA:\t<color><white>" + MadConf.conf.SERVER_RSA_KEYS + "\n";
+                output += "<color><yellow>SERVER_CERT:\t<color><white>" + MadConf.conf.SERVER_CERT + "\n";
                 output += "<color><yellow>SMTP_SERVER:\t<color><white>" + MadConf.conf.SMTP_SERVER + "\n";
                 output += "<color><yellow>SMTP_PORT:\t<color><white>" + MadConf.conf.SMTP_PORT + "\n";
                 output += "<color><yellow>SMTP_USER:\t<color><white>" + MadConf.conf.SMTP_USER + "\n";
