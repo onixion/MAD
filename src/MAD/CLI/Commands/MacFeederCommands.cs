@@ -71,24 +71,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class CatchBasicInfoPrintHostsCommand : Command
-    {
-        private DHCPReader _reader;
-
-        public CatchBasicInfoPrintHostsCommand(object[] args)
-            : base()
-        {
-            _reader = (DHCPReader)args[0];
-            description = "Prints all hosts which are currently in the List";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            string _tmp = ModelHost.PrintLists();
-
-            return "<color><blue>" + _tmp;
-        }
-    }
+    
     #endregion
 
     #region ARPReader
@@ -159,4 +142,42 @@ namespace MAD.CLICore
         }
     }
     #endregion 
+
+    #region stuff
+    public class CatchBasicInfoPrintHostsCommand : Command
+    {
+        private DHCPReader _reader;
+
+        public CatchBasicInfoPrintHostsCommand(object[] args)
+            : base()
+        {
+            _reader = (DHCPReader)args[0];
+            description = "Prints all hosts which are currently in the List";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            string _tmp = ModelHost.PrintLists();
+
+            return "<color><blue>" + _tmp;
+        }
+    }
+
+    public class ManuallySyncNodesCommand : Command
+    {
+        private JobSystem _js;
+
+        public ManuallySyncNodesCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            description = "Starts the Syncronisation manually";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            _js.SyncNodes(ModelHost.hostList);
+            return "<color><blue> Sync done";
+        }
+    }
+    #endregion
 }

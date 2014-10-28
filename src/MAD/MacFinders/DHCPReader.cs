@@ -15,7 +15,7 @@ using Amib.Threading;
 
 namespace MAD.MacFinders
 {
-    public class DHCPReader                                                          //need to do something about that name.. 
+    public class DHCPReader                                                          
     {
         #region member
         
@@ -23,9 +23,7 @@ namespace MAD.MacFinders
 
         private uint _sleepFor;
 
-        private static bool _running = false;
-
-        
+        private static bool _running = false;    
 
         private Thread _check;
         private Thread _start;
@@ -35,13 +33,16 @@ namespace MAD.MacFinders
 
         private IPEndPoint _groupEP = new IPEndPoint(IPAddress.Any, 67);
 
+        private JobSystem _js;
+
         #endregion 
 
         #region Constructor
 
-        public DHCPReader()
+        public DHCPReader(object arg)
         {
-            _sleepFor = 25000;                                                      //default value will be changeable
+            _js = (JobSystem)arg;
+            _sleepFor = 25000;                                                     
         }
 
         #endregion
@@ -212,6 +213,8 @@ namespace MAD.MacFinders
                     {
                         ModelHost.AddToList(_tmpModel);
                     }
+
+                    _js.SyncNodes(ModelHost.hostList);
                 }
             }
             catch
