@@ -8,9 +8,9 @@ namespace MAD.JobSystemCore
             : base(message, innerEx) { }
     }
 
-    public class JobSceduleException : Exception
+    public class JobScheduleException : Exception
     {
-        public JobSceduleException(string message, Exception innerEx)
+        public JobScheduleException(string message, Exception innerEx)
             : base(message, innerEx) { }
     }
 

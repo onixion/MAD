@@ -26,7 +26,7 @@ namespace CLIIO
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public static string ReadInput(int offset)
         {
@@ -148,8 +148,7 @@ namespace CLIIO
                 }
                 
                 Console.Write("\n");
-
-                return _VINPUT;
+                return _VINPUT.Trim();
             }
         }
 

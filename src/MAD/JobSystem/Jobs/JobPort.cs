@@ -22,7 +22,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public override void Execute(IPAddress targetAddress)
         {

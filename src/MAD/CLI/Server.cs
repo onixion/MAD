@@ -24,7 +24,7 @@ namespace MAD.CLIServerCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         protected abstract bool StartListener();
         protected abstract void StopListener();

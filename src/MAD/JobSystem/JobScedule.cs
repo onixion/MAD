@@ -13,7 +13,7 @@ using Amib.Threading;
 
 namespace MAD.JobSystemCore
 {
-    public class JobScedule
+    public class JobSchedule
     {
         #region members
 
@@ -42,7 +42,7 @@ namespace MAD.JobSystemCore
 
         #region constructor
 
-        public JobScedule(object jsLock, List<JobNode> jobNodes)
+        public JobSchedule(object jsLock, List<JobNode> jobNodes)
         {
             _jsLock = jsLock;
             _jobNodes = jobNodes;
@@ -51,7 +51,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public void Start()
         {
@@ -128,7 +128,7 @@ namespace MAD.JobSystemCore
                 { 
                     // This try-catch is just for debugging reasons here. If the program works
                     // as planed, it will never get into this catch.
-                    throw new SystemException("SCEDULE: INTERNAL-EXECPTION: " + e.Message);
+                    throw new SystemException("Schedule: INTERNAL-EXECPTION: " + e.Message);
                 }
 
                 if (_state == 2)
@@ -241,7 +241,7 @@ namespace MAD.JobSystemCore
                             {
                                 // Use global notification-settings.
 
-                                /* The JobScedule does not know if the SMTP-Login works. */
+                                /* The JobSchedule does not know if the SMTP-Login works. */
                             /*
                                 NotificationSystem.SendMail(_conf.MAIL_DEFAULT,
                                     _mailSubject, _mailContent, 2);

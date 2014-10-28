@@ -76,7 +76,7 @@ namespace MAD
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
                         {
-                            CLIServer cliServer = new CLIServer(Path.Combine(DATADIR, "certificate.ptx"), js);
+                            CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_CERT, js);
                             cliServer.Start();
                             Console.ReadKey();
                         }
