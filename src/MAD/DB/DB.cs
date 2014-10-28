@@ -62,7 +62,7 @@ namespace MAD
 
         public void CreateDeviceTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID INTEGER, HOST VARCHAR(30), IP VARCHAR(30), MAC VARCHAR(30), Memo1 VARCHAR(30), Memo2 VARCHAR(100));";
+            string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID INTEGER, HOST STRING, IP STRING, MAC STRING, Memo1 VARCHAR(30), Memo2 STRING);";
 
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
@@ -71,7 +71,7 @@ namespace MAD
 
         public void CreateEventTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID INTEGER, JOBNAME VARCHAR(30), JOBTYPE VARCHAR(30), PROTOCOL VARCHAR(30),Out_State VARCHAR(30), Discription VARCHAR(100), Start_Time VARCHAR(30), Stop_Time VARCHAR(30), Delay_Time VARCHAR(30), Custom1 VARCHAR(30), Custom2 INTEGER);";
+            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID INTEGER, JOBNAME STRING, JOBTYPE STRING, PROTOCOL STRING, Out_State STRING, Discription STRING, Start_Time STRING, Stop_Time STRING, Delay_Time STRING, Custom1 STRING, Custom2 INTEGER);";
 
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
@@ -80,7 +80,7 @@ namespace MAD
 
         public void CreateJobTypeTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JOBTYPE VARCHAR(30));";
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JOBTYPE STRING);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
@@ -88,7 +88,7 @@ namespace MAD
 
         public void CreateProtocolTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol VARCHAR(30));";
+            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol STRING);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
@@ -96,7 +96,7 @@ namespace MAD
 
         public void CreateStatusTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Status_Table ( GUID INTEGER, Online INTEGER, Time_of_Execution VARCHAR(30));";
+            string sql = "CREATE TABLE IF NOT EXISTS Status_Table ( GUID INTEGER, Online INTEGER, Time_of_Execution STRING);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
@@ -105,7 +105,7 @@ namespace MAD
 
         public void CreateSummaryTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID INTEGER, DATE VARCHAR(30), JOBTYPE INTEGER, PROTOCOL INTEGER, Successful_Outstate_[%] INTEGER, Average_Delay_Time VARCHAR(30), Online_[%] INTEGER);";
+            string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID INTEGER, DATE STRING, JOBTYPE INTEGER, PROTOCOL INTEGER, Successful_Outstate_[%] INTEGER, Average_Delay_Time STRING, Online_[%] INTEGER);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
