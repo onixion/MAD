@@ -15,25 +15,18 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPort()
-            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput(), new JobNotification())
+            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput())
         {
             this.port = 80;
         }
 
-        public JobPort(string jobName, JobType jobType, JobTime jobTime, JobOutput outp, JobNotification noti, int port)
-            : base(jobName, jobType, jobTime, outp, noti)
-        {
-            this.port = port;
-        }
-
         #endregion
 
-        #region methodes
+        #region methods
 
         public override void Execute(IPAddress targetAddress)
         {
             Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));
@@ -43,17 +36,7 @@ namespace MAD.JobSystemCore
             {
                 outp.outState = JobOutput.OutState.Failed;
             }
-
             _socket.Close();
-        }
-
-        protected override string JobStatus()
-        {
-            string _temp = "";
-
-            _temp += "<color><yellow>TARGET-PORT: <color><white>" + port.ToString() +"\n";
-
-            return _temp;
         }
 
         #endregion

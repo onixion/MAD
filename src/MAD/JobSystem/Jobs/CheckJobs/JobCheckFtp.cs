@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Net;
 
+using MAD.Logging;
+
 namespace MAD.JobSystemCore
 {
     class JobCheckFtp : Job
@@ -15,24 +17,8 @@ namespace MAD.JobSystemCore
 
         public JobCheckFtp()
             : base(JobType.ServiceCheck)
-        { }
-
-        protected override string JobStatus()
         {
-            string _tmp = "";
-
-            if (_working)
-            {
-                _tmp += "FTP is working";
-                outp.outState = JobOutput.OutState.Success;
-            }
-            else
-            {
-                _tmp += "FTP seems to be dead";
-                outp.outState = JobOutput.OutState.Failed;
-            }
-
-            return (_tmp);
+            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string)));
         }
 
         public override void Execute(IPAddress targetAddress)
@@ -44,12 +30,16 @@ namespace MAD.JobSystemCore
             try
             {
                 FtpWebResponse _response = (FtpWebResponse)_requestDir.GetResponse();
-                _working = true;
+                Logger.Log("FTP Service seems to work", Logger.MessageType.INFORM);
+                outp.outState = JobOutput.OutState.Success;
+                outp.GetOutputDesc("Additional Information").dataObject = _response.StatusDescription;
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                _working = false;
+                Logger.Log("FTP Service seems to be dead", Logger.MessageType.ERROR);
+                outp.outState = JobOutput.OutState.Exception;
+                outp.GetOutputDesc("Additional Information").dataObject = ex.Data.ToString();
             }
         }
     }

@@ -7,16 +7,22 @@ using CryptoNet;
 
 namespace MadNet
 {
-    public class AES
+    public class AES : IDisposable
     {
         RijndaelOpen _aes = new RijndaelOpen();
-        private static byte[] _salt = new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 };
+
         private string _pass { get; set; }
-        public string pass { set { _pass = value; } }
+        private static byte[] _salt = new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 };
 
         public AES(string pass)
         {
             _pass = pass;
+        }
+
+        public AES(string pass, byte[] salt)
+        {
+            _pass = pass;
+            _salt = salt;
         }
 
         public byte[] Encrypt(byte[] data)
@@ -101,6 +107,11 @@ namespace MadNet
             }
 
             return data;
+        }
+
+        public void Dispose()
+        {
+            _aes.Dispose();
         }
     }
 }

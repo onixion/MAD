@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Net;
-using System.Runtime.Serialization;
+using System.Collections.Specialized;
+
+using Newtonsoft.Json;
 
 namespace MAD.JobSystemCore
 {
-    [Serializable]
     public class JobHttp : Job
     {
         #region members
 
         public int port;
 
+        [JsonIgnore]
         private WebRequest _request;
+        [JsonIgnore]
         private WebResponse _response;
 
         #endregion
@@ -26,41 +29,22 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public override void Execute(IPAddress targetAddress)
         {
             try
             {
                 _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
+                _response = _request.GetResponse();
 
-                try
-                {
-                    _response = _request.GetResponse();
-                    outp.outState = JobOutput.OutState.Success;
-
-                    _response.Close();
-                }
-                catch (Exception)
-                {
-                    outp.outState = JobOutput.OutState.Failed;
-                }
-
-                _request.Abort();
+                outp.outState = JobOutput.OutState.Success;
+                _response.Close();
             }
             catch (Exception)
             {
-                outp.outState = JobOutput.OutState.Exception;
+                outp.outState = JobOutput.OutState.Failed;
             }
-        }
-
-        protected override string JobStatus()
-        {
-            string _temp = "";
-
-            _temp += "<color><yellow>TARGET-PORT: <color><white>" + port.ToString() + "\n";
-
-            return _temp;
         }
 
         #endregion

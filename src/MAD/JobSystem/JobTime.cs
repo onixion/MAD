@@ -13,7 +13,7 @@ namespace MAD.JobSystemCore
         public TimeMethod type;
 
         public JobDelayHandler jobDelay { get; set; }
-        public List<JobTimeHandler> jobTimes = new List<JobTimeHandler>();
+        public List<JobTimeHandler> jobTimes { get; set; }
 
         #endregion
 
@@ -40,7 +40,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public JobTimeHandler GetJobTimeHandler(DateTime time)
         {
@@ -298,7 +298,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public bool IsBlocked(DateTime now)
         {
@@ -371,12 +371,8 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private int _delayTime;
-        [JsonIgnore]
-        public int delayTime { get { return _delayTime; } }
-        private int _delayTimeRemaining { get; set; }
-        [JsonIgnore]
-        public int delayTimeRemaining { get { return _delayTimeRemaining; } }
+        public int delayTime;
+        public int delayTimeRemaining { get; set; }
 
         #endregion
 
@@ -387,17 +383,17 @@ namespace MAD.JobSystemCore
 
         public JobDelayHandler(int delayTime)
         {
-            _delayTime = delayTime;
-            _delayTimeRemaining = delayTime;
+            this.delayTime = delayTime;
+            this.delayTimeRemaining = delayTime;
         }
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public bool CheckTime()
         {
-            if (_delayTimeRemaining <= 0)
+            if (delayTimeRemaining <= 0)
                 return true;
             else
                 return false;
@@ -405,12 +401,12 @@ namespace MAD.JobSystemCore
 
         public void Reset()
         {
-            _delayTimeRemaining = _delayTime;
+            delayTimeRemaining = delayTime;
         }
 
         public void SubtractFromDelaytime(int deltaTime)
         {
-            _delayTimeRemaining = _delayTimeRemaining - deltaTime;
+            delayTimeRemaining = delayTimeRemaining - deltaTime;
         }
 
         #endregion

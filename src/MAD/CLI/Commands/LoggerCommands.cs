@@ -7,31 +7,6 @@ using MAD.Logging;
 
 namespace MAD.CLICore
 {
-    class ChangePathFile : Command
-    {
-        public ChangePathFile()
-        {
-            rPar.Add(new ParOption("p", "PATH", "Relativ Path to the Logfile in Unix Style", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            string _additionToPath = (string) pars.GetPar("p").argValues[0];
-
-            try
-            {
-                Logger.CreateNewPathFile(_additionToPath);
-                Logger.Log("Changed Path to Log file successfully", Logger.MessageType.INFORM);
-                return "Successfully changed path to log file";
-            }
-            catch (Exception)
-            {
-                Logger.Log("Error by changing Path File. Could Couse no logfile!", Logger.MessageType.EMERGENCY);
-                return "Error! Did you use Unix Paths?";
-            }
-        }
-    }
-
     class ChangeBufferSize : Command
     {
         public ChangeBufferSize()

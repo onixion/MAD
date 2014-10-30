@@ -5,10 +5,12 @@ using System.Net.Sockets;
 using System.Net.Security;
 using System.Text;
 using System.IO;
+using System.Xml;
+using System.Security.Cryptography.X509Certificates;
 
 using MAD.JobSystemCore;
 using MAD.CLICore;
-
+using MAD.Logging;
 using MadNet;
 
 namespace MAD.CLIServerCore
@@ -17,18 +19,17 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        public const string HEADER = "MAD CLI-Server";
-        public const string VERSION = "v2.4";
-        public readonly bool DEBUG_MODE;
-        public readonly bool LOG_MODE;
-        public readonly int ACCEPTED_RSA_MODULUS_LENGTH = 2048;
-        public readonly int AES_PASS_LENGTH = 20;
-
-        private string _user = "root";
-        private string _pass = MD5Hashing.GetHash("rofl123");
-        private bool _userOnline = false;
+        private bool _debugMode;
+        private bool _logMode;
+        private string _serverHeader;
+        private string _serverVer = "v2.0";
 
         private TcpListener _serverListener;
+        private X509Certificate2 _certificate;
+        
+        private bool _userOnline = false;
+        private string _user;
+        private string _pass = MadNetHelper.ToMD5("rofl123");
 
         private JobSystem _js;
 
@@ -36,19 +37,36 @@ namespace MAD.CLIServerCore
 
         #region constructor
 
-        public CLIServer(int port, bool debug, bool log, JobSystem js)
+        public CLIServer(string certfile, JobSystem js)
         {
-            serverPort = port;
-
-            DEBUG_MODE = debug;
-            LOG_MODE = log;
+            LoadConfig();
+            LoadCertificate(certfile);
 
             _js = js;
         }
 
+        private void LoadConfig()
+        {
+            _logMode = MadConf.conf.LOG_MODE;
+            _debugMode = MadConf.conf.DEBUG_MODE;
+            _serverHeader = MadConf.conf.SERVER_HEADER;
+            serverPort = MadConf.conf.SERVER_PORT;
+        }
+
+        private void LoadCertificate(string certfile)
+        {
+            if (File.Exists(certfile))
+            {
+                Console.Write("Pass for certification: ");
+                _certificate = new X509Certificate2(certfile, Console.ReadLine());
+            }
+            else
+                throw new Exception("Certification-file does not exist!");
+        }
+
         #endregion
 
-        #region methodes
+        #region methods
 
         protected override bool StartListener()
         {
@@ -84,37 +102,36 @@ namespace MAD.CLIServerCore
                 NetworkStream _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                if (DEBUG_MODE)
+                if (_debugMode)
                     Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
-                if (LOG_MODE)
-                    Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
-
-                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
-                {
-                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(HEADER);
-                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(VERSION);
-                    _serverInfoP.SendPacket();
-                }
+                if (_logMode)
+                    Logger.Log("Client (" + _clientEndPoint.Address + ") connected.", Logger.MessageType.INFORM);
 
                 if (_userOnline)
                     throw new Exception("User already online!");
 
-                RSAEncryption _rsa = new RSAEncryption();
-
-                using (DataStringPacket _dataP = new DataStringPacket(_stream, null))
+                // send server info
+                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
                 {
-                    _dataP.ReceivePacket();
-                    _rsa.LoadPublicFromXml(_dataP.data);
+                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_serverHeader);
+                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_serverVer);
+                    _serverInfoP.SendPacket();
                 }
-                string _pass = GenRandomPassUnicode(AES_PASS_LENGTH);
 
-                byte[] _encrypted = _rsa.PublicEncryption(Encoding.UTF8.GetBytes(_pass));
+                SslStream _sStream = new SslStream(_stream);
+                _sStream.AuthenticateAsServer(_certificate);
 
-                using (DataPacket _dataP = new DataPacket(_stream, null, _encrypted))
-                        _dataP.SendPacket();
-               
-                AES _aes = new AES(_pass);
+                // RECEIVE AES KEY
+                string _aesKey = "";
+                using (SSLPacket _sslP = new SSLPacket(_sStream))
+                { 
+                    _sslP.ReceivePacket();
+                    _aesKey = Encoding.Unicode.GetString(_sslP.data);
+                }
 
+                AES _aes = new AES(_aesKey);
+
+                // receive login packet
                 bool _loginSuccess;
                 using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
                 {
@@ -122,6 +139,7 @@ namespace MAD.CLIServerCore
                     _loginSuccess = Login(_loginP);
                 }
 
+                // send result
                 using (DataPacket _dataP = new DataPacket(_stream, _aes))
                 {
                     if (_loginSuccess)
@@ -142,33 +160,18 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (DEBUG_MODE)
-                    Console.WriteLine(GetTimeStamp() + " EX: " + e.Message);
-                if (LOG_MODE)
-                    Log(GetTimeStamp() + " EX: " + e.Message);
+                if (_debugMode)
+                    Console.WriteLine(GetTimeStamp() + " CLISERVER: " + e.Message);
+                if (_logMode)
+                    Logger.Log("CLISERVER: " + e.Message, Logger.MessageType.INFORM);
             }
 
-            if (DEBUG_MODE)
-                Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
-            if (LOG_MODE)
-                Log(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
+            if (_debugMode)
+                Console.WriteLine(GetTimeStamp() + "CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.");
+            if (_logMode)
+                Logger.Log("CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
 
             return null;
-        }
-
-        private string GenRandomPassUnicode(int stringLength)
-        {
-            Random _rand = new Random();
-            byte[] _str = new byte[stringLength * 2];
-
-            for (int i = 0; i < stringLength * 2; i += 2)
-            {
-                int _chr = _rand.Next(0xD7FF);
-                _str[i + 1] = (byte)((_chr & 0xFF00) >> 8);
-                _str[i] = (byte)(_chr & 0xFF);
-            }
-
-            return Encoding.Unicode.GetString(_str);
         }
 
         private bool Login(LoginPacket loginP)
@@ -185,29 +188,6 @@ namespace MAD.CLIServerCore
             }
             else
                 return false;
-        }
-
-        public void ChangePort(int newPort)
-        {
-            if (!IsListening)
-                serverPort = newPort;
-            else
-                throw new Exception("Server running!");
-        }
-
-        private void Log(string data)
-        {
-            FileStream _stream;
-
-            if (File.Exists("server.log"))
-                _stream = new FileStream("server.log", FileMode.Append, FileAccess.Write , FileShare.Read);
-            else
-                _stream = new FileStream("server.log", FileMode.Create, FileAccess.Write, FileShare.Read);
-
-            using (StreamWriter _writer = new StreamWriter(_stream))
-                _writer.WriteLine(data);
-
-            _stream.Dispose();
         }
 
         private string GetTimeStamp()

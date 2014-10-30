@@ -32,7 +32,7 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public override void Execute(IPAddress targetAddress)
         {
@@ -83,21 +83,6 @@ namespace MAD.JobSystemCore
                 _ping.Dispose();
             }
 
-        }
-
-        protected override string JobStatus()
-        {
-            _tmp = "";
-            _hostAddresses.ForEach(GiveAddresses);
-
-            return (_tmp);
-        }
-
-        private void GiveAddresses(IPAddress _tmpAdr)
-        {
-
-            _tmp += "IP: " + _tmpAdr.ToString() + "\n";
-            //jobOutput.jobOutputDescriptors.Add(new JobOutputDescriptor("Host", typeof(IPAddress), _tmpAdr));
         }
 
         #endregion

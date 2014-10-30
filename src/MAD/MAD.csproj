@@ -49,14 +49,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="PacketDotNet, Version=0.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\lib\PacketDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpPcap, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SharpPcap.dll</HintPath>
     </Reference>
     <Reference Include="SnmpSharpNet">
       <HintPath>..\..\lib\SnmpSharpNet.dll</HintPath>
@@ -67,9 +67,13 @@
       <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI\Commands\ConnectivityTestCommand.cs" />
     <Compile Include="CLI\Commands\LoggerCommands.cs" />
     <Compile Include="CLI\Commands\MacFeederCommands.cs" />
     <Compile Include="CLI\CLI.cs" />
@@ -87,10 +91,10 @@
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
-    <Compile Include="DHCPReader\DHCPReader.cs" />
+    <Compile Include="MacFinders\ARPReader.cs" />
+    <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
     <Compile Include="CLI\CLIError.cs" />
-    <Compile Include="JobSystem\JobNotification.cs" />
     <Compile Include="JobSystem\JobOutput.cs" />
     <Compile Include="JobSystem\JobRule.cs" />
     <Compile Include="JobSystem\Job.cs" />
@@ -102,7 +106,7 @@
     <Compile Include="JobSystem\Jobs\CheckJobs\JobCheckDns.cs" />
     <Compile Include="JobSystem\Jobs\JobSnmp.cs" />
     <Compile Include="JobSystem\JSSerializer.cs" />
-    <Compile Include="JobSystem\JobScedule.cs" />
+    <Compile Include="JobSystem\JobSchedule.cs" />
     <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
     <Compile Include="JobSystem\Jobs\JobHttp.cs" />
     <Compile Include="JobSystem\OutputDescriptor.cs" />
@@ -120,6 +124,7 @@
     <Compile Include="Notification\MailLogin.cs" />
     <Compile Include="Notification\Notification.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MacFinders\ModelHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -148,13 +153,13 @@
       <Project>{FC728832-1EAD-4B88-B557-68EB12775678}</Project>
       <Name>CLIIO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MadNet\MadNet.csproj">
-      <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
-      <Name>MadNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
       <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>
       <Name>SmartThreadPool</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MADNet\MadNet.csproj">
+      <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
+      <Name>MadNet</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

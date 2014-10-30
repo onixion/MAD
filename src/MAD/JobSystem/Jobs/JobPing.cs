@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
 
 using Newtonsoft.Json;
 
@@ -31,17 +30,16 @@ namespace MAD.JobSystemCore
 
             outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
             outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
-            //outp.outputs.Add(new OutputDescriptor("RoundtripTime", typeof(long)));
         }
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public override void Execute(IPAddress targetAddress)
         {
             PingOptions _pingOptions = new PingOptions(ttl, dontFragment);
-            PingReply _reply = _ping.Send(targetAddress, timeout, Encoding.ASCII.GetBytes("1111111111111111"), _pingOptions);
+            PingReply _reply = _ping.Send(targetAddress, timeout, new byte[8] {1,2,3,4,5,6,7,8} , _pingOptions);
 
             outp.GetOutputDesc("IPStatus").dataObject = _reply.Status.ToString();
 
@@ -50,22 +48,10 @@ namespace MAD.JobSystemCore
             else
                 outp.GetOutputDesc("TTL").dataObject = null;
 
-            //outp.GetOutputDesc("RoundtripTime").dataObject = _reply.RoundtripTime;
-
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;
             else
                 outp.outState = JobOutput.OutState.Failed;
-        }
-
-        protected override string JobStatus()
-        {
-            string _temp = "";
-
-            _temp += "<color><yellow>TTL: <color><white>" + ttl.ToString() + "\n";
-            _temp += "<color><yellow>Timeout: <color><white>" + timeout.ToString() + "\n";
-
-            return _temp;
         }
 
         #endregion

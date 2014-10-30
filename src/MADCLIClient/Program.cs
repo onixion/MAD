@@ -104,7 +104,7 @@ namespace CLIClient
         public void SetUserPass(string username, string password)
         {
             user = username;
-            _passMD5 = MD5Hashing.GetHash(password);
+            _passMD5 = MadNetHelper.ToMD5(password);
         }
 
         public void SetConnection(IPAddress server, int port)
@@ -209,12 +209,11 @@ namespace CLIClient
 
         public void CLIConnect()
         {
-            CLIClient _client = new CLIClient(new IPEndPoint(server, port));
+            CLIClient _client = new CLIClient(new IPEndPoint(server, port), user, _passMD5);
 
             try
             {
                 _client.Connect();
-                _client.LoginToRemoteCLI(user, _passMD5);
             }
             catch (Exception e)
             {

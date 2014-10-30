@@ -1,0 +1,21 @@
+Es ist ein weiters Problem bezüglich Multi-Threading aufgetreten.
+Das Problem ist das unser Programm die Jobs und Nodes sperrt (Locked) wenn diese
+Ausgeführt werden.
+
+Falls jedoch während der Job ausgeführt wird, der Job verändert wird (was leider
+derzeitig möglich ist), tritt ein metastabiler Zustand auf - man weiß nicht was
+passieren kann. Natürlich kann es mit der Lock geschützt werden, jedoch heißt das
+wenn ein Programmteil einen Job für längere Zeit "blocked" der JobScedule nicht
+weiterarbeiten kann ... usw.
+
+Ich möchte gerne einen ReaderWriterLock einbauen, damit beliebige Threads Jobs oder
+Nodes lesen können, aber nur einer gleichzeitig Änderungen vornehmen kann. 
+In unseren Programm werden diese Zustände nur ganz selten auftreten, aber wenn sie
+auftreten sollten, muss unser Programm standhalten.
+
+Mit der "ReaderWriterLock" haben wir den Vorteil, dass Threads, die zur gleichen Zeit
+lesen wollen, das auch dürfen. Sobald ein Thread schreiben möchte, wartet er bis die
+Threads fertig gelesen haben und bekommt den Job dann für sich alleine.
+
+Diese Variante klingt sehr sinnvoll und spart Prozessorzeit als jeden Job 
+für Schreiben als auch für Lesen zu sperren.

@@ -94,4 +94,7 @@ one file for all nodes - working on that as well. After these things are impleme
 unseen bugs and try to save resources by Clean-Coding. So I won't implement new big features but rather fixing bugs, rewritting parts for
 saving resources and maybe adding some small things to it.)
 
-[07.09.2014][16:00-18:00] Fixed RSA issue. It is working now...
+[07.09.2014][16:00-18:00][2h][189h] Fixed RSA issue. It is working now...
+[09.09.2014][18:00-21:00][3h][192h] Fixed many bugs (Notification, ...). Made some testing. Removed some old Commands and added some new ones.
+[13.09.2014][19:00-23:00][4h][196h] Rewritting locks.
+[14.09.2014][10:00-13:00][3h][199h] Rewritting locks / testing. Writting docs.

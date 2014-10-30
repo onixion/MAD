@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 
+using MAD;
+
 namespace MAD.Logging
 {
     public static class Logger
     {
-        public static string pathToLogFile;
-        public static string logFileName = "log.txt";
-
-
         #region fields
         
         public static uint buffer = 20;
+
+        public static string logFileName = "log.txt";
 
         public enum MessageType
         {
@@ -22,8 +22,6 @@ namespace MAD.Logging
             INFORM
         }
 
-        private static string _pathToLogFile;
-
         private static List<string> _logMessages = new List<string>();
 
         private static readonly Object _lockThis = new Object();
@@ -32,53 +30,7 @@ namespace MAD.Logging
         #endregion
 
         #region methods
-        public static bool PathFileExists()
-        {
-            string _pathToPathFile = "";
-            string _content = "lorem ipsum";
-            if (File.Exists(_pathToPathFile + @"/path.txt"))
-            {
-                using (StreamReader sr = new StreamReader(_pathToPathFile + @"/path.txt"))
-                    _content = sr.ReadToEnd();
-
-                if (!String.IsNullOrEmpty(_content))
-                    return true;
-                else
-                    return false;
-            }
-            else
-                return false;
-        }
-
-        public static void CreateNewPathFile()
-        {
-            string _newPathToPathFile = Path.GetFullPath("./");
-            string _pathToLogFile = _newPathToPathFile;
-            using (File.Create(_newPathToPathFile + @"/path.txt"));
-
-            using (StreamWriter sw = new StreamWriter(_newPathToPathFile + @"/path.txt", false))
-                sw.WriteLine(_pathToLogFile);
-        }
-
-        public static void CreateNewPathFile(string pathExtension)
-        {
-            string _newPathToPathFile = Path.GetFullPath("./");
-            string _newpathToLogFile = Path.Combine(Path.GetFullPath("./"), pathExtension);
-            using (File.Create(_newPathToPathFile + @"/path.txt")) ;
-
-            using (StreamWriter sw = new StreamWriter(_newPathToPathFile + @"/path.txt", false))
-                sw.WriteLine(_newpathToLogFile);
-
-            _pathToLogFile = _newpathToLogFile;
-        }
-
-        public static void ReadPathToLogFile()
-        {
-            string _pathToPathFile = Path.GetFullPath("./");
-            using (StreamReader sr = new StreamReader(_pathToPathFile + @"/path.txt"))
-                _pathToLogFile = sr.ReadLine();
-        }
-
+        
         public static void Log(string message, MessageType type)
         {
             lock (_lockThis)
@@ -116,7 +68,7 @@ namespace MAD.Logging
             {
                 lock (_lockThis)
                 {
-                    File.AppendAllLines(pathToLogFile + @"/" + logFileName, _logMessages.ToArray());
+                    File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + @"/" + logFileName, _logMessages.ToArray());
                     _logMessages.Clear();
                 }
             }

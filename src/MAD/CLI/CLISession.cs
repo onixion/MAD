@@ -20,15 +20,10 @@ namespace MAD.CLIServerCore
         private static uint _sessionsCount = 0;
         private uint _sessionID;
         public uint sessionID { get { return _sessionID; } }
-
         private object _sessionInitLock = new object();
 
         private NetworkStream _stream;
         private AES _aes;
-
-        private Command _command;
-        private string _clientCLIInput;
-        private string _cliInterpreter;
 
         private JobSystem _js;
 
@@ -52,7 +47,7 @@ namespace MAD.CLIServerCore
 
         #endregion
 
-        #region methodes
+        #region methods
 
         public void InitCommands()
         {
@@ -63,14 +58,11 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
-            commands.Add(new CommandOptions("conf", typeof(LoadConfigFileCommand), null));
             commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfigCommand), null));
-            commands.Add(new CommandOptions("conf-save", typeof(SaveConfigCommand), null));
             commands.Add(new CommandOptions("conf-show", typeof(ConfShowCommand), null));
 
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
-            commands.Add(new CommandOptions("change log direction", typeof(ChangePathFile), null));
 
             // MAC AND IP READER
             /*
@@ -86,10 +78,9 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("js nodes", typeof(JobSystemStatusNodesCommand), new object[] { _js }));
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { _js }));
 
-            // SCEDULE
-            commands.Add(new CommandOptions("scedule", typeof(JobSceduleCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule start", typeof(JobSceduleStartCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("scedule stop", typeof(JobSceduleStopCommand), new object[] { _js }));
+            // Schedule
+            commands.Add(new CommandOptions("Schedule start", typeof(JobScheduleStartCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("Schedule stop", typeof(JobScheduleStopCommand), new object[] { _js }));
 
             // NODES
             commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { _js }));
@@ -101,8 +92,6 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
 
             // JOBS
-            commands.Add(new CommandOptions("job status", typeof(JobStatusCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("job output", typeof(JobOutDescriptorListCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job remove", typeof(JobSystemRemoveJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job start", typeof(JobSystemStartJobCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job stop", typeof(JobSystemStopJobCommand), new object[] { _js }));
@@ -128,8 +117,13 @@ namespace MAD.CLIServerCore
 
             try
             {
+                Command _command = null;
+                string _clientCLIInput = null;
+
                 _dataP = new DataPacket(_stream, _aes);
                 _cliP = new CLIPacket(_stream, _aes);
+
+                _dataP.SendPacket();
 
                 while (true)
                 {
@@ -138,12 +132,18 @@ namespace MAD.CLIServerCore
 
                     if (_clientCLIInput != "")
                     {
-                        _cliInterpreter = CLIInterpreter(ref _command, _clientCLIInput);
+                        _clientCLIInput = CLIInterpreter(ref _command, _clientCLIInput);
 
-                        if (_cliInterpreter == "VALID_PARAMETERS")
-                            _dataP.data = Encoding.Unicode.GetBytes(_command.Execute(_cliP.consoleWidth));
+                        if (_clientCLIInput == "VALID_PARAMETERS")
+                        {
+                            _clientCLIInput = _command.Execute(_cliP.consoleWidth);
+                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
+
+                            if (_clientCLIInput == "EXIT_CLI")
+                                break;
+                        }
                         else
-                            _dataP.data = Encoding.Unicode.GetBytes(_cliInterpreter);
+                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
                     }
 
                     _dataP.SendPacket();
@@ -151,10 +151,9 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (MadConf.conf.DEBUG_MODE)
-                    Console.WriteLine("CLI-Session: EX: ");
-                if (MadConf.conf.LOG_MODE)
-                    Logger.Log("CLI-Session: EX: " + e.Message, Logger.MessageType.WARNING);
+                _dataP.Dispose();
+                _cliP.Dispose();
+                throw e;
             }
 
             _dataP.Dispose();

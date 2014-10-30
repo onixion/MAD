@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.IO; 
 
 using MAD.JobSystemCore;
-using MAD.DHCPReader;
+using MAD.MacFinders;
 using MAD.Notification;
 using MAD.Helper;
 
@@ -27,16 +27,10 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>\n JOBSYSTEM version " + JobSystem.VERSION + "\n\n";
-            output += " Nodes stored in RAM: <color><white>" + _js.NodesInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES + ")\n";
-            output += " Jobs  stored in RAM: <color><white>" + _js.JobsInitialized() + "<color><yellow>\t\t(MAX=" + JobSystem.MAXNODES * JobNode.MAX_JOBS + ")\n";
-            output += "\n\n Scedule-State: ";
-            if (_js.sceduleState == JobScedule.State.Active)
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            else
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            output += "\n";
-
+            output += _js.GetJSStats() + "\n";
+            output += _js.GetJSScheduleStats() + "\n";
+            output += _js.GetNodesStats() + "\n";
+            output += _js.GetJobsStats();
             return output;
         }
     }
@@ -54,7 +48,7 @@ namespace MAD.CLICore
         public override string Execute(int consoleWidth)
         {
             _js.SaveTable((string)pars.GetPar("file").argValues[0]);
-            return "<color><green>Table saved (contains " + _js.nodes.Count + " Nodes).";
+            return "<color><green>Table saved.";
         }
     }
 
@@ -79,33 +73,11 @@ namespace MAD.CLICore
 
     #region commands for SCEUDLE
 
-    public class JobSceduleCommand : Command
-    { 
-        JobSystem _js;
-
-        public JobSceduleCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            description = "This command shows the current state of the scedule.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            output = "<color><yellow>Scedule-state: ";
-            if (_js.sceduleState == JobScedule.State.Active)
-                output += "<color><green>" + _js.sceduleState.ToString() + "<color><yellow>";
-            else
-                output += "<color><red>" + _js.sceduleState.ToString() + "<color><yellow>";
-            return output;
-        }
-    }
-
-    public class JobSceduleStartCommand : Command
+    public class JobScheduleStartCommand : Command
     {
         JobSystem _js;
 
-        public JobSceduleStartCommand(object[] args)
+        public JobScheduleStartCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
@@ -113,16 +85,16 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StartScedule();
-            return "<color><green>Scedule started.";
+            _js.StartSchedule();
+            return "<color><green>Schedule started.";
         }
     }
 
-    public class JobSceduleStopCommand : Command
+    public class JobScheduleStopCommand : Command
     {
         JobSystem _js;
 
-        public JobSceduleStopCommand(object[] args)
+        public JobScheduleStopCommand(object[] args)
             : base()
         {
             _js = (JobSystem)args[0];
@@ -130,8 +102,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StopScedule();
-            return "<color><green>Scedule stopped.";
+            _js.StopSchedule();
+            return "<color><green>Schedule stopped.";
         }
     }
 
@@ -152,26 +124,27 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string[] _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
-            output += "\n";
-            output += " <color><yellow>Nodes max:         <color><white>" + JobSystem.MAXNODES + "\n";
-            output += " <color><yellow>Nodes initialized: <color><white>" + _js.NodesInitialized() + "\n";
-            output += " <color><yellow>Nodes active:      <color><white>" + _js.NodesActive() + "\n";
-            output += " <color><yellow>Nodes inactive:    <color><white>" + _js.NodesInactive() + "\n\n";
-            output += "<color><yellow>" + ConsoleTable.splitline; 
+            output += _js.GetNodesStats();
+            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+
+            string[] _tableRow = _tableRow = new string[] { "Node-ID", "Node-Name", "Node-State", "MAC-Address", "IP-Address", "Jobs Init." };
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
-            output += ConsoleTable.splitline;
+            output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            foreach (JobNode _temp in _js.nodes)
+            lock (_js.jsLock)
             {
-                _tableRow[0] = _temp.id.ToString();
-                _tableRow[1] = _temp.name;
-                _tableRow[2] = _temp.state.ToString();
-                _tableRow[3] = _temp.macAddress.ToString();
-                _tableRow[4] = _temp.ipAddress.ToString();
-                _tableRow[5] = _temp.jobs.Count.ToString();
-                output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
+                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                foreach (JobNode _temp in _nodes)
+                {
+                    _tableRow[0] = _temp.id.ToString();
+                    _tableRow[1] = _temp.name;
+                    _tableRow[2] = _js.NodeState(_temp.state);
+                    _tableRow[3] = _temp.mac.ToString();
+                    _tableRow[4] = _temp.ip.ToString();
+                    _tableRow[5] = _temp.jobs.Count.ToString();
+                    output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
+                }
             }
 
             return output;
@@ -209,7 +182,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StartNode((int)pars.GetPar("id").argValues[0]);
+            _js.StopNode((int)pars.GetPar("id").argValues[0]);
             return "<color><green>Node is inactive.";
         }
     }
@@ -232,8 +205,8 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.macAddress = (PhysicalAddress)pars.GetPar("mac").argValues[0];
-            _node.ipAddress = (IPAddress)pars.GetPar("ip").argValues[0];
+            _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+            _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
             _js.AddNode(_node); 
 
@@ -259,6 +232,45 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemEditNodeCommand : Command
+    {
+        private JobSystem _js;
+
+        public JobSystemEditNodeCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to edit.", false, false, new Type[] { typeof(Int32) }));
+            oPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            oPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            description = "This command edits a node. ";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            lock (_js.jsLock)
+            {
+                JobNode _node = _js.UnsafeGetNode((Int32)pars.GetPar("id").argValues[0]);
+                if (_node != null)
+                {
+                    if (OParUsed("n"))
+                        _node.name = (string)pars.GetPar("n").argValues[0];
+
+                    if (OParUsed("mac"))
+                        _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+
+                    if (OParUsed("ip"))
+                        _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
+
+                    return "<color><green>Node edited.";
+                }
+                else
+                    return "<color><red>Node does not exist!";
+            }
+        }
+    }
+
+    /*                                                                                                                          Auskommentiert für die Implementierung durch Alin
     public class JobSystemSyncNodeCommand : Command
     {
         private JobSystem _js;
@@ -283,7 +295,8 @@ namespace MAD.CLICore
             return output;
         }
     }
-
+    */
+      
     public class JobSystemSaveNodeCommand : Command
     { 
         private JobSystem _js;
@@ -329,24 +342,13 @@ namespace MAD.CLICore
 
             try
             {
-                JobNode _node = _js.LoadNode(_fileName);
-                _js.AddNode(_node);
-
+                _js.LoadNode(_fileName);
                 return "<color><green>Node loaded.";
             }
             catch(Exception e)
             {
-                return "<color><red>XML: " + e.Message;
+                return "<color><red>EX: " + e.Message;
             }
-        }
-    }
-
-    // TODO
-    public class JobSystemEditNode : Command
-    {
-        public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
         }
     }
 
@@ -362,101 +364,195 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
+
+            oPar.Add(new ParOption("more", "", "Show more infos.", true, false, null));
             description = "This command prints a table with all initialized jobs.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            string[] _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
-            output += "\n";
-            output += " <color><yellow>Jobs max:             <color><white>" + JobSystem.MAXNODES * JobNode.MAX_JOBS + "\n";
-            output += " <color><yellow>Jobs initialized:     <color><white>" + _js.JobsInitialized() + "\n";
-            output += " <color><yellow>Jobs waiting/running: <color><white>" + _js.NodesActive() + "\n";
-            output += " <color><yellow>Jobs stopped:         <color><white>" + _js.NodesInactive() + "\n\n";
-            output += "<color><yellow>" + ConsoleTable.splitline;
+            output += _js.GetJobsStats();
+            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+
+            string[] _tableRow = null;
+
+            if (!OParUsed("more"))
+                _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Output-State" };
+            else
+                _tableRow = new string[] { "Node-ID", "Job-ID", "Job-Name", "Job-Type", "Job-State", "Time-Type", "Time-Value(s)", "Last-Started", "Last-Stopped", "Last-Delta", "Output-State" };
+
             output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
-            output += ConsoleTable.splitline;
+            output += ConsoleTable.GetSplitline(consoleWidth);
             output += "<color><white>";
 
-            foreach (JobNode _temp in _js.nodes)
-                foreach (Job _temp2 in _temp.jobs)
-                {
-                    _tableRow[0] = _temp.id.ToString();
-                    _tableRow[1] = _temp2.id.ToString();
-                    _tableRow[2] = _temp2.name;
-                    _tableRow[3] = _temp2.type.ToString();
-                    _tableRow[4] = _temp2.state.ToString();
-                    _tableRow[5] = _temp2.time.type.ToString();
-                    _tableRow[6] = _temp2.time.GetValues();
-                    _tableRow[7] = _temp2.outp.outState.ToString();
-                    output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
-                }
-            return output;
-        }
-    }
-
-    public class JobOutDescriptorListCommand : Command
-    {
-        private JobSystem _js;
-
-        public JobOutDescriptorListCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-
-            rPar.Add(new ParOption("id", "JOB-ID", "Id of job.", false, false, new Type[] { typeof(int) }));
-
-            description = "Show the outdescriptors of a specific job.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job != null)
+            lock (_js.jsLock)
             {
-                output += "<color><yellow>";
-
-                foreach (OutputDescriptor _temp in _job.outp.outputs)
+                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                foreach (JobNode _temp in _nodes)
                 {
-                    output += "-> OutDesc.: " + _temp.name + "\n";
-                    output += "   DataType: " + _temp.dataType.ToString() + "\n";
-                }
+                    foreach (Job _temp2 in _temp.jobs)
+                    {
+                        _tableRow[0] = _temp.id.ToString();
+                        _tableRow[1] = _temp2.id.ToString();
+                        _tableRow[2] = _temp2.name;
+                        _tableRow[3] = _temp2.type.ToString();
+                        _tableRow[4] = _js.JobState(_temp2.state);
+                        _tableRow[5] = _temp2.time.type.ToString();
+                        _tableRow[6] = _temp2.time.GetValues();
 
+                        if (!OParUsed("more"))
+                            _tableRow[7] = _temp2.outp.outState.ToString();
+                        else
+                        {
+                            _tableRow[7] = _temp2.tStart.ToString("HH:mm:ss");
+                            _tableRow[8] = _temp2.tStop.ToString("HH:mm:ss");
+                            _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
+                            _tableRow[10] = _temp2.outp.outState.ToString();
+                        }
+                        output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
+                    }
+                }
                 return output;
             }
-            else
-            {
-                return "<color><red>Job does not exist!";
-            }
         }
     }
 
-    public class JobStatusCommand : Command
+    public class JobInfoCommand : Command
     {
         private JobSystem _js;
 
-        public JobStatusCommand(object[] args)
-            : base()
+        public JobInfoCommand(object[] args)
         {
             _js = (JobSystem)args[0];
             oPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows useful informations about jobs.";
         }
 
         public override string Execute(int consoleWidth)
         {
             if (OParUsed("id"))
             {
-                Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-                if (_job != null)
-                    output = _job.Status();
-                else
-                    output = "<color><red>Job does not exist!";
-                return output;
+                lock (_js.jsLock)
+                {
+                    JobNode _node;
+                    Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                    if (_job != null)
+                    {
+                        output = GetJobInfo(_job);
+                        return output;
+                    }
+                    else
+                        return "<color><red>Job does not exist!";
+                }
             }
             else
-                foreach (JobNode _node in _js.nodes)
-                    foreach (Job _job in _node.jobs)
-                        output += _job.Status() + "\n";
+            {
+                lock (_js.jsLock)
+                {
+                    List<JobNode> _nodes = _js.UnsafeGetNodes();
+                    foreach (JobNode _node in _nodes)
+                    {
+                        foreach (Job _job in _node.jobs)
+                        {
+                            output += GetJobInfo(_job);
+                            output += GetJobSpecificInfo(_job);
+                            output += "\n";
+                        }
+                    }
+                    return output;
+                }
+            }
+        }
+
+        private string GetJobInfo(Job job)
+        {
+            string output = "";
+
+            output += "<color><yellow>[<color><white>JOB ID='" + job.id + "']\n\n";
+            output += "<color><yellow>Name:          <color><white>" + job.name + "\n";
+            output += "<color><yellow>Type:          <color><white>" + job.type.ToString() + "\n";
+            output += "<color><yellow>Time-Type:     <color><white>" + job.time.type.ToString() + "\n";
+            output += "<color><yellow>Time-Value(s): <color><white>" + job.time.GetValues() + "\n\n";
+
+            output += "<color><yellow>Last-Started:  <color><white>" + job.tStart.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            output += "<color><yellow>Last-Stopped:  <color><white>" + job.tStop.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            output += "<color><yellow>Last-Span:     <color><white>" + "+" + job.tSpan.Seconds + "s " + job.tSpan.Milliseconds + "ms" + "\n\n";
+
+            output += "\n\n<color><yellow>Notification-Rules:";
+
+            if (job.rules == null)
+                output += " <color><white>NULL";
+            else
+            {
+                if (job.rules.Count != 0)
+                    foreach (JobRule _rule in job.rules)
+                    {
+                        output += "\n  <color><yellow>>Target-OutDesc.: <color><white>" + _rule.outDescName;
+                        output += "\n  <color><yellow> Operation:       <color><white>" + _rule.oper.ToString();
+                        output += "\n  <color><yellow> Compare value:   <color><white>" + _rule.compareValue.ToString() + "\n";
+                    }
+                else
+                    output += "<color><white>EMPTY";
+            }
+
+            output += "\n\n<color><yellow>Notification-Settings: <color><white>";
+            if (job.settings != null)
+            {
+                output += "\n  <color><yellow>Smtp-Address:      <color><white>" + job.settings.login.smtpAddr;
+                output += "\n  <color><yellow>Smtp-Port:         <color><white>" + job.settings.login.port;
+                output += "\n  <color><yellow>Username (E-Mail): <color><white>" + job.settings.login.mail;
+                output += "\n  <color><yellow>Password:          <color><white>" + job.settings.login.password;
+                output += "\n  <color><yellow>Mails to send to:  <color><white>";
+
+                foreach (MailAddress _addr in job.settings.mailAddr)
+                    output += _addr.ToString() + " ";
+            }
+            else
+                output += "NULL";
+
             return output;
+        }
+
+        private string GetJobSpecificInfo(Job job)
+        {
+            switch (job.type)
+            { 
+                    // TO DO
+                default:
+                    return "";
+            }
+        }
+    }
+
+    public class JobOutDescInfoCommand : Command
+    { 
+        private JobSystem _js;
+
+        public JobOutDescInfoCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows the out-Descriptors of a job.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            lock(_js.jsLock)
+            {
+                JobNode _node = null;
+                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                if(_job != null)
+                {
+                    foreach(OutputDescriptor _desc in _job.outp.outputs)
+                    {
+                        output += "<color><yellow>>OutDesc.: <color><white>" + _desc.name + "\n";
+                        output += "<color><yellow> Type:     <color><white>" + _desc.dataType.ToString() + "\n\n";
+                    }
+                    return output;
+                }
+                else
+                    throw new JobException("Job does not exist!", null);
+            }
         }
     }
 
@@ -514,347 +610,65 @@ namespace MAD.CLICore
         }
     }
 
-    public class JobSystemSetJobMailSettingsCommand : NotificationConCommand
+    public class JobSystemEditJobCommand : Command
     {
         private JobSystem _js;
 
-        public JobSystemSetJobMailSettingsCommand(object[] args)
+        public JobSystemEditJobCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job to edit.", false, false, new Type[] { typeof(Int32) }));
+            oPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+            oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("notiEnable", "NOT. ENABLE-FLAG", "Enables the job to use notification.", true, false, null));
         }
 
         public override string Execute(int consoleWidth)
         {
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job == null)
-                throw new Exception("Job does not exist!");
-            _job.noti.settings = ParseJobNotificationSettings(pars);
-            return "<color><green>Notification-Settings set.";
-        }
-    }
-
-    public class JobSystemSetJobRulesCommand : NotificationRuleCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemSetJobRulesCommand(object[] args)
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            Job _job = _js.GetJob((int)pars.GetPar("id").argValues[0]);
-            if (_job == null)
-                throw new Exception("Job does not exist!");
-            _job.noti.rules = ParseJobNotificationRules(pars, _job.outp);
-            return "<color><green>Rules set.";
-        }
-    }
-
-
-    #region commands for adding jobs
-
-    public class JobSystemAddPingCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddPingCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-
-            oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) }));
-            oPar.Add(new ParOption("tout", "TIMEOUT", "Timeout of the ping.", false, false, new Type[] { typeof(int) })); 
-            description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            // Create an empty job.
-            JobPing _job = new JobPing();
-
-            // Set name.
-            _job.name = (string)pars.GetPar("n").argValues[0];
-
-            // Set jobTime.
-            _job.time = ParseJobTime(this);
-            
-            // Set job-specific settings.
-            if (OParUsed("ttl"))
-                _job.ttl = (int)pars.GetPar("ttl").argValues[0];
-
-            if (OParUsed("tout"))
-                _job.timeout = (int)pars.GetPar("tout").argValues[0];
-
-            // So now the JobPing is finished and set properly. 
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddHttpCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddHttpCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            oPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobHttp _job = new JobHttp();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            _job.port = (int)pars.GetPar("p").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddPortCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddPortCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("p", "PORT", "Port of the target.", false, false, new Type[] { typeof(int) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobPort _job = new JobPort();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            _job.port = (int)pars.GetPar("p").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddHostDetectCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddHostDetectCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
-            description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobHostDetect _job = new JobHostDetect();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddCheckSnmpCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddCheckSnmpCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("l", "SECURITY-LEVEL", "Level of used security", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "Protocol for authentification", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("p", "PRIV-PROTCOL", "Protocol for privacy", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobCheckSnmp _job = new JobCheckSnmp();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            _job.version = (uint)pars.GetPar("ver").argValues[0];
-
-            if (_job.version == 3)
+            lock (_js.jsLock)
             {
-                string _buffer = (string)pars.GetPar("s").argValues[0];
-                switch (_buffer)
+                JobNode _node = null;
+                Job _job = _js.UnsafeGetJob((Int32)pars.GetPar("id").argValues[0], out _node);
+
+                if (OParUsed("n"))
+                    _job.name = (string)pars.GetPar("n").argValues[0];
+
+                if (OParUsed("t"))
+                    _job.time = ParseJobTime(this);
+
+                if (OParUsed("rule"))
                 {
-                    case "authNoPriv":
-                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
-                        if (!(OParUsed("a") && !OParUsed("p")))
-                            return "<color><red>ERROR: Wrong Parameters Used";
-                        break;
-                    case "authPriv":
-                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
-                        if (!(OParUsed("a") && OParUsed("p")))
-                            return "<color><red>ERROR: Wrong Parameters Used";
-                        break;
-                    case "noAuthNoPriv":
-                        _job.secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
-                        if (!(!OParUsed("a") && !OParUsed("p")))
-                            return "<color><red>ERROR: Wrong Parameters Used";
-                        break;
-                    default:
-                        return "<color><red>ERROR: Wrong Security Level! choose between authNoPriv, authPriv and noAuthNoPriv";
+                    List<JobRule> _rules = ParseJobNotificationRules(pars, _job.outp);
+                    _job.rules = _rules;
                 }
 
-                _buffer = (string)pars.GetPar("a").argValues[0];
-                switch (_buffer)
-                {
-                    case "md5":
-                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
-                        break;
-                    case "sha":
-                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
-                        break;
-                    default:
-                        return "<color><red>ERROR: Wrong authentification Protocol! choose between md5, sha";
-                }
+                if (OParUsed("notiEnable"))
+                    _job.notiFlag = true;
+                else
+                    _job.notiFlag = false;
 
-                _buffer = (string)pars.GetPar("p").argValues[0];
-                switch (_buffer)
-                {
-                    case "aes":
-                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
-                        break;
-                    case "des":
-                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
-                        break;
-                    default:
-                        return "<color><red>ERROR: Wrong privacy Protocol! choose between aes, des";
-                }
+                return "<color><green>Job updated.";
             }
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddCheckFtpCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddCheckFtpCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("u", "USERNAME", "Username on the server.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("p", "PASSWORD", "Password on the server.", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobCheckFtp _job = new JobCheckFtp();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            _job.username = (string)pars.GetPar("u").argValues[0];
-            _job.password = (string)pars.GetPar("p").argValues[0];
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    public class JobSystemAddCheckDnsCommand : JobCommand
-    {
-        private JobSystem _js;
-
-        public JobSystemAddCheckDnsCommand(object[] args)
-            : base()
-        {
-            _js = (JobSystem)args[0];
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            JobCheckDns _job = new JobCheckDns();
-
-            _job.name = (string)pars.GetPar("n").argValues[0];
-            _job.time = ParseJobTime(this);
-
-            int _nodeID = (int)pars.GetPar("id").argValues[0];
-            _js.AddJobToNode(_nodeID, _job);
-            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
-        }
-    }
-
-    #endregion
-
-    #region commands for editing jobs
-
-    // TODO
-
-    #endregion
-
-    public class JobCommand : Command
-    {
-        public const string JOB_NAME = "n";
-        public const string JOB_ID = "id";
-        public const string JOB_TIME_PAR = "t";
- 
-
-        public JobCommand()
-            : base()
-        {
-            // GENERAL
-            rPar.Add(new ParOption(JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
-            
-            // TIME
-            oPar.Add(new ParOption(JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
-
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
         }
 
         public static JobTime ParseJobTime(Command c)
         {
             JobTime _buffer = new JobTime();
-            if (c.OParUsed(JOB_TIME_PAR))
+            if (c.OParUsed("t"))
             {
-                Type _argType = c.GetArgType(JOB_TIME_PAR);
+                Type _argType = c.GetArgType("t");
 
                 if (_argType == typeof(int))
                 {
                     _buffer.type = JobTime.TimeMethod.Relative;
-                    _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar(JOB_TIME_PAR).argValues[0]);
+                    _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
                 {
                     _buffer.type = JobTime.TimeMethod.Absolute;
-                    _buffer.jobTimes = JobTime.ParseStringArray(c.pars.GetPar(JOB_TIME_PAR).argValues);
+                    _buffer.jobTimes = JobTime.ParseStringArray(c.pars.GetPar("t").argValues);
                 }
             }
             else
@@ -865,29 +679,12 @@ namespace MAD.CLICore
             }
             return _buffer;
         }
-    }
-
-    // for JobNotification
-    public class NotificationRuleCommand : Command
-    {
-        public const string JOB_NOTI_RULE = "rule";
-
-        public NotificationRuleCommand()
-            : base()
-        {
-            rPar.Add(new ParOption(JOB_NOTI_RULE, "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
-        }
 
         public static List<JobRule> ParseJobNotificationRules(ParInput pars, JobOutput outp)
         {
             List<JobRule> _rules = new List<JobRule>();
 
-            object[] _args = pars.GetPar(JOB_NOTI_RULE).argValues;
+            object[] _args = pars.GetPar("rule").argValues;
             string _temp;
 
             foreach (object _arg in _args)
@@ -973,6 +770,330 @@ namespace MAD.CLICore
         }
     }
 
+    public class JobSystemSetJobMailSettingsCommand : NotificationConCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemSetJobMailSettingsCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("id", "JOB-ID", "ID of the job.", false, false, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            lock (_js.jsLock)
+            {
+                JobNode _node;
+                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                if (_job != null)
+                {
+                    _job.settings = ParseJobNotificationSettings(pars);
+                    return "<color><green>Rules set.";
+                }
+                else
+                    return "<color><red>Job does not exist!";
+            }
+        }
+    }
+
+    #region commands for adding jobs
+
+    public class JobSystemAddPingCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddPingCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+
+            oPar.Add(new ParOption("ttl", "TTL", "TTL of the ping.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("tout", "TIMEOUT", "Timeout of the ping.", false, false, new Type[] { typeof(int) })); 
+            description = "This command adds a job with the jobtype 'PingRequest' to the node with the given ID.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobPing _job = new JobPing();
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            if (OParUsed("ttl"))
+                _job.ttl = (int)pars.GetPar("ttl").argValues[0];
+
+            if (OParUsed("tout"))
+                _job.timeout = (int)pars.GetPar("tout").argValues[0];
+
+            // So now the JobPing is finished and set properly. 
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddHttpCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddHttpCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            oPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobHttp _job = new JobHttp();
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+            
+            if (OParUsed("p"))
+                _job.port = (int)pars.GetPar("p").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddPortCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddPortCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("p", "PORT", "Port of the target.", false, false, new Type[] { typeof(int) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobPort _job = new JobPort();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            _job.port = (int)pars.GetPar("p").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddHostDetectCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddHostDetectCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("m", "SUBNETMASK", "Subnetmask of the target Net", false, false, new Type[] { typeof(IPAddress) }));
+            description = "Checks the given Network for all IPAddresses. Mind that it won't work if Ping is blocked.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobHostDetect _job = new JobHostDetect();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            _job.Subnetmask = (IPAddress)pars.GetPar("m").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckSnmpCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckSnmpCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
+            oPar.Add(new ParOption("l", "SECURITY-LEVEL", "Level of used security", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "Protocol for authentification", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("p", "PRIV-PROTCOL", "Protocol for privacy", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobCheckSnmp _job = new JobCheckSnmp();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            _job.version = (uint)pars.GetPar("ver").argValues[0];
+
+            if (_job.version == 3)
+            {
+                string _buffer = (string)pars.GetPar("s").argValues[0];
+                switch (_buffer)
+                {
+                    case "authNoPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
+                        if (!(OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    case "authPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
+                        if (!(OParUsed("a") && OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    case "noAuthNoPriv":
+                        _job.secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
+                        if (!(!OParUsed("a") && !OParUsed("p")))
+                            return "<color><red>ERROR: Wrong Parameters Used";
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong Security Level! choose between authNoPriv, authPriv and noAuthNoPriv";
+                }
+
+                _buffer = (string)pars.GetPar("a").argValues[0];
+                switch (_buffer)
+                {
+                    case "md5":
+                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
+                        break;
+                    case "sha":
+                        _job.secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong authentification Protocol! choose between md5, sha";
+                }
+
+                _buffer = (string)pars.GetPar("p").argValues[0];
+                switch (_buffer)
+                {
+                    case "aes":
+                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
+                        break;
+                    case "des":
+                        _job.secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
+                        break;
+                    default:
+                        return "<color><red>ERROR: Wrong privacy Protocol! choose between aes, des";
+                }
+            }
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckFtpCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckFtpCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+            rPar.Add(new ParOption("u", "USERNAME", "Username on the server.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("p", "PASSWORD", "Password on the server.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobCheckFtp _job = new JobCheckFtp();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            _job.username = (string)pars.GetPar("u").argValues[0];
+            _job.password = (string)pars.GetPar("p").argValues[0];
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    public class JobSystemAddCheckDnsCommand : JobAddCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddCheckDnsCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobCheckDns _job = new JobCheckDns();
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = ParseJobTime(this);
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";
+        }
+    }
+
+    #endregion
+
+    #region parsing job parameters
+
+    public class JobAddCommand : Command
+    {
+        public const string JOB_NAME = "n";
+        public const string JOB_ID = "id";
+        public const string JOB_TIME_PAR = "t";
+ 
+        public JobAddCommand()
+            : base()
+        {
+            rPar.Add(new ParOption(JOB_NAME, "<JOB-NAME>", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JOB_ID, "<NODE-ID>", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption(JOB_TIME_PAR, "<TIME>", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static JobTime ParseJobTime(Command c)
+        {
+            JobTime _buffer = new JobTime();
+            if (c.OParUsed(JOB_TIME_PAR))
+            {
+                Type _argType = c.GetArgType(JOB_TIME_PAR);
+
+                if (_argType == typeof(int))
+                {
+                    _buffer.type = JobTime.TimeMethod.Relative;
+                    _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar(JOB_TIME_PAR).argValues[0]);
+                }
+                else if (_argType == typeof(string))
+                {
+                    _buffer.type = JobTime.TimeMethod.Absolute;
+                    _buffer.jobTimes = JobTime.ParseStringArray(c.pars.GetPar(JOB_TIME_PAR).argValues);
+                }
+            }
+            else
+            {
+                // default settings
+                _buffer.jobDelay = new JobDelayHandler(20000);
+                _buffer.type = JobTime.TimeMethod.Relative;
+            }
+            return _buffer;
+        }
+    }
+
     // for NotificationSettings
     public class NotificationConCommand : Command
     {
@@ -983,14 +1104,14 @@ namespace MAD.CLICore
         public NotificationConCommand()
             :base()
         {
-            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "SMTP-ADDR>:<SMTP-PORT", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "SMTP-MAIL>:<SMTP-PASS", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "TO-MAIL-ADDR", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
+            rPar.Add(new ParOption(NOTI_SMTP_ENDPOINT, "<SMTP-ADDR>:<SMTP-PORT>", "Serveraddress and Serverport.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_LOGIN, "<SMTP-MAIL>:<SMTP-PASS>", "From Mailaddress.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(NOTI_SMTP_MAILS, "<TO-MAIL-ADDR>", "Mailaddresses to send notifications to.", false, true, new Type[] { typeof(MailAddress) }));
         }
 
         public override string Execute(int consoleWidth)
-        {
-            throw new NotImplementedException();
+        { 
+            return null; 
         }
 
         public JobNotificationSettings ParseJobNotificationSettings(ParInput pars)
@@ -1008,7 +1129,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse SMTP-Port!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse SMTP-Port!", true));
                 }
             }
             else
@@ -1023,7 +1144,7 @@ namespace MAD.CLICore
                 }
                 catch (Exception)
                 {
-                    throw new Exception(CLIError.Error(CLIError.ErrorType.argTypeError, "Could not parse MailAddress!", true));
+                    throw new Exception(CLIError.Error(CLIError.ErrorType.ArgumentTypeError, "Could not parse MailAddress!", true));
                 }
 
                 _settings.login.password = _temp2[1];
@@ -1052,6 +1173,8 @@ namespace MAD.CLICore
             }
         }
     }
+
+    #endregion
 
     #endregion
 }

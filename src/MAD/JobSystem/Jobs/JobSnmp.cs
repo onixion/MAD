@@ -10,11 +10,8 @@ namespace MAD.JobSystemCore
     {
         #region fields
         public uint version;                                                            //required Parameter möglichkeiten 2 oder 3
-        public uint expectedIfNr = 10;                                                  //optional Parameter default (wie zu sehen) ist 10
 
-        public bool interfaceParUsed;                                                   //required Parameter, irgendwie a option -i oder sowas.. wenn der Parameter vorkimmt wead a Auflistung von Interfaces ausgegeben und zwar in der Menge von expectedIfNr
-
-        public string ifEntryNr;                                                        //required Parameter sofern !interfaceParUsed
+		public string ifEntryNr = MadConf.conf.snmpInterface;
 
         public NetworkHelper.securityModel secModel;                                    //required Parameter if version == 3
 
@@ -36,11 +33,6 @@ namespace MAD.JobSystemCore
         #endregion
 
         #region FromJob
-        protected override string JobStatus()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void Execute(IPAddress _targetAddress)
         {
             UdpTarget _target = new UdpTarget(_targetAddress, 161, 5000, 3);

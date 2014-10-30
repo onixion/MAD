@@ -1,0 +1,52 @@
+_______
+JobPing
+
+Dieser Job sendet einen Ping an die jeweilige Node. Falls der IPStatus des Pings ungleich 'Success' ist, wird
+der 'OutState' auf 'Failed' gesetzt, andernfalls auf 'Success' (der OutState 'Exception' wird nicht verwendet).
+
+Settings:
+
+	int ttl;
+	int timeout;
+
+OutDescriptors:
+
+	NAME: 'IPStatus'
+	TYPE: 'STRING'
+	DESCRIPTION: The status of the ping.
+	POSSIBLE VALUES: 'BadDestination', 'BadHeader', 'BadOption', 'BadRoute', 'DestinationHostUnreachable', 
+	'DestinationNetworkUnreachable', 'DestinationPortUnreachable', 'DestinationProhibited', 
+	'DestinationProtocolUnreachable', 'DestinationScopeMismatch', 'DestinationUnreachable', 
+	'HardwareError', 'IcmpError', 'NoResources', 'PacketTooBig', 'ParameterProblem', 'SourceQuench', 
+	'Success', 'TimedOut', 'TimeExceeded', 'TtlExpired', 'TtlReassemblyTimeExceeded', 'Unknown', 'UnrecognizedNextHeader'
+	
+	NAME: 'TTL'
+	TYPE: 'INT32'
+	DESCRIPTION: TTL remaining.
+	POSSIBLE VALUES: 0 <= TTL <= INT32.MAX
+	
+_______
+JobPort
+
+Dieser Job versucht eine TCP-Verbindung mit der jeweiligen Node herzustellen. Falls das Netzwerkgerät die Verbindung
+verweigert (Port closed, etc.) wird der 'OutState' auf 'Failed' gesetzt (der OutState 'Exception' wird nicht verwendet).
+
+Settings:
+
+	int port;
+	int timeout;
+
+OutDescriptors:
+
+_______
+JobHttp
+
+Dieser Job sendet eine HTTP-Anfrage an die Node. Falls das Netzwerkgerät die Verbindung
+verweigert (Port closed, etc.) wird der 'OutState' auf 'Failed' gesetzt (der OutState 'Exception' wird nicht verwendet).
+
+Settings:
+
+	int port;
+	int timeout;
+
+OutDescriptors:

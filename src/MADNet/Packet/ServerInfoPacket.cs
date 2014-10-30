@@ -6,7 +6,6 @@ namespace MadNet
 {
     public class ServerInfoPacket : Packet
     {
-
         public byte[] serverHeader { get; set; }
         public byte[] serverVersion { get; set; }
 

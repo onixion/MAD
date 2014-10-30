@@ -8,12 +8,110 @@ using SnmpSharpNet;
 
 namespace MAD.CLICore
 {
-    public class SnmpInterfaceCommand : Command
+    public abstract class SnmpCommand : Command
     {
-        #region fields
-        public NetworkHelper.securityModel secModel; 
-        
-        private uint _version;
+        protected uint version;
+        protected NetworkHelper.securityModel secModel;
+
+        public SnmpCommand()
+            : base()
+        {
+            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
+            oPar.Add(new ParOption("p", "PRIV-PROTOCOL", "privPro", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "authProt", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("s", "SECURITY-LEVEL", "security", false, false, new Type[] { typeof(string) }));
+        }
+
+        protected void ParseParameters()
+        {
+            ParseVersion();
+            if (version == 3)
+            {
+                ParseSecurityLevel();
+                ParseAuthentificationProtocol();
+                ParsePrivacyProtocol();
+            }
+        }
+
+        protected void ParseVersion()
+        {
+            version = (uint)pars.GetPar("ver").argValues[0];
+        }
+
+        protected void ParseSecurityLevel()
+        {
+            string _buffer = (string)pars.GetPar("s").argValues[0];
+            switch (_buffer)
+            {
+                case "authNoPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
+                    if (!(OParUsed("a") && !OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        throw new ArgumentException("Wrong Parameters Used");
+                    }
+                    break;
+                case "authPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
+                    if (!(OParUsed("a") && OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        throw new ArgumentException("Wrong Parameters Used");
+                    }
+                    break;
+                case "noAuthNoPriv":
+                    secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
+                    if (!(!OParUsed("a") && !OParUsed("p")))
+                    {
+                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
+                        throw new ArgumentException("Wrong Parameters Used");
+                    }
+                    break;
+                default:
+                    Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
+                    throw new ArgumentException("Unknown Error with Parameters");
+            }
+        }
+
+        protected void ParseAuthentificationProtocol()
+        {
+            string _buffer = (string)pars.GetPar("a").argValues[0];
+            switch (_buffer)
+            {
+                case "md5":
+                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
+                    break;
+                case "sha":
+                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
+                    break;
+                default:
+                    Logger.Log("Wrong algorithm used for snmp device request authentification", Logger.MessageType.ERROR);
+                    throw new ArgumentException("Wrong algorithm used");
+            }
+
+        }
+
+        protected void ParsePrivacyProtocol()
+        {
+            string _buffer = (string)pars.GetPar("p").argValues[0];
+            switch (_buffer)
+            {
+                case "aes":
+                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
+                    break;
+                case "des":
+                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
+                    break;
+                default:
+                    Logger.Log("Wrong algrorithm used for snmp device request privacy", Logger.MessageType.ERROR);
+                    throw new ArgumentException("Wrong algorithm used");
+            }
+        }
+    }
+
+    public class SnmpInterfaceCommand : SnmpCommand
+    {
+        #region fields       
         private uint _expectedIfNr = 10;
         
         private IPAddress _targetIP;
@@ -30,12 +128,9 @@ namespace MAD.CLICore
         #region methods
         #region inheritedFromCommand
         public SnmpInterfaceCommand()
-        {
-            rPar.Add(new ParOption("ver", "VERSION", "Version of SNMP to use.", false, false, new Type[] { typeof(uint) }));
-            rPar.Add(new ParOption("ip", "Target-IP", "Target.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("p", "PRIV-PROTOCOL", "privPro", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("a", "AUTH-PROTOCOL", "authProt", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("s", "SECURITY-LEVEL", "security", false, false, new Type[] { typeof(string) }));
+            : base()
+        {         
+            rPar.Add(new ParOption("ip", "Target-IP", "Target.", false, false, new Type[] { typeof(string) }));           
         }
 
         public override string Execute(int consoleWidth)
@@ -44,6 +139,7 @@ namespace MAD.CLICore
 
             try
             {
+                ParseIP();
                 ParseParameters();
             }
             catch (ArgumentException ex)
@@ -56,7 +152,7 @@ namespace MAD.CLICore
 
             
 
-            if (_version == 2)
+            if (version == 2)
             {
                 AgentParameters _param = NetworkHelper.GetSNMPV2Param(NetworkHelper.SNMP_COMMUNITY_STRING);
 
@@ -71,7 +167,7 @@ namespace MAD.CLICore
 
                 return _output; 
             }
-            else if (_version == 3)
+            else if (version == 3)
             {
                 SecureAgentParameters _param = NetworkHelper.GetSNMPV3Param(_target, NetworkHelper.SNMP_COMMUNITY_STRING, secModel);
 
@@ -138,19 +234,6 @@ namespace MAD.CLICore
             {
                 return 0;
             }
-
-        }
-
-        private void ParseParameters()
-        {
-            ParseIP();
-            ParseVersion();
-            if (_version == 3)
-            {
-                ParseSecurityLevel();
-                ParseAuthentificationProtocol();
-                ParsePrivacyProtocol();
-            }
         }
 
         private void ParseIP()
@@ -163,81 +246,6 @@ namespace MAD.CLICore
             }
             else
                 _targetIP = IPAddress.Parse(_buffer);
-        }
-
-        private void ParseVersion()
-        {
-            _version = (uint)pars.GetPar("ver").argValues[0];
-        }
-
-        private void ParseSecurityLevel()
-        {
-            string _buffer = (string)pars.GetPar("s").argValues[0];
-            switch (_buffer)
-            {
-                case "authNoPriv":
-                    secModel.securityLevel = NetworkHelper.securityLvl.authNoPriv;
-                    if (!(OParUsed("a") && !OParUsed("p")))
-                    {
-                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                        throw new ArgumentException("Wrong Parameters Used");
-                    }
-                    break;
-                case "authPriv":
-                    secModel.securityLevel = NetworkHelper.securityLvl.authPriv;
-                    if (!(OParUsed("a") && OParUsed("p")))
-                    {
-                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                        throw new ArgumentException("Wrong Parameters Used");
-                    }
-                    break;
-                case "noAuthNoPriv":
-                    secModel.securityLevel = NetworkHelper.securityLvl.noAuthNoPriv;
-                    if (!(!OParUsed("a") && !OParUsed("p")))
-                    {
-                        Logger.Log("SNMP Request for devices failt because off wrong parameters.", Logger.MessageType.ERROR);
-                        throw new ArgumentException("Wrong Parameters Used");
-                    }
-                    break;
-                default:
-                    Logger.Log("Unknown Error with SNMP device request parameters", Logger.MessageType.ERROR);
-                    throw new ArgumentException("Unknown Error with Parameters");
-            }
-        }
-
-        private void ParseAuthentificationProtocol()
-        {
-            string _buffer = (string)pars.GetPar("a").argValues[0];
-            switch (_buffer)
-            {
-                case "md5":
-                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.MD5;
-                    break;
-                case "sha":
-                    secModel.authentificationProtocol = NetworkHelper.snmpProtocols.SHA;
-                    break;
-                default:
-                    Logger.Log("Wrong algorithm used for snmp device request authentification", Logger.MessageType.ERROR);
-                    throw new ArgumentException("Wrong algorithm used");
-            }
-
-        }
-
-        private void ParsePrivacyProtocol()
-        {
-            string _buffer = (string)pars.GetPar("p").argValues[0];
-            switch (_buffer)
-            {
-                case "aes":
-                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.AES;
-                    break;
-                case "des":
-                    secModel.privacyProtocol = NetworkHelper.snmpProtocols.DES;
-                    break;
-                default:
-                    Logger.Log("Wrong algrorithm used for snmp device request privacy", Logger.MessageType.ERROR);
-                    throw new ArgumentException("Wrong algorithm used");
-            }
         }
 
         private void PreparePackets()
@@ -320,5 +328,45 @@ namespace MAD.CLICore
         }
         #endregion 
         #endregion
+    }
+
+    public class JobSystemAddReadTrafficCommand : SnmpCommand
+    {
+        private JobSystem _js;
+
+        public JobSystemAddReadTrafficCommand(object[] args)
+            : base()
+        {
+            _js = (JobSystem)args[0];
+
+            rPar.Add(new ParOption(JobAddCommand.JOB_NAME, "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption(JobAddCommand.JOB_ID, "NODE-ID", "ID of the node to add the job to.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption(JobAddCommand.JOB_TIME_PAR, "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
+
+			description = "This Command will try to read the outgoing traffic out of a host. Don't forget to set the credentials to public, MADMADMAD and MADMADMAD again. \n Also if it doesn't work, you may check the interface in the config file and compare it to the snmpinterface command";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            JobSnmp _job = new JobSnmp();
+            try
+            {
+                ParseParameters();
+            }
+            catch(Exception ex)
+            {
+                return ex.Data.ToString();
+            }
+
+            _job.secModel = secModel;
+            _job.version = version;
+
+            _job.name = (string)pars.GetPar("n").argValues[0];
+            _job.time = JobAddCommand.ParseJobTime(this);
+
+            int _nodeID = (int)pars.GetPar("id").argValues[0];
+            _js.AddJobToNode(_nodeID, _job);
+            return "<color><green>Job (ID " + _job.id + ") added to node (ID " + _nodeID + ").";          
+        }
     }
 }

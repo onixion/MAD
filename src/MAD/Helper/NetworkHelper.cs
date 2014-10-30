@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Generic;
 
 using SnmpSharpNet;
 
@@ -48,6 +49,14 @@ namespace MAD.Helper
         #endregion
 
         #region Methods
+
+        public static uint GetHosts(uint subnet)
+        {
+            uint hosts = (uint) Math.Pow(2, 32 - subnet);
+
+            return hosts; 
+        }
+
         public Byte[] GetHosts(IPAddress subnet)                                    //returns the maximal number of hosts for a given subnetmask INCLUSIVE Netaddress and Broadcastaddress!!!
         {
             byte[] subnetBytes = subnet.GetAddressBytes();
@@ -67,7 +76,7 @@ namespace MAD.Helper
             return (subnetBytes);
         }
 
-        public bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
+        public static bool IsDhcp(byte[] data)                                             //Checks if udp datagramm is dhcp
         {
             if (data[DHCP_COOKIE_POSITION] == DHCP_COOKIE_BYTE0_VALUE 
                 && data[DHCP_COOKIE_POSITION + 1] == DHCP_COOKIE_BYTE1_VALUE 
@@ -79,7 +88,7 @@ namespace MAD.Helper
             else return false;
         }
 
-        public bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
+        public static bool IsDhcpRequest(byte[] data)                                      //Checks if udp datagramm (which should already be checked if dhcp) is a request
         {
             for (uint i = DHCP_COOKIE_POSITION; i < data.Length; i++)
             {
@@ -92,7 +101,7 @@ namespace MAD.Helper
             return false;
         }
 
-        public string getMacString(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
+        public static string getMacStringFromDhcp(byte[] data)                                     //Filters the MAC Address out of a dhcp packet (therefor it should be only used if already checkt wether it is a dhcp packet or not) 
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";
@@ -107,7 +116,22 @@ namespace MAD.Helper
             return macAddress;
         }
 
-        public string getPhysicalAddressString(byte[] data)                         // same as ^ but without doubledots, so PhysicalAddress Class can parse it
+        public static string getMacStringFromArp(byte[] data)                                     //Filters the MAC Address out of a arp packet (therefor it should be only used if already checkt wether it is a arp packet or not) 
+        {
+            byte[] macBytes = new byte[6];
+            string macAddress = "";
+
+            for (uint i = 0; i < 6; i++)
+            {
+                macBytes[i] = data[i];
+                macAddress += String.Format("{0:X02}", macBytes[i]);
+                if (i < 5)
+                    macAddress += ":";
+            }
+            return macAddress;
+        }
+
+        public static string getPhysicalAddressStringFromDhcp(byte[] data)                         // same as ^ but without doubledots, so PhysicalAddress Class can parse it
         {
             byte[] macBytes = new byte[6];
             string macAddress = "";
@@ -116,6 +140,20 @@ namespace MAD.Helper
             {
                 macBytes[i - 28] = data[i];
                 macAddress += String.Format("{0:X02}", macBytes[i - 28]);
+                macAddress.ToUpperInvariant();
+            }
+            return macAddress;
+        }
+
+        public static string getPhysicalAddressStringFromArp(byte[] data)
+        {
+            byte[] macBytes = new byte[6];
+            string macAddress = "";
+
+            for (uint i = 0; i < 6; i++)
+            {
+                macBytes[i] = data[i];
+                macAddress += String.Format("{0:X02}", macBytes[i]);
                 macAddress.ToUpperInvariant();
             }
             return macAddress;
@@ -169,100 +207,5 @@ namespace MAD.Helper
             return _param; 
         }
         #endregion
-    }
-
-    public class ModelHost                                                         //A class which provides all importand information for a host - feel free to put more in it!
-    {
-        public uint ID;
-
-        public IPAddress hostIP;
-        public string hostName;
-        public string hostMac;
-
-        public bool nameGiven, macGiven, ipGiven;
-
-        private static uint _count = 0;
-
-        public ModelHost()
-        {
-            macGiven = ipGiven = nameGiven = false;
-
-            ID = _count;
-
-            hostMac = null;
-            hostName = null;
-            hostIP = null;
-
-        }
-
-        public ModelHost(string MAC)
-        {
-            macGiven = true;
-            ipGiven = nameGiven = false;
-
-            ID = _count;
-
-            hostMac = MAC;
-            hostName = null;
-            hostIP = null;
-
-            _count++;
-        }
-
-        public ModelHost(string MAC, IPAddress address)
-        {
-            macGiven = ipGiven = true;
-            nameGiven = false;
-
-            ID = _count;
-
-            hostMac = MAC;
-            hostIP = address; 
-            hostName = null;
-
-            _count++;
-        }
-
-        public ModelHost(string MAC, string name)
-        {
-            nameGiven = macGiven = true;
-            ipGiven = false;
-
-            ID = _count;
-
-            hostMac = MAC;
-            hostName = name;
-            hostIP = null;
-
-            _count++;
-        }
-
-        public ModelHost(string MAC, IPAddress address, string name)
-        {
-            nameGiven = ipGiven = macGiven = true;
-
-            ID = _count;
-
-            hostMac = MAC;
-            hostIP = address;
-            hostName = name;
-
-            _count++;
-        }
-
-        public void ManuallyIncreaseCount()
-        {
-            _count++;
-        }
-
-        public void ManuallyDecreaseCount()
-        {
-            _count--;
-        }
-
-        ~ModelHost()
-        {
-            _count--;
-        }
     }
 }

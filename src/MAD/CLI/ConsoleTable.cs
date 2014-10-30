@@ -4,15 +4,12 @@ namespace MAD.CLICore
 {
     public static class ConsoleTable
     {
-        #region members
+        #region methods
 
-        public static string splitline = "".PadRight(Console.BufferWidth, '_');
-        public static string splitline2 = "".PadRight(Console.BufferWidth, '-');
-        public static string splitline3 = "".PadRight(Console.BufferWidth, '.');
-
-        #endregion
-
-        #region methodes
+        public static string GetSplitline(int width)
+        { 
+            return "".PadRight(Console.BufferWidth, '_');
+        }
 
         public static string FormatStringArray(int consoleWidth, params string[] data)
         {
