@@ -9,6 +9,7 @@ using PacketDotNet;
 using MAD;
 using MAD.Logging;
 using MAD.Helper;
+using MAD.JobSystemCore;
 
 namespace MAD.MacFinders
 {
@@ -67,6 +68,40 @@ namespace MAD.MacFinders
                 _buffer += dev.ToString() + "\n";
 
             return _buffer;
+        }
+
+        public void SteadyStart(object jsArg)
+        {
+            Thread _steady = new Thread(SteadyStartsFunktion);
+            _steady.Start(jsArg);
+        }
+
+        private void SteadyStartsFunktion(object jsArg)
+        {
+            while (work)
+            {
+                JobSystem _js = (JobSystem)jsArg;
+                Start();
+                _js.SyncNodes(ModelHost.hostList);
+                Thread.Sleep(50000);                                                                //too tired, fixing tomorrow
+                if (!work)
+                    break;
+                Thread.Sleep(50000);
+                if (!work)
+                    break;
+                Thread.Sleep(50000);
+                if (!work)
+                    break;
+                Thread.Sleep(50000);
+                if (!work)
+                    break;
+                Thread.Sleep(50000);
+                if (!work)
+                    break;
+                Thread.Sleep(50000);
+                if (!work)
+                    break;
+            }
         }
 
         private void SendRequests()
