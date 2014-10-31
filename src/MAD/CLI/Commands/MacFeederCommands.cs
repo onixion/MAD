@@ -150,6 +150,22 @@ namespace MAD.CLICore
             return "<color><blue>Updated list";
         }
     }
+
+    public class StopArpReaderCommand : Command
+    {
+        public StopArpReaderCommand()
+            : base()
+        {
+            description = "Use this command to stop a steady Arp Scan";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            ARPReader.SteadyStop();
+            return "<color><blue>Arp Reader stopped";
+        }
+    }
+
     #endregion 
 
     #region stuff

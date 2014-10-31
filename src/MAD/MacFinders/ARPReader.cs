@@ -19,6 +19,8 @@ namespace MAD.MacFinders
         private ICaptureDevice _dev;
         private ICaptureDevice _listenDev;
 
+        private static Thread _steady;
+
         public uint networkInterface = MadConf.conf.arpInterface;
         public uint subnetMask;
         public IPAddress netAddress;
@@ -72,35 +74,23 @@ namespace MAD.MacFinders
 
         public void SteadyStart(object jsArg)
         {
-            Thread _steady = new Thread(SteadyStartsFunktion);
+            _steady = new Thread(SteadyStartsFunktion);
             _steady.Start(jsArg);
+        }
+
+        public static void SteadyStop()
+        {
+            _steady.Abort();
         }
 
         private void SteadyStartsFunktion(object jsArg)
         {
-            while (work)
+            while (true)
             {
                 JobSystem _js = (JobSystem)jsArg;
                 Start();
                 _js.SyncNodes(ModelHost.hostList);
-                Thread.Sleep(50000);                                                                //too tired, fixing tomorrow
-                if (!work)
-                    break;
-                Thread.Sleep(50000);
-                if (!work)
-                    break;
-                Thread.Sleep(50000);
-                if (!work)
-                    break;
-                Thread.Sleep(50000);
-                if (!work)
-                    break;
-                Thread.Sleep(50000);
-                if (!work)
-                    break;
-                Thread.Sleep(50000);
-                if (!work)
-                    break;
+                Thread.Sleep(300000);                                                                //too tired, fixing tomorrow
             }
         }
 

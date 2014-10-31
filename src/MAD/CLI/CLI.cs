@@ -51,6 +51,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { dhcpReader }));
             commands.Add(new CommandOptions("arp reader list interfaces", typeof(PrintArpReadyInterfaces), null));
             commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), new object[] { js }));
+            commands.Add(new CommandOptions("arp reader stop", typeof(StopArpReaderCommand), null));
+
             commands.Add(new CommandOptions("check list", typeof(CheckList), new object[] { js }));
 
             // JOBSYSTEM
