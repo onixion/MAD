@@ -5,6 +5,7 @@ using System.IO;
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
 using MAD.MacFinders;
+using MAD.Logging;
 using CLIIO;
 
 namespace MAD.CLICore
@@ -104,6 +105,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
             */
+
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(StrgCHandler);
         }
 
         #endregion
@@ -147,6 +150,12 @@ namespace MAD.CLICore
                     CLIOutput.WriteToConsole(response);
                 }
             }
+        }
+
+        private static void StrgCHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            Logger.Log("Exited by sending Ctrl+C", Logger.MessageType.INFORM);
+            Logger.ForceWriteToLog();
         }
 
         #endregion
