@@ -20,15 +20,10 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
-
         [JsonIgnore]
         public const int MAXJOBS = 100;
-
-        /* This bool represents the state of the node. The node can
-         * be active (state = 1) or inactive (state = 0). */
         [JsonIgnore]
-        public int state = 0;
-        /* This counter shows how many jobs are working. */
+        public int state = 0; //active (state = 1) or inactive (state = 0)
         [JsonIgnore]
         public int uWorker = 0;
 
