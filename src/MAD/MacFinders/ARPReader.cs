@@ -9,6 +9,7 @@ using PacketDotNet;
 using MAD;
 using MAD.Logging;
 using MAD.Helper;
+using MAD.JobSystemCore;
 
 namespace MAD.MacFinders
 {
@@ -17,6 +18,8 @@ namespace MAD.MacFinders
         private CaptureDeviceList _list;
         private ICaptureDevice _dev;
         private ICaptureDevice _listenDev;
+
+        private static Thread _steady;
 
         public uint networkInterface = MadConf.conf.arpInterface;
         public uint subnetMask;
@@ -67,6 +70,28 @@ namespace MAD.MacFinders
                 _buffer += dev.ToString() + "\n";
 
             return _buffer;
+        }
+
+        public void SteadyStart(object jsArg)
+        {
+            _steady = new Thread(SteadyStartsFunktion);
+            _steady.Start(jsArg);
+        }
+
+        public static void SteadyStop()
+        {
+            _steady.Abort();
+        }
+
+        private void SteadyStartsFunktion(object jsArg)
+        {
+            while (true)
+            {
+                JobSystem _js = (JobSystem)jsArg;
+                Start();
+                _js.SyncNodes(ModelHost.hostList);
+                Thread.Sleep(300000);                                                                //too tired, fixing tomorrow
+            }
         }
 
         private void SendRequests()

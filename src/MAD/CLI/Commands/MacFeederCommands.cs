@@ -107,6 +107,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("s", "SUBNETMASK", "The Subnetmask of the Network. ie 16 for a /16 subnet", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("n", "NETWORK", "The Network Address. Something like 192.168.1.0", false, false, new Type[] { typeof(IPAddress) }));
 
+            oPar.Add(new ParOption("o", "ONE-SHOT", "Use this option to just make one scan", true, false, null));
             description = "Starts looking for hosts via ARP";
         }
 
@@ -117,9 +118,17 @@ namespace MAD.CLICore
             _reader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
             _reader.subnetMask = (uint)pars.GetPar("s").argValues[0];
 
-            _reader.Start();
-            _js.SyncNodes(ModelHost.hostList);
-            return "<color><blue>Successfully performed Scan";
+            if (OParUsed("o"))
+            {
+                _reader.Start();
+                _js.SyncNodes(ModelHost.hostList);
+                return "<color><blue>Successfully performed Scan";
+            }
+            else
+            {
+                _reader.SteadyStart(_js);
+                return "<color><blue> Started steady arp reader";
+            }
         }
     }
 
@@ -141,6 +150,22 @@ namespace MAD.CLICore
             return "<color><blue>Updated list";
         }
     }
+
+    public class StopArpReaderCommand : Command
+    {
+        public StopArpReaderCommand()
+            : base()
+        {
+            description = "Use this command to stop a steady Arp Scan";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            ARPReader.SteadyStop();
+            return "<color><blue>Arp Reader stopped";
+        }
+    }
+
     #endregion 
 
     #region stuff

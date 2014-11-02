@@ -82,6 +82,7 @@ namespace MAD.MacFinders
                 _running = false;
 
                 _pool.Cancel();
+                _pool.Shutdown();
 
                 if (_check.ThreadState != ThreadState.Unstarted)
                     _check.Join(TimeSpan.FromSeconds(3));
