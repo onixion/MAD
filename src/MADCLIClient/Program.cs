@@ -49,10 +49,6 @@ namespace CLIClient
                 Console.ReadKey();
                 return 0;
             }
-            else if( args.Length == 0)
-            {
-                // do nothing
-            }
             else
             {
                 CLIOutput.WriteToConsole("To many args! .. switching to CLI-Setup-Assistent ..");
@@ -214,6 +210,12 @@ namespace CLIClient
             try
             {
                 _client.Connect();
+
+                _client.GetServerInfo();
+                _client.MakeHandshake();
+                _client.Login();
+
+                _client.StartRemoteCLI();
             }
             catch (Exception e)
             {

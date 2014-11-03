@@ -100,94 +100,98 @@ namespace MAD.CLIServerCore
             {
                 TcpClient _client = (TcpClient)clientObject;
                 NetworkStream _stream = _client.GetStream();
-                _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
+                AES _aes = null;
+                bool _login = false;
 
                 if (_debugMode)
                     Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") connected.");
                 if (_logMode)
                     Logger.Log("Client (" + _clientEndPoint.Address + ") connected.", Logger.MessageType.INFORM);
 
-                if (_userOnline)
-                    throw new Exception("User already online!");
-
-                // send server info
-                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+                while (true)
                 {
-                    _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_serverHeader);
-                    _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_serverVer);
-                    _serverInfoP.SendPacket();
+                    using (DataPacket _dataP = new DataPacket(_stream, null))
+                    {
+                        _dataP.ReceivePacket();
+
+                        switch (_dataP.data[0])
+                        {
+                            case 0: // info
+                                SendServerInfo(_stream);
+                                break;
+                            case 1: // SSL handshake
+                                _aes = MakeHandshake(_stream);
+                                break;
+                            case 2: // login
+                                _login = Login(_stream, _aes);
+                                break;
+                            case 3: // start remote cli
+                                if (_login)
+                                {
+                                    CLISession _session = new CLISession(_stream, _aes, _js);
+                                    _session.InitCommands();
+                                    _session.Start();
+                                }
+                                break;
+                            case 4:
+                                throw new Exception("Client disconnected!");
+                            default:
+                                break;
+                        }
+                    }
                 }
-
-                SslStream _sStream = new SslStream(_stream);
-                _sStream.AuthenticateAsServer(_certificate);
-
-                // RECEIVE AES KEY
-                string _aesKey = "";
-                using (SSLPacket _sslP = new SSLPacket(_sStream))
-                { 
-                    _sslP.ReceivePacket();
-                    _aesKey = Encoding.Unicode.GetString(_sslP.data);
-                }
-
-                AES _aes = new AES(_aesKey);
-
-                // receive login packet
-                bool _loginSuccess;
-                using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
-                {
-                    _loginP.ReceivePacket();
-                    _loginSuccess = Login(_loginP);
-                }
-
-                // send result
-                using (DataPacket _dataP = new DataPacket(_stream, _aes))
-                {
-                    if (_loginSuccess)
-                        _dataP.data = Encoding.Unicode.GetBytes("LOGIN_SUCCESS");
-                    else
-                        _dataP.data = Encoding.Unicode.GetBytes("LOGIN_DENIED");
-                    _dataP.SendPacket();
-                }
-
-                if (_loginSuccess)
-                {
-                    CLISession _session = new CLISession(_stream, _aes, _js);
-                    _session.InitCommands();
-                    _session.Start();
-                }
-
-                _client.Close();
             }
             catch (Exception e)
             {
                 if (_debugMode)
-                    Console.WriteLine(GetTimeStamp() + " CLISERVER: " + e.Message);
+                    Console.WriteLine(GetTimeStamp() + " Client (" + _clientEndPoint.Address + ") disconnected.");
                 if (_logMode)
-                    Logger.Log("CLISERVER: " + e.Message, Logger.MessageType.INFORM);
+                    Logger.Log("Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
             }
-
-            if (_debugMode)
-                Console.WriteLine(GetTimeStamp() + "CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.");
-            if (_logMode)
-                Logger.Log("CLISERVER: Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
 
             return null;
         }
 
-        private bool Login(LoginPacket loginP)
+        private AES MakeHandshake(NetworkStream stream)
         {
-            if (loginP.user.Length != 0 || loginP.passMD5.Length != 0)
+            using (SslStream _sStream = new SslStream(stream))
             {
-                string _userUnicode = Encoding.Unicode.GetString(loginP.user);
-                string _passUnicode = Encoding.Unicode.GetString(loginP.passMD5);
+                _sStream.AuthenticateAsServer(_certificate);
 
-                if (_userUnicode == _user && _passUnicode == _pass)
-                    return true;
+                using (StreamReader _reader = new StreamReader(_sStream))
+                    return new AES(_reader.ReadLine());
+            }
+        }
+
+        private void SendServerInfo(NetworkStream stream)
+        {
+            using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+            {
+                _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_serverHeader);
+                _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_serverVer);
+                _serverInfoP.SendPacket();
+            }
+        }
+
+        private bool Login(NetworkStream stream, AES aes)
+        {
+            using (LoginPacket _loginP = new LoginPacket(stream, aes))
+            {
+                _loginP.ReceivePacket();
+
+                if (_loginP.user.Length != 0 || _loginP.passMD5.Length != 0)
+                {
+                    string _userUnicode = Encoding.Unicode.GetString(_loginP.user);
+                    string _passUnicode = Encoding.Unicode.GetString(_loginP.passMD5);
+
+                    if (_userUnicode == _user && _passUnicode == _pass)
+                        return true;
+                    else
+                        return false;
+                }
                 else
                     return false;
             }
-            else
-                return false;
         }
 
         private string GetTimeStamp()
