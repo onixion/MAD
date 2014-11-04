@@ -31,7 +31,7 @@ namespace MAD.MacFinders
             Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
             _list = CaptureDeviceList.Instance;
             Thread _send = new Thread(SendRequests);
-            Thread _listen = new Thread(ListenForRequests);
+            Thread _listen = new Thread(ListenForFloodResponses);
             _listen.Start();
             Thread.Sleep(10);
             _send.Start();
@@ -44,7 +44,7 @@ namespace MAD.MacFinders
             _dev.Close();
             Thread.Sleep(100);
             _listenDev.Close();
-
+            
         }
 
         public string ListInterfaces()
@@ -53,6 +53,7 @@ namespace MAD.MacFinders
 
             _list = CaptureDeviceList.Instance;
 
+            uint _count = 1;
             string _buffer = "";
 
             if (_list.Count < 1)
@@ -67,8 +68,11 @@ namespace MAD.MacFinders
             _buffer += "\n";
 
             foreach (ICaptureDevice dev in _list)
+            {
+                _buffer += "Nr " + _count.ToString() + "\n";
                 _buffer += dev.ToString() + "\n";
 
+            }
             return _buffer;
         }
 
@@ -90,7 +94,7 @@ namespace MAD.MacFinders
                 JobSystem _js = (JobSystem)jsArg;
                 Start();
                 _js.SyncNodes(ModelHost.hostList);
-                Thread.Sleep(300000);                                                                //too tired, fixing tomorrow
+                Thread.Sleep(300000);
             }
         }
 
@@ -107,9 +111,8 @@ namespace MAD.MacFinders
 
             _dev = _list[(int) networkInterface];
             _dev.Open();
-            PhysicalAddress _sourceHW = _dev.MacAddress;
 
-            EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
 
             byte[] _targetBytes = new byte[4];
 
@@ -121,25 +124,30 @@ namespace MAD.MacFinders
 
                 IPAddress _target = new IPAddress(_targetBytes);
 
-                ARPPacket _arppac = new ARPPacket(ARPOperation.Request, 
-                                                    System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"), 
-                                                    _target, 
-                                                    _sourceHW, 
-                                                    srcAddress);
-                _ethpac.PayloadPacket = _arppac;
-
-                try
-                {
-                    _dev.SendPacket(_ethpac);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
-                }
+                ExecuteRequests(_ethpac, _target);
             }   
         }
 
-        private void ListenForRequests()
+        private void ExecuteRequests(EthernetPacket pacBase, IPAddress destIP)
+        {
+            ARPPacket _arppac = new ARPPacket(ARPOperation.Request,
+                                                System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"),
+                                                destIP,
+                                                pacBase.SourceHwAddress,
+                                                srcAddress);
+            pacBase.PayloadPacket = _arppac;
+
+            try
+            {
+                _dev.SendPacket(pacBase);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
+            }
+        }
+
+        private void ListenForFloodResponses()
         {
             Logger.Log("Started listening for Responses on ArpFlood..", Logger.MessageType.INFORM);
             _listenDev = _list[(int)networkInterface];
@@ -148,6 +156,17 @@ namespace MAD.MacFinders
             _listenDev.Open(DeviceMode.Normal);
             _listenDev.StartCapture();
             
+        }
+
+        private void ListenForCheckResponses()
+        {
+            Logger.Log("Started listening for Responses on ArpFlood..", Logger.MessageType.INFORM);
+            _listenDev = _list[(int)networkInterface];
+
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ParseArpPackets);
+            _listenDev.Open(DeviceMode.Normal);
+            _listenDev.StartCapture();
+
         }
 
         private void ParseArpPackets(object sender, CaptureEventArgs packet)
