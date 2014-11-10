@@ -93,7 +93,7 @@ namespace CLIClient
                 using (DataPacket _dataP = new DataPacket(_stream, null, new byte[] { 1 }))
                     _dataP.SendPacket();
 
-                using (SslStream _sStream = new SslStream(_stream))
+                using (SslStream _sStream = new SslStream(_stream, false, new RemoteCertificateValidationCallback(CheckSSLCertification), null))
                 {
                     _sStream.AuthenticateAsClient("MAD");
                     cert = (X509Certificate2)_sStream.RemoteCertificate;
@@ -107,6 +107,11 @@ namespace CLIClient
             }
             else
                 throw new Exception("Not connected!");
+        }
+
+        private bool CheckSSLCertification(object o, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
+            return true;
         }
 
         public void Login()

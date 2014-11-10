@@ -100,6 +100,8 @@ namespace MAD.CLIServerCore
             {
                 TcpClient _client = (TcpClient)clientObject;
                 NetworkStream _stream = _client.GetStream();
+                _clientEndPoint = (IPEndPoint) _client.Client.RemoteEndPoint;
+
                 AES _aes = null;
                 bool _login = false;
 
@@ -154,7 +156,7 @@ namespace MAD.CLIServerCore
 
         private AES MakeHandshake(NetworkStream stream)
         {
-            using (SslStream _sStream = new SslStream(stream))
+            using (SslStream _sStream = new SslStream(stream, false, new RemoteCertificateValidationCallback(CheckSSLCertificate), null))
             {
                 _sStream.AuthenticateAsServer(_certificate);
 
@@ -163,9 +165,14 @@ namespace MAD.CLIServerCore
             }
         }
 
+        private bool CheckSSLCertificate(object o, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
+            return true;
+        }
+
         private void SendServerInfo(NetworkStream stream)
         {
-            using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+            using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(stream, null))
             {
                 _serverInfoP.serverHeader = Encoding.Unicode.GetBytes(_serverHeader);
                 _serverInfoP.serverVersion = Encoding.Unicode.GetBytes(_serverVer);
