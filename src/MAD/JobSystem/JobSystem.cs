@@ -162,13 +162,13 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public int JobsWorking()
+        public int JobsStopped()
         {
             int _count = 0;
             lock (jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
                     foreach (Job _job in _nodes[i].jobs)
-                        if (_job.state == 2)
+                        if (_job.state == 0)
                             _count++;
             return _count;
         }
@@ -184,13 +184,13 @@ namespace MAD.JobSystemCore
             return _count;
         }
 
-        public int JobsStopped()
+        public int JobsWorking()
         {
             int _count = 0;
             lock (jsLock)
                 for (int i = 0; i < _nodes.Count; i++)
                     foreach (Job _job in _nodes[i].jobs)
-                        if (_job.state == 0)
+                        if (_job.state == 2)
                             _count++;
             return _count;
         }
@@ -215,6 +215,8 @@ namespace MAD.JobSystemCore
                 case 1:
                     return "Waiting";
                 case 2:
+                    return "Working";
+                case 3:
                     return "Exception";
                 default:
                     throw new Exception("NOT-VALID-JOBSTATE");

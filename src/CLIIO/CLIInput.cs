@@ -142,9 +142,7 @@ namespace CLIIO
                 }
                 catch (Exception)
                 {
-                    // There are some keyboards, which can make some problems here (spezial keys, ...).
-                    // So this try-catch is just used becauce of security-reasons ..
-                    throw new Exception("KEYBOARD-ERROR");
+                    SetCursor(_HEAD);
                 }
                 
                 Console.Write("\n");
