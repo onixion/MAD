@@ -78,7 +78,8 @@ namespace MAD
 
                 conf.SERVER_HEADER = "MAD-CLIServer";
                 conf.SERVER_PORT = 2222;
-                conf.SERVER_CERT = "cert.pfx";
+                conf.AES_PASS = "";
+                conf.AES_SALT = new byte[] { 32, 23, 12, 54, 42 };
 
                 conf.NOTI_ENABLE = true;
                 conf.SMTP_SERVER = "smtp-mail.outlook.com";
@@ -107,7 +108,8 @@ namespace MAD
         // cliserver
         public string SERVER_HEADER;
         public int SERVER_PORT;
-        public string SERVER_CERT; // ssl certificate for CLIServer
+        public string AES_PASS;
+        public byte[] AES_SALT;
 
         // notification
         public bool NOTI_ENABLE;

@@ -15,22 +15,16 @@ namespace CLIClient
     {
         #region member
 
-        public bool connected = false;
-        public bool login = false;
-
         private IPEndPoint _serverEndPoint;
         private TcpClient _client;
 
         private NetworkStream _stream;
-        private AES _aes = null;
+        private AES _aes;
 
         public string serverHeader = "";
         public string serverVersion = "";
 
-        public X509Certificate2 cert = null;
-
-        private string _username;
-        private string _passwordMD5;
+        private string _aesPass;
 
         public string cursor = "MAD-CLIENT>";
         private string _cliInput;
@@ -39,11 +33,10 @@ namespace CLIClient
 
         #region constructor
 
-        public CLIClient(IPEndPoint serverEndPoint, string username, string passwordMD5)
+        public CLIClient(IPEndPoint serverEndPoint, string aesPass)
         {
             _serverEndPoint = serverEndPoint;
-            _username = username;
-            _passwordMD5 = passwordMD5;
+            _aes = new AES(MadNetHelper.GenSHA512(aesPass));
         }
 
         #endregion
@@ -57,8 +50,6 @@ namespace CLIClient
                 _client = new TcpClient();
                 _client.Connect(_serverEndPoint);
                 _stream = _client.GetStream();
-
-                connected = true;
             }
             catch (Exception e)
             {
@@ -68,12 +59,9 @@ namespace CLIClient
 
         public void GetServerInfo()
         {
-            if (connected)
+            if (_client.Connected)
             {
-                using (DataPacket _dataP = new DataPacket(_stream, null, new byte[] { 0 }))
-                    _dataP.SendPacket();
-
-                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, null))
+                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, _aes))
                 {
                     _serverInfoP.ReceivePacket();
 
@@ -83,111 +71,39 @@ namespace CLIClient
             }
             else
                 throw new Exception("Not connected!");
-            
-        }
-
-        public AES MakeHandshake()
-        {
-            if (connected)
-            {
-                using (DataPacket _dataP = new DataPacket(_stream, null, new byte[] { 1 }))
-                    _dataP.SendPacket();
-
-                using (SslStream _sStream = new SslStream(_stream, false, new RemoteCertificateValidationCallback(CheckSSLCertification), null))
-                {
-                    _sStream.AuthenticateAsClient("MAD");
-                    cert = (X509Certificate2)_sStream.RemoteCertificate;
-
-                    _aes = new AES("RANDOM");
-                    using (StreamWriter _writer = new StreamWriter(_sStream))
-                        _writer.WriteLine("RANDOM");
-                }
-
-                return _aes;
-            }
-            else
-                throw new Exception("Not connected!");
-        }
-
-        private bool CheckSSLCertification(object o, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
-        {
-            return true;
-        }
-
-        public void Login()
-        {
-            if (connected)
-            {
-                if(_aes == null)
-                    throw new Exception("No AES!");
-
-                using (DataPacket _dataP = new DataPacket(_stream, null, new byte[] { 2 }))
-                    _dataP.SendPacket();
-
-                using (LoginPacket _loginP = new LoginPacket(_stream, _aes))
-                {
-                    _loginP.user = Encoding.Unicode.GetBytes(_username);
-                    _loginP.passMD5 = Encoding.Unicode.GetBytes(_passwordMD5);
-                    _loginP.SendPacket();
-                }
-
-                using (DataPacket _dataP = new DataPacket(_stream, _aes))
-                {
-                    _dataP.ReceivePacket();
-                    if (_dataP.data[0] == 0)
-                        login = true;
-                    else
-                        throw new Exception("Login rejected!");
-                }
-            }
-            else
-                throw new Exception("Not connected!");
         }
 
         public void StartRemoteCLI()
         {
-            if (connected)
+            if (_client.Connected)
             {
-                if (_aes != null)
+                using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
                 {
-                    if (login)
+                    while (true)
                     {
-                        using (DataPacket _dataP = new DataPacket(_stream, null, new byte[] { 3 }))
-                            _dataP.SendPacket();
+                        // write cursor
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(cursor);
+                        Console.ForegroundColor = ConsoleColor.White;
 
-                        using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
+                        // read input
+                        _cliInput = CLIInput.ReadInput(cursor.Length);
+
+                        if (_cliInput != "")
                         {
-                            while (true)
-                            {
-                                // write cursor
-                                Console.ForegroundColor = ConsoleColor.Cyan;
-                                Console.Write(cursor);
-                                Console.ForegroundColor = ConsoleColor.White;
+                            _cliP.consoleWidth = Console.BufferWidth;
+                            _cliP.cliInput = _cliInput;
+                            _cliP.SendPacket();
 
-                                // read input
-                                _cliInput = CLIInput.ReadInput(cursor.Length);
+                            _cliP.ReceivePacket();
 
-                                if (_cliInput != "")
-                                {
-                                    _cliP.consoleWidth = Console.BufferWidth;
-                                    _cliP.cliInput = _cliInput;
-                                    _cliP.SendPacket();
+                            if (_cliP.serverAnswer == "EXIT_CLI")
+                                break;
 
-                                    _cliP.ReceivePacket();
-
-                                    if (_cliP.serverAnswer == "EXIT_CLI")
-                                        break;
-
-                                    CLIOutput.WriteToConsole(_cliP.serverAnswer);
-                                }
-                            }
+                            CLIOutput.WriteToConsole(_cliP.serverAnswer);
                         }
                     }
-                    else
-                        throw new Exception("Not logged in!");
                 }
-                else
-                    throw new Exception("No AES!");
             }
             else
                 throw new Exception("Not connected!");

@@ -79,7 +79,7 @@ namespace MAD
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
                         {
-                            CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_CERT, js);
+                            CLIServer cliServer = new CLIServer(js);
                             cliServer.Start();
                             Console.WriteLine("Server listening on port " + cliServer.serverPort + ".");
                             if (MadConf.conf.LOG_MODE)

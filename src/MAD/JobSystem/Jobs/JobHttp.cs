@@ -11,6 +11,7 @@ namespace MAD.JobSystemCore
         #region members
 
         public int port;
+        public int timeout;
 
         [JsonIgnore]
         private WebRequest _request;
@@ -25,6 +26,7 @@ namespace MAD.JobSystemCore
             : base(JobType.Http)
         {
             this.port = 80;
+            this.timeout = 2000;
         }
 
         #endregion
@@ -36,9 +38,13 @@ namespace MAD.JobSystemCore
             try
             {
                 _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
-                _response = _request.GetResponse();
+                _request.Timeout = timeout;
 
+                _response = _request.GetResponse();
                 outp.outState = JobOutput.OutState.Success;
+
+                WebHeaderCollection _collection = _response.Headers;
+
                 _response.Close();
             }
             catch (Exception)
