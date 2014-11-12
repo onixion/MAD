@@ -122,14 +122,9 @@ namespace MAD.CLIServerCore
             return null;
         }
 
-        private void SendServerInfo(NetworkStream stream)
-        {
-            
-        }
-
         private string GetTimeStamp()
         {
-            return DateTime.Now.ToString("[dd.mm.yyyy|hh:MM.ss]");
+            return DateTime.Now.ToString("[dd.mm.yyyy HH:MM.ss]");
         }
 
         #endregion

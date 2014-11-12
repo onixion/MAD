@@ -18,8 +18,8 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
 
         [STAThread]
-        static int Main(string[] args)
-       {
+        public static int Main(string[] args)
+        {
             MadConf.TryCreateDir(DATADIR);
             if (File.Exists(CONFFILE))
             {
@@ -75,31 +75,46 @@ namespace MAD
                         CLI cli = new CLI(js, dhcpReader);
                         cli.Start();
                         break;
+
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
                         {
                             CLIServer cliServer = new CLIServer(js);
                             cliServer.Start();
-                            Console.WriteLine("Server listening on port " + cliServer.serverPort + ".");
+
+                            Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + ".");
                             if (MadConf.conf.LOG_MODE)
-                                Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.ERROR);
-                            Console.ReadKey();
+                                Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
+
+                            Console.ReadKey(true);
+                            cliServer.Stop();
+
+                            Console.WriteLine("(SERVER) Stopped.");
+                            if (MadConf.conf.LOG_MODE)
+                                Logger.Log("Server stopped", Logger.MessageType.INFORM);
+
+                            PressAnyKeyToClose();
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Could not start server: " + e.Message);
+                            Console.WriteLine("(SERVER) Could not start: " + e.Message);
                             if (MadConf.conf.LOG_MODE)
                                 Logger.Log("CLIServer could not start: " + e.Message, Logger.MessageType.ERROR);
-                            Console.ReadKey();
+
+                            PressAnyKeyToClose();
                         }
                         break;
+
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");
                         if (MadConf.conf.LOG_MODE)
+                        {
                             Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
-                        Logger.ForceWriteToLog();
-                        Console.ReadKey();
+                            Logger.ForceWriteToLog();
+                        }
+
+                        PressAnyKeyToClose();
                         return 1;
                 }
             }
@@ -111,7 +126,8 @@ namespace MAD
                     Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
                     Logger.ForceWriteToLog();
                 }
-                Console.ReadKey();
+
+                PressAnyKeyToClose();
                 return 1;
             }
 
@@ -124,6 +140,12 @@ namespace MAD
             }
 
             return 0;
+        }
+
+        private static void PressAnyKeyToClose()
+        {
+            Console.WriteLine("Press any key to close program ...");
+            Console.ReadKey(true);
         }
     }
 }
