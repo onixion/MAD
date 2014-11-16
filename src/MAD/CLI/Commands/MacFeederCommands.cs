@@ -77,7 +77,7 @@ namespace MAD.CLICore
     #region ARPReader
     public class PrintArpReadyInterfaces : Command
     {
-        private ARPReader _reader = new ARPReader();                              
+        //private ARPReader _reader = new ARPReader();                              
 
         public PrintArpReadyInterfaces()
             : base()
@@ -87,7 +87,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string _tmp = _reader.ListInterfaces();
+            string _tmp = ARPReader.ListInterfaces();
 
             return "<color><blue>" + _tmp;
         }
@@ -95,8 +95,8 @@ namespace MAD.CLICore
 
     public class ArpReaderStart : Command
     {
-        private ARPReader _reader = new ARPReader();
         private JobSystem _js; 
+
         public ArpReaderStart(object[] args)
             : base()
         {
@@ -115,22 +115,22 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _reader.srcAddress = (IPAddress) pars.GetPar("l").argValues[0];           
-            _reader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
-            _reader.subnetMask = (uint)pars.GetPar("s").argValues[0];
+            ARPReader.srcAddress = (IPAddress) pars.GetPar("l").argValues[0];           
+            ARPReader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
+            ARPReader.subnetMask = (uint)pars.GetPar("s").argValues[0];
 
             if(OParUsed("i"))
-                _reader.networkInterface = (uint)pars.GetPar("i").argValues[0] - 1;
+                ARPReader.networkInterface = (uint)pars.GetPar("i").argValues[0] - 1;
 
             if (OParUsed("o"))
             {
-                _reader.Start();
+                ARPReader.Start();
                 _js.SyncNodes(ModelHost.hostList);
                 return "<color><blue>Successfully performed Scan";
             }
             else
             {
-                _reader.SteadyStart(_js);
+                ARPReader.SteadyStart(_js);
                 return "<color><blue> Started steady arp reader";
             }
         }
