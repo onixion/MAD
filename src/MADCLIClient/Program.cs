@@ -53,10 +53,10 @@ namespace CLIClient
                     return 0;
                 }
             }
+            else if (args.Length > 3)
+                CLIOutput.WriteToConsole("To many args! .. switching to CLI-Setup-Assistent ..");
             else
             {
-                CLIOutput.WriteToConsole("To many args! .. switching to CLI-Setup-Assistent ..");
-
                 string _consoleInput;
 
                 CLIOutput.WriteToConsole("<color><yellow>1.) Server-IP (or hostname): ");

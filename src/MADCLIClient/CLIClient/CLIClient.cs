@@ -24,9 +24,7 @@ namespace CLIClient
         public string serverHeader = "";
         public string serverVersion = "";
 
-        private string _aesPass;
-
-        public string cursor = "MAD-CLIENT>";
+        public string cursor = "MAD-CLIENT> ";
         private string _cliInput;
 
         #endregion
@@ -79,6 +77,8 @@ namespace CLIClient
             {
                 using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
                 {
+                    _cliP.serverAnswer = "";
+
                     while (true)
                     {
                         // write cursor
