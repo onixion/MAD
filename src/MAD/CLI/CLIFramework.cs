@@ -11,6 +11,7 @@ namespace MAD.CLICore
     {
         #region member
 
+        public const string fwver = "2.0.4.0 stable";
         public List<CommandOptions> commands = new List<CommandOptions>();
 
         #endregion
@@ -125,43 +126,6 @@ namespace MAD.CLICore
                 _par.argValues = _args.ToArray();
                 _temp.pars.Add(_par);
             }
-
-            /*
-            string[] _buffer = input.Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-
-            // Remove unnecessary spaces.
-            for (int i = 1; i < _buffer.Length; i++)
-                _buffer[i] = _buffer[i].Trim();
-
-            for (int i = 1; i < _buffer.Length; i++)
-            {
-                string[] _buffer2 = _buffer[i].Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (_buffer2.Length == 1)
-                {
-                    // no args
-                    _temp.pars.Add(new Parameter(_buffer2[0], null));
-                }
-                else
-                {
-                    // one or multiple args
-                    if (_buffer2.Length == 2)
-                    {
-                        // one arg
-                        _temp.pars.Add(new Parameter(_buffer2[0], new object[] { _buffer2[1] }));
-                    }
-                    else
-                    {
-                        //multiple args
-                        object[] _buffer3 = new object[_buffer2.Length - 1];
-
-                        for (int i2 = 1; i2 < _buffer2.Length; i2++)
-                            _buffer3[i2 - 1] = _buffer2[i2];
-
-                        _temp.pars.Add(new Parameter(_buffer2[0], _buffer3));
-                    }
-                }
-            }*/
 
             return _temp;
         }
@@ -326,11 +290,11 @@ namespace MAD.CLICore
 
             _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
             _buffer += @"<color><cyan>  __  __  ___  _____" + "\n";
-            _buffer += @"<color><cyan> |  \/  |/ _ \|  _  \" + "\n";
-            _buffer += @"<color><cyan> |      / /_\ \ | \ | <color><yellow>VER." + "  <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
-            _buffer += @"<color><cyan> | |\/| |  _  | | | | <color><yellow>DATE" + "  <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
-            _buffer += @"<color><cyan> | |  | | | | | |_/ | <color><yellow>TIME" + "  <color><white>" + DateTime.Now.ToString("HH:mm:ss") + "\n";
-            _buffer += @"<color><cyan> |_|  |_|_| |_|_____/ " + "\n";
+            _buffer += @"<color><cyan> |  \/  |/ _ \|  _  \ <color><yellow>PROJECT VERS. " + "  <color><white>" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version + "\n";
+            _buffer += @"<color><cyan> |      / /_\ \ | \ | <color><yellow>CLI-FRAMEWORK " + "  <color><white>" + fwver + "\n";
+            _buffer += @"<color><cyan> | |\/| |  _  | | | | " + "\n";
+            _buffer += @"<color><cyan> | |  | | | | | |_/ | <color><yellow>DATE" + "  <color><white>" + DateTime.Now.ToString("dd.MM.yyyy") + "\n";
+            _buffer += @"<color><cyan> |_|  |_|_| |_|_____/ <color><yellow>TIME" + "  <color><white>" + DateTime.Now.ToString("HH:mm:ss") + "\n";
             _buffer += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
 
             return _buffer;

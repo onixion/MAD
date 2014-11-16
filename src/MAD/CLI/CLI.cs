@@ -148,8 +148,8 @@ namespace MAD.CLICore
                             response = "<color><red>" + e.Message;
                         }
                     }
-                    
-                    CLIOutput.WriteToConsole(response);
+
+                    CLIOutput.WriteToConsole(response + "\n");
                 }
             }
         }

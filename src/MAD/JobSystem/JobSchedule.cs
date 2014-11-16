@@ -231,33 +231,13 @@ namespace MAD.JobSystemCore
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                        if (_job.settings != null)
+                        if (_job.settings == null)
                         {
-                            // This is not the perfect solution. Need to create a class, which
-                            // can stack notifications, so we do not lose precious time here ...
-                            NotificationSystem.SendMail(_job.settings.mailAddr, _mailSubject, _mailContent, 2,
-                                _job.settings.login.smtpAddr, _job.settings.login.mail,
-                                _job.settings.login.password, _job.settings.login.port);
+                            MailNotification.SendMail(_mailSubject, _mailContent);
                         }
                         else
                         {
-                            // WORKIN ON THIS!!!
-                            /*
-                            if (_conf.MAIL_DEFAULT != null || _conf.MAIL_DEFAULT.Length != 0)
-                            {
-                                // Use global notification-settings.
-
-                                /* The JobSchedule does not know if the SMTP-Login works. */
-                            /*
-                                NotificationSystem.SendMail(_conf.MAIL_DEFAULT,
-                                    _mailSubject, _mailContent, 2);
-                            }
-                            else
-                            {
-                                // No notification is possible, because the Job has no settings and the default
-                                // mail-addresses are not set.
-                                Logger.Log("No notification possible! Job has no settings and no global settings set!", Logger.MessageType.ERROR);
-                            }*/
+                            MailNotification.SendMail(_job.settings, _mailSubject, _mailContent);
                         }
                     }
                 }
