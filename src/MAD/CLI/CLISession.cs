@@ -104,60 +104,32 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("job add dnscheck", typeof(JobSystemAddCheckDnsCommand), new object[] { _js }));
             commands.Add(new CommandOptions("job add snmpcheck", typeof(JobSystemAddCheckSnmpCommand), new object[] { _js }));
 
-            
-
             // SNMP
             commands.Add(new CommandOptions("snmpinterface", typeof(SnmpInterfaceCommand), null));
         }
 
         public void Start()
         {
-            DataPacket _dataP = null;
-            CLIPacket _cliP = null;
-
-            try
+            using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
             {
                 Command _command = null;
-                string _clientCLIInput = null;
-
-                _dataP = new DataPacket(_stream, _aes);
-                _cliP = new CLIPacket(_stream, _aes);
-
-                _dataP.SendPacket();
 
                 while (true)
                 {
                     _cliP.ReceivePacket();
-                    _clientCLIInput = Encoding.Unicode.GetString(_cliP.cliInput);
+                    _cliP.serverAnswer = CLIInterpreter(ref _command, _cliP.cliInput);
 
-                    if (_clientCLIInput != "")
+                    if (_cliP.serverAnswer == "VALID_PARAMETERS")
                     {
-                        _clientCLIInput = CLIInterpreter(ref _command, _clientCLIInput);
+                        _cliP.serverAnswer = _command.Execute(_cliP.consoleWidth);
+                        _cliP.SendPacket();
 
-                        if (_clientCLIInput == "VALID_PARAMETERS")
-                        {
-                            _clientCLIInput = _command.Execute(_cliP.consoleWidth);
-                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
+                        if (_cliP.serverAnswer == "EXIT_CLI")
+                            break;
 
-                            if (_clientCLIInput == "EXIT_CLI")
-                                break;
-                        }
-                        else
-                            _dataP.data = Encoding.Unicode.GetBytes(_clientCLIInput);
                     }
-
-                    _dataP.SendPacket();
                 }
             }
-            catch (Exception e)
-            {
-                _dataP.Dispose();
-                _cliP.Dispose();
-                throw e;
-            }
-
-            _dataP.Dispose();
-            _cliP.Dispose();
         }
 
         #endregion

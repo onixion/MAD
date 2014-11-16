@@ -140,7 +140,7 @@ namespace MAD.JobSystemCore
                 if (_state == 2)
                     break;
 
-                //Thread.Sleep(_cycleTime);
+                Thread.Sleep(_cycleTime);
             }
         }
 
