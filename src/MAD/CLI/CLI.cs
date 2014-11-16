@@ -117,7 +117,7 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            CLIOutput.WriteToConsole(GetBanner(Console.BufferWidth));
+            CLIOutput.WriteToConsole(GetBanner(Console.BufferWidth) + "\n");
 
             while (true)
             {

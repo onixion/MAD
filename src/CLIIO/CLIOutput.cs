@@ -7,9 +7,8 @@ namespace CLIIO
     {
         #region members
 
-        public static object _outputLock = new object();
-
-        private const string colorTag = "<color>";
+        private static object _outputLock = new object();
+        private const string _colorTag = "<color>";
         public static List<object[]> colors = new List<object[]>()
         {
             new object[] { "<blue>" , ConsoleColor.Blue },
@@ -29,6 +28,8 @@ namespace CLIIO
             new object[] { "<yellow>" , ConsoleColor.Yellow }
         };
 
+        private static ConsoleColor _defaultColor = ConsoleColor.Gray;
+
         #endregion
 
         #region methods
@@ -39,7 +40,7 @@ namespace CLIIO
             {
                 if (data != "")
                 {
-                    string[] temp = data.Split(new string[] { colorTag }, StringSplitOptions.None);
+                    string[] temp = data.Split(new string[] { _colorTag }, StringSplitOptions.None);
                     bool _colorTagFound;
 
                     if (temp.Length != 1)
@@ -67,84 +68,21 @@ namespace CLIIO
                             // If no color-tag was found, write it in gray.
                             if (!_colorTagFound)
                             {
-                                Console.ForegroundColor = ConsoleColor.Gray;
+                                Console.ForegroundColor = _defaultColor;
                                 Console.Write(temp[i]);
                             }
                         }
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.ForegroundColor = _defaultColor;
                         Console.Write(data);
                     }
 
-                    Console.Write("\n");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
             }
         }
-
-        // Wanted to add text-wraping, so words won't be cut into two pieces at the end of lines.
-        // But it can't be used in combination with those color-codes ...
-        // Maybe it can be implemented somehow ... but for now I won't spend more time working on it.
-        /*
-        public static void WrapTextToConsole(string textToPrint, int lineWidth)
-        {
-            string[] _words = textToPrint.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
-            string _buffer = null;
-
-            for (int i = 0; i < _words.Length; i++)
-            {
-                if (_buffer == null)
-                {
-                    _buffer = "";
-                }
-
-                // Add one word to buffer.
-                _buffer += _words[i];
-
-                // Check if the buffer length is equal or bigger than the line width.
-                if (_buffer.Length > lineWidth)
-                {
-                    if (_buffer.Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries).Length != 1)
-                    {
-                        // Remove last word from buffer.
-                        _buffer = _buffer.Remove(_buffer.Length - _words[i].Length - 1);
-                        // Write it to console.
-                        Console.Write(_buffer);
-                        // Clear buffer.
-                        _buffer = null;
-                        // Set i one back.
-                        i--;
-                    }
-                    else
-                    { 
-                        // If the line has one word and it is to long for the line, than just write it into the console.
-                        Console.Write(_buffer);
-                        // Clear buffer.
-                        _buffer = null;
-                    }
-                }
-                else if (_buffer.Length == lineWidth)
-                {
-                    Console.Write(_buffer);
-                    _buffer = null;
-                }
-                else
-                {
-                    // Check if it is the last word.
-                    if (_words.Length - 1 == i)
-                    {
-                        Console.Write(_buffer);
-                        break;
-                    }
-                    else
-                    {
-                        _buffer += " ";
-                    }
-                }
-            }
-        }*/
 
         #endregion
     }

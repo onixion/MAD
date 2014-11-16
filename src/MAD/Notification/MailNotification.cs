@@ -11,7 +11,8 @@ namespace MAD.Notification
 {
     /*
      * Mail Notification
-     * This here is just for testing mail notification ...
+     * This here is just for testing the function of the
+     * JobSystem ...
      */
 
     public static class MailNotification
@@ -26,7 +27,7 @@ namespace MAD.Notification
         private static Thread _workerThread = null;
         private static object _startStopLock = new object();
         private static bool _stopRequest = false;
-        private static ManualResetEvent _resetEvent = new ManualResetEvent(false);
+        private static ManualResetEvent _sendEvent = new ManualResetEvent(false);
 
         private static SmtpClient _client;
         private static MailAddress[] _to;
@@ -84,36 +85,27 @@ namespace MAD.Notification
                 _obj[2] = _sett;
 
                 _publ.Add(_obj);
+                _sendEvent.Set();
             }
         }
 
         private static void Working()
         {
-            bool _sending = false;
-
             while (true)
             {
-                lock (_sendLock)
-                {
-                    if (_publ.Count > 0)
-                        _sending = true;
-                    else
-                        _sending = false;
-                }
+                // wait for a new request
+                _sendEvent.WaitOne();
+                _sendEvent.Reset();
 
-                if (_sending)
-                {
-                    MoveMails();
-                    WorkOffMails();
-                }
-
+                // check for stop-request
                 if (_stopRequest)
                 {
                     _stopRequest = false;
                     break;
                 }
 
-                Thread.Sleep(2000);
+                MoveMails();
+                WorkOffMails();
             }
         }
 
@@ -123,7 +115,6 @@ namespace MAD.Notification
             {
                 foreach (object[] _obj in _publ)
                     _priv.Add(_obj);
-
                 _publ.Clear();
             }
         }
