@@ -20,6 +20,7 @@ namespace MAD
         [STAThread]
         public static int Main(string[] args)
         {
+            // load config-file
             MadConf.TryCreateDir(DATADIR);
             if (File.Exists(CONFFILE))
             {
@@ -46,19 +47,14 @@ namespace MAD
                 Console.WriteLine("(CONFIG) Default config may not use all possible features!");
             }
 
-            // -------------------------
             // init components
-
             JobSystem js = new JobSystem();
             DHCPReader dhcpReader = new DHCPReader(js);
-
             NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
 
-            // -------------------------
-
+            // start interface
             if (args.Length == 0)
             { 
-                // No args -> start gui.
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
                 Logger.Log("Programm Aborted. No GUI!", Logger.MessageType.EMERGENCY);
                 Logger.ForceWriteToLog();
@@ -93,21 +89,19 @@ namespace MAD
                             Console.WriteLine("(SERVER) Stopped.");
                             if (MadConf.conf.LOG_MODE)
                                 Logger.Log("Server stopped", Logger.MessageType.INFORM);
-
-                            PressAnyKeyToClose();
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine("(SERVER) Could not start: " + e.Message);
                             if (MadConf.conf.LOG_MODE)
                                 Logger.Log("CLIServer could not start: " + e.Message, Logger.MessageType.ERROR);
-
-                            PressAnyKeyToClose();
                         }
+
+                        PressAnyKeyToClose();
                         break;
 
                     default:
-                        Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");
+                        Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");
                         if (MadConf.conf.LOG_MODE)
                         {
                             Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
@@ -115,12 +109,12 @@ namespace MAD
                         }
 
                         PressAnyKeyToClose();
-                        return 1;
+                        break;
                 }
             }
             else
             {
-                Console.WriteLine("ERROR! Too many arguments!\nPress any key to close ...");
+                Console.WriteLine("ERROR! Too many arguments!");
                 if (MadConf.conf.LOG_MODE)
                 {
                     Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
@@ -128,7 +122,6 @@ namespace MAD
                 }
 
                 PressAnyKeyToClose();
-                return 1;
             }
 
             js.Shutdown();
