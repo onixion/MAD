@@ -45,7 +45,7 @@ namespace MAD.CLIServerCore
             _debugMode = MadConf.conf.DEBUG_MODE;
             _serverHeader = MadConf.conf.SERVER_HEADER;
             serverPort = MadConf.conf.SERVER_PORT;
-            _aes = new AES(MadNetHelper.GenSHA512(MadConf.conf.AES_PASS));
+            _aes = new AES(MadConf.conf.AES_PASS);
         }
 
         #endregion

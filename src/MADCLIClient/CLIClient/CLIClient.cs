@@ -36,7 +36,7 @@ namespace CLIClient
         public CLIClient(IPEndPoint serverEndPoint, string aesPass)
         {
             _serverEndPoint = serverEndPoint;
-            _aes = new AES(MadNetHelper.GenSHA512(aesPass));
+            _aes = new AES(aesPass);
         }
 
         #endregion
