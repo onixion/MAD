@@ -21,7 +21,7 @@ namespace MAD.JobSystemCore
         private bool _log = false;
 
         private Thread _cycleThread;
-        private int _cycleTime = 100;
+        private int _cycleTime = 1;
 
         private object _stateLock = new object();
         /* state = 0 | inactive
@@ -104,11 +104,11 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    if (_job.state == 1)
+                                    if (_job.state == 1 || _job.state == 2)
                                     {
-                                        if (_job.type != Job.JobType.NULL)
+                                        if (JobTimeCheck(_job, _nowTime))
                                         {
-                                            if (JobTimeCheck(_job, _nowTime))
+                                            if (_job.type != Job.JobType.NULL)
                                             {
                                                 if (_log)
                                                     Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
@@ -146,41 +146,72 @@ namespace MAD.JobSystemCore
 
         private bool JobTimeCheck(Job job, DateTime time)
         {
-            if (job.time.type == JobTime.TimeMethod.Relative)
+            if (job.time.delayed)
             {
-                if (job.time.jobDelay.CheckTime())
+                if (job.state == 1)
                 {
-                    job.time.jobDelay.Reset();
+                    job.time.delayed = false;
                     return true;
-                }
-                else
-                {
-                    job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
-                    return false;
-                }
-            }
-            else if (job.time.type == JobTime.TimeMethod.Absolute)
-            {
-                JobTimeHandler _timeHandler = job.time.GetJobTimeHandler(time);
-
-                if (_timeHandler != null)
-                {
-                    if (!_timeHandler.IsBlocked(time))
-                    {
-                        if (_timeHandler.CheckTime(time))
-                        {
-                            _timeHandler.minuteAtBlock = time.Minute;
-                            return true;
-                        }
-                    }
-                    
-                    return false;
                 }
                 else
                     return false;
             }
             else
-                return false;
+            {
+                if (job.time.type == JobTime.TimeMethod.Relative)
+                {
+                    if (job.time.jobDelay.CheckTime())
+                    {
+                        job.time.jobDelay.Reset();
+
+                        if (job.state == 1)
+                            return true;
+                        else
+                        {
+                            // Job can't get executed at the moment,
+                            // try at next cycle.
+                            job.time.delayed = true;
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                        return false;
+                    }
+                }
+                else if (job.time.type == JobTime.TimeMethod.Absolute)
+                {
+                    JobTimeHandler _timeHandler = job.time.GetJobTimeHandler(time);
+
+                    if (_timeHandler != null)
+                    {
+                        if (!_timeHandler.IsBlocked(time))
+                        {
+                            if (_timeHandler.CheckTime(time))
+                            {
+                                _timeHandler.minuteAtBlock = time.Minute;
+
+                                if (job.state == 1)
+                                    return true;
+                                else
+                                {
+                                    // Job can't get executed at the moment,
+                                    // try at next cycle.
+                                    job.time.delayed = true;
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
         }
 
         private void JobThreadStart(JobHolder holder)
