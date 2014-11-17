@@ -56,6 +56,8 @@ namespace MAD.Notification
                 if (_workerThread != null)
                 {
                     _stopRequest = true;
+                    _sendEvent.Set();
+
                     _workerThread.Join();
                     _workerThread = null;
                 }

@@ -26,8 +26,7 @@ namespace MAD.JobSystemCore
         private object _stateLock = new object();
         /* state = 0 | inactive
          * state = 1 | active
-         * state = 2 | stop-request
-         * state = 3 | execption */
+         * state = 2 | stop-request */
         private int _state = 0;
         public int state { get { return _state; } }
 

@@ -120,14 +120,12 @@ namespace MAD.CLIServerCore
                     _cliP.serverAnswer = CLIInterpreter(ref _command, _cliP.cliInput);
 
                     if (_cliP.serverAnswer == "VALID_PARAMETERS")
-                    {
                         _cliP.serverAnswer = _command.Execute(_cliP.consoleWidth);
-                        _cliP.SendPacket();
 
-                        if (_cliP.serverAnswer == "EXIT_CLI")
-                            break;
+                    _cliP.SendPacket();
 
-                    }
+                    if (_cliP.serverAnswer == "EXIT_CLI")
+                        break;
                 }
             }
         }

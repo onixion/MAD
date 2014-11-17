@@ -100,7 +100,7 @@ namespace CLIClient
                             if (_cliP.serverAnswer == "EXIT_CLI")
                                 break;
 
-                            CLIOutput.WriteToConsole(_cliP.serverAnswer);
+                            CLIOutput.WriteToConsole(_cliP.serverAnswer + "\n");
                         }
                     }
                 }
