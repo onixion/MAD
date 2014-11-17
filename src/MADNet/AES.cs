@@ -9,7 +9,8 @@ namespace MadNet
 {
     public class AES : IDisposable
     {
-        RijndaelOpen _aes = new RijndaelOpen();
+        //RijndaelOpen _aes = new RijndaelOpen();
+        Rijndael _aes = Rijndael.Create();
 
         private string _pass { get; set; }
         private static byte[] _salt = new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 };
