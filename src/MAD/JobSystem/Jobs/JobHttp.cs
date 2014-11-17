@@ -26,7 +26,7 @@ namespace MAD.JobSystemCore
             : base(JobType.Http)
         {
             this.port = 80;
-            this.timeout = 2000;
+            this.timeout = 5000;
         }
 
         #endregion
@@ -37,9 +37,8 @@ namespace MAD.JobSystemCore
         {
             try
             {
-                _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
                 _request.Timeout = timeout;
-
+                _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
                 _response = _request.GetResponse();
                 outp.outState = JobOutput.OutState.Success;
 
