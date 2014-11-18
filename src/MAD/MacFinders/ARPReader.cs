@@ -28,18 +28,65 @@ namespace MAD.MacFinders
         public static IPAddress netAddress;
         public static IPAddress srcAddress;
 
-        public static void Start()
+        public static void CheckStart()
         {
-            Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
-            Thread _send = new Thread(SendRequests);
-            if (!_working)
+            Logger.Log("Start Checking Devices", Logger.MessageType.INFORM);
+            InitInterfaces();
+            Thread _listen = new Thread(ListenCheckResponses);
+            _listen.Start();
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
+            foreach (ModelHost _dummy in ModelHost.hostList)
             {
-                Thread _listen = new Thread(InitInterfaces);
-                _listen.Start();
+                _dummy.status = false;
+                ExecuteRequests(_dummy.hostIP);
             }
             Thread.Sleep(10000);
-            _send.Start();
-            _send.Join();
+            DeInitInterfaces();
+        }
+
+        public static void FloodStart()
+        {
+            Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
+            InitInterfaces();
+            Thread _listen = new Thread(ListenFloodResponses);
+            _listen.Start();
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
+            SendRequests();
+            Thread.Sleep(10000);
+            _listen.Join();
+            DeInitInterfaces();
+        }
+
+        private static void InitInterfaces()
+        {
+            _list = CaptureDeviceList.Instance;
+            _dev = _list[(int)networkInterface];
+            _dev.Open();
+
+            _listenDev = _list[(int)networkInterface];
+        }
+
+        private static void ListenCheckResponses()
+        {
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ProcessCheck);
+            _listenDev.Open();
+            _listenDev.StartCapture();
+        }
+
+        private static void ListenFloodResponses()
+        {
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ProcessFlood);
+            _listenDev.Open();
+            _listenDev.StartCapture();
+        }
+
+        private static void DeInitInterfaces()
+        {
+            _dev.Close();
+            _listenDev.StopCapture();
+            _listenDev.Close();
+            _dev = null;
+            _listenDev = null;
         }
 
         public static string ListInterfaces()
@@ -82,31 +129,12 @@ namespace MAD.MacFinders
             _steady.Abort();
         }
 
-        public static void CleanUp()
-        {
-            _dev.Close();
-        }
-
-        private static void InitInterfaces()
-        {
-            _working = true;
-            _list = CaptureDeviceList.Instance;
-            _dev = _list[(int)networkInterface];
-            _dev.Open();
-
-            _listenDev = _list[(int)networkInterface];
-
-            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ParseArpPackets);
-            _listenDev.Open(DeviceMode.Normal);
-            _listenDev.StartCapture();
-        }
-
         private static void SteadyStartsFunktion(object jsArg)
         {
             while (true)
             {
                 JobSystem _js = (JobSystem)jsArg;
-                Start();
+                FloodStart();
                 _js.SyncNodes(ModelHost.hostList);
                 Thread.Sleep(300000);
             }
@@ -139,6 +167,28 @@ namespace MAD.MacFinders
             }   
         }
 
+        public static void ExecuteRequests(IPAddress destIP)
+        {
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
+            
+            ARPPacket _arppac = new ARPPacket(ARPOperation.Request,
+                                                System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"),
+                                                destIP,
+                                                _ethpac.SourceHwAddress,
+                                                srcAddress);
+            _ethpac.PayloadPacket = _arppac;
+
+            try
+            {
+                _dev.SendPacket(_ethpac);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
+            }
+        }
+
         private static void ExecuteRequests(EthernetPacket pacBase, IPAddress destIP)
         {
             ARPPacket _arppac = new ARPPacket(ARPOperation.Request,
@@ -150,10 +200,8 @@ namespace MAD.MacFinders
 
             try
             {
-                lock (lockObj)
-                {
-                    _dev.SendPacket(pacBase);
-                }
+                _dev.SendPacket(pacBase);
+
             }
             catch (Exception ex)
             {
@@ -161,7 +209,7 @@ namespace MAD.MacFinders
             }
         }
 
-        private static void ParseArpPackets(object sender, CaptureEventArgs packet)
+        private static void ProcessFlood(object sender, CaptureEventArgs packet)
         {
             if (packet.Packet.Data.Length >= 42)
             {
@@ -174,6 +222,28 @@ namespace MAD.MacFinders
 
 				if (arpheader [0] == 8 && arpheader [1] == 6 && arpheader [2] == 0 && arpheader [3] == 2)
 					SyncModelHosts (ReadAddresses(data));
+            }
+        }
+
+        private static void ProcessCheck(object sender, CaptureEventArgs packet)
+        {
+            if (packet.Packet.Data.Length >= 42)
+            {
+                byte[] data = packet.Packet.Data;
+                byte[] arpheader = new byte[4];
+                ModelHost _dummy = new ModelHost();
+                arpheader[0] = data[12];
+                arpheader[1] = data[13];
+                arpheader[2] = data[20];
+                arpheader[3] = data[21];
+
+                if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
+                    _dummy = ReadAddresses(data);
+
+                if (ModelHost.Exists(_dummy))
+                    _dummy.status = true;
+
+                ModelHost.UpdateHost(_dummy, _dummy);
             }
         }
 

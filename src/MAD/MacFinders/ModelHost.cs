@@ -16,7 +16,7 @@ namespace MAD.MacFinders
 		public IPAddress hostIP;
 		public string hostName;
 		public string hostMac;
-        public string status; 
+        public bool status; 
         
         public static List<ModelHost> hostList = new List<ModelHost>();
 		
@@ -382,64 +382,6 @@ namespace MAD.MacFinders
 			}
 			return _output;
 		}
-
-        public static void PingThroughList()
-        {
-            Logger.Log("Pinging through host list..", Logger.MessageType.INFORM);
-            lock (lockObj)
-            {
-                if (ModelHost.hostList != null)
-                {
-                    for (int i = 0; i < ModelHost.hostList.Count; i++)
-                    {
-                        ModelHost _dummy = ModelHost.hostList[i];
-                        if (_dummy.hostIP != null)
-                        {
-                            Ping _ping = new Ping();
-
-                            try
-                            {
-                                PingReply _reply = _ping.Send(_dummy.hostIP);
-
-                                if (_reply.Status != IPStatus.Success)
-                                {
-                                    _dummy.reachable = false;
-
-                                    if (_reply.Status == IPStatus.DestinationHostUnreachable)
-                                        _dummy.status = " (Host Unreachable)";
-                                    else if (_reply.Status == IPStatus.DestinationNetworkUnreachable)
-                                        _dummy.status = " (Network Unreachable)";
-                                    else if (_reply.Status == IPStatus.DestinationPortUnreachable)
-                                        _dummy.status = " (Port Unreachable)";
-                                    else if (_reply.Status == IPStatus.DestinationUnreachable)
-                                        _dummy.status = " (Unreachable)";
-                                    else if (_reply.Status == IPStatus.TimedOut)
-                                        _dummy.status = " (Ping Time Out)";
-                                    else if (_reply.Status == IPStatus.Unknown)
-                                        _dummy.status = " (Unknown Ping Error)";
-                                    else
-                                        _dummy.status = " (Unknown Ping Error)";
-
-                                    ModelHost.hostList[i] = _dummy;
-                                }
-                                else
-                                {
-                                    _dummy.reachable = true;
-
-                                    ModelHost.hostList[i] = _dummy;
-                                }
-                            }
-                            catch
-                            {
-                                _dummy.reachable = false;
-                                _dummy.status = " (Unknown Ping Error)";
-                                ModelHost.hostList[i] = _dummy;
-                            }
-                        }
-                    }
-                }
-            }           
-        }
 
 		#endregion
 	}

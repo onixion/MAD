@@ -124,7 +124,7 @@ namespace MAD.CLICore
 
             if (OParUsed("o"))
             {
-                ARPReader.Start();
+                ARPReader.FloodStart();
                 _js.SyncNodes(ModelHost.hostList);
                 return "<color><blue>Successfully performed Scan";
             }
@@ -149,7 +149,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            ModelHost.PingThroughList();
+            ARPReader.CheckStart();
             _js.SyncNodes(ModelHost.hostList);
             return "<color><blue>Updated list";
         }

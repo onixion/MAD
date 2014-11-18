@@ -229,7 +229,7 @@ namespace MAD.MacFinders
             while (true)
             {
                 Thread.Sleep((int)_sleepFor);
-                ModelHost.PingThroughList();
+                ARPReader.CheckStart();
             }
         }
         #endregion
