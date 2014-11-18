@@ -140,6 +140,9 @@ namespace MadNet
         public void Dispose()
         {
             _streamIO.Dispose();
+
+            if (_aes != null)
+                _aes.Dispose();
         }
     }
 }
