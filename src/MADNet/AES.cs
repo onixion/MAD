@@ -3,8 +3,6 @@ using System.IO;
 using System.Text;
 using System.Security.Cryptography;
 
-using CryptoNet;
-
 namespace MadNet
 {
     public class AES : IDisposable

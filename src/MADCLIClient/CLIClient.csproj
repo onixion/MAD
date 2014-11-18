@@ -53,9 +53,9 @@
       <Project>{FC728832-1EAD-4B88-B557-68EB12775678}</Project>
       <Name>CLIIO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MadNet\MadNet.csproj">
+    <ProjectReference Include="..\MADNet\MadNet.csproj">
       <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
-      <Name>MadNet</Name>
+      <Name>MADNet</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
