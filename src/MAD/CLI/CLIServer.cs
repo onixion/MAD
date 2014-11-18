@@ -56,7 +56,7 @@ namespace MAD.CLIServerCore
         {
             try
             {
-                _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, serverPort));
+                _serverListener = new TcpListener(new IPEndPoint(IPAddress.Any, serverPort));
                 _serverListener.Start();
                 return true;
             }
