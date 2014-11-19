@@ -28,6 +28,29 @@ namespace CLIIO
 
         #region methods
 
+        public static string ReadHidden()
+        {
+            ConsoleKeyInfo _key;
+            string _vinput = "";
+
+            while (true)
+            {
+                _key = Console.ReadKey(true);
+
+                if (_key.Key == ConsoleKey.Enter)
+                {
+                    return _vinput;
+                }
+                else if (_key.Key == ConsoleKey.Backspace)
+                {
+                    if (_vinput.Length > 0)
+                        _vinput = _vinput.Remove(_vinput.Length - 1, 1);
+                }
+                else
+                    _vinput += _key.KeyChar.ToString();
+            }
+        }
+
         public static string ReadInput(int offset)
         {
             lock (_inputLock)
@@ -58,10 +81,9 @@ namespace CLIIO
                         {
                             if (_key.Modifiers == ConsoleModifiers.Control)
                             {
-
                                 ClearInput();
 
-                                _VINPUT = "KASE JA WC HER";
+                                _VINPUT = "JACK WAS HERE!";
 
                                 SetCursor(_HEAD);
                                 Console.Write(_VINPUT);

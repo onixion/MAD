@@ -59,24 +59,30 @@ namespace CLIClient
             {
                 string _consoleInput;
 
-                CLIOutput.WriteToConsole("<color><yellow>1.) Server-IP (or hostname): ");
-                _consoleInput = Console.ReadLine();
-
-                if (!IPAddress.TryParse(_consoleInput, out _serverIp))
+                while (true)
                 {
-                    CLIOutput.WriteToConsole("<color><yellow>Resolving hostname ...");
+                    CLIOutput.WriteToConsole("<color><yellow>1.) Server-IP (or hostname): ");
+                    _consoleInput = Console.ReadLine();
 
-                    IPAddress[] _ips = Dns.GetHostAddresses(_consoleInput);
-                    if (_ips.Length == 0)
+                    if (!IPAddress.TryParse(_consoleInput, out _serverIp))
                     {
-                        CLIOutput.WriteToConsole("<color><red>Could not resolve this hostname ...");
-                        CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
-                        Console.ReadKey();
-                        return 0;
-                    }
-                    _serverIp = _ips[0];
+                        CLIOutput.WriteToConsole("<color><yellow>Resolving hostname ... ");
 
-                    CLIOutput.WriteToConsole("<color><yellow>" + _serverIp.ToString());
+                        try
+                        {
+                            IPAddress[] _ips = Dns.GetHostAddresses(_consoleInput);
+                            _serverIp = _ips[0];
+
+                            CLIOutput.WriteToConsole("<color><white>" + _serverIp.ToString() + "\n");
+                            break;
+                        }
+                        catch (Exception)
+                        {
+                            CLIOutput.WriteToConsole("<color><red> Could not resolve hostname '" + _consoleInput + "'\n");
+                        }
+                    }
+                    else
+                        break;
                 }
 
                 while (true)
@@ -90,13 +96,15 @@ namespace CLIClient
                     }
                     catch (Exception)
                     {
-                        CLIOutput.WriteToConsole("<color><red>No port-number!");
+                        CLIOutput.WriteToConsole("<color><red>No port-number!\n");
                     }
                 }
 
                 CLIOutput.WriteToConsole("<color><yellow>3.) AES-Key: ");
-                _aesPass = Console.ReadLine();
+                _aesPass = CLIInput.ReadHidden();
             }
+
+            Console.WriteLine();
 
             CLIClient _client = new CLIClient(new IPEndPoint(_serverIp, _serverPort), _aesPass);
 
@@ -112,7 +120,7 @@ namespace CLIClient
             }
             catch (Exception e)
             {
-                CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message);
+                CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "\n");
                 CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
                 Console.ReadKey();
             }

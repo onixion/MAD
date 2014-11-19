@@ -7,23 +7,23 @@ namespace MadNet
     {
         public byte[] data { get; set; }
 
-        public DataPacket(NetworkStream stream, AES aes)
-            : base(stream, aes, 1) { }
+        public DataPacket(NetworkStream stream)
+            : base(stream, 1) { }
 
-        public DataPacket(NetworkStream stream, AES aes, byte[] data)
-            : base(stream, aes, 1)
+        public DataPacket(NetworkStream stream, byte[] data)
+            : base(stream, 1)
         {
             this.data = data;
         }
 
-        public override void SendPacketSpec(StreamIO streamIO)
+        public override void SendPacketSpec(StreamIO streamIO, AES aes)
         {
-            SendBytes(data);
+            SendBytes(data, aes);
         }
 
-        public override void ReceivePacketSpec(StreamIO streamIO)
+        public override void ReceivePacketSpec(StreamIO streamIO, AES aes)
         {
-            data = ReceiveBytes();
+            data = ReceiveBytes(aes);
         }
     }
 }

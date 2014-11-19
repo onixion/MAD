@@ -16,21 +16,21 @@ namespace MadNet
         public int consoleWidth { get; set; }
         public string serverAnswer { get; set; }
 
-        public CLIPacket(NetworkStream stream, AES aes)
-            : base(stream, aes, 4) { }
+        public CLIPacket(NetworkStream stream)
+            : base(stream, 4) { }
 
-        public override void SendPacketSpec(StreamIO streamIO)
+        public override void SendPacketSpec(StreamIO streamIO, AES aes)
         {
-            SendBytes(Encoding.Unicode.GetBytes(cliInput));
-            SendBytes(Ser(consoleWidth));
-            SendBytes(Encoding.Unicode.GetBytes(serverAnswer));
+            SendBytes(Encoding.Unicode.GetBytes(cliInput), aes);
+            SendBytes(Ser(consoleWidth), aes);
+            SendBytes(Encoding.Unicode.GetBytes(serverAnswer), aes);
         }
 
-        public override void ReceivePacketSpec(StreamIO streamIO)
+        public override void ReceivePacketSpec(StreamIO streamIO, AES aes)
         {
-            cliInput = Encoding.Unicode.GetString(ReceiveBytes());
-            consoleWidth = (int)DeSer(ReceiveBytes(), typeof(Int32));
-            serverAnswer = Encoding.Unicode.GetString(ReceiveBytes());
+            cliInput = Encoding.Unicode.GetString(ReceiveBytes(aes));
+            consoleWidth = (int)DeSer(ReceiveBytes(aes), typeof(Int32));
+            serverAnswer = Encoding.Unicode.GetString(ReceiveBytes(aes));
         }
     }
 }

@@ -63,12 +63,15 @@ namespace MadNet
             {
                 using (CryptoStream _cryptoStream = new CryptoStream(_stream, _transform, CryptoStreamMode.Write))
                 {
+                    // first block-iv
                     _buffer = new byte[16];
                     _gen.GetBytes(_buffer);
                     _cryptoStream.Write(_buffer, 0, 15);
+
+                    // rest of data
                     _cryptoStream.Write(data, 0, data.Length);
+                    return _stream.ToArray();
                 }
-                return _stream.ToArray();
             }
         }
 
@@ -82,13 +85,17 @@ namespace MadNet
             {
                 using (CryptoStream _cryptoStream = new CryptoStream(_stream, _transform, CryptoStreamMode.Read))
                 {
-                    _buffer = new byte[16];
-                    _cryptoStream.Read(_buffer, 0, 15);
-                    _buffer = new byte[data.Length - 16];
-                    _cryptoStream.Read(_buffer, 0, data.Length - 16);
+                    // encrypt everything
+                    _buffer = new byte[data.Length];
+                    _cryptoStream.Read(_buffer, 0, data.Length);
+
+                    // remove first 16 bytes
+                    byte[] _buffer2 = new byte[_buffer.Length - 16];
+                    Array.Copy(_buffer, 15, _buffer2, 0, _buffer2.Length);
+
+                    return _buffer;
                 }
             }
-            return _buffer;
         }
 
         public void Dispose()

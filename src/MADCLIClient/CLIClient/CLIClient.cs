@@ -59,9 +59,9 @@ namespace CLIClient
         {
             if (_client.Connected)
             {
-                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream, _aes))
+                using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream))
                 {
-                    _serverInfoP.ReceivePacket();
+                    _serverInfoP.ReceivePacket(_aes);
 
                     serverHeader = Encoding.Unicode.GetString(_serverInfoP.serverHeader);
                     serverVersion = Encoding.Unicode.GetString(_serverInfoP.serverVersion);
@@ -75,7 +75,7 @@ namespace CLIClient
         {
             if (_client.Connected)
             {
-                using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
+                using (CLIPacket _cliP = new CLIPacket(_stream))
                 {
                     _cliP.serverAnswer = "";
 
@@ -93,9 +93,9 @@ namespace CLIClient
                         {
                             _cliP.consoleWidth = Console.BufferWidth;
                             _cliP.cliInput = _cliInput;
-                            _cliP.SendPacket();
+                            _cliP.SendPacket(_aes);
 
-                            _cliP.ReceivePacket();
+                            _cliP.ReceivePacket(_aes);
 
                             if (_cliP.serverAnswer == "EXIT_CLI")
                                 break;

@@ -10,8 +10,6 @@ namespace MadNet
     public abstract class Packet : IDisposable
     {
         private StreamIO _streamIO;
-        private AES _aes;
-
         private uint _packetType = 0;
 
         /* TYPE               UINT
@@ -30,16 +28,9 @@ namespace MadNet
             _streamIO = new StreamIO(stream);
         }
 
-        public Packet(Stream stream, AES aes)
+        public Packet(NetworkStream stream, uint packetType)
         {
             _streamIO = new StreamIO(stream);
-            _aes = aes;
-        }
-
-        public Packet(NetworkStream stream, AES aes, uint packetType)
-        {
-            _streamIO = new StreamIO(stream);
-            _aes = aes;
             _packetType = packetType;
         }
 
@@ -54,43 +45,42 @@ namespace MadNet
             return _streamIO.ReadUInt();
         }
 
-        public void SendPacket()
+        public void SendPacket(AES aes)
         {
             SendPacketType();
-            SendPacketSpec(_streamIO);
+            SendPacketSpec(_streamIO,aes);
         }
 
-        public void ReceivePacket()
+        public void ReceivePacket(AES aes)
         {
             if (_packetType == ReceivePacketType())
-                ReceivePacketSpec(_streamIO);
+                ReceivePacketSpec(_streamIO, aes);
             else
                 throw new PacketException("No packet or wrong packet!", null);
         }
 
-        public abstract void SendPacketSpec(StreamIO streamIO);
+        public abstract void SendPacketSpec(StreamIO streamIO, AES aes);
 
-        public abstract void ReceivePacketSpec(StreamIO streamIO);
+        public abstract void ReceivePacketSpec(StreamIO streamIO, AES aes);
 
-        protected void SendBytes(byte[] data)
+        protected void SendBytes(byte[] data, AES aes)
         {
             if (data != null)
             {
-                if (_aes == null)
+                if (aes == null)
                     _streamIO.Write(data, true);
                 else
-                    _streamIO.Write(_aes.Encrypt(data), true);
+                    _streamIO.Write(aes.Encrypt(data), true);
             }
             else
-            {
                 _streamIO.Write(new byte[0], true);
-            }
+
             _streamIO.Flush();
         }
 
-        protected byte[] ReceiveBytes()
+        protected byte[] ReceiveBytes(AES aes)
         {
-            if (_aes == null)
+            if (aes == null)
             {
                 uint _length = _streamIO.ReadUInt();
                 return _streamIO.ReadBytes(_length);
@@ -98,7 +88,7 @@ namespace MadNet
             else
             {
                 uint _length = _streamIO.ReadUInt();
-                return _aes.Decrypt(_streamIO.ReadBytes(_length));
+                return aes.Decrypt(_streamIO.ReadBytes(_length));
             }
         }
 
@@ -140,9 +130,6 @@ namespace MadNet
         public void Dispose()
         {
             _streamIO.Dispose();
-
-            if (_aes != null)
-                _aes.Dispose();
         }
     }
 }
