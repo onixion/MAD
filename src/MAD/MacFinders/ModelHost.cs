@@ -97,7 +97,10 @@ namespace MAD.MacFinders
 		#region Exists
 		public static bool Exists(string macAddr)
 		{
-			bool _exists; 
+			bool _exists;
+            if (macAddr == null)
+                return false;
+
 			var _foo = hostList.Find(x => x.hostMac.Contains(macAddr));
 
 			if(_foo == null)
@@ -110,7 +113,10 @@ namespace MAD.MacFinders
 
 		public static bool Exists(ModelHost dummy)
 		{
-			bool _exists; 
+			bool _exists;
+            if (dummy.hostMac == null)
+                return false;
+
 			var _foo = hostList.Find(x => x.hostMac.Contains(dummy.hostMac));
 
 			if(_foo == null)

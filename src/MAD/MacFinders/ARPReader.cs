@@ -241,9 +241,11 @@ namespace MAD.MacFinders
                     _dummy = ReadAddresses(data);
 
                 if (ModelHost.Exists(_dummy))
+                {
                     _dummy.status = true;
-
-                ModelHost.UpdateHost(_dummy, _dummy);
+                    ModelHost.UpdateHost(_dummy, _dummy);
+                }
+                
             }
         }
 
