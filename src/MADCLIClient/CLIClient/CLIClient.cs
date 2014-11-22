@@ -51,7 +51,7 @@ namespace CLIClient
             }
             catch (Exception e)
             {
-                throw new Exception("Could not connect to server. E:" + e.Message);
+                throw new Exception("Could not connect to server!");
             }
         }
 

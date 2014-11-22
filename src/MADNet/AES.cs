@@ -56,45 +56,39 @@ namespace MadNet
         private byte[] AESEncryption(byte[] data, byte[] key)
         {
             _aes.Key = key;
-            _aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 , 0};
+            _aes.IV = new byte[16];
 
-            ICryptoTransform _transform = _aes.CreateEncryptor(_aes.Key, _aes.IV);
+            using (ICryptoTransform _transform = _aes.CreateEncryptor(_aes.Key, _aes.IV))
             using (MemoryStream _stream = new MemoryStream())
             {
                 using (CryptoStream _cryptoStream = new CryptoStream(_stream, _transform, CryptoStreamMode.Write))
                 {
-                    // first block-iv
                     _buffer = new byte[16];
                     _gen.GetBytes(_buffer);
-                    _cryptoStream.Write(_buffer, 0, 15);
-
-                    // rest of data
+                    _cryptoStream.Write(_buffer, 0, 16);
                     _cryptoStream.Write(data, 0, data.Length);
-                    return _stream.ToArray();
+
                 }
+                return _stream.ToArray();
             }
         }
 
         private byte[] AESDecryption(byte[] data, byte[] key)
         {
             _aes.Key = key;
-            _aes.IV = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            _aes.IV = new byte[16];
 
-            ICryptoTransform _transform = _aes.CreateDecryptor(_aes.Key, _aes.IV);
+            using (ICryptoTransform _transform = _aes.CreateDecryptor(_aes.Key, _aes.IV))
             using (MemoryStream _stream = new MemoryStream(data))
+            using (MemoryStream _stream2 = new MemoryStream())
             {
                 using (CryptoStream _cryptoStream = new CryptoStream(_stream, _transform, CryptoStreamMode.Read))
                 {
-                    // encrypt everything
-                    _buffer = new byte[data.Length];
-                    _cryptoStream.Read(_buffer, 0, data.Length);
-
-                    // remove first 16 bytes
-                    byte[] _buffer2 = new byte[_buffer.Length - 16];
-                    Array.Copy(_buffer, 15, _buffer2, 0, _buffer2.Length);
-
-                    return _buffer;
+                    _buffer = new byte[16];
+                    _cryptoStream.Read(_buffer, 0, 16);
+                    _cryptoStream.CopyTo(_stream2);
                 }
+                return _stream2.ToArray();
             }
         }
 

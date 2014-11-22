@@ -10,11 +10,11 @@ namespace CLIClient
 {
     public class Program
     {
+        /* ARGS => <server-ip>   <server-port> <aes-pass> */
+        /* ARGS => <server-host> <server-port> <aes-pass> */
+
         static int Main(string[] args)
         {
-            /* ARGS => <server-ip>   <server-port> <aes-pass> */
-            /* ARGS => <server-host> <server-port> <aes-pass> */
-
             IPAddress _serverIp = null;
             int _serverPort = 0;
             string _aesPass = null;
@@ -113,14 +113,18 @@ namespace CLIClient
                 _client.Connect();
                 _client.GetServerInfo();
 
-                CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER: " + _client.serverHeader + "\n");
-                CLIOutput.WriteToConsole("<color><yellow>SERVER-VER.:   " + _client.serverVersion + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER:   " + _client.serverHeader + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:  " + _client.serverVersion + "\n");
 
                 _client.StartRemoteCLI();
             }
             catch (Exception e)
             {
-                CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "\n");
+                if (e is System.Security.Cryptography.CryptographicException)
+                    CLIOutput.WriteToConsole("<color><red>CryptographicExecption: AES-key is wrong!\n");
+                else
+                    CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "!\n");
+
                 CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
                 Console.ReadKey();
             }
