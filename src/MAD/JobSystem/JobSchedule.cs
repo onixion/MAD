@@ -21,7 +21,7 @@ namespace MAD.JobSystemCore
         private bool _log = false;
 
         private Thread _cycleThread;
-        private int _cycleTime = 1;
+        private int _cycleTime = 10;
 
         private object _stateLock = new object();
         /* state = 0 | inactive
