@@ -12,8 +12,6 @@ namespace MAD
         public enum OType 
         {
             INTEGER,
-            CHAR20,
-            CHAR30,
             boolean1 
         }
 
@@ -34,10 +32,6 @@ namespace MAD
             {
                 case OType.INTEGER:
                     return "INTERGER";
-                case OType.CHAR20:
-                    return "CHAR(20)";
-                case OType.CHAR30:
-                    return "CHAR(30)";
                 case OType.boolean1:
                     return "BOOLEAN1";
 
@@ -58,5 +52,8 @@ namespace MAD
             this.data = data;
         }
     }
-
+    public class Select
+    {
+        
+    }
 }
