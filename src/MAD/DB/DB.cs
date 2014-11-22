@@ -29,9 +29,9 @@ MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("H
 //reading function will be finished soon
 
 
-namespace MAD
+namespace MAD.Database
 { 
-    public class DB
+    public class DB : IDisposable // <- this is needed when the DB gets destroyed at the end of program
     {
         private string _DBname;
         private SQLiteConnection _dbConnection;
@@ -40,21 +40,30 @@ namespace MAD
         public DB(string DBname)
         {
             _DBname = DBname;
-            if (!File.Exists(_DBname))
-            {
-                SQLiteConnection.CreateFile(_DBname);
-            }
+            //if (!File.Exists(_DBname))
+            SQLiteConnection.CreateFile(_DBname);
+            ConnectDB();
+
+            // Why not automaticly connect to DB and
+            // create all need tables?
+            CreateDeviceTable();
+            CreateEventTable();
+            CreateSummaryTable();
+
+            CreateProtocolTable();
+            CreateJobTypeTable();
+            //CreateJobNameTable(); this one is not necessary ... makes everthing more complicated
         }
 
         //connect to database
-        public void ConnectDB(string DBname)
+        private void ConnectDB() // <- database name as a argument is not necessary, already defined with constructor
         {
-            _dbConnection = new SQLiteConnection("Data Source=" + DBname + ";;");
+            _dbConnection = new SQLiteConnection("Data Source=" + _DBname);
             _dbConnection.Open();
         }
 
         //disconnect
-        public void DisconnectDB()
+        private void DisconnectDB()
         {
             _dbConnection.Close();
         }
@@ -181,6 +190,11 @@ namespace MAD
             DataTable TempResult = new DataTable();
             TempResult.Load(reader);
             return TempResult;
+        }
+
+        public void Dispose()
+        {
+            DisconnectDB();
         }
     }
 }
