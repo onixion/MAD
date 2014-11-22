@@ -6,11 +6,11 @@ namespace MadNet
 {
     public static class MadNetHelper
     {
+        private static Random _rand;
+
         private static SHA1 _SHA1 = new SHA1CryptoServiceProvider();
         private static SHA256 _SHA256 = new SHA256CryptoServiceProvider();
         private static SHA512 _SHA512 = new SHA512CryptoServiceProvider();
-
-        private static Random _rand;
 
         #region SHA1 hashing
 
@@ -53,29 +53,6 @@ namespace MadNet
         }
 
         #endregion
-
-        public static byte[] CombineByteArrays(byte[] Array1, byte[] Array2)
-        {
-            byte[] resultArray = new byte[Array1.Length + Array2.Length];
-            Array.Copy(Array1, resultArray, Array1.Length);
-            Array.Copy(Array2, 0, resultArray, Array1.Length, Array2.Length);
-            return resultArray;
-        }
-
-        public static string GetUnicodeRandom(int length)
-        {
-            _rand = new Random((int)DateTime.Now.Ticks);
-
-            byte[] str = new byte[length * 2];
-            for (int i = 0; i < length * 2; i += 2)
-            {
-                int chr = _rand.Next(0xD7FF);
-                str[i + 1] = (byte)((chr & 0xFF00) >> 8);
-                str[i] = (byte)(chr & 0xFF);
-            }
-
-            return Encoding.Unicode.GetString(str);
-        }
 
         public static string GetTimeStamp()
         {

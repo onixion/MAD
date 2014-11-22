@@ -12,6 +12,7 @@ namespace MAD.JobSystemCore
         public enum TimeMethod { Absolute, Relative }
         public TimeMethod type;
 
+        public bool delayed = false;
         public JobDelayHandler jobDelay { get; set; }
         public List<JobTimeHandler> jobTimes { get; set; }
 

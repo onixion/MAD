@@ -110,24 +110,22 @@ namespace MAD.CLIServerCore
 
         public void Start()
         {
-            using (CLIPacket _cliP = new CLIPacket(_stream, _aes))
+            using (CLIPacket _cliP = new CLIPacket(_stream))
             {
                 Command _command = null;
 
                 while (true)
                 {
-                    _cliP.ReceivePacket();
+                    _cliP.ReceivePacket(_aes);
                     _cliP.serverAnswer = CLIInterpreter(ref _command, _cliP.cliInput);
 
                     if (_cliP.serverAnswer == "VALID_PARAMETERS")
-                    {
                         _cliP.serverAnswer = _command.Execute(_cliP.consoleWidth);
-                        _cliP.SendPacket();
 
-                        if (_cliP.serverAnswer == "EXIT_CLI")
-                            break;
+                    _cliP.SendPacket(_aes);
 
-                    }
+                    if (_cliP.serverAnswer == "EXIT_CLI")
+                        break;
                 }
             }
         }

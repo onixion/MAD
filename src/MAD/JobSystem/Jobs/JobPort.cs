@@ -9,6 +9,7 @@ namespace MAD.JobSystemCore
         #region members
 
         public int port { get; set; }
+        public int timeout { get; set; }
 
         #endregion
 
@@ -17,7 +18,8 @@ namespace MAD.JobSystemCore
         public JobPort()
             : base("NULL", JobType.PortScan, new JobTime(), new JobOutput())
         {
-            this.port = 80;
+            port = 80;
+            timeout = 5000;
         }
 
         #endregion
@@ -27,6 +29,9 @@ namespace MAD.JobSystemCore
         public override void Execute(IPAddress targetAddress)
         {
             Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            _socket.SendTimeout = timeout;
+            _socket.ReceiveTimeout = timeout;
+
             try
             {
                 _socket.Connect(new IPEndPoint(targetAddress, port));

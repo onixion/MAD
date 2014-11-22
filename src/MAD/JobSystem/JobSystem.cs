@@ -25,7 +25,6 @@ namespace MAD.JobSystemCore
 
         public event EventHandler OnScheduleStateChange = null;
         public event EventHandler OnNodeCountChange = null;
-        public event EventHandler OnNodeStatusChange = null;
         public event EventHandler OnJobCountChange = null;
         public event EventHandler OnJobStatusChange = null;
         public event EventHandler OnShutdown = null;

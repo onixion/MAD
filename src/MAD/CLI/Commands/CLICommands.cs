@@ -146,6 +146,15 @@ namespace MAD.CLICore
         }
     }
 
+    public class ClearCommand : Command
+    {
+        public override string Execute(int consoleWidth)
+        {
+            Console.Clear();
+            return "";
+        }
+    }
+
     public class InfoCommand : Command
     {
         public InfoCommand()

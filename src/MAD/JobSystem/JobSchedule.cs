@@ -21,13 +21,12 @@ namespace MAD.JobSystemCore
         private bool _log = false;
 
         private Thread _cycleThread;
-        private int _cycleTime = 100;
+        private int _cycleTime = 1;
 
         private object _stateLock = new object();
         /* state = 0 | inactive
          * state = 1 | active
-         * state = 2 | stop-request
-         * state = 3 | execption */
+         * state = 2 | stop-request */
         private int _state = 0;
         public int state { get { return _state; } }
 
@@ -104,11 +103,11 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    if (_job.state == 1)
+                                    if (_job.state == 1 || _job.state == 2)
                                     {
-                                        if (_job.type != Job.JobType.NULL)
+                                        if (JobTimeCheck(_job, _nowTime))
                                         {
-                                            if (JobTimeCheck(_job, _nowTime))
+                                            if (_job.type != Job.JobType.NULL)
                                             {
                                                 if (_log)
                                                     Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
@@ -146,41 +145,72 @@ namespace MAD.JobSystemCore
 
         private bool JobTimeCheck(Job job, DateTime time)
         {
-            if (job.time.type == JobTime.TimeMethod.Relative)
+            if (job.time.delayed)
             {
-                if (job.time.jobDelay.CheckTime())
+                if (job.state == 1)
                 {
-                    job.time.jobDelay.Reset();
+                    job.time.delayed = false;
                     return true;
-                }
-                else
-                {
-                    job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
-                    return false;
-                }
-            }
-            else if (job.time.type == JobTime.TimeMethod.Absolute)
-            {
-                JobTimeHandler _timeHandler = job.time.GetJobTimeHandler(time);
-
-                if (_timeHandler != null)
-                {
-                    if (!_timeHandler.IsBlocked(time))
-                    {
-                        if (_timeHandler.CheckTime(time))
-                        {
-                            _timeHandler.minuteAtBlock = time.Minute;
-                            return true;
-                        }
-                    }
-                    
-                    return false;
                 }
                 else
                     return false;
             }
             else
-                return false;
+            {
+                if (job.time.type == JobTime.TimeMethod.Relative)
+                {
+                    if (job.time.jobDelay.CheckTime())
+                    {
+                        job.time.jobDelay.Reset();
+
+                        if (job.state == 1)
+                            return true;
+                        else
+                        {
+                            // Job can't get executed at the moment,
+                            // try at next cycle.
+                            job.time.delayed = true;
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        job.time.jobDelay.SubtractFromDelaytime(_cycleTime);
+                        return false;
+                    }
+                }
+                else if (job.time.type == JobTime.TimeMethod.Absolute)
+                {
+                    JobTimeHandler _timeHandler = job.time.GetJobTimeHandler(time);
+
+                    if (_timeHandler != null)
+                    {
+                        if (!_timeHandler.IsBlocked(time))
+                        {
+                            if (_timeHandler.CheckTime(time))
+                            {
+                                _timeHandler.minuteAtBlock = time.Minute;
+
+                                if (job.state == 1)
+                                    return true;
+                                else
+                                {
+                                    // Job can't get executed at the moment,
+                                    // try at next cycle.
+                                    job.time.delayed = true;
+                                    return false;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
         }
 
         private void JobThreadStart(JobHolder holder)
@@ -231,33 +261,13 @@ namespace MAD.JobSystemCore
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                        if (_job.settings != null)
+                        if (_job.settings == null)
                         {
-                            // This is not the perfect solution. Need to create a class, which
-                            // can stack notifications, so we do not lose precious time here ...
-                            NotificationSystem.SendMail(_job.settings.mailAddr, _mailSubject, _mailContent, 2,
-                                _job.settings.login.smtpAddr, _job.settings.login.mail,
-                                _job.settings.login.password, _job.settings.login.port);
+                            MailNotification.SendMail(_mailSubject, _mailContent);
                         }
                         else
                         {
-                            // WORKIN ON THIS!!!
-                            /*
-                            if (_conf.MAIL_DEFAULT != null || _conf.MAIL_DEFAULT.Length != 0)
-                            {
-                                // Use global notification-settings.
-
-                                /* The JobSchedule does not know if the SMTP-Login works. */
-                            /*
-                                NotificationSystem.SendMail(_conf.MAIL_DEFAULT,
-                                    _mailSubject, _mailContent, 2);
-                            }
-                            else
-                            {
-                                // No notification is possible, because the Job has no settings and the default
-                                // mail-addresses are not set.
-                                Logger.Log("No notification possible! Job has no settings and no global settings set!", Logger.MessageType.ERROR);
-                            }*/
+                            MailNotification.SendMail(_job.settings, _mailSubject, _mailContent);
                         }
                     }
                 }
