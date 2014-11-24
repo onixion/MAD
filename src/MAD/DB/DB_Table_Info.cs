@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MAD
+namespace MAD.Database
 {
     public class TableInfo
     {
@@ -12,8 +12,6 @@ namespace MAD
         public enum OType 
         {
             INTEGER,
-            CHAR30,
-            CHAR100,
             boolean1 
         }
 
@@ -34,10 +32,6 @@ namespace MAD
             {
                 case OType.INTEGER:
                     return "INTERGER";
-                case OType.CHAR30:
-                    return "CHAR(30)";
-                case OType.CHAR100:
-                    return "CHAR(100)";
                 case OType.boolean1:
                     return "BOOLEAN1";
 
@@ -58,5 +52,8 @@ namespace MAD
             this.data = data;
         }
     }
-
+    public class Select
+    {
+        
+    }
 }

@@ -13,46 +13,89 @@ using MAD.JobSystemCore;
 
 namespace MAD.MacFinders
 {
-    class ARPReader
+    static class ARPReader
     {
-        private CaptureDeviceList _list;
-        private ICaptureDevice _dev;
-        private ICaptureDevice _listenDev;
+        private static CaptureDeviceList _list;
+        private static ICaptureDevice _dev;
+        private static ICaptureDevice _listenDev;
 
+        private static Object lockObj = new Object();
+        private static bool _working = false;
         private static Thread _steady;
 
-        public uint networkInterface = MadConf.conf.arpInterface;
-        public uint subnetMask;
-        public IPAddress netAddress;
-        public IPAddress srcAddress;
+        public static uint networkInterface = MadConf.conf.arpInterface - 1;
+        public static uint subnetMask;
+        public static IPAddress netAddress;
+        public static IPAddress srcAddress;
 
-        public void Start()
+        public static void CheckStart()
         {
-            Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
-            _list = CaptureDeviceList.Instance;
-            Thread _send = new Thread(SendRequests);
-            Thread _listen = new Thread(ListenForRequests);
+            Logger.Log("Start Checking Devices", Logger.MessageType.INFORM);
+            InitInterfaces();
+            Thread _listen = new Thread(ListenCheckResponses);
             _listen.Start();
-            Thread.Sleep(10);
-            _send.Start();
-            _send.Join();
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
+            foreach (ModelHost _dummy in ModelHost.hostList)
             {
-                Thread.Sleep(1000);
+                _dummy.status = false;
+                ExecuteRequests(_dummy.hostIP);
             }
-            _listen.Join();
-            _dev.Close();
-            Thread.Sleep(100);
-            _listenDev.Close();
-
+            Thread.Sleep(10000);
+            DeInitInterfaces();
         }
 
-        public string ListInterfaces()
+        public static void FloodStart()
+        {
+            Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
+            InitInterfaces();
+            Thread _listen = new Thread(ListenFloodResponses);
+            _listen.Start();
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
+            SendRequests();
+            Thread.Sleep(10000);
+            _listen.Join();
+            DeInitInterfaces();
+        }
+
+        private static void InitInterfaces()
+        {
+            _list = CaptureDeviceList.Instance;
+            _dev = _list[(int)networkInterface];
+            _dev.Open();
+
+            _listenDev = _list[(int)networkInterface];
+        }
+
+        private static void ListenCheckResponses()
+        {
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ProcessCheck);
+            _listenDev.Open();
+            _listenDev.StartCapture();
+        }
+
+        private static void ListenFloodResponses()
+        {
+            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ProcessFlood);
+            _listenDev.Open();
+            _listenDev.StartCapture();
+        }
+
+        private static void DeInitInterfaces()
+        {
+            _dev.Close();
+            _listenDev.StopCapture();
+            _listenDev.Close();
+            _dev = null;
+            _listenDev = null;
+        }
+
+        public static string ListInterfaces()
         {
             Logger.Log("Listed Interfaces for ArpReader", Logger.MessageType.INFORM);
 
             _list = CaptureDeviceList.Instance;
 
+            uint _count = 1;
             string _buffer = "";
 
             if (_list.Count < 1)
@@ -67,12 +110,15 @@ namespace MAD.MacFinders
             _buffer += "\n";
 
             foreach (ICaptureDevice dev in _list)
+            {
+                _buffer += "Nr " + _count.ToString() + "\n";
                 _buffer += dev.ToString() + "\n";
 
+            }
             return _buffer;
         }
 
-        public void SteadyStart(object jsArg)
+        public static void SteadyStart(object jsArg)
         {
             _steady = new Thread(SteadyStartsFunktion);
             _steady.Start(jsArg);
@@ -83,18 +129,18 @@ namespace MAD.MacFinders
             _steady.Abort();
         }
 
-        private void SteadyStartsFunktion(object jsArg)
+        private static void SteadyStartsFunktion(object jsArg)
         {
             while (true)
             {
                 JobSystem _js = (JobSystem)jsArg;
-                Start();
+                FloodStart();
                 _js.SyncNodes(ModelHost.hostList);
-                Thread.Sleep(300000);                                                                //too tired, fixing tomorrow
+                Thread.Sleep(300000);
             }
         }
 
-        private void SendRequests()
+        private static void SendRequests()
         {
             Logger.Log("Sending ArpRequest flood..", Logger.MessageType.INFORM);
             uint _hosts = NetworkHelper.GetHosts(subnetMask);
@@ -105,11 +151,7 @@ namespace MAD.MacFinders
 
             uint _netPartInt = BitConverter.ToUInt32(_netPartBytes, 0);
 
-            _dev = _list[(int) networkInterface];
-            _dev.Open();
-            PhysicalAddress _sourceHW = _dev.MacAddress;
-
-            EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
 
             byte[] _targetBytes = new byte[4];
 
@@ -121,36 +163,53 @@ namespace MAD.MacFinders
 
                 IPAddress _target = new IPAddress(_targetBytes);
 
-                ARPPacket _arppac = new ARPPacket(ARPOperation.Request, 
-                                                    System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"), 
-                                                    _target, 
-                                                    _sourceHW, 
-                                                    srcAddress);
-                _ethpac.PayloadPacket = _arppac;
-
-                try
-                {
-                    _dev.SendPacket(_ethpac);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
-                }
+                ExecuteRequests(_ethpac, _target);
             }   
         }
 
-        private void ListenForRequests()
+        public static void ExecuteRequests(IPAddress destIP)
         {
-            Logger.Log("Started listening for Responses on ArpFlood..", Logger.MessageType.INFORM);
-            _listenDev = _list[(int)networkInterface];
-
-            _listenDev.OnPacketArrival += new PacketArrivalEventHandler(ParseArpPackets);
-            _listenDev.Open(DeviceMode.Normal);
-            _listenDev.StartCapture();
+            EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
             
+            ARPPacket _arppac = new ARPPacket(ARPOperation.Request,
+                                                System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"),
+                                                destIP,
+                                                _ethpac.SourceHwAddress,
+                                                srcAddress);
+            _ethpac.PayloadPacket = _arppac;
+
+            try
+            {
+                _dev.SendPacket(_ethpac);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
+            }
         }
 
-        private void ParseArpPackets(object sender, CaptureEventArgs packet)
+        private static void ExecuteRequests(EthernetPacket pacBase, IPAddress destIP)
+        {
+            ARPPacket _arppac = new ARPPacket(ARPOperation.Request,
+                                                System.Net.NetworkInformation.PhysicalAddress.Parse("00-00-00-00-00-00"),
+                                                destIP,
+                                                pacBase.SourceHwAddress,
+                                                srcAddress);
+            pacBase.PayloadPacket = _arppac;
+
+            try
+            {
+                _dev.SendPacket(pacBase);
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Problems with sending ArpRequest flood: " + ex.ToString(), Logger.MessageType.ERROR);
+            }
+        }
+
+        private static void ProcessFlood(object sender, CaptureEventArgs packet)
         {
             if (packet.Packet.Data.Length >= 42)
             {
@@ -166,7 +225,31 @@ namespace MAD.MacFinders
             }
         }
 
-		private ModelHost ReadAddresses(byte[] data)
+        private static void ProcessCheck(object sender, CaptureEventArgs packet)
+        {
+            if (packet.Packet.Data.Length >= 42)
+            {
+                byte[] data = packet.Packet.Data;
+                byte[] arpheader = new byte[4];
+                ModelHost _dummy = new ModelHost();
+                arpheader[0] = data[12];
+                arpheader[1] = data[13];
+                arpheader[2] = data[20];
+                arpheader[3] = data[21];
+
+                if (arpheader[0] == 8 && arpheader[1] == 6 && arpheader[2] == 0 && arpheader[3] == 2)
+                    _dummy = ReadAddresses(data);
+
+                if (ModelHost.Exists(_dummy))
+                {
+                    _dummy.status = true;
+                    ModelHost.UpdateHost(_dummy, _dummy);
+                }
+                
+            }
+        }
+
+		private static ModelHost ReadAddresses(byte[] data)
         {
 			byte[] hwAddress = new byte[6];
 			byte[] ipAddress = new byte[4];
@@ -198,7 +281,7 @@ namespace MAD.MacFinders
 			return _tmp; 
         }
 
-		private void SyncModelHosts(ModelHost _dummy)
+		private static void SyncModelHosts(ModelHost _dummy)
         {
 			if (ModelHost.Exists (_dummy))
 				ModelHost.UpdateHost (_dummy, _dummy);
@@ -206,7 +289,7 @@ namespace MAD.MacFinders
 				ModelHost.AddToList (_dummy);
         }
 
-		private string TryGetName(IPAddress ipAddr)
+		private static string TryGetName(IPAddress ipAddr)
 		{
 			string hostName = "";
             IPHostEntry ipEntry;

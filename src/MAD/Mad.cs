@@ -3,12 +3,16 @@ using System.Windows.Forms;
 using System.IO;
 using System.Security.AccessControl;
 
+using MAD.Database;
 using MAD.JobSystemCore;
 using MAD.CLICore;
 using MAD.CLIServerCore;
 using MAD.MacFinders;
 using MAD.Logging;
 using MAD.Notification;
+
+using MadNet;
+using System.Text;
 
 namespace MAD
 {
@@ -18,11 +22,9 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
 
         [STAThread]
-        static int Main(string[] args)
-       {
-            Console.WriteLine("(WARNING) THIS SOFTWARE IS STILL UNDER DEVELOPMENT!");
-            Console.WriteLine("(WARNING) DO NOT RELY ON THIS SOFTWARE!");
-            
+        public static int Main(string[] args)
+        {
+            // load config-file
             MadConf.TryCreateDir(DATADIR);
             if (File.Exists(CONFFILE))
             {
@@ -46,17 +48,20 @@ namespace MAD
                 Console.WriteLine("(CONFIG) Loaded default config.");
                 MadConf.SaveConf(CONFFILE);
                 Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
-                Console.WriteLine("(CONFIG) Default config does not use all possible features!");
+                Console.WriteLine("(CONFIG) Default config may not use all possible features!");
             }
 
+            // init components
+
+            DB db = new DB(Path.Combine(DATADIR, "mad.db"));
             JobSystem js = new JobSystem();
             DHCPReader dhcpReader = new DHCPReader(js);
-
             NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
+            MailNotification.Start();
 
+            // start interface
             if (args.Length == 0)
             { 
-                // No args -> start gui.
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
                 Logger.Log("Programm Aborted. No GUI!", Logger.MessageType.EMERGENCY);
                 Logger.ForceWriteToLog();
@@ -68,47 +73,81 @@ namespace MAD
                 switch (args[0])
                 {
                     case "-cli":
-                        Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
+                        if (MadConf.conf.LOG_MODE)
+                            Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
                         CLI cli = new CLI(js, dhcpReader);
                         cli.Start();
                         break;
+
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
                         {
-                            CLIServer cliServer = new CLIServer(MadConf.conf.SERVER_CERT, js);
+                            CLIServer cliServer = new CLIServer(js);
                             cliServer.Start();
-                            Console.ReadKey();
+
+                            Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + ".");
+                            if (MadConf.conf.LOG_MODE)
+                                Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
+
+                            Console.ReadKey(true);
+                            cliServer.Stop();
+
+                            Console.WriteLine("(SERVER) Stopped.");
+                            if (MadConf.conf.LOG_MODE)
+                                Logger.Log("Server stopped", Logger.MessageType.INFORM);
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Could not start server: " + e.Message);
-                            Console.ReadKey();
+                            Console.WriteLine("(SERVER) Could not start: " + e.Message);
+                            if (MadConf.conf.LOG_MODE)
+                                Logger.Log("CLIServer could not start: " + e.Message, Logger.MessageType.ERROR);
                         }
+
+                        PressAnyKeyToClose();
                         break;
+
                     default:
-                        Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
-                        Logger.ForceWriteToLog();
-                        Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!\nPress any key to close ...");
-                        Console.ReadKey();
-                        return 1;
+                        Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");
+                        if (MadConf.conf.LOG_MODE)
+                        {
+                            Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
+                            Logger.ForceWriteToLog();
+                        }
+
+                        PressAnyKeyToClose();
+                        break;
                 }
             }
             else
             {
-                Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
-                Logger.ForceWriteToLog();
-                Console.WriteLine("ERROR! Too many arguments!\nPress any key to close ...");
-                Console.ReadKey();
-                return 1;
+                Console.WriteLine("ERROR! Too many arguments!");
+                if (MadConf.conf.LOG_MODE)
+                {
+                    Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
+                    Logger.ForceWriteToLog();
+                }
+
+                PressAnyKeyToClose();
             }
 
             js.Shutdown();
+            db.Dispose();
+            MailNotification.Stop();
 
-            Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
-            Logger.ForceWriteToLog();
+            if (MadConf.conf.LOG_MODE)
+            {
+                Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
+                Logger.ForceWriteToLog();
+            }
 
             return 0;
+        }
+
+        private static void PressAnyKeyToClose()
+        {
+            Console.WriteLine("Press any key to close program ...");
+            Console.ReadKey(true);
         }
     }
 }

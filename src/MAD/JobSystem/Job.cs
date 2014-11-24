@@ -21,15 +21,13 @@ namespace MAD.JobSystemCore
         private int _id;
         [JsonIgnore]
         public int id { get { return _id; } }
-        
+        [JsonIgnore]
+        public int state = 0;
         /* This INT represents the state of the job.
          * state = 0 | stopped
          * state = 1 | waiting
          * state = 2 | working
          * state = 3 | execption */
-        [JsonIgnore]
-        public int state = 0;
-
         [JsonIgnore]
         public JobOutput outp { get; set; }
         [JsonIgnore]
@@ -39,13 +37,11 @@ namespace MAD.JobSystemCore
         [JsonIgnore]
         public TimeSpan tSpan { get; set; }
 
-        // general
         public Guid guid { get; set; }
         public string name { get; set; }
         public JobType type { get; set; }
         public JobTime time { get; set; }
 
-        // notification
         public bool notiFlag = true;
         public JobNotificationSettings settings { get; set; }
         public List<JobRule> rules = new List<JobRule>();

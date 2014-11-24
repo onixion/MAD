@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.NetworkInformation;
 using System.Collections.Generic;
 
 using SnmpSharpNet;
+using PacketDotNet;
+using SharpPcap;
 
 namespace MAD.Helper
 {
@@ -205,6 +208,22 @@ namespace MAD.Helper
             }
 
             return _param; 
+        }
+
+        public static EthernetPacket CreateArpBasePacket(PhysicalAddress sourceHW)
+        {
+            EthernetPacket _ethpac = new EthernetPacket(sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
+
+            return _ethpac;
+        }
+
+        public static EthernetPacket CreateArpBasePacket(string sourceHWString)                                                                                                        //use carfully, make sure the string is a mac address
+        {
+            PhysicalAddress _sourceHW = PhysicalAddress.Parse(sourceHWString);
+
+            EthernetPacket _ethpac = new EthernetPacket(_sourceHW, PhysicalAddress.Parse("FF-FF-FF-FF-FF-FF"), EthernetPacketType.Arp);
+
+            return _ethpac;
         }
         #endregion
     }

@@ -7,26 +7,31 @@ using System.Data.SQLite; //include SQLite database library
 using System.IO;  
 using System.Data;
 
-namespace MAD
-{
-    /*      //don't forget at the end .sqlite
-            DB MADmemory = new DB("MAD7.sqlite");
-            //connect to DB
-            MADmemory.ConnectDB("MAD7.sqlite");
-     * 
-     *      MADmemory.CreateTable("mac_id", new TableInfo("IP", TableInfo.OType.CHAR20), new TableInfo("PORT", TableInfo.OType.CHAR30), new TableInfo("subnetzmaske", TableInfo.OType.CHAR30));
+/*
+ //add to main!!
+            DB MADstore = new DB("MAD.sqlite");
+            MADstore.ConnectDB("MAD.sqlite");
 
-            MADmemory.InsertToTable("mac_id", new Insert("PORT", "17"), new Insert("IP", "192.168.1.8"));
+            MADstore.CreateDeviceTable();
+            MADstore.CreateEventTable();
+            MADstore.CreateJobTypeTable();
+            MADstore.CreateProtocolTable();
+            MADstore.CreateStatusTable();
+            MADstore.CreateSummaryTable();
+ 
+            MADstore.DisconnectDB();
+ */
+//how to insert e.g. ... 
+/*
+MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("HOST", "YOLO"), new Insert("IP", "192.168.17.17"));
+                          Tablename                column    value ...
+*/
+//reading function will be finished soon
 
-            DataTable TableTest = MADmemory.ReadTable("mac_id");
 
-            Console.WriteLine();
-
-            MADmemory.AllTables();
-     *
-     * */
-
-    public class DB
+namespace MAD.Database
+{ 
+    public class DB : IDisposable // <- this is needed when the DB gets destroyed at the end of program
     {
         private string _DBname;
         private SQLiteConnection _dbConnection;
@@ -35,72 +40,93 @@ namespace MAD
         public DB(string DBname)
         {
             _DBname = DBname;
-            if (!File.Exists(_DBname))
-            {
-                SQLiteConnection.CreateFile(_DBname);
-            }
+            //if (!File.Exists(_DBname))
+            SQLiteConnection.CreateFile(_DBname);
+            ConnectDB();
+
+            // Why not automaticly connect to DB and
+            // create all need tables?
+            CreateDeviceTable();
+            CreateEventTable();
+            CreateSummaryTable();
+
+            CreateProtocolTable();
+            CreateJobTypeTable();
+            //CreateJobNameTable(); this one is not necessary ... makes everthing more complicated
         }
 
         //connect to database
-        public void ConnectDB(string DBname)
+        private void ConnectDB() // <- database name as a argument is not necessary, already defined with constructor
         {
-            //_dbConnection = new SQLiteConnection("Data Source=MyDatabase.sqlite;Version=3;");
-            _dbConnection = new SQLiteConnection("Data Source=" + DBname + ";Version=3;");
+            _dbConnection = new SQLiteConnection("Data Source=" + _DBname);
             _dbConnection.Open();
         }
 
         //disconnect
-        public void DisconnectDB()
+        private void DisconnectDB()
         {
             _dbConnection.Close();
         }
 
-        public bool TableCheck(string TabelName)
-        { 
-           // _dbConnection.
-            return true;
-        }
-
-        //check if table excists, create if not and connect
-        public void CreateTable(string TableName, params TableInfo[] tableInfos)
+        public void CreateDeviceTable()
         {
-            string sql = "create table if not exists '" + TableName + "' (";
-            sql += "id INTEGER PRIMERY KEY AUTO_INCREMENT,";
-            for (int i = 0; i < tableInfos.Length; i++)
-            {
-                sql += tableInfos[i].GetCommand();
-                if (i != tableInfos.Length - 1)
-                    sql += ",";
-            }
-            sql += ")";
-            
+            string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID TEXT, HOSTNAME TEXT, IP TEXT, MAC TEXT, Online INTEGER, Memo1 VARCHAR(5), Memo2 TEXT);";
+
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-          
+
             command.ExecuteNonQuery();
+            command.Dispose();
         }
 
-        public int Insert(string Command)
+        public void CreateEventTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteNonQuery();
+            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, Success INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+            command.Dispose();
         }
 
-        public DataTable Select(string Command)
+        public void CreateJobTypeTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteReader().GetSchemaTable();
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JobType TEXT);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+            command.Dispose();
         }
 
-        public int Create(string Command)
+        public void CreateJobNameTable()
         {
-            SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-            return cmd.ExecuteNonQuery();
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Name_Table ( ID INTEGER, JobNames TEXT);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+            command.Dispose();
+        }
+
+        public void CreateProtocolTable()
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol TEXT);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+            command.Dispose();
+        }
+
+        public void CreateSummaryTable()
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID TEXT, DATE TEXT, JOBTYPE INTEGER, PROTOCOL INTEGER, OutState INTEGER);";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+
+            command.ExecuteNonQuery();
+            command.Dispose();
         }
 
         //insert data
         public void InsertToTable(string TableName, params Insert[] insdata)
         {
-            // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
+            // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + "); ...";
             string sql = "INSERT into " + TableName + " (";
             for (int i = 0; i < insdata.Length; i++)
             {
@@ -121,32 +147,20 @@ namespace MAD
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
+            command.Dispose();
         }
-
-        //see all tables
-        
-        public DataTable AllTables()
-        {
-            //string sql = "SELECT name FROM '" + DBName + "'_master WHERE type='table'";
-            string sql = "SELECT name FROM sqlite_master WHERE type = 'table'";
-            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
-        }
-     
+    
 
         //read entire table
         public DataTable ReadTable(string TableName)
         {
-            //string sql = "SELECT * FROM '" + TableName + "' ORDER BY ID DESC";
-            string sql = "SELECT * FROM '" + TableName + "'";
+            string sql = "SELECT * FROM " + TableName + "";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             DataTable TempResult = new DataTable();
+            command.Dispose();
             TempResult.Load(reader);
-            return TempResult;
+            return TempResult;  
         }
 
         //read one result from table
@@ -159,55 +173,105 @@ namespace MAD
             TempResult.Load(reader);
             return TempResult;
         }
+        
+        public DataTable ReadEvents()
+        {
+            //string sql = "SELECT GUID, JobNames FROM " + TableName + " INNER JOIN Job_Name_Table ON Event_Table.JOBNAME = Job_Name_Table.JobNames WHERE GUID='" + TableID + "'";
+            //string sql = "SELECT * FROM Job_Name_Table, Job_Type_Table where Job_Name_Table.ID = Job_Type_Table.ID";
+            string sql = "SELECT * FROM event_Table INNER JOIN job_Name_Table ON event_Table.JOBNAME = job_Name_Table.ID INNER JOIN job_Type_Table ON event_Table.JOBTYPE = job_Type_Table.ID INNER JOIN protocol_Table ON event_Table.PROTOCOL = protocol_Table.ID;";
+            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            /*
+            while (reader.Read())
+                Console.WriteLine("ID: " + reader["ID"] + "\tJobname: " + reader["JobNames"] + "\tID: " + reader["ID"] + "\tJobType: " + reader["JobType"]);
+            Console.ReadLine();
+            command.Dispose();
+            */
+            DataTable TempResult = new DataTable();
+            TempResult.Load(reader);
+            return TempResult;
+        }
 
-
+        public void Dispose()
+        {
+            DisconnectDB();
+        }
     }
 }
 
-       
 
 
 
 
-
+//at the moment useless
 /*
-        public bool CheckTableExists(string TableName)
-        {
-           bool tableExists = false;
-           string query1 = "SELECT name FROM sqlite_master WHERE name ='" + TableName + "';";
+public int Insert(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteNonQuery();
+}
 
-           SQLiteConnection sqlConnection = OpenConnection();
-           SQLiteCommand sqlCommand = new SQLiteCommand(query1, sqlConnection);
-        
-            try
-            {
+public DataTable Select(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteReader().GetSchemaTable();
+}
 
-                SQLiteDataReader sqlDataReader = sqlCommand.ExecuteReader();
-
-                if(sqlDataReader.HasRows)
-                {
-                    tableExists = true;
-                }
-
-               // sqlDataReader.Close();
-               // sqlConnection.Close();
-            }
-      
-            catch (Exception ex)
-            {
-           //exception
-            }
-
-            return tableExists;
-        }
+public int Create(string Command)
+{
+    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
+    return cmd.ExecuteNonQuery();
+}
 */
 
-         //write results in the table
-         //  sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + ");";
-        //Public Output[] SelectFromTable(string tablename, ) 
+/* =========copy too main:
+ 
+            DB MADstore = new DB("MAD.sqlite");
+            MADstore.ConnectDB("MAD.sqlite");
+
+            MADstore.CreateDeviceTable();
+            MADstore.CreateEventTable();
+            MADstore.CreateJobTypeTable();
+            MADstore.CreateProtocolTable();
+            MADstore.CreateJobNameTable();
+            MADstore.CreateSummaryTable();
 
 
-
-
-
-
+            MADstore.InsertToTable("Device_Table",
+                        new Insert("GUID", "0001"), 
+                        new Insert("HOSTNAME", "Router1"), 
+                        new Insert("IP", "192.168.17.17"), 
+                        new Insert("MAC", "00-50-56-C0-00-08"), 
+                        new Insert("Online", "1"), 
+                        new Insert("Memo1","NAT-Router"), 
+                        new Insert ("Memo2", "Router for Ineternet-connection"));
+            MADstore.InsertToTable("Event_Table", 
+                        new Insert("GUID", "0001"), 
+                        new Insert("JOBNAME", "0"), 
+                        new Insert("JOBTYPE", "0"), 
+                        new Insert("PROTOCOL", "0"), 
+                        new Insert("Success", "1"), 
+                        new Insert("StartTime", "12:20:20:20"), 
+                        new Insert("StopTime", "12:20:20:50"), 
+                        new Insert("DelayTime", "00:30"), 
+                        new Insert("Custom1", "IPStatus"), 
+                        new Insert("Custom2", "17"));
+            MADstore.InsertToTable("Job_Type_Table", 
+                        new Insert("ID", "0"), 
+                        new Insert("JobType", "Ping-Request"));
+            MADstore.InsertToTable("Job_Type_Table", 
+                        new Insert("ID", "1"), 
+                        new Insert("JobType", "FTP-Request"));
+            MADstore.InsertToTable("Protocol_Table", 
+                        new Insert("ID", "0"), 
+                        new Insert("Protocol", "TCP"));
+            MADstore.InsertToTable("Job_Name_Table", 
+                        new Insert("ID", "0"), 
+                        new Insert("JobName", "Ping1"));
+            MADstore.InsertToTable("Summary_Table", 
+                        new Insert("GUID", "0001"), 
+                        new Insert("DATE", "12.03.2015"), 
+                        new Insert("JOBTYPE", "0"), 
+                        new Insert("Protocol", "0"), 
+                        new Insert("OutState", "60"));
+ */

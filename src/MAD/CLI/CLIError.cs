@@ -4,7 +4,7 @@ namespace MAD.CLICore
 {
     static class CLIError
     {
-        public const string _colorTag = "red";
+        private const string _colorTag = "red";
         public enum ErrorType
         {
             SyntaxError,

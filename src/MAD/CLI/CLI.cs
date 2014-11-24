@@ -28,16 +28,14 @@ namespace MAD.CLICore
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
+            commands.Add(new CommandOptions("clear", typeof(ClearCommand), null));
             commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
+            commands.Add(new CommandOptions("conf", typeof(ConfShowCommand), null));
             commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfigCommand), null));
-            commands.Add(new CommandOptions("conf-show", typeof(ConfShowCommand), null));
-
-            // MAIL-SETTINGS GLOBAL
-            commands.Add(new CommandOptions("set-mail", typeof(SetMailSettingsCommand), null));
-
+            
             // INTERNET CONECTIVITY
             commands.Add(new CommandOptions("check connection", typeof(ConnectivityTestCommand), null));
 
@@ -64,8 +62,8 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("js jobs", typeof(JobSystemStatusJobsCommand), new object[] { js }));
 
             // Schedule
-            commands.Add(new CommandOptions("Schedule start", typeof(JobScheduleStartCommand), new object[] { js }));
-            commands.Add(new CommandOptions("Schedule stop", typeof(JobScheduleStopCommand), new object[] { js }));
+            commands.Add(new CommandOptions("schedule start", typeof(JobScheduleStartCommand), new object[] { js }));
+            commands.Add(new CommandOptions("schedule stop", typeof(JobScheduleStopCommand), new object[] { js }));
 
             // NODES
             commands.Add(new CommandOptions("node add", typeof(JobSystemAddNodeCommand), new object[] { js }));
@@ -115,7 +113,7 @@ namespace MAD.CLICore
 
         public void Start()
         {
-            CLIOutput.WriteToConsole(GetBanner(Console.BufferWidth));
+            CLIOutput.WriteToConsole(GetBanner(Console.BufferWidth) + "\n");
 
             while (true)
             {
@@ -146,8 +144,8 @@ namespace MAD.CLICore
                             response = "<color><red>" + e.Message;
                         }
                     }
-                    
-                    CLIOutput.WriteToConsole(response);
+
+                    CLIOutput.WriteToConsole(response + "\n");
                 }
             }
         }

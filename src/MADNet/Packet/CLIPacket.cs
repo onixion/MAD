@@ -12,29 +12,25 @@ namespace MadNet
 
     public class CLIPacket : Packet
     {
-        public byte[] cliInput { get; set; }
+        public string cliInput { get; set; }
         public int consoleWidth { get; set; }
+        public string serverAnswer { get; set; }
 
-        public CLIPacket(NetworkStream stream, AES aes)
-            : base(stream, aes, 4) { }
+        public CLIPacket(NetworkStream stream)
+            : base(stream, 4) { }
 
-        public CLIPacket(NetworkStream stream, AES aes, int consoleWidth, byte[] cliInput)
-            : base(stream, aes, 4)
+        public override void SendPacketSpec(StreamIO streamIO, AES aes)
         {
-            this.consoleWidth = consoleWidth;
-            this.cliInput = cliInput;
+            SendBytes(Encoding.Unicode.GetBytes(cliInput), aes);
+            SendBytes(Ser(consoleWidth), aes);
+            SendBytes(Encoding.Unicode.GetBytes(serverAnswer), aes);
         }
 
-        public override void SendPacketSpec(StreamIO streamIO)
+        public override void ReceivePacketSpec(StreamIO streamIO, AES aes)
         {
-            SendBytes(Ser(consoleWidth));
-            SendBytes(cliInput);
-        }
-
-        public override void ReceivePacketSpec(StreamIO streamIO)
-        {
-            consoleWidth = (int)DeSer(ReceiveBytes(), typeof(Int32));
-            cliInput = ReceiveBytes();
+            cliInput = Encoding.Unicode.GetString(ReceiveBytes(aes));
+            consoleWidth = (int)DeSer(ReceiveBytes(aes), typeof(Int32));
+            serverAnswer = Encoding.Unicode.GetString(ReceiveBytes(aes));
         }
     }
 }

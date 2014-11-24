@@ -29,7 +29,8 @@ namespace MAD.JobSystemCore
             timeout = 5000;
 
             outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
-            outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
+            //outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
+            // Useless, does not work ...
         }
 
         #endregion
@@ -42,11 +43,6 @@ namespace MAD.JobSystemCore
             PingReply _reply = _ping.Send(targetAddress, timeout, new byte[8] {1,2,3,4,5,6,7,8} , _pingOptions);
 
             outp.GetOutputDesc("IPStatus").dataObject = _reply.Status.ToString();
-
-            if (_reply.Options != null)
-                outp.GetOutputDesc("TTL").dataObject = _reply.Options.Ttl;
-            else
-                outp.GetOutputDesc("TTL").dataObject = null;
 
             if (_reply.Status == IPStatus.Success)
                 outp.outState = JobOutput.OutState.Success;

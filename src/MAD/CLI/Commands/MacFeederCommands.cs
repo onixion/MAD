@@ -77,7 +77,7 @@ namespace MAD.CLICore
     #region ARPReader
     public class PrintArpReadyInterfaces : Command
     {
-        private ARPReader _reader = new ARPReader();                              
+        //private ARPReader _reader = new ARPReader();                              
 
         public PrintArpReadyInterfaces()
             : base()
@@ -87,7 +87,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            string _tmp = _reader.ListInterfaces();
+            string _tmp = ARPReader.ListInterfaces();
 
             return "<color><blue>" + _tmp;
         }
@@ -95,17 +95,19 @@ namespace MAD.CLICore
 
     public class ArpReaderStart : Command
     {
-        private ARPReader _reader = new ARPReader();
         private JobSystem _js; 
+
         public ArpReaderStart(object[] args)
             : base()
         {
             _js = (JobSystem) args[0];
-
-            rPar.Add(new ParOption("i", "INTERFACE", "The Networkinterface to use, check with arp reader list interfaces for the right one", false, false, new Type[] { typeof(uint) }));
+  
             rPar.Add(new ParOption("l", "SOURCE-IP", "The IPAddress of the used Network Interface", false, false, new Type[] { typeof(IPAddress) }));
             rPar.Add(new ParOption("s", "SUBNETMASK", "The Subnetmask of the Network. ie 16 for a /16 subnet", false, false, new Type[] { typeof(uint) }));
             rPar.Add(new ParOption("n", "NETWORK", "The Network Address. Something like 192.168.1.0", false, false, new Type[] { typeof(IPAddress) }));
+
+            oPar.Add(new ParOption("i", "INTERFACE", "The Networkinterface to use, check with arp reader list interfaces for the right one."
+            + " If none is chosen it will use the one declared in the config file", false, false, new Type[] { typeof(uint) }));
 
             oPar.Add(new ParOption("o", "ONE-SHOT", "Use this option to just make one scan", true, false, null));
             description = "Starts looking for hosts via ARP";
@@ -113,20 +115,22 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _reader.srcAddress = (IPAddress) pars.GetPar("l").argValues[0];
-            _reader.networkInterface = (uint)pars.GetPar("i").argValues[0] - 1;
-            _reader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
-            _reader.subnetMask = (uint)pars.GetPar("s").argValues[0];
+            ARPReader.srcAddress = (IPAddress) pars.GetPar("l").argValues[0];           
+            ARPReader.netAddress = (IPAddress)pars.GetPar("n").argValues[0];
+            ARPReader.subnetMask = (uint)pars.GetPar("s").argValues[0];
+
+            if(OParUsed("i"))
+                ARPReader.networkInterface = (uint)pars.GetPar("i").argValues[0] - 1;
 
             if (OParUsed("o"))
             {
-                _reader.Start();
+                ARPReader.FloodStart();
                 _js.SyncNodes(ModelHost.hostList);
                 return "<color><blue>Successfully performed Scan";
             }
             else
             {
-                _reader.SteadyStart(_js);
+                ARPReader.SteadyStart(_js);
                 return "<color><blue> Started steady arp reader";
             }
         }
@@ -145,7 +149,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            ModelHost.PingThroughList();
+            ARPReader.CheckStart();
             _js.SyncNodes(ModelHost.hostList);
             return "<color><blue>Updated list";
         }

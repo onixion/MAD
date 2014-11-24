@@ -126,7 +126,10 @@ namespace MAD.JobSystemCore
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return new System.Net.Mail.MailAddress(((string)reader.Value));
+            if (reader.Value != null)
+                return new System.Net.Mail.MailAddress(((string)reader.Value));
+            else
+                return null;
         }
     }
 
