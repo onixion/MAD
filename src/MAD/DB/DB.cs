@@ -89,7 +89,7 @@ namespace MAD.Database
 
         public void CreateJobTypeTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JobType TEXT);";
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, JobType TEXT);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
@@ -98,7 +98,7 @@ namespace MAD.Database
 
         public void CreateJobNameTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Job_Name_Table ( ID INTEGER, JobNames TEXT);";
+            string sql = "CREATE TABLE IF NOT EXISTS Job_Name_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, JobNames TEXT);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
@@ -107,7 +107,7 @@ namespace MAD.Database
 
         public void CreateProtocolTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol TEXT);";
+            string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, Protocol TEXT);";
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
 
             command.ExecuteNonQuery();
