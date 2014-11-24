@@ -220,11 +220,6 @@ namespace MAD.JobSystemCore
 
         private object JobInvoke(object holder)
         {
-            /* In the worst case scenario the node can be deleted at this point 
-             * and the only variable that prevents it from doing this, is the 
-             * 'uCounter'. Everytime the job starts, it increases the 'uCounter' by 1.
-             * After execution it decreases the counter by 1. Only if the uCounter is
-             * equal to 0 the node can be deleted (or else). */
             JobHolder _holder = (JobHolder)holder;
             JobNode _node = _holder.node;
             Job _job = _holder.job;
@@ -241,7 +236,9 @@ namespace MAD.JobSystemCore
             _job.tStop = DateTime.Now;
             _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
+            // Global OutDescriptors
             _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
+            _job.outp.outputs[1].dataObject = _job.tSpan.Milliseconds;
 
             if (MadConf.conf.NOTI_ENABLE)
             {

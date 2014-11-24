@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.MacFinders;
+using MAD.Logging;
 
 using Newtonsoft.Json;
 
@@ -14,7 +15,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public const string VERSION = "v2.9.0.3";
+        public const string VERSION = "v2.9.0.6";
         public const int MAXNODES = 100;
 
         private JobSchedule _Schedule { get; set; }
@@ -157,7 +158,7 @@ namespace MAD.JobSystemCore
                 case 1:
                     return "Active";
                 default:
-                    throw new Exception("NOT-VALID-NODESTATE");
+                    return "";
             }
         }
 
@@ -218,7 +219,7 @@ namespace MAD.JobSystemCore
                 case 3:
                     return "Exception";
                 default:
-                    throw new Exception("NOT-VALID-JOBSTATE");
+                    return "";
             }
         }
 
@@ -422,8 +423,11 @@ namespace MAD.JobSystemCore
                             _result.nodesAdded++;
                         }
                     }
-                    catch(Exception)
-                    { }
+                    catch(Exception e)
+                    {
+                        if (MadConf.conf.LOG_MODE)
+                            Logger.Log("(JS) Sync-error: " + e.Message, Logger.MessageType.ERROR);
+                    }
                 }
             }
             return _result;

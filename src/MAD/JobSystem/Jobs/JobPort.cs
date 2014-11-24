@@ -19,7 +19,7 @@ namespace MAD.JobSystemCore
             : base("NULL", JobType.PortScan, new JobTime(), new JobOutput())
         {
             port = 80;
-            timeout = 5000;
+            timeout = 500;
         }
 
         #endregion
