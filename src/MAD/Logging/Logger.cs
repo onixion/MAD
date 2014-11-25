@@ -33,33 +33,32 @@ namespace MAD.Logging
         
         public static void Log(string message, MessageType type)
         {
-            lock (_lockThis)
+            string _buffer = "";
+            _buffer += DateTime.Now.ToString();
+
+            switch (type)
             {
-                string _buffer = "";
-                _buffer += DateTime.Now.ToString();
+                 case MessageType.EMERGENCY:
+                     _buffer += " !EMERGENCY: ";
+                     break;
+                 case MessageType.ERROR:
+                     _buffer += " ERROR: ";
+                     break;
+                 case MessageType.INFORM:
+                     _buffer += " INFORMATION: ";
+                     break;
+                 case MessageType.WARNING:
+                     _buffer += " WARNING: ";
+                     break;
+             }
 
-                switch (type)
-                {
-                    case MessageType.EMERGENCY:
-                        _buffer += " !EMERGENCY: ";
-                        break;
-                    case MessageType.ERROR:
-                        _buffer += " ERROR: ";
-                        break;
-                    case MessageType.INFORM:
-                        _buffer += " INFORMATION: ";
-                        break;
-                    case MessageType.WARNING:
-                        _buffer += " WARNING: ";
-                        break;
-                }
+             _buffer += message;
+             lock (_lockThis)
+             {
+                 _logMessages.Add(_buffer);
+             }
 
-                _buffer += message;
-
-                _logMessages.Add(_buffer);
-
-                WriteToLog();
-            }
+             WriteToLog();
         }
 
         private static void WriteToLog()
