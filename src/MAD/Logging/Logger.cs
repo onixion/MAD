@@ -56,28 +56,27 @@ namespace MAD.Logging
              lock (_lockThis)
              {
                  _logMessages.Add(_buffer);
-             }
-
-             WriteToLog();
+                 WriteToLog();
+             }           
         }
 
         private static void WriteToLog()
         {
             if (_logMessages.Count >= buffer || _force)
             {
-                lock (_lockThis)
-                {
-                    File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + @"/" + logFileName, _logMessages.ToArray());
-                    _logMessages.Clear();
-                }
+                File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + @"/" + logFileName, _logMessages.ToArray());
+                _logMessages.Clear();
             }
         }
 
         public static void ForceWriteToLog()
         {
-            _force = true;
-            WriteToLog();
-            _force = false;
+            lock (_lockThis)
+            {
+                _force = true;
+                WriteToLog();
+                _force = false;
+            }
         }
         #endregion 
     }
