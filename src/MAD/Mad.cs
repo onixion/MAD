@@ -52,9 +52,8 @@ namespace MAD
             }
 
             // init components
-
             DB db = new DB(Path.Combine(DATADIR, "mad.db"));
-            JobSystem js = new JobSystem();
+            JobSystem js = new JobSystem(db);
             DHCPReader dhcpReader = new DHCPReader(js);
             NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
             MailNotification.Start();

@@ -6,6 +6,7 @@ using System.Threading;
 
 using MAD.MacFinders;
 using MAD.Logging;
+using MAD.Database;
 
 using Newtonsoft.Json;
 
@@ -29,14 +30,18 @@ namespace MAD.JobSystemCore
         public event EventHandler OnJobCountChange = null;
         public event EventHandler OnJobStatusChange = null;
         public event EventHandler OnShutdown = null;
-        
+
+
+        private DB _db;
+
         #endregion
 
         #region constructor
 
-        public JobSystem()
+        public JobSystem(DB db)
         {
             _Schedule = new JobSchedule(jsLock, _nodes);
+            _db = db;
         }
 
         #endregion
@@ -572,6 +577,30 @@ namespace MAD.JobSystemCore
                 else
                     return false;
             }
+        }
+
+        #endregion
+
+        #region Database-only
+
+        /// <summary>
+        /// Writes a node into the 'device'-table.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="node"></param>
+        private void DBWriteNode(JobNode node)
+        {
+
+        }
+
+        /// <summary>
+        /// Writes the current state of a specific job into
+        /// the 'job event'-table.
+        /// </summary>
+        /// <param name="job"></param>
+        private void DBWriteJob(Job job)
+        { 
+        
         }
 
         #endregion

@@ -31,32 +31,28 @@ MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("H
 
 namespace MAD.Database
 { 
-    public class DB : IDisposable // <- this is needed when the DB gets destroyed at the end of program
+    public class DB
     {
         private string _DBname;
         private SQLiteConnection _dbConnection;
 
-        //check if a databese already exists if not create one
         public DB(string DBname)
         {
             _DBname = DBname;
-            //if (!File.Exists(_DBname))
             SQLiteConnection.CreateFile(_DBname);
             ConnectDB();
 
-            // Why not automaticly connect to DB and
-            // create all need tables?
             CreateDeviceTable();
             CreateEventTable();
             CreateSummaryTable();
 
             CreateProtocolTable();
             CreateJobTypeTable();
-            //CreateJobNameTable(); this one is not necessary ... makes everthing more complicated
+            CreateJobNameTable();
         }
 
         //connect to database
-        private void ConnectDB() // <- database name as a argument is not necessary, already defined with constructor
+        private void ConnectDB()
         {
             _dbConnection = new SQLiteConnection("Data Source=" + _DBname);
             _dbConnection.Open();
@@ -73,7 +69,6 @@ namespace MAD.Database
             string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID TEXT, HOSTNAME TEXT, IP TEXT, MAC TEXT, Online INTEGER, Memo1 VARCHAR(5), Memo2 TEXT);";
 
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -81,8 +76,8 @@ namespace MAD.Database
         public void CreateEventTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, Success INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -90,8 +85,8 @@ namespace MAD.Database
         public void CreateJobTypeTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER, JobType TEXT);";
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -99,8 +94,8 @@ namespace MAD.Database
         public void CreateJobNameTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Job_Name_Table ( ID INTEGER, JobNames TEXT);";
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -108,8 +103,8 @@ namespace MAD.Database
         public void CreateProtocolTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER, Protocol TEXT);";
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
@@ -117,8 +112,8 @@ namespace MAD.Database
         public void CreateSummaryTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID TEXT, DATE TEXT, JOBTYPE INTEGER, PROTOCOL INTEGER, OutState INTEGER);";
+            
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }

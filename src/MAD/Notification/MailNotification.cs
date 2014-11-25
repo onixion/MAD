@@ -62,7 +62,7 @@ namespace MAD.Notification
                     _workerThread = null;
                 }
                 else
-                    throw new Exception("Threa already stopped!");
+                    throw new Exception("Thread already stopped!");
             }
         }
 
@@ -166,6 +166,8 @@ namespace MAD.Notification
                     }
 
                     _client.EnableSsl = true;
+                    _client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    _client.Timeout = 10000;
 
                     foreach (MailAddress _mail in _to)
                     {

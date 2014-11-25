@@ -34,13 +34,10 @@ namespace MAD.CLIServerCore
         {
             _aes = new AES(MadConf.conf.AES_PASS);
 
-            lock (MadConf.confLock)
-            {
-                _logMode = MadConf.conf.LOG_MODE;
-                _debugMode = MadConf.conf.DEBUG_MODE;
-                _serverHeader = MadConf.conf.SERVER_HEADER;
-                serverPort = MadConf.conf.SERVER_PORT;
-            }
+            _logMode = MadConf.conf.LOG_MODE;
+            _debugMode = MadConf.conf.DEBUG_MODE;
+            _serverHeader = MadConf.conf.SERVER_HEADER;
+            serverPort = MadConf.conf.SERVER_PORT;
 
             _js = js;
         }

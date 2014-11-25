@@ -47,11 +47,8 @@ namespace MAD.JobSystemCore
             _jobNodes = jobNodes;
             _workerPool = new SmartThreadPool(_maxThreads);
 
-            lock (MadConf.confLock)
-            {
-                _debug = MadConf.conf.DEBUG_MODE;
-                _log = MadConf.conf.LOG_MODE;
-            }
+            _debug = MadConf.conf.DEBUG_MODE;
+            _log = MadConf.conf.LOG_MODE;
         }
 
         #endregion
