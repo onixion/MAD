@@ -7,6 +7,7 @@ using SharpPcap;
 using PacketDotNet;
 
 using MAD.Logging;
+using MAD.JobSystemCore;
 
 namespace MAD.MacFinders
 {
@@ -338,6 +339,33 @@ namespace MAD.MacFinders
                 }
             }
 		}
+
+        public static void SyncHostList(JobSystem js)
+        {
+            lock (js.jsLock)
+            {
+                try
+                {
+                    List<JobNode> _nodeList = js.UnsafeGetNodes();
+                    foreach (JobNode _tmpNode in _nodeList)
+                    {
+                        if (!Exists(_tmpNode.mac.ToString()))
+                        {
+                            if (_tmpNode.name != null && _tmpNode.ip != null)
+                                AddToList(_tmpNode.mac.ToString(), _tmpNode.ip, _tmpNode.name);
+                            else if (_tmpNode.name != null)
+                                AddToList(_tmpNode.mac.ToString(), _tmpNode.name);
+                            else if (_tmpNode.ip != null)
+                                AddToList(_tmpNode.mac.ToString(), _tmpNode.ip);
+                            else
+                                AddToList(_tmpNode.mac.ToString());
+                        }
+                    }
+                }
+                catch(Exception)
+                {}
+            }
+        }
 		#endregion 
 
 		public static string PrintLists()
