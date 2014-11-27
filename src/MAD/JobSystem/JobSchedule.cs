@@ -100,9 +100,8 @@ namespace MAD.JobSystemCore
                                         {
                                             if (_job.type != Job.JobType.NULL)
                                             {
-                                                Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
+                                                Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] started execution.", Logger.MessageType.INFORM);
 
-                                                // Change job-state.
                                                 _node.uWorker++;
                                                 _job.state = 2;
 
@@ -120,10 +119,8 @@ namespace MAD.JobSystemCore
                     }
                 }
                 catch (Exception e)
-                { 
-                    // This try-catch is just for debugging reasons here. If the program works
-                    // as planed, it will never get into this catch.
-                    throw new SystemException("Schedule: INTERNAL-EXECPTION: " + e.Message);
+                {
+                    Logger.Log("(Schedule) INTERNAL-EXECPTION: " + e.Message, Logger.MessageType.EMERGENCY);
                 }
 
                 if (_state == 2)
@@ -248,21 +245,13 @@ namespace MAD.JobSystemCore
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                        if (_job.settings == null)
-                        {
-                            MailNotification.SendMail(_mailSubject, _mailContent);
-                        }
-                        else
-                        {
-                            MailNotification.SendMail(_job.settings, _mailSubject, _mailContent);
-                        }
+                        MailNotification.SendMail(_job.settings, _mailSubject, _mailContent);
                     }
                 }
             }
 
-            Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
+            Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] stopped execution.", Logger.MessageType.INFORM);
 
-            // Change job-state.
             _job.state = 1;
             _node.uWorker--;
             return null;
