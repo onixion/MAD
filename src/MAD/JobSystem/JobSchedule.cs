@@ -17,9 +17,6 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        private bool _debug = false;
-        private bool _log = false;
-
         private Thread _cycleThread;
         private int _cycleTime = 10;
 
@@ -46,9 +43,6 @@ namespace MAD.JobSystemCore
             _jsLock = jsLock;
             _jobNodes = jobNodes;
             _workerPool = new SmartThreadPool(_maxThreads);
-
-            _debug = MadConf.conf.DEBUG_MODE;
-            _log = MadConf.conf.LOG_MODE;
         }
 
         #endregion
@@ -106,8 +100,7 @@ namespace MAD.JobSystemCore
                                         {
                                             if (_job.type != Job.JobType.NULL)
                                             {
-                                                if (_log)
-                                                    Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
+                                                Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") started execution.", Logger.MessageType.INFORM);
 
                                                 // Change job-state.
                                                 _node.uWorker++;
@@ -267,8 +260,7 @@ namespace MAD.JobSystemCore
                 }
             }
 
-            if (_log)
-                Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
+            Logger.Log("(SCHEDULE) JOB (ID:" + _job.id + ")(GUID:" + _job.guid + ") stopped execution.", Logger.MessageType.INFORM);
 
             // Change job-state.
             _job.state = 1;

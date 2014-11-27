@@ -430,8 +430,7 @@ namespace MAD.JobSystemCore
                     }
                     catch(Exception e)
                     {
-                        if (MadConf.conf.LOG_MODE)
-                            Logger.Log("(JS) Sync-error: " + e.Message, Logger.MessageType.ERROR);
+                        Logger.Log("(JS) Sync-error: " + e.Message, Logger.MessageType.ERROR);
                     }
                 }
             }

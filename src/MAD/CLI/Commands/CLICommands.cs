@@ -235,8 +235,6 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "<color><yellow>DEBUG_MODE:     <color><white>" + MadConf.conf.DEBUG_MODE + "\n";
-            output += "<color><yellow>LOG_MODE:       <color><white>" + MadConf.conf.LOG_MODE + "\n";
             output += "<color><yellow>SERVER_HEADER:  <color><white>" + MadConf.conf.SERVER_HEADER + "\n";
             output += "<color><yellow>SERVER_PORT:    <color><white>" + MadConf.conf.SERVER_PORT + "\n";
             output += "<color><yellow>SERVER_AESPASS: <color><white>" + MadConf.conf.AES_PASS + "\n";

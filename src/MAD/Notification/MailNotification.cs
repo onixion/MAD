@@ -176,8 +176,7 @@ namespace MAD.Notification
                 }
                 catch (Exception e)
                 {
-                    if (MadConf.conf.LOG_MODE)
-                        Logger.Log("MailNotification: " + e.Message, Logger.MessageType.ERROR);
+                    Logger.Log("MailNotification: " + e.Message, Logger.MessageType.ERROR);
                 }
                 finally
                 {

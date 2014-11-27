@@ -58,17 +58,12 @@ namespace MAD
             {
                 JsonReader _jReader = new JsonTextReader(_reader);
                 conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
-
-                //if(OnConfChange != null)
-                  //  OnConfChange.Invoke(null, null);
             }
         }
 
         public static void SetToDefault()
         {
-            // general
-            conf.DEBUG_MODE = true;
-            conf.LOG_MODE = true;
+            // logger
             conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
 
             // jobsystem
@@ -96,9 +91,7 @@ namespace MAD
     /* This class contains all READ-only config-variables. They are saved / loaded from the config file. */
     public class MadConfigFile
     {
-        // general
-        public bool DEBUG_MODE;
-        public bool LOG_MODE;
+        // logger
         public string LOG_FILE_DIRECTORY;
 
         // jobsystem
