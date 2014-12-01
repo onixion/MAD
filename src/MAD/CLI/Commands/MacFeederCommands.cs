@@ -208,5 +208,24 @@ namespace MAD.CLICore
             return "<color><blue> Sync done";
         }
     }
+    
+    /*
+    public class ManuallySyncHostListCommand : Command
+    {
+        private JobSystem _js;
+
+        public ManuallySyncHostListCommand(object[] args)
+        {
+            _js = (JobSystem)args[0];
+            description = "Starts reverse Syncronisation manually";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            ModelHost.SyncHostList();
+            return "<color><blue> Revers Sync Done";
+        }
+    }
+    */
     #endregion
 }

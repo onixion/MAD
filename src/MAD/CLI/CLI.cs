@@ -44,9 +44,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("change logName", typeof(ChangeLogFileName), null));
 
             // MAC AND IP READER
-            commands.Add(new CommandOptions("dhcp reader start", typeof(CatchBasicInfoStartCommand), new object[] { dhcpReader }));
-            commands.Add(new CommandOptions("dhcp reader stop", typeof(CatchBasicInfoStopCommand), new object[] { dhcpReader }));
-            commands.Add(new CommandOptions("dhcp reader set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { dhcpReader }));
+            commands.Add(new CommandOptions("dhcp reader start", typeof(CatchBasicInfoStartCommand), new object[] { dhcpReader }));                             //Outdated!
+            commands.Add(new CommandOptions("dhcp reader stop", typeof(CatchBasicInfoStopCommand), new object[] { dhcpReader }));                               //Outdated!
+            commands.Add(new CommandOptions("dhcp reader set time", typeof(CatchBasicInfoSetTimeIntervallCommand), new object[] { dhcpReader }));               //Outdated!
             commands.Add(new CommandOptions("print list", typeof(CatchBasicInfoPrintHostsCommand), new object[] { dhcpReader }));
             commands.Add(new CommandOptions("arp reader list interfaces", typeof(PrintArpReadyInterfaces), null));
             commands.Add(new CommandOptions("arp reader start", typeof(ArpReaderStart), new object[] { js }));

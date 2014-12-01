@@ -20,7 +20,6 @@ namespace MAD.MacFinders
         private static ICaptureDevice _listenDev;
 
         private static Object lockObj = new Object();
-        private static bool _working = false;
         private static Thread _steady;
 
         public static uint networkInterface = MadConf.conf.arpInterface - 1;

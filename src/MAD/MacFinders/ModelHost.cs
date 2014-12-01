@@ -22,11 +22,11 @@ namespace MAD.MacFinders
         public static List<ModelHost> hostList = new List<ModelHost>();
 		
         public bool nameGiven, macGiven, ipGiven;
-        public bool reachable; 
 
 		public static uint _count = 0;
 
         private static Object lockObj = new Object();
+        private static JobSystem _js;
 		#endregion
 
 		#region constructors
@@ -340,13 +340,21 @@ namespace MAD.MacFinders
             }
 		}
 
-        public static void SyncHostList(JobSystem js)
+        
+		#endregion 
+
+        public static void Init(ref JobSystem js)
         {
-            lock (js.jsLock)
+            _js = js;
+        }
+
+        public static void SyncHostList(Object sender, EventArgs e)
+        {
+            lock (_js.jsLock)
             {
                 try
                 {
-                    List<JobNode> _nodeList = js.UnsafeGetNodes();
+                    List<JobNode> _nodeList = _js.UnsafeGetNodes();
                     foreach (JobNode _tmpNode in _nodeList)
                     {
                         if (!Exists(_tmpNode.mac.ToString()))
@@ -366,7 +374,6 @@ namespace MAD.MacFinders
                 {}
             }
         }
-		#endregion 
 
 		public static string PrintLists()
 		{
@@ -379,38 +386,25 @@ namespace MAD.MacFinders
                 {
                     foreach (ModelHost _dummy in hostList)
                     {
-                        if (_dummy.reachable)
-                        {
-                            _output += "\n MAC-Address: " + _dummy.hostMac;
-
-                            if (_dummy.hostName != null)
-                                _output += "\n Host Name: " + _dummy.hostName;
-                            else
-                                _output += "\n Host Name: NA..";
-
-                            if (_dummy.hostIP != null)
-                                _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                            else
-                                _output += "\n IP-Address: NA..";
-
-                            _output += "\n \n";
-                        }
+                        if (_dummy.status)
+                            _output += "Reachable:";
                         else
-                        {
-                            _output += "\n MAC-Address: " + _dummy.hostMac + _dummy.status;
+                            _output += "Not Reachable:";
 
-                            if (_dummy.hostName != null)
-                                _output += "\n Host Name: " + _dummy.hostName;
-                            else
-                                _output += "\n Host Name: NA..";
+                        _output += "\n MAC-Address: " + _dummy.hostMac;
 
-                            if (_dummy.hostIP != null)
-                                _output += "\n IP-Address: " + _dummy.hostIP.ToString();
-                            else
-                                _output += "\n IP-Address: NA..";
+                        if (_dummy.hostName != null)
+                            _output += "\n Host Name: " + _dummy.hostName;
+                        else
+                            _output += "\n Host Name: NA..";
 
-                            _output += "\n \n";
-                        }
+                        if (_dummy.hostIP != null)
+                            _output += "\n IP-Address: " + _dummy.hostIP.ToString();
+                        else
+                            _output += "\n IP-Address: NA..";
+
+                        _output += "\n \n";
+                        
                     }
                 }
 			}
