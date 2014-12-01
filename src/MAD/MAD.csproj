@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\Commands\ConnectivityTestCommand.cs" />
+    <Compile Include="CLI\Commands\DBCommands.cs" />
     <Compile Include="CLI\Commands\LoggerCommands.cs" />
     <Compile Include="CLI\Commands\MacFeederCommands.cs" />
     <Compile Include="CLI\CLI.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="JobSystem\DBHandler.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />

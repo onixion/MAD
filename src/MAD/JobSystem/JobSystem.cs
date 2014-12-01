@@ -31,8 +31,7 @@ namespace MAD.JobSystemCore
         public event EventHandler OnJobStatusChange = null;
         public event EventHandler OnShutdown = null;
 
-
-        private DB _db;
+        private DBHandler _handler;
 
         #endregion
 
@@ -41,7 +40,7 @@ namespace MAD.JobSystemCore
         public JobSystem(DB db)
         {
             _Schedule = new JobSchedule(jsLock, _nodes);
-            _db = db;
+            _handler = new DBHandler(db._dbConnection);
         }
 
         #endregion
@@ -292,7 +291,10 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 if (MAXNODES > _nodes.Count)
+                {
                     _nodes.Add(node);
+                    _handler.InsertNode(node);
+                }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
             }

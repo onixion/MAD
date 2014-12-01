@@ -34,7 +34,7 @@ namespace MAD.Database
     public class DB
     {
         private string _DBname;
-        private SQLiteConnection _dbConnection;
+        public SQLiteConnection _dbConnection;
 
         public DB(string DBname)
         {
@@ -75,7 +75,7 @@ namespace MAD.Database
 
         public void CreateEventTable()
         {
-            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, Success INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
+            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, SUCCESS INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
             
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             command.ExecuteNonQuery();
@@ -140,12 +140,10 @@ namespace MAD.Database
             sql += "')";
 
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-
             command.ExecuteNonQuery();
             command.Dispose();
         }
     
-
         //read entire table
         public DataTable ReadTable(string TableName)
         {
