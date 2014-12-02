@@ -34,7 +34,7 @@ namespace MAD.Logging
         public static void Log(string message, MessageType type)
         {
             string _buffer = "";
-            _buffer += DateTime.Now.ToString();
+            _buffer += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss:fff");
 
             switch (type)
             {

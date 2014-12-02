@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Net.NetworkInformation;
 using System.Security.Cryptography;
 
 namespace MadNet
@@ -53,6 +54,16 @@ namespace MadNet
         }
 
         #endregion
+
+        public static string ParseMacAddress(string mac)
+        {
+            if (mac.Length < 12)
+                mac = mac.PadRight(12 - mac.Length, '0');
+            else if (mac.Length > 12)
+                throw new Exception("MAC-Address too long!");
+
+            return PhysicalAddress.Parse(mac).ToString();
+        }
 
         public static string GetTimeStamp()
         {

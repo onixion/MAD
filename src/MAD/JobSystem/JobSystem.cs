@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.MacFinders;
@@ -31,7 +30,7 @@ namespace MAD.JobSystemCore
         public event EventHandler OnJobStatusChange = null;
         public event EventHandler OnShutdown = null;
 
-        private DBHandler _handler;
+        //private DBHandler _handler;
 
         #endregion
 
@@ -40,7 +39,7 @@ namespace MAD.JobSystemCore
         public JobSystem(DB db)
         {
             _Schedule = new JobSchedule(jsLock, _nodes);
-            _handler = new DBHandler(db._dbConnection);
+            //_handler = new DBHandler(db._dbConnection);
         }
 
         #endregion
@@ -281,7 +280,7 @@ namespace MAD.JobSystemCore
                 if (MAXNODES > _nodes.Count)
                 {
                     _nodes.Add(node);
-                    _handler.InsertNode(node);
+                    //_handler.InsertNode(node);
                 }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
@@ -362,7 +361,7 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public bool UpdateNodeMac(int nodeID, PhysicalAddress mac)
+        public bool UpdateNodeMac(int nodeID, string mac)
         {
             lock (jsLock)
             {
@@ -413,7 +412,7 @@ namespace MAD.JobSystemCore
                         else
                         {
                             // Node with this mac does not exist -> make new node.
-                            JobNode _newNode = new JobNode(_host.hostName, PhysicalAddress.Parse(_host.hostMac), _host.hostIP, new List<Job>());
+                            JobNode _newNode = new JobNode(_host.hostName, _host.hostMac, _host.hostIP, new List<Job>());
                             _nodes.Add(_newNode);
                             _result.nodesAdded++;
                         }
