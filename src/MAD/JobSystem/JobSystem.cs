@@ -16,7 +16,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public const string VERSION = "v2.9.0.6";
+        public const string VERSION = "v3.0.0.0";
         public const int MAXNODES = 100;
 
         private JobSchedule _Schedule { get; set; }
@@ -49,21 +49,12 @@ namespace MAD.JobSystemCore
 
         #region jobsystem handling
 
-        /// <summary>
-        /// Save all current nodes into a json-file.
-        /// </summary>
-        /// <param name="filepath">Path to file (Execption will be thrown if directory does not exist or if the file already exist!).</param>
         public void SaveTable(string filepath)
         {
             lock(jsLock)
                 JSSerializer.SerializeTable(filepath, _nodes);
         }
 
-        /// <summary>
-        /// Load nodes from json-file.
-        /// </summary>
-        /// <param name="filepath"></param>
-        /// <returns>Path to file (Execption will be thrown if file does not exist!).</returns>
         public int LoadTable(string filepath)
         {
             List<JobNode> _loadNodes = JSSerializer.DeserializeTable(filepath);
@@ -77,9 +68,6 @@ namespace MAD.JobSystemCore
             return _nodes.Count;
         }
 
-        /// <summary>
-        /// This method will clean-up all resources used by the JobSystem.
-        /// </summary>
         public void Shutdown()
         {
             _Schedule.Stop();
@@ -584,21 +572,11 @@ namespace MAD.JobSystemCore
 
         #region Database-only
 
-        /// <summary>
-        /// Writes a node into the 'device'-table.
-        /// </summary>
-        /// <param name="db"></param>
-        /// <param name="node"></param>
         private void DBWriteNode(JobNode node)
         {
 
         }
 
-        /// <summary>
-        /// Writes the current state of a specific job into
-        /// the 'job event'-table.
-        /// </summary>
-        /// <param name="job"></param>
         private void DBWriteJob(Job job)
         { 
         
