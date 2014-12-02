@@ -63,17 +63,19 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.SQLite">
+    <Reference Include="System.Data.SQLite, Version=1.0.79.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLI\Commands\ConnectivityTestCommand.cs" />
+    <Compile Include="CLI\Commands\DBCommands.cs" />
     <Compile Include="CLI\Commands\LoggerCommands.cs" />
     <Compile Include="CLI\Commands\MacFeederCommands.cs" />
     <Compile Include="CLI\CLI.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="JobSystem\DBHandler.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />

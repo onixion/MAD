@@ -5,6 +5,8 @@ using System.Net.NetworkInformation;
 using System.Threading;
 
 using MAD.MacFinders;
+using MAD.Logging;
+using MAD.Database;
 
 using Newtonsoft.Json;
 
@@ -14,7 +16,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public const string VERSION = "v2.9.0.3";
+        public const string VERSION = "v2.9.0.6";
         public const int MAXNODES = 100;
 
         private JobSchedule _Schedule { get; set; }
@@ -28,14 +30,17 @@ namespace MAD.JobSystemCore
         public event EventHandler OnJobCountChange = null;
         public event EventHandler OnJobStatusChange = null;
         public event EventHandler OnShutdown = null;
-        
+
+        private DBHandler _handler;
+
         #endregion
 
         #region constructor
 
-        public JobSystem()
+        public JobSystem(DB db)
         {
             _Schedule = new JobSchedule(jsLock, _nodes);
+            _handler = new DBHandler(db._dbConnection);
         }
 
         #endregion
@@ -157,7 +162,7 @@ namespace MAD.JobSystemCore
                 case 1:
                     return "Active";
                 default:
-                    throw new Exception("NOT-VALID-NODESTATE");
+                    return "";
             }
         }
 
@@ -218,7 +223,7 @@ namespace MAD.JobSystemCore
                 case 3:
                     return "Exception";
                 default:
-                    throw new Exception("NOT-VALID-JOBSTATE");
+                    return "";
             }
         }
 
@@ -286,7 +291,10 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 if (MAXNODES > _nodes.Count)
+                {
                     _nodes.Add(node);
+                    _handler.InsertNode(node);
+                }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
             }
@@ -422,8 +430,10 @@ namespace MAD.JobSystemCore
                             _result.nodesAdded++;
                         }
                     }
-                    catch(Exception)
-                    { }
+                    catch(Exception e)
+                    {
+                        Logger.Log("(JS) Sync-error: " + e.Message, Logger.MessageType.ERROR);
+                    }
                 }
             }
             return _result;
@@ -568,6 +578,30 @@ namespace MAD.JobSystemCore
                 else
                     return false;
             }
+        }
+
+        #endregion
+
+        #region Database-only
+
+        /// <summary>
+        /// Writes a node into the 'device'-table.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="node"></param>
+        private void DBWriteNode(JobNode node)
+        {
+
+        }
+
+        /// <summary>
+        /// Writes the current state of a specific job into
+        /// the 'job event'-table.
+        /// </summary>
+        /// <param name="job"></param>
+        private void DBWriteJob(Job job)
+        { 
+        
         }
 
         #endregion

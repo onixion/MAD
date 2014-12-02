@@ -26,7 +26,7 @@ namespace MAD.JobSystemCore
             : base(JobType.Ping)
         {
             ttl = 200;
-            timeout = 5000;
+            timeout = 500;
 
             outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
             //outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));

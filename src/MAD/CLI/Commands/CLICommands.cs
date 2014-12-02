@@ -29,7 +29,7 @@ namespace MAD.CLICore
         {
             _commands = (List<CommandOptions>)commands[0];
 
-            oPar.Add(new ParOption("id", "<COMMAND-ID>", "ID of the specific command." , false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("id", "COMMAND-ID", "ID of the specific command." , false, false, new Type[] { typeof(int) }));
             description = "This command shows information about available commands.";
         }
 
@@ -111,7 +111,7 @@ namespace MAD.CLICore
                         }
                     }
                     else
-                        output += "\n\t<color><gray>(command does not use any par)\n";
+                        output += "\n\t<color><gray>(command does not use any parameters)\n";
                 }
                 catch (Exception)
                 {
@@ -148,6 +148,11 @@ namespace MAD.CLICore
 
     public class ClearCommand : Command
     {
+        public ClearCommand()
+        {
+            description = "This command clears the console.";
+        }
+
         public override string Execute(int consoleWidth)
         {
             Console.Clear();
@@ -230,24 +235,19 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            lock (MadConf.confLock)
-            {
-                output += "<color><yellow>DEBUG_MODE:\t<color><white>" + MadConf.conf.DEBUG_MODE + "\n";
-                output += "<color><yellow>LOG_MODE:\t<color><white>" + MadConf.conf.LOG_MODE + "\n";
-                output += "<color><yellow>SERVER_HEADER:\t<color><white>" + MadConf.conf.SERVER_HEADER + "\n";
-                output += "<color><yellow>SERVER_PORT:\t<color><white>" + MadConf.conf.SERVER_PORT + "\n";
-                output += "<color><yellow>SERVER_AESPASS:\t<color><white>" + MadConf.conf.AES_PASS + "\n";
-                output += "<color><yellow>SMTP_SERVER:\t<color><white>" + MadConf.conf.SMTP_SERVER + "\n";
-                output += "<color><yellow>SMTP_PORT:\t<color><white>" + MadConf.conf.SMTP_PORT + "\n";
-                output += "<color><yellow>SMTP_USER:\t<color><white>" + MadConf.conf.SMTP_USER + "\n";
-                output += "<color><yellow>SMTP_PASS:\t<color><white>" + MadConf.conf.SMTP_PASS + "\n";
-                output += "<color><yellow>DEFAULT_MAILS:\t<color><white>";
+            output += "<color><yellow>SERVER_HEADER:  <color><white>" + MadConf.conf.SERVER_HEADER + "\n";
+            output += "<color><yellow>SERVER_PORT:    <color><white>" + MadConf.conf.SERVER_PORT + "\n";
+            output += "<color><yellow>SERVER_AESPASS: <color><white>" + MadConf.conf.AES_PASS + "\n";
+            output += "<color><yellow>SMTP_SERVER:    <color><white>" + MadConf.conf.SMTP_SERVER + "\n";
+            output += "<color><yellow>SMTP_PORT:      <color><white>" + MadConf.conf.SMTP_PORT + "\n";
+            output += "<color><yellow>SMTP_USER:      <color><white>" + MadConf.conf.SMTP_USER + "\n";
+            output += "<color><yellow>SMTP_PASS:      <color><white>" + MadConf.conf.SMTP_PASS + "\n";
+            output += "<color><yellow>DEFAULT_MAILS:  <color><white>";
 
-                if (MadConf.conf.MAIL_DEFAULT != null || MadConf.conf.MAIL_DEFAULT.Length != 0)
-                    foreach (MailAddress _mail in MadConf.conf.MAIL_DEFAULT)
-                        output += _mail.Address + " ";
-                output += "\n";
-            }
+            if (MadConf.conf.MAIL_DEFAULT != null || MadConf.conf.MAIL_DEFAULT.Length != 0)
+                foreach (MailAddress _mail in MadConf.conf.MAIL_DEFAULT)
+                    output += _mail.Address + " ";
+            output += "\n";
 
             return output;
         }

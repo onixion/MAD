@@ -26,7 +26,7 @@ namespace MAD.JobSystemCore
             : base(JobType.Http)
         {
             this.port = 80;
-            this.timeout = 5000;
+            this.timeout = 500;
         }
 
         #endregion

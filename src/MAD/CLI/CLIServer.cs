@@ -16,8 +16,6 @@ namespace MAD.CLIServerCore
     {
         #region members
 
-        private bool _debugMode;
-        private bool _logMode;
         private string _serverHeader;
         private string _serverVer = "v2.0";
 
@@ -34,13 +32,8 @@ namespace MAD.CLIServerCore
         {
             _aes = new AES(MadConf.conf.AES_PASS);
 
-            lock (MadConf.confLock)
-            {
-                _logMode = MadConf.conf.LOG_MODE;
-                _debugMode = MadConf.conf.DEBUG_MODE;
-                _serverHeader = MadConf.conf.SERVER_HEADER;
-                serverPort = MadConf.conf.SERVER_PORT;
-            }
+            _serverHeader = MadConf.conf.SERVER_HEADER;
+            serverPort = MadConf.conf.SERVER_PORT;
 
             _js = js;
         }
@@ -53,7 +46,7 @@ namespace MAD.CLIServerCore
         {
             try
             {
-                _serverListener = new TcpListener(new IPEndPoint(IPAddress.Loopback, serverPort));
+                _serverListener = new TcpListener(new IPEndPoint(IPAddress.Any, serverPort));
                 _serverListener.Start();
                 return true;
             }
@@ -83,10 +76,8 @@ namespace MAD.CLIServerCore
                 NetworkStream _stream = _client.GetStream();
                 _clientEndPoint = (IPEndPoint)_client.Client.RemoteEndPoint;
 
-                if (_debugMode)
-                    Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") connected.");
-                if (_logMode)
-                    Logger.Log("Client (" + _clientEndPoint.Address + ") connected.", Logger.MessageType.INFORM);
+                Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") connected.");
+                Logger.Log("Client (" + _clientEndPoint.Address + ") connected.", Logger.MessageType.INFORM);
 
                 using (ServerInfoPacket _serverInfoP = new ServerInfoPacket(_stream))
                 {
@@ -101,17 +92,13 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                if (_debugMode)
-                    Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Execption: " + e.Message);
-                if (_logMode)
-                    Logger.Log(" Execption: " + e.Message, Logger.MessageType.ERROR);
+                Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Execption: " + e.Message);
+                Logger.Log(" Execption: " + e.Message, Logger.MessageType.ERROR);
             }
             finally
             {
-                if (_debugMode)
-                    Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") disconnected.");
-                if (_logMode)
-                    Logger.Log("Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
+                Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") disconnected.");
+                Logger.Log("Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
             }
 
             return null;

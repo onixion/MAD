@@ -13,7 +13,6 @@ namespace MAD
     {
         #region members
 
-        public static object confLock = new object();
         public static MadConfigFile conf = new MadConfigFile();
 
         /* The idea of be able to load the config-file, while
@@ -39,16 +38,14 @@ namespace MAD
 
         public static void SaveConf(string filePath)
         {
-            lock (confLock)
-            {
-                JsonSerializer _ser = new JsonSerializer();
-                _ser.Formatting = Formatting.Indented;
-                _ser.Converters.Add(new MailAddressConverter());
 
-                using (FileStream _file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                using (StreamWriter _writer = new StreamWriter(_file))
-                    _ser.Serialize(_writer, conf);
-            }
+            JsonSerializer _ser = new JsonSerializer();
+            _ser.Formatting = Formatting.Indented;
+            _ser.Converters.Add(new MailAddressConverter());
+
+            using (FileStream _file = new FileStream(filePath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            using (StreamWriter _writer = new StreamWriter(_file))
+                _ser.Serialize(_writer, conf);
         }
 
         public static void LoadConf(string filePath)
@@ -60,72 +57,61 @@ namespace MAD
             using (StreamReader _reader = new StreamReader(_file))
             {
                 JsonReader _jReader = new JsonTextReader(_reader);
-
-                lock(confLock)
-                    conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
-
-                //if(OnConfChange != null)
-                  //  OnConfChange.Invoke(null, null);
+                conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
             }
         }
 
         public static void SetToDefault()
         {
-            lock (confLock)
-            {
-                conf.DEBUG_MODE = true;
-                conf.LOG_MODE = true;
+            // logger
+            conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
 
-                conf.SERVER_HEADER = "MAD-CLIServer";
-                conf.SERVER_PORT = 2222;
-                conf.AES_PASS = "";
-                conf.AES_SALT = new byte[] { 32, 23, 12, 54, 42 };
+            // jobsystem
+            conf.NOTI_ENABLE = true;
 
-                conf.NOTI_ENABLE = true;
-                conf.SMTP_SERVER = "smtp-mail.outlook.com";
-                conf.SMTP_PORT = 587;
-                conf.SMTP_USER = "mad.group@outlook.com";
-                conf.SMTP_PASS = "Mad-21436587";
-                conf.MAIL_DEFAULT = new MailAddress[1] { new MailAddress("alin.porcic@gmail.com") };
+            // notification
+            conf.SMTP_SERVER = "smtp-mail.outlook.com";
+            conf.SMTP_PORT = 587;
+            conf.SMTP_USER = "mad.group@outlook.com";
+            conf.SMTP_PASS = "Mad-21436587";
+            conf.MAIL_DEFAULT = new MailAddress[1] { new MailAddress("alin.porcic@gmail.com") };
 
-                conf.arpInterface = 4;
-                conf.snmpInterface = "12";
+            // cliserver
+            conf.SERVER_HEADER = "MAD-CLIServer";
+            conf.SERVER_PORT = 2222;
+            conf.AES_PASS = "PASSWORT";
 
-                conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
-            }
+            conf.arpInterface = 4;
+            conf.snmpInterface = "12";
         }
 
         #endregion
     }
 
-    /* This class contains all variables, which should be saved / loaded from the config file. */
+    /* This class contains all READ-only config-variables. They are saved / loaded from the config file. */
     public class MadConfigFile
     {
-        // global
-        public bool DEBUG_MODE;
-        public bool LOG_MODE;
+        // logger
+        public string LOG_FILE_DIRECTORY;
 
-        // cliserver
-        public string SERVER_HEADER;
-        public int SERVER_PORT;
-        public string AES_PASS;
-        public byte[] AES_SALT;
+        // jobsystem
+        public bool NOTI_ENABLE;
 
         // notification
-        public bool NOTI_ENABLE;
-        // global notification
         public string SMTP_SERVER;
         public int SMTP_PORT;
         public string SMTP_USER;
         public string SMTP_PASS;
         public MailAddress[] MAIL_DEFAULT;
 
+        // cliserver
+        public string SERVER_HEADER;
+        public int SERVER_PORT;
+        public string AES_PASS;
+
         // networking vars
         public uint arpInterface;
 		public string snmpInterface;
-
-        // logger var
-        public string LOG_FILE_DIRECTORY;
     }
 
     /* json converters */

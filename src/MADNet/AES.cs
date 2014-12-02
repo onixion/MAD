@@ -15,7 +15,7 @@ namespace MadNet
         public AES(string pass)
         {
             _pdb = new Rfc2898DeriveBytes(Encoding.Unicode.GetBytes(pass), 
-                new byte[] { 0x11, 0x33, 0x3A, 0x4D, 0x32, 0xFF, 0xE2, 0x95 }, 10);
+                new byte[]{25,34,56,32,46,32,54,76,12,128,250,234,21,23,63,74,35}, 10);
 
             _aes.Mode = CipherMode.CBC;
             _aes.BlockSize = 128;

@@ -392,23 +392,47 @@ namespace MAD.CLICore
                 {
                     foreach (Job _temp2 in _temp.jobs)
                     {
-                        _tableRow[0] = _temp.id.ToString();
-                        _tableRow[1] = _temp2.id.ToString();
-                        _tableRow[2] = _temp2.name;
-                        _tableRow[3] = _temp2.type.ToString();
-                        _tableRow[4] = _js.JobState(_temp2.state);
-                        _tableRow[5] = _temp2.time.type.ToString();
-                        _tableRow[6] = _temp2.time.GetValues();
+                        if (_temp2.state == 0 || _temp2.state == 1)
+                        {
+                            _tableRow[0] = _temp.id.ToString();
+                            _tableRow[1] = _temp2.id.ToString();
+                            _tableRow[2] = _temp2.name;
+                            _tableRow[3] = _temp2.type.ToString();
+                            _tableRow[4] = _js.JobState(_temp2.state);
+                            _tableRow[5] = _temp2.time.type.ToString();
+                            _tableRow[6] = _temp2.time.GetValues();
 
-                        if (!OParUsed("more"))
-                            _tableRow[7] = _temp2.outp.outState.ToString();
+                            if (!OParUsed("more"))
+                                _tableRow[7] = _temp2.outp.outState.ToString();
+                            else
+                            {
+                                _tableRow[7] = _temp2.tStart.ToString("HH:mm:ss");
+                                _tableRow[8] = _temp2.tStop.ToString("HH:mm:ss");
+                                _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
+                                _tableRow[10] = _temp2.outp.outState.ToString();
+                            }
+                        }
                         else
                         {
-                            _tableRow[7] = _temp2.tStart.ToString("HH:mm:ss");
-                            _tableRow[8] = _temp2.tStop.ToString("HH:mm:ss");
-                            _tableRow[9] = "+" + _temp2.tSpan.Seconds + "s" + _temp2.tSpan.Milliseconds + "ms";
-                            _tableRow[10] = _temp2.outp.outState.ToString();
+                            _tableRow[0] = _temp.id.ToString();
+                            _tableRow[1] = _temp2.id.ToString();
+                            _tableRow[2] = "-";
+                            _tableRow[3] = "-";
+                            _tableRow[4] = _js.JobState(_temp2.state);
+                            _tableRow[5] = "-";
+                            _tableRow[6] = "-";
+
+                            if (!OParUsed("more"))
+                                _tableRow[7] = "-";
+                            else
+                            {
+                                _tableRow[7] = "-";
+                                _tableRow[8] = "-";
+                                _tableRow[9] = "-";
+                                _tableRow[10] = "-";
+                            }
                         }
+
                         output += ConsoleTable.FormatStringArray(consoleWidth, _tableRow);
                     }
                 }
@@ -842,6 +866,8 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             oPar.Add(new ParOption("p", "PORT", "Port-Address of the target.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("tout", "TIMEOUT", "Timeout of the ping.", false, false, new Type[] { typeof(int) }));
+            description = "This command adds a job with the jobtype 'HTTPRequest' to the node with the given ID.";
         }
 
         public override string Execute(int consoleWidth)
@@ -852,6 +878,9 @@ namespace MAD.CLICore
             
             if (OParUsed("p"))
                 _job.port = (int)pars.GetPar("p").argValues[0];
+
+            if (OParUsed("tout"))
+                _job.timeout = (int)pars.GetPar("tout").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);
@@ -868,6 +897,8 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("p", "PORT", "Port of the target.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("tout", "TIMEOUT", "Timeout of the ping.", false, false, new Type[] { typeof(int) }));
+            description = "This command adds a job with the jobtype 'PortScan' to the node with the given ID.";
         }
 
         public override string Execute(int consoleWidth)
@@ -878,6 +909,9 @@ namespace MAD.CLICore
             _job.time = ParseJobTime(this);
 
             _job.port = (int)pars.GetPar("p").argValues[0];
+
+            if (OParUsed("tout"))
+                _job.timeout = (int)pars.GetPar("tout").argValues[0];
 
             int _nodeID = (int)pars.GetPar("id").argValues[0];
             _js.AddJobToNode(_nodeID, _job);

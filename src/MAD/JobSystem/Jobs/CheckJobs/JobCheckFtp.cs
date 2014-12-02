@@ -10,8 +10,6 @@ namespace MAD.JobSystemCore
 {
     class JobCheckFtp : Job
     {
-        private bool _working;
-
         public string username; //required parameter
         public string password; //required parameter
 

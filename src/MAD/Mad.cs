@@ -52,9 +52,8 @@ namespace MAD
             }
 
             // init components
-
             DB db = new DB(Path.Combine(DATADIR, "mad.db"));
-            JobSystem js = new JobSystem();
+            JobSystem js = new JobSystem(db);
             DHCPReader dhcpReader = new DHCPReader(js);
             NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
             MailNotification.Start();
@@ -73,8 +72,7 @@ namespace MAD
                 switch (args[0])
                 {
                     case "-cli":
-                        if (MadConf.conf.LOG_MODE)
-                            Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
+                        Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
                         CLI cli = new CLI(js, dhcpReader);
                         cli.Start();
                         break;
@@ -87,21 +85,19 @@ namespace MAD
                             cliServer.Start();
 
                             Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + ".");
-                            if (MadConf.conf.LOG_MODE)
-                                Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
+                            Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
 
                             Console.ReadKey(true);
                             cliServer.Stop();
+                            cliServer.Dispose();
 
                             Console.WriteLine("(SERVER) Stopped.");
-                            if (MadConf.conf.LOG_MODE)
-                                Logger.Log("Server stopped", Logger.MessageType.INFORM);
+                            Logger.Log("Server stopped", Logger.MessageType.INFORM);
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine("(SERVER) Could not start: " + e.Message);
-                            if (MadConf.conf.LOG_MODE)
-                                Logger.Log("CLIServer could not start: " + e.Message, Logger.MessageType.ERROR);
+                            Logger.Log("CLIServer could not start: " + e.Message, Logger.MessageType.ERROR);
                         }
 
                         PressAnyKeyToClose();
@@ -109,12 +105,8 @@ namespace MAD
 
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");
-                        if (MadConf.conf.LOG_MODE)
-                        {
-                            Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
-                            Logger.ForceWriteToLog();
-                        }
-
+                        Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
+                        Logger.ForceWriteToLog();
                         PressAnyKeyToClose();
                         break;
                 }
@@ -122,12 +114,8 @@ namespace MAD
             else
             {
                 Console.WriteLine("ERROR! Too many arguments!");
-                if (MadConf.conf.LOG_MODE)
-                {
-                    Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
-                    Logger.ForceWriteToLog();
-                }
-
+                Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
+                Logger.ForceWriteToLog();
                 PressAnyKeyToClose();
             }
 
@@ -135,12 +123,8 @@ namespace MAD
             db.Dispose();
             MailNotification.Stop();
 
-            if (MadConf.conf.LOG_MODE)
-            {
-                Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
-                Logger.ForceWriteToLog();
-            }
-
+            Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
+            Logger.ForceWriteToLog();
             return 0;
         }
 

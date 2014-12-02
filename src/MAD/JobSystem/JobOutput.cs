@@ -14,7 +14,9 @@ namespace MAD.JobSystemCore
 
         public JobOutput()
         {
+            // Global OutDescriptors (= every Job need those)
             outputs.Add(new OutputDescriptor("OutState", typeof(string)));
+            outputs.Add(new OutputDescriptor("ExDuration", typeof(int)));
         }
 
         public OutputDescriptor GetOutputDesc(string name)
