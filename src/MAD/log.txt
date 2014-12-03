@@ -1,0 +1,2 @@
+12/3/2014 9:11:08 AM INFORMATION: Programm Start. GUI Start.
+12/3/2014 9:11:08 AM !EMERGENCY: Programm Aborted. No GUI!
