@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.NetworkInformation;
-using System.Threading;
+using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
@@ -26,12 +24,16 @@ namespace MAD.JobSystemCore
         public int state = 0; //active (state = 1) or inactive (state = 0)
         [JsonIgnore]
         public int uWorker = 0;
+        [JsonIgnore]
+        public DateTime lastIPUpdate = DateTime.Now;
 
         public Guid guid { get; set; }
         public string name { get; set; }
-        public PhysicalAddress mac { get; set; } // sns
+        public string mac { get; set; }
         public IPAddress ip { get; set; } // sns
         public List<Job> jobs = new List<Job>();
+
+        public bool ipCheckFlag = true;
 
         #endregion
 
@@ -43,7 +45,7 @@ namespace MAD.JobSystemCore
             this.guid = Guid.NewGuid();
         }
 
-        public JobNode(string nodeName, PhysicalAddress macAddress, IPAddress ipAddress, List<Job> jobs)
+        public JobNode(string nodeName, string macAddress, IPAddress ipAddress, List<Job> jobs)
         {
             InitID();
 

@@ -9,6 +9,7 @@ using MAD.JobSystemCore;
 using MAD.MacFinders;
 using MAD.Notification;
 using MAD.Helper;
+using MadNet;
 
 namespace MAD.CLICore
 {
@@ -195,7 +196,7 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
             description = "This command creates a node.";
         }
@@ -205,7 +206,7 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+            _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
             _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
 
             _js.AddNode(_node); 
@@ -241,7 +242,7 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to edit.", false, false, new Type[] { typeof(Int32) }));
             oPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
+            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
             description = "This command edits a node. ";
         }
@@ -257,7 +258,7 @@ namespace MAD.CLICore
                         _node.name = (string)pars.GetPar("n").argValues[0];
 
                     if (OParUsed("mac"))
-                        _node.mac = (PhysicalAddress)pars.GetPar("mac").argValues[0];
+                        _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
 
                     if (OParUsed("ip"))
                         _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
