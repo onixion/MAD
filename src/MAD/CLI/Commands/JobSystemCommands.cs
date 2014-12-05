@@ -135,7 +135,7 @@ namespace MAD.CLICore
 
             lock (_js.jsLock)
             {
-                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                List<JobNode> _nodes = _js.LGetNodes();
                 foreach (JobNode _temp in _nodes)
                 {
                     _tableRow[0] = _temp.id.ToString();
@@ -198,6 +198,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
             rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            oPar.Add(new ParOption("i", "IP-RENEW", "Try to renew IP-Addresses over ARP-Request.", true, false, null));
             description = "This command creates a node.";
         }
 
@@ -208,6 +209,9 @@ namespace MAD.CLICore
             _node.name = (string)pars.GetPar("n").argValues[0];
             _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
             _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
+
+            if (OParUsed("i"))
+                _node.ipRenewFlag = true;
 
             _js.AddNode(_node); 
 
@@ -244,6 +248,7 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
+            oPar.Add(new ParOption("i", "IP-RENEW", "Try to renew IP-Addresses over ARP-Request.", true, false, null));
             description = "This command edits a node. ";
         }
 
@@ -251,7 +256,7 @@ namespace MAD.CLICore
         {
             lock (_js.jsLock)
             {
-                JobNode _node = _js.UnsafeGetNode((Int32)pars.GetPar("id").argValues[0]);
+                JobNode _node = _js.LGetNode((Int32)pars.GetPar("id").argValues[0]);
                 if (_node != null)
                 {
                     if (OParUsed("n"))
@@ -262,6 +267,11 @@ namespace MAD.CLICore
 
                     if (OParUsed("ip"))
                         _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
+
+                    if (OParUsed("i"))
+                        _node.ipRenewFlag = true;
+                    else
+                        _node.ipRenewFlag = false;
 
                     return "<color><green>Node edited.";
                 }
@@ -388,7 +398,7 @@ namespace MAD.CLICore
 
             lock (_js.jsLock)
             {
-                List<JobNode> _nodes = _js.UnsafeGetNodes();
+                List<JobNode> _nodes = _js.LGetNodes();
                 foreach (JobNode _temp in _nodes)
                 {
                     foreach (Job _temp2 in _temp.jobs)
@@ -460,7 +470,7 @@ namespace MAD.CLICore
                 lock (_js.jsLock)
                 {
                     JobNode _node;
-                    Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                    Job _job = _js.LGetJob((int)pars.GetPar("id").argValues[0], out _node);
                     if (_job != null)
                     {
                         output = GetJobInfo(_job);
@@ -474,7 +484,7 @@ namespace MAD.CLICore
             {
                 lock (_js.jsLock)
                 {
-                    List<JobNode> _nodes = _js.UnsafeGetNodes();
+                    List<JobNode> _nodes = _js.LGetNodes();
                     foreach (JobNode _node in _nodes)
                     {
                         foreach (Job _job in _node.jobs)
@@ -565,7 +575,7 @@ namespace MAD.CLICore
             lock(_js.jsLock)
             {
                 JobNode _node = null;
-                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                Job _job = _js.LGetJob((int)pars.GetPar("id").argValues[0], out _node);
                 if(_job != null)
                 {
                     foreach(OutputDescriptor _desc in _job.outp.outputs)
@@ -647,7 +657,7 @@ namespace MAD.CLICore
             oPar.Add(new ParOption("n", "JOB-NAME", "Name of the job.", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("t", "TIME", "Delaytime or time on which th job should be executed.", false, true, new Type[] { typeof(Int32), typeof(string) }));
             oPar.Add(new ParOption("rule", "NOT.-RULE", "Define Rule(s).", false, true, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("notiEnable", "NOT. ENABLE-FLAG", "Enables the job to use notification.", true, false, null));
+            oPar.Add(new ParOption("ne", "", "Enables notification over E-Mail.", true, false, null));
         }
 
         public override string Execute(int consoleWidth)
@@ -655,7 +665,7 @@ namespace MAD.CLICore
             lock (_js.jsLock)
             {
                 JobNode _node = null;
-                Job _job = _js.UnsafeGetJob((Int32)pars.GetPar("id").argValues[0], out _node);
+                Job _job = _js.LGetJob((Int32)pars.GetPar("id").argValues[0], out _node);
 
                 if (OParUsed("n"))
                     _job.name = (string)pars.GetPar("n").argValues[0];
@@ -810,7 +820,7 @@ namespace MAD.CLICore
             lock (_js.jsLock)
             {
                 JobNode _node;
-                Job _job = _js.UnsafeGetJob((int)pars.GetPar("id").argValues[0], out _node);
+                Job _job = _js.LGetJob((int)pars.GetPar("id").argValues[0], out _node);
                 if (_job != null)
                 {
                     _job.settings = ParseJobNotificationSettings(pars);

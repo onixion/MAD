@@ -50,13 +50,33 @@ namespace MAD.JobSystemCore
 
         public void SaveTable(string filepath)
         {
-            lock(jsLock)
-                JSSerializer.SerializeTable(filepath, _nodes);
+            lock (jsLock)
+            {
+                try
+                {
+                    JSSerializer.SerializeTable(filepath, _nodes);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("(JS) Error while saving table: " + e.Message, Logger.MessageType.ERROR);
+                    throw new Exception("Error while saving table.", e);
+                }
+            }
         }
 
         public int LoadTable(string filepath)
         {
-            List<JobNode> _loadNodes = JSSerializer.DeserializeTable(filepath);
+            List<JobNode> _loadNodes;
+            try
+            {
+                _loadNodes = JSSerializer.DeserializeTable(filepath);
+            }
+            catch (Exception e)
+            {
+                Logger.Log("(JS) Error while loading table: " + e.Message, Logger.MessageType.ERROR);
+                throw new Exception("Error while loading table.", e);
+            }
+
             lock (jsLock)
             {
                 if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
@@ -218,12 +238,12 @@ namespace MAD.JobSystemCore
 
         #region nodes handling
 
-        public List<JobNode> UnsafeGetNodes()
+        public List<JobNode> LGetNodes()
         {
             return _nodes;
         }
 
-        public JobNode UnsafeGetNode(int id)
+        public JobNode LGetNode(int id)
         {
             for (int i = 0; i < _nodes.Count; i++)
                 if (_nodes[i].id == id)
@@ -231,7 +251,7 @@ namespace MAD.JobSystemCore
             return null;
         }
 
-        public JobNode UnsafeGetNode(string mac)
+        public JobNode LGetNode(string mac)
         {
             for (int i = 0; i < _nodes.Count; i++)
                 if (_nodes[i].mac.ToString() == mac)
@@ -243,7 +263,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(id);
+                JobNode _node = LGetNode(id);
                 if (_node != null)
                 {
                     if (_node.state == 0)
@@ -260,7 +280,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(id);
+                JobNode _node = LGetNode(id);
                 if (_node != null)
                 {
                     if (_node.state == 1)
@@ -338,7 +358,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(id);
+                JobNode _node = LGetNode(id);
                 if (_node != null)
                     return true;
                 else
@@ -350,7 +370,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(nodeID);
+                JobNode _node = LGetNode(nodeID);
                 if (_node != null)
                 {
                     _node.name = name;
@@ -365,7 +385,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(nodeID);
+                JobNode _node = LGetNode(nodeID);
                 if (_node != null)
                 {
                     _node.mac = mac;
@@ -380,7 +400,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(nodeID);
+                JobNode _node = LGetNode(nodeID);
                 if (_node != null)
                 {
                     _node.ip = ip;
@@ -401,7 +421,7 @@ namespace MAD.JobSystemCore
                     JobNode _node = null;
                     try
                     {
-                        _node = UnsafeGetNode(_host.hostMac);
+                        _node = LGetNode(_host.hostMac);
                         if (_node != null)
                         {
                             // Node does exist with this mac -> update IP and HOST
@@ -434,7 +454,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(id);
+                JobNode _node = LGetNode(id);
                 if (_node != null)
                     JSSerializer.SerializeNode(fileName, _node);
                 else
@@ -454,7 +474,7 @@ namespace MAD.JobSystemCore
 
         #region jobs handling
 
-        public Job UnsafeGetJob(int id, out JobNode node)
+        public Job LGetJob(int id, out JobNode node)
         {
             for (int i = 0; i < _nodes.Count; i++)
                 for (int i2 = 0; i2 < _nodes[i].jobs.Count; i2++)
@@ -472,7 +492,7 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 JobNode _node;
-                Job _job = UnsafeGetJob(id, out _node);
+                Job _job = LGetJob(id, out _node);
                 if (_job != null)
                 {
                         if (_job.state == 0)
@@ -493,7 +513,7 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 JobNode _node;
-                Job _job = UnsafeGetJob(id, out _node);
+                Job _job = LGetJob(id, out _node);
                 if (_job != null)
                 {
                     if (_job.state == 1)
@@ -513,7 +533,7 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node = UnsafeGetNode(nodeId);
+                JobNode _node = LGetNode(nodeId);
                 if (_node != null)
                 {
                     if (JobNode.MAXJOBS > _node.jobs.Count)
@@ -559,7 +579,7 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 JobNode _node;
-                Job _job = UnsafeGetJob(id, out _node);
+                Job _job = LGetJob(id, out _node);
                 if (_job != null)
                     return true;
                 else
@@ -573,12 +593,16 @@ namespace MAD.JobSystemCore
 
         private void DBWriteNode(JobNode node)
         {
-
+            /* This method will save a given node into the db.
+             * It will check if the node already exists in the
+             * database. If it exists it will update the old
+             * entry, else It will create a new entry. */
         }
 
         private void DBWriteJob(Job job)
         { 
-        
+            /* This method will save a given job. It does not
+             * check if the job already exists. */
         }
 
         #endregion

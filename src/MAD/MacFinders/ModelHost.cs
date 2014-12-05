@@ -346,7 +346,7 @@ namespace MAD.MacFinders
             {
                 try
                 {
-                    List<JobNode> _nodeList = js.UnsafeGetNodes();
+                    List<JobNode> _nodeList = js.LGetNodes();
                     foreach (JobNode _tmpNode in _nodeList)
                     {
                         if (!Exists(_tmpNode.mac.ToString()))

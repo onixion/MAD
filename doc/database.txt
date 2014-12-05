@@ -1,0 +1,36 @@
+Datenbank-Organisation (nach Alin)
+----------------------------------
+
+NodeTable -> Speicherung der Netzwerkknoten
+
+	GUID_NODE:TEXT
+	NAME:TEXT 	(Hostname oder anderer Name für das Gerät)
+	IP:TEXT		(IP-Adresse)
+	MAC:TEXT	(MAC-Adresse)
+	MEMO:TEXT	(Feld für den Administrator)
+
+JobTable -> Speicherung der Job-Ergebnisse
+
+	GUID_NODE:TEXT	(GUID des Nodes)
+	GUID_JOB:TEXT	(GUID des Jobs)
+	JOBNAME:INTEGER (Name des Jobs)
+	OUTSTATE:INTEGER (Ausgangszustand des Jobs)
+	STARTTIME:TEXT	(Zeitstempel für den Beginn der Ausführung)
+	STOPTIME:TEXT	(Zeitstempel für das Ende der Ausführung)
+	DELAYTIME:TEXT	(Ausführungsdauer des Jobs; in Millisekunden)
+	OUTDESC:TEXT	(Hier werden die Werte der OutDescriptoren abgespeichert; getrennt mit ':'!)
+
+JobNameTable -> Speicherung der Namen der Jobs
+
+	GUID_JOB:TEXT	(GUID des Jobs)
+	NAME:TEXT	(Name des Jobs)
+
+SummaryTable p0
+
+
+
+
+
+
+
+	
