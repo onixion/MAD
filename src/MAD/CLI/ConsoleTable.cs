@@ -8,7 +8,7 @@ namespace MAD.CLICore
 
         public static string GetSplitline(int width)
         { 
-            return "".PadRight(Console.BufferWidth, '_');
+            return "".PadRight(width, '_');
         }
 
         public static string FormatStringArray(int consoleWidth, params string[] data)
