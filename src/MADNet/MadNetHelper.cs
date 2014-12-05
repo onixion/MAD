@@ -7,8 +7,6 @@ namespace MadNet
 {
     public static class MadNetHelper
     {
-        private static Random _rand;
-
         private static SHA1 _SHA1 = new SHA1CryptoServiceProvider();
         private static SHA256 _SHA256 = new SHA256CryptoServiceProvider();
         private static SHA512 _SHA512 = new SHA512CryptoServiceProvider();

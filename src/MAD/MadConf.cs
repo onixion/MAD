@@ -64,7 +64,7 @@ namespace MAD
         public static void SetToDefault()
         {
             // logger
-            conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
+            conf.LOG_FILE_DIRECTORY = "." + Path.DirectorySeparatorChar;
 
             // jobsystem
             conf.NOTI_ENABLE = true;
@@ -84,7 +84,6 @@ namespace MAD
             conf.arpInterface = 4;
             conf.snmpInterface = "12";
         }
-
         #endregion
     }
 

@@ -10,6 +10,7 @@ namespace MAD.JobSystemCore
 {
     class JobCheckDns : Job
     {
+        //keine Parameter benötigt 
         public JobCheckDns()
             : base(JobType.ServiceCheck)
         { }
