@@ -25,7 +25,36 @@ JobNameTable -> Speicherung der Namen der Jobs
 	GUID_JOB:TEXT	(GUID des Jobs)
 	NAME:TEXT	(Name des Jobs)
 
-SummaryTable p0
+SummaryTable -> Speicherung der Zusammenfassungen
+
+	GUID_NODE:TEXT	(GUID des Nodes)
+	STARTTIME:TEXT	(Zeitstempel für den Beginn der Zusammenfassung)
+	STOPTIME:TEXT	(Zeitstempel für das Ende der Zusammenfassung)
+
+	SUCCESS:TEXT	(0 bis 100%; OUTSTATES, die erfolgreich waren)
+	AVERAGE_DURATION:TEXT (durchschnittliche Ausführungsdauer; in Millisekunden)
+	MAX_DURATION:TEXT (maximale Ausführungsdauer; in Millisekunden)
+	MIN_DURATION:TEXT (minamele Ausführungsdauer; in Millisekunden)
+
+
+__________________________________________________________________________________________
+
+Anmerkungen:
+------------
+
+Die NodeTable speichert die aktuellsten Geräte (=Nodes). Falls das Gerät eine neue Adresse
+vom Anwender zugewießen bekommt oder der ARP-Reader eine neue Adresse auflöst, dann wird
+die IP-Adresse in der Datenbank geupdatet. Nachteil an der Sache: wir verlieren die
+Information der IP-Adressen, die ein Gerät mal gehabt hat.
+
+Zwei Memofelder sind nicht sinnvoll, wir arbeiten mit SQLITE, also eine sehr einfache Datenbank.
+Sie ist eine leichtgewichtige, unkomplizierte und einfach zu implementierende (sowohl auf Linux
+als Windows) Datebank. Da sie alles als Text abspeichert, muss das Programm die Kontrolle über
+die gespeicherten Werte übernehmen (maximale Länge usw.). In der Datenbank verwenden wir ein Feld
+namens 'Memo'. Dieses Feld kann unterteilt werden. Muss das Programm machen, nicht die DB!
+
+
+
 
 
 
