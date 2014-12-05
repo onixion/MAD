@@ -18,7 +18,6 @@ namespace MAD.JobSystemCore
 
         private static List<IPAddress> _hostAddresses = new List<IPAddress>();
         private NetworkHelper _helper = new NetworkHelper();
-        private string _tmp = "";
 
         #endregion
 

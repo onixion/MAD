@@ -91,7 +91,7 @@ namespace MAD
                 conf.arpInterface = 4;
                 conf.snmpInterface = "12";
 
-                conf.LOG_FILE_DIRECTORY = Directory.GetCurrentDirectory();
+                conf.LOG_FILE_DIRECTORY = "." + Path.DirectorySeparatorChar;
             }
         }
 
