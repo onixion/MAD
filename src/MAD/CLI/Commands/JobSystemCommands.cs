@@ -207,8 +207,16 @@ namespace MAD.CLICore
             JobNode _node = new JobNode();
 
             _node.name = (string)pars.GetPar("n").argValues[0];
-            _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
             _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
+
+            try
+            {
+                _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
+            }
+            catch (Exception e)
+            {
+                return "<color><red>Cannot parse MAC-Address!";
+            }
 
             if (OParUsed("i"))
                 _node.ipRenewFlag = true;
