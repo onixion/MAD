@@ -38,7 +38,6 @@ namespace MAD
 
         public static void SaveConf(string filePath)
         {
-
             JsonSerializer _ser = new JsonSerializer();
             _ser.Formatting = Formatting.Indented;
             _ser.Converters.Add(new MailAddressConverter());

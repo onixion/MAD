@@ -20,6 +20,7 @@ namespace MAD
     {
         public static readonly string DATADIR = Path.Combine("data");
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
+        public static readonly string DBFILE = Path.Combine(DATADIR, "mad.db");
 
         [STAThread]
         public static int Main(string[] args)
@@ -52,7 +53,7 @@ namespace MAD
             }
 
             // init components
-            DB db = new DB(Path.Combine(DATADIR, "mad.db"));
+            DB db = new DB(DBFILE);
             JobSystem js = new JobSystem(db);
             js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             DHCPReader dhcpReader = new DHCPReader(js);
