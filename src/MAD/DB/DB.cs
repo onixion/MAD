@@ -6,18 +6,12 @@ using System.Text;
 using System.Data.SQLite; //include SQLite database library
 using System.IO;  
 using System.Data;
+using MAD.JobSystemCore;
 
 /*
  //add to main!!
             DB MADstore = new DB("MAD.sqlite");
             MADstore.ConnectDB("MAD.sqlite");
-
-            MADstore.CreateDeviceTable();
-            MADstore.CreateEventTable();
-            MADstore.CreateJobTypeTable();
-            MADstore.CreateProtocolTable();
-            MADstore.CreateStatusTable();
-            MADstore.CreateSummaryTable();
  
             MADstore.DisconnectDB();
  */
@@ -30,8 +24,13 @@ MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("H
 
 
 namespace MAD.Database
+<<<<<<< HEAD
+{
+    public class DB : IDisposable // <- this is needed when the DB gets destroyed at the end of program
+=======
 { 
     public class DB
+>>>>>>> origin/master
     {
         private string _DBname;
         public SQLiteConnection _dbConnection;
@@ -39,7 +38,12 @@ namespace MAD.Database
         public DB(string DBname)
         {
             _DBname = DBname;
+<<<<<<< HEAD
+            if (!File.Exists(_DBname))
+                SQLiteConnection.CreateFile(_DBname);
+=======
             SQLiteConnection.CreateFile(_DBname);
+>>>>>>> origin/master
             ConnectDB();
 
             CreateDeviceTable();
@@ -48,7 +52,11 @@ namespace MAD.Database
 
             CreateProtocolTable();
             CreateJobTypeTable();
+<<<<<<< HEAD
+            CreateJobNameTable(); //this one is not necessary ... makes everthing more complicated
+=======
             CreateJobNameTable();
+>>>>>>> origin/master
         }
 
         //connect to database
@@ -64,7 +72,7 @@ namespace MAD.Database
             _dbConnection.Close();
         }
 
-        public void CreateDeviceTable()
+        private void CreateDeviceTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Device_Table ( GUID TEXT, HOSTNAME TEXT, IP TEXT, MAC TEXT, Online INTEGER, Memo1 VARCHAR(5), Memo2 TEXT);";
 
@@ -73,16 +81,20 @@ namespace MAD.Database
             command.Dispose();
         }
 
-        public void CreateEventTable()
+        private void CreateEventTable()
         {
+<<<<<<< HEAD
+            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, GUIDdt TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, Success INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
+=======
             string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, SUCCESS INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
             
+>>>>>>> origin/master
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             command.ExecuteNonQuery();
             command.Dispose();
         }
 
-        public void CreateJobTypeTable()
+        private void CreateJobTypeTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Job_Type_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, JobType TEXT);";
 
@@ -91,7 +103,7 @@ namespace MAD.Database
             command.Dispose();
         }
 
-        public void CreateJobNameTable()
+        private void CreateJobNameTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Job_Name_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, JobNames TEXT);";
 
@@ -100,7 +112,7 @@ namespace MAD.Database
             command.Dispose();
         }
 
-        public void CreateProtocolTable()
+        private void CreateProtocolTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Protocol_Table ( ID INTEGER PRIMARY KEY AUTOINCREMENT, Protocol TEXT);";
 
@@ -109,7 +121,7 @@ namespace MAD.Database
             command.Dispose();
         }
 
-        public void CreateSummaryTable()
+        void CreateSummaryTable()
         {
             string sql = "CREATE TABLE IF NOT EXISTS Summary_Table ( GUID TEXT, DATE TEXT, JOBTYPE INTEGER, PROTOCOL INTEGER, OutState INTEGER);";
             
@@ -143,51 +155,115 @@ namespace MAD.Database
             command.ExecuteNonQuery();
             command.Dispose();
         }
+<<<<<<< HEAD
+
+        
+        public void InsertNode(JobNode node)
+=======
     
         //read entire table
         public DataTable ReadTable(string TableName)
+>>>>>>> origin/master
         {
-            string sql = "SELECT * FROM " + TableName + "";
-            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            command.Dispose();
-            TempResult.Load(reader);
-            return TempResult;  
+
+            
         }
 
-        //read one result from table
-        public DataTable ReadResult(string TableName, int TableID)
+        public void InsertJob(JobNode node, Job job)
         {
-            string sql = "SELECT * FROM " + TableName + " WHERE ID='" + TableID + "'";
-            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
+
         }
-        
+
+        public void Update(string TableName, string GUID, string IP)
+        {
+            string sql = "UPDATE Device_Table SET IP = '" + IP + "' WHERE GUID = '" + GUID + "'";
+        }
+
+
+        static class QUERYHELPER
+        {
+            public const string READ_TABLE = "SELECT * FROM {0}";
+            public const string READ_RESULT = "SELECT * FROM {0} WHERE ID='{1}'";
+            public const string READ_EVENTS = "SELECT * FROM event_Table INNER JOIN job_Name_Table ON event_Table.JOBNAME = job_Name_Table.ID INNER JOIN job_Type_Table ON event_Table.JOBTYPE = job_Type_Table.ID INNER JOIN protocol_Table ON event_Table.PROTOCOL = protocol_Table.ID;";
+            public const string READ_EVENT = "SELECT * FROM event_Table INNER JOIN job_Name_Table ON event_Table.JOBNAME = job_Name_Table.ID INNER JOIN job_Type_Table ON event_Table.JOBTYPE = job_Type_Table.ID INNER JOIN protocol_Table ON event_Table.PROTOCOL = protocol_Table.ID; WHERE GUID='{1}'";
+            public const string DELETE_CONTENT = "DELETE * FROM Event_Table";
+        }
+
+        public DataTable ReadTable(string tableName)
+        {
+            return readDT(String.Format(QUERYHELPER.READ_TABLE, tableName));
+        }
+
+
+        public DataTable ReadResult(string tableName, int tableId)
+        {
+            return readDT(String.Format(QUERYHELPER.READ_RESULT, tableName, tableId));
+
+        }
+
         public DataTable ReadEvents()
         {
-            //string sql = "SELECT GUID, JobNames FROM " + TableName + " INNER JOIN Job_Name_Table ON Event_Table.JOBNAME = Job_Name_Table.JobNames WHERE GUID='" + TableID + "'";
-            //string sql = "SELECT * FROM Job_Name_Table, Job_Type_Table where Job_Name_Table.ID = Job_Type_Table.ID";
-            string sql = "SELECT * FROM event_Table INNER JOIN job_Name_Table ON event_Table.JOBNAME = job_Name_Table.ID INNER JOIN job_Type_Table ON event_Table.JOBTYPE = job_Type_Table.ID INNER JOIN protocol_Table ON event_Table.PROTOCOL = protocol_Table.ID;";
-            SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            /*
-            while (reader.Read())
-                Console.WriteLine("ID: " + reader["ID"] + "\tJobname: " + reader["JobNames"] + "\tID: " + reader["ID"] + "\tJobType: " + reader["JobType"]);
-            Console.ReadLine();
-            command.Dispose();
-            */
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
+            return readDT(QUERYHELPER.READ_EVENTS);
         }
+
+        public DataTable ReadEvent()
+        {
+            return readDT(QUERYHELPER.READ_EVENTS);
+        }
+        /*
+    public DataTable DoSomething(string tableName, string SQLOrder)
+    {
+        return do(String.Format(SQLOrder, tableName));
+    }*/
+
+
+        private DataTable readDT(string sql)
+        {
+            DataTable result = new DataTable();
+            using (SQLiteCommand command = new SQLiteCommand(sql, _dbConnection))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                result.Load(reader);
+            }
+            return result;
+        }
+
+        /*
+        public void DataTable DeleteContent(string tableName)
+        {
+            deleteDT(String.Format(QUERYHELPER.DELETE_CONTENT, tableName));
+        }
+    
+
+        private DataTable deleteDT(string sql)
+        {
+            DataTable result = new DataTable();
+            using (SQLiteCommand command = new SQLiteCommand(sql, _dbConnection))
+        }
+     
+        public void DataTable DoSomething(string tableName)
+        {
+            do(String.Format(QUERYHELPER.DELETE_CONTENT, tableName));
+        }
+     
+         private DataTable doDT(string sql)
+        {
+            DataTable result = new DataTable();
+            using (SQLiteCommand command = new SQLiteCommand(sql, _dbConnection))
+        }
+         */
 
         public void Dispose()
         {
             DisconnectDB();
+        }
+
+        private static DateTime TimeFromUnixTimestamp(int unixTimestamp)
+        {
+            DateTime unixYear0 = new DateTime(1970, 1, 1);
+            long unixTimeStampInTicks = unixTimestamp * TimeSpan.TicksPerSecond;
+            DateTime dtUnix = new DateTime(unixYear0.Ticks + unixTimeStampInTicks);
+            return dtUnix;
         }
     }
 }
@@ -196,26 +272,7 @@ namespace MAD.Database
 
 
 
-//at the moment useless
-/*
-public int Insert(string Command)
-{
-    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-    return cmd.ExecuteNonQuery();
-}
 
-public DataTable Select(string Command)
-{
-    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-    return cmd.ExecuteReader().GetSchemaTable();
-}
-
-public int Create(string Command)
-{
-    SQLiteCommand cmd = new SQLiteCommand(Command, _dbConnection);
-    return cmd.ExecuteNonQuery();
-}
-*/
 
 /* =========copy too main:
  
