@@ -56,6 +56,7 @@ namespace MAD
             DB db = new DB(DBFILE);
             JobSystem js = new JobSystem(db);
             js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
+            ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
             //NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
             MailNotification.Start();
