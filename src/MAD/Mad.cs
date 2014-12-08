@@ -59,7 +59,6 @@ namespace MAD
             DHCPReader dhcpReader = new DHCPReader(js);
             //NotificationSystem.SetOrigin(MadConf.conf.SMTP_SERVER, new System.Net.Mail.MailAddress(MadConf.conf.SMTP_USER), MadConf.conf.SMTP_PASS, MadConf.conf.SERVER_PORT);
             //MailNotification.Start();
-            NotificationGetParams.SetSendMail("Fick de scheise", " Fick sie sowas von", 3);
 
             // start interface
             if (args.Length == 0)
