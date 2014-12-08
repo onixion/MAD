@@ -71,9 +71,9 @@ namespace MAD
             // notification
             conf.SMTP_SERVER = "smtp-mail.outlook.com";
             conf.SMTP_PORT = 587;
-            conf.SMTP_USER = "mad.group@outlook.com";
-            conf.SMTP_PASS = "Mad-21436587";
-            conf.MAIL_DEFAULT = new MailAddress[1] { new MailAddress("alin.porcic@gmail.com") };
+            conf.SMTP_USER = new MailAddress("mad.group@outlook.com");
+            conf.SMTP_PASS = "MAD-21436587";
+            conf.MAIL_DEFAULT = new MailAddress[1] { new MailAddress("singh.manpreet@live.at") };
 
             // cliserver
             conf.SERVER_HEADER = "MAD-CLIServer";
@@ -98,7 +98,7 @@ namespace MAD
         // notification
         public string SMTP_SERVER;
         public int SMTP_PORT;
-        public string SMTP_USER;
+        public MailAddress SMTP_USER;
         public string SMTP_PASS;
         public MailAddress[] MAIL_DEFAULT;
 
