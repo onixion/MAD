@@ -6,6 +6,7 @@ using System.Text;
 using System.Data.SQLite; //include SQLite database library
 using System.IO;  
 using System.Data;
+
 using MAD.JobSystemCore;
 
 /*
@@ -24,13 +25,10 @@ MADstore.InsertToTable("Device_Table", new Insert("GUID", "0001"), new Insert("H
 
 
 namespace MAD.Database
-<<<<<<< HEAD
 {
+
+
     public class DB : IDisposable // <- this is needed when the DB gets destroyed at the end of program
-=======
-{ 
-    public class DB
->>>>>>> origin/master
     {
         private string _DBname;
         public SQLiteConnection _dbConnection;
@@ -38,12 +36,8 @@ namespace MAD.Database
         public DB(string DBname)
         {
             _DBname = DBname;
-<<<<<<< HEAD
-            if (!File.Exists(_DBname))
-                SQLiteConnection.CreateFile(_DBname);
-=======
+
             SQLiteConnection.CreateFile(_DBname);
->>>>>>> origin/master
             ConnectDB();
 
             CreateDeviceTable();
@@ -52,11 +46,8 @@ namespace MAD.Database
 
             CreateProtocolTable();
             CreateJobTypeTable();
-<<<<<<< HEAD
+
             CreateJobNameTable(); //this one is not necessary ... makes everthing more complicated
-=======
-            CreateJobNameTable();
->>>>>>> origin/master
         }
 
         //connect to database
@@ -83,12 +74,8 @@ namespace MAD.Database
 
         private void CreateEventTable()
         {
-<<<<<<< HEAD
             string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, GUIDdt TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, Success INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
-=======
-            string sql = "CREATE TABLE IF NOT EXISTS Event_Table ( GUID TEXT, JOBNAME INTEGER, JOBTYPE INTEGER, PROTOCOL INTEGER, SUCCESS INTEGER, StartTime TEXT, StopTime TEXT, DelayTime TEXT, Custom1 TEXT, Custom2 INTEGER);";
-            
->>>>>>> origin/master
+
             SQLiteCommand command = new SQLiteCommand(sql, _dbConnection);
             command.ExecuteNonQuery();
             command.Dispose();
@@ -155,15 +142,8 @@ namespace MAD.Database
             command.ExecuteNonQuery();
             command.Dispose();
         }
-<<<<<<< HEAD
 
-        
         public void InsertNode(JobNode node)
-=======
-    
-        //read entire table
-        public DataTable ReadTable(string TableName)
->>>>>>> origin/master
         {
 
             

@@ -91,9 +91,10 @@
     <Compile Include="CLI\CommandOptions.cs" />
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
+    <Compile Include="DB\DBSummary.cs" />
+    <Compile Include="DB\DBTableInfo.cs" />
     <Compile Include="DB\DB.cs" />
     <Compile Include="JobSystem\DBHandler.cs" />
-    <Compile Include="DB\DB_Table_Info.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
