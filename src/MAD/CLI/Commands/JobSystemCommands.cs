@@ -196,7 +196,7 @@ namespace MAD.CLICore
         {
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
             rPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
             oPar.Add(new ParOption("i", "IP-RENEW", "Try to renew IP-Addresses over ARP-Request.", true, false, null));
             description = "This command creates a node.";
@@ -208,15 +208,7 @@ namespace MAD.CLICore
 
             _node.name = (string)pars.GetPar("n").argValues[0];
             _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
-
-            try
-            {
-                _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
-            }
-            catch (Exception e)
-            {
-                return "<color><red>Cannot parse MAC-Address!";
-            }
+            _node.mac = ((PhysicalAddress)pars.GetPar("mac").argValues[0]).ToString();
 
             if (OParUsed("i"))
                 _node.ipRenewFlag = true;
