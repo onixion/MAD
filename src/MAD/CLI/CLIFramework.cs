@@ -249,12 +249,16 @@ namespace MAD.CLICore
                     case "System.Net.IPAddress":
                         return System.Net.IPAddress.Parse(value);
                     case "System.Net.NetworkInformation.PhysicalAddress":
+                        if (value.Length < 12)
+                            value = value.PadRight(12 - value.Length, '0');
+                        else if (value.Length > 12)
+                            throw new Exception("MAC-Address too long!");
                         return System.Net.NetworkInformation.PhysicalAddress.Parse(value);
                     case "System.Net.Mail.MailAddress":
                         return new System.Net.Mail.MailAddress(value);
+                    default:
+                        return null;
                 }
-
-                return null;
             }
             catch (Exception)
             {

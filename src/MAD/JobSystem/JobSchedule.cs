@@ -19,7 +19,6 @@ namespace MAD.JobSystemCore
 
         private Thread _cycleThread;
         private int _cycleTime = 10;
-        private int _fetchIPTime = 5;
 
         private object _stateLock = new object();
         /* state = 0 | inactive

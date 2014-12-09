@@ -106,7 +106,7 @@ namespace MAD.CLICore
             */
 
             // Database commands
-            commands.Add(new CommandOptions("db t", typeof(DBInsertTest), new object[] { db }));
+            commands.Add(new CommandOptions("db show", typeof(DBShow), new object[] { db }));
 
             Console.CancelKeyPress += new ConsoleCancelEventHandler(StrgCHandler);
         }
