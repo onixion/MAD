@@ -210,9 +210,6 @@ namespace MAD.CLICore
             _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
             _node.mac = ((PhysicalAddress)pars.GetPar("mac").argValues[0]).ToString();
 
-            if (OParUsed("i"))
-                _node.ipRenewFlag = true;
-
             _js.AddNode(_node); 
 
             return "<color><green>Node created (ID " + _node.id + ").";
@@ -246,7 +243,7 @@ namespace MAD.CLICore
             _js = (JobSystem)args[0];
             rPar.Add(new ParOption("id", "NODE-ID", "ID of the node to edit.", false, false, new Type[] { typeof(Int32) }));
             oPar.Add(new ParOption("n", "NODE-NAME", "Name of the node.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("mac", "MAC-ADDRESS", "MAC-Address of the target.", false, false, new Type[] { typeof(PhysicalAddress) }));
             oPar.Add(new ParOption("ip", "IP-ADDRESS", "IP-Address of the target.", false, false, new Type[] { typeof(IPAddress) }));
             oPar.Add(new ParOption("i", "IP-RENEW", "Try to renew IP-Addresses over ARP-Request.", true, false, null));
             description = "This command edits a node. ";
@@ -263,15 +260,10 @@ namespace MAD.CLICore
                         _node.name = (string)pars.GetPar("n").argValues[0];
 
                     if (OParUsed("mac"))
-                        _node.mac = MadNetHelper.ParseMacAddress((string)pars.GetPar("mac").argValues[0]);
+                        _node.mac = ((PhysicalAddress)pars.GetPar("mac").argValues[0]).ToString();
 
                     if (OParUsed("ip"))
                         _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
-
-                    if (OParUsed("i"))
-                        _node.ipRenewFlag = true;
-                    else
-                        _node.ipRenewFlag = false;
 
                     return "<color><green>Node edited.";
                 }

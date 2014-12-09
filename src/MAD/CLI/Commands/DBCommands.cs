@@ -1,33 +1,44 @@
 ﻿using System;
-using System.Data;
 
+using System.Data;
+using System.Data.SQLite;
 using MAD.Database;
 
 namespace MAD.CLICore
 {
-    public class DBSelect : Command
+    public class DBShow : Command
     {
-        public DBSelect(object[] args)
+        private DB _db;
+
+        public DBShow(object[] args)
+            :base()
         {
-            
+            _db = (DB)args[0];
+            oPar.Add(new ParOption("t", "TABLE-NAME", "Name of the table.", false, false, new Type[] { typeof(string) }));
+            description = "This command shows you the content of a specific table.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            return "";
-        }
-    }
+            if (!OParUsed("t"))
+            {
+                output += "<color><yellow>Tables:\n";
+                output += "<color><yellow> -> <color><white>GUIDTable\n";
+                output += "<color><yellow> -> <color><white>DeviceTable\n";
+                output += "<color><yellow> -> <color><white>EventTable\n";
+                output += "<color><yellow> -> <color><white>JobNameTable\n";
+                output += "<color><yellow> -> <color><white>SummaryTable\n";
 
-    public class DBInsertTest : Command
-    {
-        public void DBSelect(object[] args)
-        {
-           
-        }
+                return output;
+            }
+            else
+            { 
+                // check if table exists
+                // read content
+                // create console table
+            }
 
-        public override string Execute(int consoleWidth)
-        {
-            return "";
+            return output;
         }
     }
 }
