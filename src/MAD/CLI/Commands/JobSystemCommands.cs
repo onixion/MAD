@@ -679,7 +679,7 @@ namespace MAD.CLICore
                     _job.rules = _rules;
                 }
 
-                if (OParUsed("notiEnable"))
+                if (OParUsed("ne"))
                     _job.notiFlag = true;
                 else
                     _job.notiFlag = false;
