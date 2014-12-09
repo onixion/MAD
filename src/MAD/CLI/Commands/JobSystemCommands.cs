@@ -218,9 +218,6 @@ namespace MAD.CLICore
                 return "<color><red>Cannot parse MAC-Address!";
             }
 
-            if (OParUsed("i"))
-                _node.ipRenewFlag = true;
-
             _js.AddNode(_node); 
 
             return "<color><green>Node created (ID " + _node.id + ").";
@@ -275,11 +272,6 @@ namespace MAD.CLICore
 
                     if (OParUsed("ip"))
                         _node.ip = (IPAddress)pars.GetPar("ip").argValues[0];
-
-                    if (OParUsed("i"))
-                        _node.ipRenewFlag = true;
-                    else
-                        _node.ipRenewFlag = false;
 
                     return "<color><green>Node edited.";
                 }
