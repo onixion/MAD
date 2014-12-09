@@ -10,20 +10,24 @@ namespace MAD.CLICore
     {
         private DB _db;
 
-        public void DBSelect(object[] args)
+        public DBInsertTest(object[] args)
+            :base()
         {
             _db = (DB)args[0];
         }
 
         public override string Execute(int consoleWidth)
         {
-            using (SQLiteCommand _command = new SQLiteCommand(_db._dbConnection))
+            try
             {
-                // Test writing into the database.
-
-                // Test reading from the database.
+                
             }
-            return "Worked.";
+            catch (Exception e)
+            {
+                output += "<color><red>SQL-ERROR: " + e.Message;
+            }
+
+            return output;
         }
     }
 }
