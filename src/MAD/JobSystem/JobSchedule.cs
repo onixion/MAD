@@ -260,7 +260,34 @@ namespace MAD.JobSystemCore
                         _mailContent += GenJobInfo(_job);
                         _mailContent += GenBrokenRulesText(_job.outp, _bRules);
 
-                        MailNotification.SendMail(_job.settings, _mailSubject, _mailContent);
+                        // ___________________________________________________
+
+                        if (_job.settings == null)
+                        {
+                            NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
+                        }
+                        else
+                        {
+                            if (_job.settings.login == null)
+                            {
+                                NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
+                            }
+                            else
+                            {
+                                if (_job.settings.login.smtpAddr == null || _job.settings.login.port == 0)
+                                {
+                                    NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
+                                }
+                                else
+                                {
+                                    NotificationGetParams.SetSendMail(_job.settings.mailAddr, _mailSubject,
+                                        _mailContent, 3, _job.settings.login.smtpAddr, _job.settings.login.mail,
+                                        _job.settings.login.password, _job.settings.login.port);
+                                }
+                            }     
+                        }
+
+                        // ___________________________________________________
                     }
                 }
             }

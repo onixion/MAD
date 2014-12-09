@@ -15,8 +15,8 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            //JobNotificationSettings _settings = ParseJobNotificationSettings(pars);
-            //NotificationSystem.SetOrigin(_settings.login.smtpAddr, _settings.login.mail, _settings.login.password, _settings.login.port);
+            JobNotificationSettings _settings = ParseJobNotificationSettings(pars);
+
             return "<color><red>Default mail-settings set.";
         }
     }

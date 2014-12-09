@@ -125,7 +125,8 @@
     <Compile Include="Mad.cs" />
     <Compile Include="MadConf.cs" />
     <Compile Include="Notification\MailLogin.cs" />
-    <Compile Include="Notification\MailNotification.cs" />
+    <Compile Include="Notification\Notification.cs" />
+    <Compile Include="Notification\NotificationGetParams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MacFinders\ModelHost.cs" />
   </ItemGroup>

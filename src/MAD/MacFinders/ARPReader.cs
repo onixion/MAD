@@ -112,7 +112,7 @@ namespace MAD.MacFinders
             {
                 _buffer += "Nr " + _count.ToString() + "\n";
                 _buffer += dev.ToString() + "\n";
-
+                _count++;
             }
             return _buffer;
         }
