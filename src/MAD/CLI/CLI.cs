@@ -5,6 +5,7 @@ using System.IO;
 using MAD.JobSystemCore;
 using MAD.CLIServerCore;
 using MAD.MacFinders;
+using MAD.Database;
 using MAD.Logging;
 using CLIIO;
 
@@ -22,7 +23,7 @@ namespace MAD.CLICore
 
         #region constructor
 
-        public CLI(JobSystem js, DHCPReader dhcpReader)
+        public CLI(JobSystem js, DHCPReader dhcpReader, DB db)
             :base()
         {
             // GENERAL
@@ -103,6 +104,9 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("cliserver stop", typeof(CLIServerStop), new object[] { cliServer }));
             commands.Add(new CommandOptions("cliserver changeport", typeof(CLIChangePort), new object[] { cliServer }));
             */
+
+            // Database commands
+            commands.Add(new CommandOptions("db show", typeof(DBShow), new object[] { db }));
 
             Console.CancelKeyPress += new ConsoleCancelEventHandler(StrgCHandler);
         }

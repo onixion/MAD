@@ -1,9 +1,14 @@
 Datenbank-Organisation (nach Alin)
 ----------------------------------
 
+GUIDTable -> Speicherung der GUIDs
+
+	ID_NODE:INTEGER
+	GUID_NODE:TEXT
+
 NodeTable -> Speicherung der Netzwerkknoten
 
-	GUID_NODE:TEXT
+	ID_NODE:INTEGER
 	NAME:TEXT 	(Hostname oder anderer Name für das Gerät)
 	IP:TEXT		(IP-Adresse)
 	MAC:TEXT	(MAC-Adresse)
@@ -11,8 +16,8 @@ NodeTable -> Speicherung der Netzwerkknoten
 
 JobTable -> Speicherung der Job-Ergebnisse
 
-	GUID_NODE:TEXT	(GUID des Nodes)
-	GUID_JOB:TEXT	(GUID des Jobs)
+	ID_NODE:INTEGER
+	ID_JOB:INTEGER
 	JOBNAME:INTEGER (Name des Jobs)
 	OUTSTATE:INTEGER (Ausgangszustand des Jobs)
 	STARTTIME:TEXT	(Zeitstempel für den Beginn der Ausführung)
@@ -22,12 +27,12 @@ JobTable -> Speicherung der Job-Ergebnisse
 
 JobNameTable -> Speicherung der Namen der Jobs
 
-	GUID_JOB:TEXT	(GUID des Jobs)
+	JOB_ID:INTEGER
 	NAME:TEXT	(Name des Jobs)
 
 SummaryTable -> Speicherung der Zusammenfassungen
 
-	GUID_NODE:TEXT	(GUID des Nodes)
+	ID_NODE:INTEGER
 	STARTTIME:TEXT	(Zeitstempel für den Beginn der Zusammenfassung)
 	STOPTIME:TEXT	(Zeitstempel für das Ende der Zusammenfassung)
 

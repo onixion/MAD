@@ -33,8 +33,6 @@ namespace MAD.JobSystemCore
         public IPAddress ip { get; set; } // sns
         public List<Job> jobs = new List<Job>();
 
-        public bool ipRenewFlag = false;
-
         #endregion
 
         #region constructors

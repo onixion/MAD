@@ -74,7 +74,7 @@ namespace MAD
                 {
                     case "-cli":
                         Logger.Log("Programm Start. CLI Start.", Logger.MessageType.INFORM);
-                        CLI cli = new CLI(js, dhcpReader);
+                        CLI cli = new CLI(js, dhcpReader, db);
                         cli.Start();
                         break;
 

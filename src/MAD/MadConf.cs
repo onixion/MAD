@@ -47,6 +47,17 @@ namespace MAD
                 _ser.Serialize(_writer, conf);
         }
 
+        public static void OverwriteConf(string filePath, MadConfigFile conf)
+        {
+            JsonSerializer _ser = new JsonSerializer();
+            _ser.Formatting = Formatting.Indented;
+            _ser.Converters.Add(new MailAddressConverter());
+
+            using (FileStream _file = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (StreamWriter _writer = new StreamWriter(_file))
+                _ser.Serialize(_writer, conf);
+        }
+
         public static void LoadConf(string filePath)
         {
             JsonSerializer _ser = new JsonSerializer();

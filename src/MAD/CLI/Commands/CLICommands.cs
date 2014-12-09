@@ -170,10 +170,14 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            output += "\n<color><yellow>MAD - Network Monitoring v" + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() + "\n\n";
-            output += "<color><yellow>Program written by: \n";
-            output += "<color><white><PORCIC Alin> <RANALTER Daniel> <SINGH Manpreet> <STOJANOVIC Marko>";
-
+            output += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
+            output += @"<color><cyan>  __  __  ___  _____  " + "\n";
+            output += @"<color><cyan> |  \/  |/ _ \|  _  \ " + "<color><yellow>Those bastards have created me:\n";
+            output += @"<color><cyan> |      / /_\ \ | \ | " + "<color><white>PORCIC     Alin\n";
+            output += @"<color><cyan> | |\/| |  _  | | | | " + "<color><white>RANALTER   Daniel\n";
+            output += @"<color><cyan> | |  | | | | | |_/ | " + "<color><white>SINGH      Manpreet\n";
+            output += @"<color><cyan> |_|  |_|_| |_|_____/ " + "<color><white>STOJANOVIC Marko\n";
+            output += @"<color><cyan>" + "".PadLeft(consoleWidth, '_');
             return output;
         }
     }
@@ -216,7 +220,7 @@ namespace MAD.CLICore
     {
         public LoadDefaultConfigCommand()
         {
-            description = "This command loads the default conf file.";
+            description = "This command loads the default config-file.";
         }
 
         public override string Execute(int consoleWidth)

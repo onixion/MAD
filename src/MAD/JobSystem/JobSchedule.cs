@@ -19,7 +19,6 @@ namespace MAD.JobSystemCore
 
         private Thread _cycleThread;
         private int _cycleTime = 10;
-        private int _fetchIPTime = 5;
 
         private object _stateLock = new object();
         /* state = 0 | inactive
@@ -102,18 +101,6 @@ namespace MAD.JobSystemCore
                                             if (_job.type != Job.JobType.NULL)
                                             {
                                                 Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] preparing for execution.", Logger.MessageType.INFORM);
-
-                                                if (_node.ipRenewFlag)
-                                                {
-                                                    if (DateTime.Now.Subtract(_node.lastIPUpdate.Add(new TimeSpan(0, 0, 0, _fetchIPTime))).Milliseconds > 0)
-                                                    {
-                                                        // fetch ip or use old
-
-
-                                                        // update note with new ip
-                                                        Logger.Log("(SCHEDULE) NODE [ID:" + _node.id + ", GUID:" + _node.guid + "] fetched a new IP-Address: ", Logger.MessageType.INFORM);
-                                                    }
-                                                }
 
                                                 _node.uWorker++;
                                                 _job.state = 2;
