@@ -27,30 +27,7 @@ namespace MAD
         {
             // load config-file
             MadConf.TryCreateDir(DATADIR);
-            if (File.Exists(CONFFILE))
-            {
-                try
-                {
-                    MadConf.LoadConf(CONFFILE);
-                    Console.WriteLine("(CONFIG) Config loaded.");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("(CONFIG) Config could not be loaded: " + e.Message);
-                    MadConf.SetToDefault();
-                    Console.WriteLine("(CONFIG) Loaded default config.");
-                    Console.WriteLine("(CONFIG) Default config does not use all possible features!");
-                }
-            }
-            else
-            {
-                Console.WriteLine("(CONFIG) No config file found!");
-                MadConf.SetToDefault();
-                Console.WriteLine("(CONFIG) Loaded default config.");
-                MadConf.SaveConf(CONFFILE);
-                Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
-                Console.WriteLine("(CONFIG) Default config may not use all possible features!");
-            }
+            
 
             // init components
             DB db = new DB(DBFILE);
@@ -61,15 +38,46 @@ namespace MAD
 
             // start interface
             if (args.Length == 0)
-            { 
-                Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                Logger.Log("Programm Aborted. No GUI!", Logger.MessageType.EMERGENCY);
-                Logger.ForceWriteToLog();
+            {
+                if (File.Exists(CONFFILE))
+                {
+                    Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
+                    Application.Run(new StartUp());
+                    Logger.ForceWriteToLog();
+                }
 
-                throw new NotImplementedException("NO GUI!");
+                else
+                {
+                    Application.Run(new ConfigDialog());
+                }
             }
             else if (args.Length == 1)
             {
+                if (File.Exists(CONFFILE))
+                {
+                    try
+                    {   
+                        MadConf.LoadConf(CONFFILE);
+                        Console.WriteLine("(CONFIG) Config loaded.");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("(CONFIG) Config could not be loaded: " + e.Message);
+                        MadConf.SetToDefault();
+                        Console.WriteLine("(CONFIG) Loaded default config.");
+                        Console.WriteLine("(CONFIG) Default config does not use all possible features!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("(CONFIG) No config file found!");
+                    MadConf.SetToDefault();
+                    Console.WriteLine("(CONFIG) Loaded default config.");
+                    MadConf.SaveConf(CONFFILE);
+                    Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
+                    Console.WriteLine("(CONFIG) Default config may not use all possible features!");
+                }
+
                 switch (args[0])
                 {
                     case "-cli":
