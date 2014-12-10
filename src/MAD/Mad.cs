@@ -63,10 +63,8 @@ namespace MAD
             if (args.Length == 0)
             { 
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                Logger.Log("Programm Aborted. No GUI!", Logger.MessageType.EMERGENCY);
+                Application.Run(new StartUp());
                 Logger.ForceWriteToLog();
-
-                throw new NotImplementedException("NO GUI!");
             }
             else if (args.Length == 1)
             {
