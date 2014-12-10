@@ -67,6 +67,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
@@ -92,6 +93,12 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="GUI\ConfigDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ConfigDialog.Designer.cs">
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="JobSystem\DBHandler.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
@@ -167,9 +174,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GUI\READ_ME.txt" />
     <Content Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GUI\ConfigDialog.resx">
+      <DependentUpon>ConfigDialog.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

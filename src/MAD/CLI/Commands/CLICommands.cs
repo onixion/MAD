@@ -239,9 +239,9 @@ namespace MAD.CLICore
             output += "<color><yellow>SERVER_PORT:    <color><white>" + MadConf.conf.SERVER_PORT + "\n";
             output += "<color><yellow>SERVER_AESPASS: <color><white>" + MadConf.conf.AES_PASS + "\n";
             output += "<color><yellow>SMTP_SERVER:    <color><white>" + MadConf.conf.SMTP_SERVER + "\n";
-            output += "<color><yellow>SMTP_PORT:      <color><white>" + MadConf.conf.SMTP_PORT + "\n";
-            output += "<color><yellow>SMTP_USER:      <color><white>" + MadConf.conf.SMTP_USER + "\n";
-            output += "<color><yellow>SMTP_PASS:      <color><white>" + MadConf.conf.SMTP_PASS + "\n";
+            output += "<color><yellow>SmtpPort:      <color><white>" + MadConf.conf.SMTP_PORT + "\n";
+            output += "<color><yellow>SourceMail:      <color><white>" + MadConf.conf.SMTP_USER + "\n";
+            output += "<color><yellow>SmtpPass:      <color><white>" + MadConf.conf.SMTP_PASS + "\n";
             output += "<color><yellow>DEFAULT_MAILS:  <color><white>";
 
             if (MadConf.conf.MAIL_DEFAULT != null || MadConf.conf.MAIL_DEFAULT.Length != 0)
