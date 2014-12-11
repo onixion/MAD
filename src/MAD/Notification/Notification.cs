@@ -124,7 +124,7 @@ namespace MAD.Notification
                     client.Credentials = new NetworkCredential(eMailFrom_special.ToString(), password_special);
                     client.EnableSsl = true;
                     client.Send(mail); //Send order
-                    eMailSendingSucceed = "(" + tryCounter + ".Attempt) Success";
+                    eMailSendingSucceed = "(" + tryCounter + ".Attempt) Success Sir";
                     Logger.Log(eMailSendingSucceed, Logger.MessageType.INFORM);
                     client.Dispose();
                     break;
@@ -132,7 +132,7 @@ namespace MAD.Notification
 
                 catch (Exception ex)
                 {
-                    eMailSendingFailed = "(" + tryCounter + ".Attempt) Sending mail failed becuase: " + ex.Message;
+                    eMailSendingFailed = "(" + tryCounter + ".Attempt) Sending mail failed Sir becuase: " + ex.Message;
                     Logger.Log(eMailSendingFailed, Logger.MessageType.ERROR);//ex gives a report_intern of problems
                     client.Dispose();
                     continue;
@@ -148,7 +148,7 @@ namespace MAD.Notification
         {
             for(;NotificationGetParams.NotificPackQueue.Count != 0;)
             {
-                lock (lockQueueForReading)
+                lock (NotificationGetParams.lockObject)
                 {
                     tempNotificPackIn = (NotificPackIn)NotificationGetParams.NotificPackQueue.Dequeue();
                 }

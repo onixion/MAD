@@ -30,14 +30,14 @@ namespace MAD.Notification
 
         //Declaration of static Parameters (Private)
 
-        private static object lockObject = new object();
+        internal static object lockObject = new object();
                 
         //Decleration of Objects
 
         public static Queue<Object> NotificPackQueue = new Queue<object>();
         internal static NotificPackIn NotificPackIn = new NotificPackIn();
 
-        public static Thread sendMailThread = new Thread(NotificationSend.SendMail);
+        public static Thread sendMailThread = null;
 
         
         #endregion
@@ -76,10 +76,20 @@ namespace MAD.Notification
                 NotificPackQueue.Enqueue(NotificPackIn);
             }
 
-            if (sendMailThread.IsAlive == false)
+            if (sendMailThread == null)
             {
-                sendMailThread.Start();
-                return true;
+                try
+                {
+                    sendMailThread = new Thread(new ThreadStart(NotificationSend.SendMail));
+                    sendMailThread.Start();
+                    return true;
+                }
+
+                catch(Exception ex)
+                {
+                    Logging.Logger.Log("Failed to send Mail because:" + ex, Logging.Logger.MessageType.ERROR);
+                    return true;
+                }
             }
 
             else
