@@ -119,8 +119,15 @@ namespace MAD.CLIServerCore
                     _cliP.ReceivePacket(_aes);
                     _cliP.serverAnswer = CLIInterpreter(ref _command, _cliP.cliInput);
 
-                    if (_cliP.serverAnswer == "VALID_PARAMETERS")
-                        _cliP.serverAnswer = _command.Execute(_cliP.consoleWidth);
+                    try
+                    {
+                        if (_cliP.serverAnswer == "VALID_PARAMETERS")
+                            _cliP.serverAnswer = _command.Execute(_cliP.consoleWidth);
+                    }
+                    catch (Exception e)
+                    {
+                        _cliP.serverAnswer = e.Message;
+                    }
 
                     _cliP.SendPacket(_aes);
 
