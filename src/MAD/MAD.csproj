@@ -103,7 +103,17 @@
     <Compile Include="GUI\ConfigDialog.Designer.cs">
       <DependentUpon>ConfigDialog.cs</DependentUpon>
     </Compile>
+<<<<<<< HEAD
     <Compile Include="GUI\BaseGUI.cs">
+=======
+    <Compile Include="GUI\NodeListing.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\NodeListing.Designer.cs">
+      <DependentUpon>NodeListing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\StartUp.cs">
+>>>>>>> NodeListing
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GUI\BaseGUI.Designer.cs">
@@ -198,8 +208,16 @@
     <EmbeddedResource Include="GUI\ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
+<<<<<<< HEAD
     <EmbeddedResource Include="GUI\BaseGUI.resx">
       <DependentUpon>BaseGUI.cs</DependentUpon>
+=======
+    <EmbeddedResource Include="GUI\NodeListing.resx">
+      <DependentUpon>NodeListing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\StartUp.resx">
+      <DependentUpon>StartUp.cs</DependentUpon>
+>>>>>>> NodeListing
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
