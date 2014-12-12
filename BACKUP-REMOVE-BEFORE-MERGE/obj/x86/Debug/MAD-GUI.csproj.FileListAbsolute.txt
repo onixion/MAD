@@ -20,3 +20,5 @@ D:\Schule\Diplomarbeit\MADGUI\MAD-GUI\MAD-GUI\obj\x86\Debug\MAD_GUI.Form_CreateN
 D:\Schule\Diplomarbeit\MADGUI\MAD-GUI\MAD-GUI\obj\x86\Debug\MAD_GUI.Plot_Form.resources
 D:\Schule\Diplomarbeit\MAD\src\BACKUP_GUI-REMOVE-BEFORE-MERGE\MAD-GUI\MAD-GUI\obj\x86\Debug\MAD-GUI.exe
 D:\Schule\Diplomarbeit\MAD\src\BACKUP_GUI-REMOVE-BEFORE-MERGE\MAD-GUI\MAD-GUI\obj\x86\Debug\MAD-GUI.pdb
+D:\Schule\Diplomarbeit\MAD\BACKUP-REMOVE-BEFORE-MERGE\obj\x86\Debug\MAD-GUI.exe
+D:\Schule\Diplomarbeit\MAD\BACKUP-REMOVE-BEFORE-MERGE\obj\x86\Debug\MAD-GUI.pdb

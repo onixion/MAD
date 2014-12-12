@@ -43,7 +43,7 @@ namespace MAD.GUI
                 if (File.Exists(CONFFILE))
                 {
                     Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                    Application.Run(new StartUp());
+                    Application.Run(new NodeListing());
                     Logger.ForceWriteToLog();
                 }
 
