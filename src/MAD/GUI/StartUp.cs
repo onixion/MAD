@@ -16,39 +16,14 @@ namespace MAD
             InitializeComponent();
         }
 
-        private void showNodesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-
-        }
-
-        private void StartUp_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void jobsToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
