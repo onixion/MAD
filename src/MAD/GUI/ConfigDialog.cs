@@ -14,7 +14,7 @@ using MAD;
 
 namespace MAD.GUI
 {
-    public partial class ConfigDialog : Form
+    public partial class ConfigDialog : BaseGUI
     {
        // private StartUp _cont = new StartUp();
 

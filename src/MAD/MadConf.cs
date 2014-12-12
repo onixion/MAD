@@ -63,7 +63,7 @@ namespace MAD
         public static void SetToDefault()
         {
             // logger
-            conf.LOG_FILE_DIRECTORY = "." + Path.DirectorySeparatorChar;
+            conf.LOG_FILE_DIRECTORY = Environment.CurrentDirectory; 
 
             // jobsystem
             conf.NOTI_ENABLE = true;

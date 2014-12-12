@@ -15,7 +15,7 @@ using MAD.GUI;
 using MadNet;
 using System.Text;
 
-namespace MAD.GUI
+namespace MAD
 {
     public class Mad
     {
@@ -40,10 +40,12 @@ namespace MAD.GUI
             // start interface
             if (args.Length == 0)
             {
+                BaseGUI.InitGui(js, db);
                 if (File.Exists(CONFFILE))
                 {
                     Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                    Application.Run(new StartUp());
+                    //Application.Run(new GUI());
+                    Console.WriteLine("I am working i promise!");
                     Logger.ForceWriteToLog();
                 }
 

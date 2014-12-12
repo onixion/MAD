@@ -1,6 +1,6 @@
 ﻿namespace MAD.GUI
 {
-    partial class ConfigDialog
+    public partial class ConfigDialog
     {
         /// <summary>
         /// Erforderliche Designervariable.
