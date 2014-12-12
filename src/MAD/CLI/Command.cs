@@ -43,7 +43,6 @@ namespace MAD.CLICore
                     return _temp.argValues[0].GetType();
                 }
             }
-
             return null;
         }
 

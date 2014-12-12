@@ -35,7 +35,6 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
 
             commands.Add(new CommandOptions("conf", typeof(ConfShowCommand), null));
-            commands.Add(new CommandOptions("conf-default", typeof(LoadDefaultConfigCommand), null));
             
             // INTERNET CONECTIVITY
             commands.Add(new CommandOptions("check connection", typeof(ConnectivityTestCommand), null));
@@ -127,6 +126,7 @@ namespace MAD.CLICore
                 Console.Write(_cursor);
                 Console.ForegroundColor = _inputColor;
                 string _cliInput = CLIInput.ReadInput(Console.CursorLeft);
+                string _response;
 
                 // This is the old method to read input from cli.
                 //string _cliInput = Console.ReadLine();
@@ -134,22 +134,22 @@ namespace MAD.CLICore
                 _cliInput = _cliInput.Trim();
                 if (_cliInput != "")
                 {
-                    string response = CLIInterpreter(ref _command, _cliInput);
-                    if (response == "VALID_PARAMETERS")
+                    _response = CLIInterpreter(ref _command, _cliInput);
+                    if (_response == "VALID_PARAMETERS")
                     {
                         try
                         {
-                            response = _command.Execute(Console.BufferWidth);
-                            if (response == "EXIT_CLI")
+                            _response = _command.Execute(Console.BufferWidth);
+                            if (_response == "EXIT_CLI")
                                 break;
                         }
                         catch (Exception e)
                         {
-                            response = "<color><red>" + e.Message;
+                            _response = "<color><red>" + e.Message;
                         }
                     }
 
-                    CLIOutput.WriteToConsole(response + "\n");
+                    CLIOutput.WriteToConsole(_response + "\n");
                 }
             }
         }

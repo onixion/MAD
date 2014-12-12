@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.IO;
 
+using MAD.MacFinders;
+using MAD.Database;
 using MAD.JobSystemCore;
 using MAD.CLICore;
 using MAD.Logging;
@@ -23,12 +25,14 @@ namespace MAD.CLIServerCore
         private AES _aes;
         
         private JobSystem _js;
+        private DHCPReader _dhcpReader;
+        private DB _db;
 
         #endregion
 
         #region constructor
 
-        public CLIServer(JobSystem js)
+        public CLIServer(JobSystem js, DHCPReader dhcpReader, DB db)
         {
             _aes = new AES(MadConf.conf.AES_PASS);
 
@@ -36,6 +40,8 @@ namespace MAD.CLIServerCore
             serverPort = MadConf.conf.SERVER_PORT;
 
             _js = js;
+            _dhcpReader = dhcpReader;
+            _db = db;
         }
 
         #endregion
@@ -86,7 +92,7 @@ namespace MAD.CLIServerCore
                     _serverInfoP.SendPacket(_aes);
                 }
 
-                CLISession _session = new CLISession(_stream, _aes, _js);
+                CLISession _session = new CLISession(_stream, _aes, _js, _dhcpReader, _db);
                 _session.InitCommands();
                 _session.Start();
             }

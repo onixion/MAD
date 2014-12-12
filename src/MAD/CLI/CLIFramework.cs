@@ -11,7 +11,7 @@ namespace MAD.CLICore
     {
         #region member
 
-        public const string fwver = "2.0.4.0 stable";
+        public const string fwver = "2.0.6.0 stable";
         public List<CommandOptions> commands = new List<CommandOptions>();
 
         #endregion

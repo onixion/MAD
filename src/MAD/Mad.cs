@@ -82,7 +82,7 @@ namespace MAD
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
                         {
-                            CLIServer cliServer = new CLIServer(js);
+                            CLIServer cliServer = new CLIServer(js, dhcpReader, db);
                             cliServer.Start();
 
                             Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + ".");
