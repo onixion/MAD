@@ -85,10 +85,10 @@ namespace MAD
                             CLIServer cliServer = new CLIServer(js, dhcpReader, db);
                             cliServer.Start();
 
-                            Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + ".");
+                            Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + " ...");
                             Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
 
-                            Console.ReadKey(true);
+                            Console.ReadKey(false);
                             cliServer.Stop();
                             cliServer.Dispose();
 
@@ -122,7 +122,6 @@ namespace MAD
 
             js.Shutdown();
             db.Dispose();
-            //MailNotification.Stop();
 
             Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
             Logger.ForceWriteToLog();
@@ -132,7 +131,7 @@ namespace MAD
         private static void PressAnyKeyToClose()
         {
             Console.WriteLine("Press any key to close program ...");
-            Console.ReadKey(true);
+            Console.ReadKey(false);
         }
     }
 }
