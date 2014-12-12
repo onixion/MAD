@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0A1F0057-E91E-41C6-A224-9850C5D17B5B}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MAD</RootNamespace>
+    <AssemblyName>MAD</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PacketDotNet, Version=0.13.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\PacketDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpPcap, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SharpPcap.dll</HintPath>
+    </Reference>
+    <Reference Include="SnmpSharpNet">
+      <HintPath>..\..\lib\SnmpSharpNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.79.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CLI\Commands\ConnectivityTestCommand.cs" />
+    <Compile Include="CLI\Commands\DBCommands.cs" />
+    <Compile Include="CLI\Commands\LoggerCommands.cs" />
+    <Compile Include="CLI\Commands\MacFeederCommands.cs" />
+    <Compile Include="CLI\CLI.cs" />
+    <Compile Include="CLI\CLIFramework.cs" />
+    <Compile Include="CLI\Commands\CLIServerCommands.cs" />
+    <Compile Include="CLI\CLIServer.cs" />
+    <Compile Include="CLI\Commands\NotificationCommands.cs" />
+    <Compile Include="CLI\Commands\SnmpCommands.cs" />
+    <Compile Include="CLI\Parameter.cs" />
+    <Compile Include="CLI\ParameterInput.cs" />
+    <Compile Include="CLI\ParameterOption.cs" />
+    <Compile Include="CLI\Command.cs" />
+    <Compile Include="CLI\CommandOptions.cs" />
+    <Compile Include="CLI\ConsoleTable.cs" />
+    <Compile Include="CLI\Server.cs" />
+    <Compile Include="DB\DB.cs" />
+    <Compile Include="GUI\StartUp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\StartUp.Designer.cs">
+      <DependentUpon>StartUp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="JobSystem\DBHandler.cs" />
+    <Compile Include="DB\DB_Table_Info.cs" />
+    <Compile Include="MacFinders\ARPReader.cs" />
+    <Compile Include="MacFinders\DHCPReader.cs" />
+    <Compile Include="Helper\NetworkHelper.cs" />
+    <Compile Include="CLI\CLIError.cs" />
+    <Compile Include="JobSystem\JobOutput.cs" />
+    <Compile Include="JobSystem\JobRule.cs" />
+    <Compile Include="JobSystem\Job.cs" />
+    <Compile Include="JobSystem\JobNode.cs" />
+    <Compile Include="JobSystem\JobNotificationSettings.cs" />
+    <Compile Include="JobSystem\JobSystemExceptions.cs" />
+    <Compile Include="JobSystem\Jobs\CheckJobs\JobCheckSnmp.cs" />
+    <Compile Include="JobSystem\Jobs\CheckJobs\JobCheckFtp.cs" />
+    <Compile Include="JobSystem\Jobs\CheckJobs\JobCheckDns.cs" />
+    <Compile Include="JobSystem\Jobs\JobSnmp.cs" />
+    <Compile Include="JobSystem\JSSerializer.cs" />
+    <Compile Include="JobSystem\JobSchedule.cs" />
+    <Compile Include="JobSystem\Jobs\JobHostDetect.cs" />
+    <Compile Include="JobSystem\Jobs\JobHttp.cs" />
+    <Compile Include="JobSystem\OutputDescriptor.cs" />
+    <Compile Include="JobSystem\Jobs\JobPing.cs" />
+    <Compile Include="JobSystem\Jobs\JobPort.cs" />
+    <Compile Include="JobSystem\JobTime.cs" />
+    <Compile Include="JobSystem\JobSystem.cs" />
+    <Compile Include="CLI\Commands\JobSystemCommands.cs" />
+    <Compile Include="CLI\CLISession.cs" />
+    <Compile Include="CLI\Commands\CLICommands.cs" />
+    <Compile Include="JobSystem\SyncResult.cs" />
+    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Mad.cs" />
+    <Compile Include="MadConf.cs" />
+    <Compile Include="Notification\MailLogin.cs" />
+    <Compile Include="Notification\Notification.cs" />
+    <Compile Include="Notification\NotificationGetParams.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MacFinders\ModelHost.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 und x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CLIIO\CLIIO.csproj">
+      <Project>{FC728832-1EAD-4B88-B557-68EB12775678}</Project>
+      <Name>CLIIO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SmartThreadPool\SmartThreadPool.csproj">
+      <Project>{74D4C33F-7CC8-4B2A-A7DF-D8B6E63B6EBD}</Project>
+      <Name>SmartThreadPool</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MADNet\MadNet.csproj">
+      <Project>{A514087D-3F5D-4B89-A5E9-EB673210566F}</Project>
+      <Name>MadNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GUI\READ_ME.txt" />
+    <Content Include="sqlite3.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GUI\StartUp.resx">
+      <DependentUpon>StartUp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
