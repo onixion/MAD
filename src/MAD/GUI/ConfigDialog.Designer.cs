@@ -1,4 +1,4 @@
-﻿namespace GUI
+﻿namespace MAD.GUI
 {
     partial class ConfigDialog
     {

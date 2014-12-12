@@ -10,11 +10,12 @@ using MAD.CLIServerCore;
 using MAD.MacFinders;
 using MAD.Logging;
 using MAD.Notification;
+using MAD.GUI;
 
 using MadNet;
 using System.Text;
 
-namespace MAD
+namespace MAD.GUI
 {
     public class Mad
     {

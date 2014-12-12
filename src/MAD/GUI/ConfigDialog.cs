@@ -12,11 +12,11 @@ using System.Net.Mail;
 
 using MAD;
 
-namespace GUI
+namespace MAD.GUI
 {
     public partial class ConfigDialog : Form
     {
-        private StartUp _cont = new StartUp();
+       // private StartUp _cont = new StartUp();
 
         public ConfigDialog()
         {
@@ -44,7 +44,7 @@ namespace GUI
             SetConf();
             MadConf.SaveConf(Mad.CONFFILE);
 
-            StartUp.Show();
+            //StartUp.Show();
             this.Dispose();
             this.Close();
         }
@@ -53,7 +53,7 @@ namespace GUI
         {
             MadConf.SetToDefault();
 
-            StartUp.Show();
+            //StartUp.Show();
             this.Dispose();
             this.Close();
         }

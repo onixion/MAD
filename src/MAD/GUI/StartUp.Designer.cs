@@ -1,4 +1,4 @@
-﻿namespace MAD
+﻿namespace MAD.GUI
 {
     partial class StartUp
     {
@@ -61,8 +61,8 @@
             this.nodesToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.jobsToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.jobsToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.nodesToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.jobsToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openWorkingDirectoryToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -182,6 +182,7 @@
             this.panel1.Controls.Add(this.pictureBox1);
             resources.ApplyResources(this.panel1, "panel1");
             this.panel1.Name = "panel1";
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
             // title_Nodes
             // 
@@ -291,15 +292,15 @@
             resources.ApplyResources(this.saveToolStripMenuItem1, "saveToolStripMenuItem1");
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
             // 
-            // jobsToolStripMenuItem3
-            // 
-            resources.ApplyResources(this.jobsToolStripMenuItem3, "jobsToolStripMenuItem3");
-            this.jobsToolStripMenuItem3.Name = "jobsToolStripMenuItem3";
-            // 
             // nodesToolStripMenuItem3
             // 
             resources.ApplyResources(this.nodesToolStripMenuItem3, "nodesToolStripMenuItem3");
             this.nodesToolStripMenuItem3.Name = "nodesToolStripMenuItem3";
+            // 
+            // jobsToolStripMenuItem3
+            // 
+            resources.ApplyResources(this.jobsToolStripMenuItem3, "jobsToolStripMenuItem3");
+            this.jobsToolStripMenuItem3.Name = "jobsToolStripMenuItem3";
             // 
             // saveAllToolStripMenuItem1
             // 
@@ -386,6 +387,7 @@
             this.HelpButton = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "StartUp";
+            this.Load += new System.EventHandler(this.StartUp_Load);
             this.contextMenuStrip1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

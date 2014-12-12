@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MAD
+namespace MAD.GUI
 {
     public partial class StartUp : Form
     {
@@ -23,6 +23,16 @@ namespace MAD
         }
 
         private void jobsToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void StartUp_Load(object sender, EventArgs e)
         {
 
         }
