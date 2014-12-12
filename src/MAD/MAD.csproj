@@ -185,9 +185,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GUI\StartUp.en.resx">
-      <DependentUpon>StartUp.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\StartUp.resx">
       <DependentUpon>StartUp.cs</DependentUpon>
     </EmbeddedResource>

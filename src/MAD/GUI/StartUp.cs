@@ -18,7 +18,8 @@ namespace MAD
 
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            Environment.Exit(0);
+           // Environment.Exit(0);
+            Application.Exit();
         }
 
         private void jobsToolStripMenuItem2_Click(object sender, EventArgs e)
