@@ -76,7 +76,7 @@ namespace MAD.Notification
                 NotificPackQueue.Enqueue(NotificPackIn);
             }
 
-            if (sendMailThread == null)
+            if (sendMailThread == null || (sendMailThread.ThreadState == ThreadState.Stopped))
             {
                 try
                 {
