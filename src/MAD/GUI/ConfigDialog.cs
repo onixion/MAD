@@ -85,7 +85,11 @@ namespace MAD.GUI
 
             if (this.PathToLog.Text != null)
                 MadConf.conf.LOG_FILE_DIRECTORY = this.PathToLog.Text + Path.DirectorySeparatorChar;
-
+            //DeOutComment after merge in master
+            /*
+            if (this.logLevelTextBox != null)
+                MadConf.conf.LOG_LEVEL = Convert.ToUInt32(this.logLevelTextBox.Text);
+            */
             MadConf.conf.NOTI_ENABLE = this.EnableNotification.Checked;
         }
     }

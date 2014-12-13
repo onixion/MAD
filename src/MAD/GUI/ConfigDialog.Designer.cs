@@ -1,6 +1,6 @@
 ﻿namespace MAD.GUI
 {
-    public partial class ConfigDialog
+    public partial class ConfigDialog : BaseGUI
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -50,13 +50,26 @@
             this.EnableNotification = new System.Windows.Forms.CheckBox();
             this.SafeSettings = new System.Windows.Forms.Button();
             this.UseDefaults = new System.Windows.Forms.Button();
+            this.logLevelLabel = new System.Windows.Forms.Label();
+            this.logLevelTextBox = new System.Windows.Forms.TextBox();
+            this.titlePanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.titlePicBox)).BeginInit();
             this.SuspendLayout();
+            // 
+            // titlePanel
+            // 
+            this.titlePanel.Size = new System.Drawing.Size(884, 64);
+            // 
+            // title
+            // 
+            this.title.Size = new System.Drawing.Size(294, 54);
+            this.title.Text = "Configuration";
             // 
             // NotificSettingsLabel
             // 
             this.NotificSettingsLabel.AutoSize = true;
             this.NotificSettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NotificSettingsLabel.Location = new System.Drawing.Point(12, 72);
+            this.NotificSettingsLabel.Location = new System.Drawing.Point(12, 95);
             this.NotificSettingsLabel.Name = "NotificSettingsLabel";
             this.NotificSettingsLabel.Size = new System.Drawing.Size(273, 31);
             this.NotificSettingsLabel.TabIndex = 0;
@@ -66,7 +79,7 @@
             // 
             this.SourceMail.AllowDrop = true;
             this.SourceMail.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SourceMail.Location = new System.Drawing.Point(30, 141);
+            this.SourceMail.Location = new System.Drawing.Point(30, 164);
             this.SourceMail.Name = "SourceMail";
             this.SourceMail.Size = new System.Drawing.Size(189, 20);
             this.SourceMail.TabIndex = 1;
@@ -77,7 +90,7 @@
             // SourceMailLabel
             // 
             this.SourceMailLabel.AutoSize = true;
-            this.SourceMailLabel.Location = new System.Drawing.Point(27, 125);
+            this.SourceMailLabel.Location = new System.Drawing.Point(27, 148);
             this.SourceMailLabel.Name = "SourceMailLabel";
             this.SourceMailLabel.Size = new System.Drawing.Size(73, 13);
             this.SourceMailLabel.TabIndex = 2;
@@ -86,7 +99,7 @@
             // TargetMailLabel
             // 
             this.TargetMailLabel.AutoSize = true;
-            this.TargetMailLabel.Location = new System.Drawing.Point(247, 125);
+            this.TargetMailLabel.Location = new System.Drawing.Point(247, 148);
             this.TargetMailLabel.Name = "TargetMailLabel";
             this.TargetMailLabel.Size = new System.Drawing.Size(70, 13);
             this.TargetMailLabel.TabIndex = 4;
@@ -96,7 +109,7 @@
             // 
             this.TargetMail.AllowDrop = true;
             this.TargetMail.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.TargetMail.Location = new System.Drawing.Point(250, 141);
+            this.TargetMail.Location = new System.Drawing.Point(250, 164);
             this.TargetMail.Name = "TargetMail";
             this.TargetMail.Size = new System.Drawing.Size(189, 20);
             this.TargetMail.TabIndex = 3;
@@ -107,7 +120,7 @@
             // SmtpPassLabel
             // 
             this.SmtpPassLabel.AutoSize = true;
-            this.SmtpPassLabel.Location = new System.Drawing.Point(471, 125);
+            this.SmtpPassLabel.Location = new System.Drawing.Point(471, 148);
             this.SmtpPassLabel.Name = "SmtpPassLabel";
             this.SmtpPassLabel.Size = new System.Drawing.Size(53, 13);
             this.SmtpPassLabel.TabIndex = 6;
@@ -117,7 +130,7 @@
             // 
             this.SmtpPass.AllowDrop = true;
             this.SmtpPass.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SmtpPass.Location = new System.Drawing.Point(474, 141);
+            this.SmtpPass.Location = new System.Drawing.Point(474, 164);
             this.SmtpPass.Name = "SmtpPass";
             this.SmtpPass.Size = new System.Drawing.Size(189, 20);
             this.SmtpPass.TabIndex = 5;
@@ -127,7 +140,7 @@
             // SmtpSrvLabel
             // 
             this.SmtpSrvLabel.AutoSize = true;
-            this.SmtpSrvLabel.Location = new System.Drawing.Point(27, 193);
+            this.SmtpSrvLabel.Location = new System.Drawing.Point(27, 216);
             this.SmtpSrvLabel.Name = "SmtpSrvLabel";
             this.SmtpSrvLabel.Size = new System.Drawing.Size(71, 13);
             this.SmtpSrvLabel.TabIndex = 8;
@@ -137,7 +150,7 @@
             // 
             this.SmtpSrv.AllowDrop = true;
             this.SmtpSrv.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SmtpSrv.Location = new System.Drawing.Point(30, 209);
+            this.SmtpSrv.Location = new System.Drawing.Point(30, 232);
             this.SmtpSrv.Name = "SmtpSrv";
             this.SmtpSrv.Size = new System.Drawing.Size(189, 20);
             this.SmtpSrv.TabIndex = 7;
@@ -148,7 +161,7 @@
             // SmtpPortLabel
             // 
             this.SmtpPortLabel.AutoSize = true;
-            this.SmtpPortLabel.Location = new System.Drawing.Point(247, 193);
+            this.SmtpPortLabel.Location = new System.Drawing.Point(247, 216);
             this.SmtpPortLabel.Name = "SmtpPortLabel";
             this.SmtpPortLabel.Size = new System.Drawing.Size(59, 13);
             this.SmtpPortLabel.TabIndex = 10;
@@ -158,7 +171,7 @@
             // 
             this.SmtpPort.AllowDrop = true;
             this.SmtpPort.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SmtpPort.Location = new System.Drawing.Point(250, 209);
+            this.SmtpPort.Location = new System.Drawing.Point(250, 232);
             this.SmtpPort.Name = "SmtpPort";
             this.SmtpPort.Size = new System.Drawing.Size(189, 20);
             this.SmtpPort.TabIndex = 9;
@@ -169,7 +182,7 @@
             // SnmpIntLabel
             // 
             this.SnmpIntLabel.AutoSize = true;
-            this.SnmpIntLabel.Location = new System.Drawing.Point(247, 337);
+            this.SnmpIntLabel.Location = new System.Drawing.Point(247, 360);
             this.SnmpIntLabel.Name = "SnmpIntLabel";
             this.SnmpIntLabel.Size = new System.Drawing.Size(94, 13);
             this.SnmpIntLabel.TabIndex = 15;
@@ -179,7 +192,7 @@
             // 
             this.SnmpInt.AllowDrop = true;
             this.SnmpInt.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.SnmpInt.Location = new System.Drawing.Point(250, 353);
+            this.SnmpInt.Location = new System.Drawing.Point(250, 376);
             this.SnmpInt.Name = "SnmpInt";
             this.SnmpInt.Size = new System.Drawing.Size(189, 20);
             this.SnmpInt.TabIndex = 14;
@@ -189,7 +202,7 @@
             // ArpIntLabel
             // 
             this.ArpIntLabel.AutoSize = true;
-            this.ArpIntLabel.Location = new System.Drawing.Point(27, 337);
+            this.ArpIntLabel.Location = new System.Drawing.Point(27, 360);
             this.ArpIntLabel.Name = "ArpIntLabel";
             this.ArpIntLabel.Size = new System.Drawing.Size(97, 13);
             this.ArpIntLabel.TabIndex = 13;
@@ -199,7 +212,7 @@
             // 
             this.ArpInt.AllowDrop = true;
             this.ArpInt.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.ArpInt.Location = new System.Drawing.Point(30, 353);
+            this.ArpInt.Location = new System.Drawing.Point(30, 376);
             this.ArpInt.Name = "ArpInt";
             this.ArpInt.Size = new System.Drawing.Size(189, 20);
             this.ArpInt.TabIndex = 12;
@@ -210,7 +223,7 @@
             // 
             this.NetworkSettingsLabel.AutoSize = true;
             this.NetworkSettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NetworkSettingsLabel.Location = new System.Drawing.Point(12, 284);
+            this.NetworkSettingsLabel.Location = new System.Drawing.Point(12, 307);
             this.NetworkSettingsLabel.Name = "NetworkSettingsLabel";
             this.NetworkSettingsLabel.Size = new System.Drawing.Size(230, 31);
             this.NetworkSettingsLabel.TabIndex = 11;
@@ -220,7 +233,7 @@
             // 
             this.OthersLabel.AutoSize = true;
             this.OthersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.OthersLabel.Location = new System.Drawing.Point(12, 433);
+            this.OthersLabel.Location = new System.Drawing.Point(12, 460);
             this.OthersLabel.Name = "OthersLabel";
             this.OthersLabel.Size = new System.Drawing.Size(105, 31);
             this.OthersLabel.TabIndex = 16;
@@ -229,7 +242,7 @@
             // PathToLogFileLabel
             // 
             this.PathToLogFileLabel.AutoSize = true;
-            this.PathToLogFileLabel.Location = new System.Drawing.Point(27, 491);
+            this.PathToLogFileLabel.Location = new System.Drawing.Point(27, 514);
             this.PathToLogFileLabel.Name = "PathToLogFileLabel";
             this.PathToLogFileLabel.Size = new System.Drawing.Size(115, 13);
             this.PathToLogFileLabel.TabIndex = 18;
@@ -239,7 +252,7 @@
             // 
             this.PathToLog.AllowDrop = true;
             this.PathToLog.ForeColor = System.Drawing.SystemColors.GrayText;
-            this.PathToLog.Location = new System.Drawing.Point(30, 507);
+            this.PathToLog.Location = new System.Drawing.Point(30, 530);
             this.PathToLog.Name = "PathToLog";
             this.PathToLog.Size = new System.Drawing.Size(189, 20);
             this.PathToLog.TabIndex = 17;
@@ -250,7 +263,7 @@
             // EnableNotification
             // 
             this.EnableNotification.AutoSize = true;
-            this.EnableNotification.Location = new System.Drawing.Point(274, 508);
+            this.EnableNotification.Location = new System.Drawing.Point(474, 235);
             this.EnableNotification.Name = "EnableNotification";
             this.EnableNotification.Size = new System.Drawing.Size(113, 17);
             this.EnableNotification.TabIndex = 19;
@@ -259,7 +272,7 @@
             // 
             // SafeSettings
             // 
-            this.SafeSettings.Location = new System.Drawing.Point(662, 505);
+            this.SafeSettings.Location = new System.Drawing.Point(656, 528);
             this.SafeSettings.Name = "SafeSettings";
             this.SafeSettings.Size = new System.Drawing.Size(75, 23);
             this.SafeSettings.TabIndex = 20;
@@ -269,7 +282,7 @@
             // 
             // UseDefaults
             // 
-            this.UseDefaults.Location = new System.Drawing.Point(743, 505);
+            this.UseDefaults.Location = new System.Drawing.Point(737, 528);
             this.UseDefaults.Name = "UseDefaults";
             this.UseDefaults.Size = new System.Drawing.Size(75, 23);
             this.UseDefaults.TabIndex = 21;
@@ -277,11 +290,33 @@
             this.UseDefaults.UseVisualStyleBackColor = true;
             this.UseDefaults.Click += new System.EventHandler(this.UseDefaults_Click);
             // 
-            // PathToLogFile
+            // logLevelLabel
+            // 
+            this.logLevelLabel.AutoSize = true;
+            this.logLevelLabel.Location = new System.Drawing.Point(247, 515);
+            this.logLevelLabel.Name = "logLevelLabel";
+            this.logLevelLabel.Size = new System.Drawing.Size(161, 13);
+            this.logLevelLabel.TabIndex = 23;
+            this.logLevelLabel.Text = "From where do you want to log? ";
+            // 
+            // logLevelTextBox
+            // 
+            this.logLevelTextBox.AllowDrop = true;
+            this.logLevelTextBox.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.logLevelTextBox.Location = new System.Drawing.Point(250, 530);
+            this.logLevelTextBox.Name = "logLevelTextBox";
+            this.logLevelTextBox.Size = new System.Drawing.Size(189, 20);
+            this.logLevelTextBox.TabIndex = 22;
+            this.logLevelTextBox.Text = "2";
+            this.logLevelTextBox.UseWaitCursor = true;
+            // 
+            // ConfigDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 562);
+            this.Controls.Add(this.logLevelLabel);
+            this.Controls.Add(this.logLevelTextBox);
             this.Controls.Add(this.UseDefaults);
             this.Controls.Add(this.SafeSettings);
             this.Controls.Add(this.EnableNotification);
@@ -304,8 +339,37 @@
             this.Controls.Add(this.SourceMailLabel);
             this.Controls.Add(this.SourceMail);
             this.Controls.Add(this.NotificSettingsLabel);
-            this.Name = "PathToLogFile";
+            this.Name = "ConfigDialog";
+            this.Text = "Config Dialog";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Controls.SetChildIndex(this.titlePanel, 0);
+            this.Controls.SetChildIndex(this.NotificSettingsLabel, 0);
+            this.Controls.SetChildIndex(this.SourceMail, 0);
+            this.Controls.SetChildIndex(this.SourceMailLabel, 0);
+            this.Controls.SetChildIndex(this.TargetMail, 0);
+            this.Controls.SetChildIndex(this.TargetMailLabel, 0);
+            this.Controls.SetChildIndex(this.SmtpPass, 0);
+            this.Controls.SetChildIndex(this.SmtpPassLabel, 0);
+            this.Controls.SetChildIndex(this.SmtpSrv, 0);
+            this.Controls.SetChildIndex(this.SmtpSrvLabel, 0);
+            this.Controls.SetChildIndex(this.SmtpPort, 0);
+            this.Controls.SetChildIndex(this.SmtpPortLabel, 0);
+            this.Controls.SetChildIndex(this.NetworkSettingsLabel, 0);
+            this.Controls.SetChildIndex(this.ArpInt, 0);
+            this.Controls.SetChildIndex(this.ArpIntLabel, 0);
+            this.Controls.SetChildIndex(this.SnmpInt, 0);
+            this.Controls.SetChildIndex(this.SnmpIntLabel, 0);
+            this.Controls.SetChildIndex(this.OthersLabel, 0);
+            this.Controls.SetChildIndex(this.PathToLog, 0);
+            this.Controls.SetChildIndex(this.PathToLogFileLabel, 0);
+            this.Controls.SetChildIndex(this.EnableNotification, 0);
+            this.Controls.SetChildIndex(this.SafeSettings, 0);
+            this.Controls.SetChildIndex(this.UseDefaults, 0);
+            this.Controls.SetChildIndex(this.logLevelTextBox, 0);
+            this.Controls.SetChildIndex(this.logLevelLabel, 0);
+            this.titlePanel.ResumeLayout(false);
+            this.titlePanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.titlePicBox)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -335,5 +399,7 @@
         private System.Windows.Forms.CheckBox EnableNotification;
         private System.Windows.Forms.Button SafeSettings;
         private System.Windows.Forms.Button UseDefaults;
+        private System.Windows.Forms.Label logLevelLabel;
+        private System.Windows.Forms.TextBox logLevelTextBox;
     }
 }
