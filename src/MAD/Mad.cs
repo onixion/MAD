@@ -22,6 +22,8 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
         public static readonly string DBFILE = Path.Combine(DATADIR, "mad.db");
 
+        public static bool restart = false;
+
         [STAThread]
         public static int Main(string[] args)
         {
@@ -125,6 +127,10 @@ namespace MAD
 
             Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
             Logger.ForceWriteToLog();
+
+            if (restart)
+                Application.Restart();
+
             return 0;
         }
 
