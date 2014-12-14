@@ -12,8 +12,6 @@ namespace MAD.Notification
         public string password { get; set; }
 
         public MailLogin()
-        {
-
-        }
+        { }
     }
 }

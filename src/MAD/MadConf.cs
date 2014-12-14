@@ -94,6 +94,7 @@ namespace MAD
             conf.arpInterface = 4;
             conf.snmpInterface = "12";
         }
+
         #endregion
     }
 

@@ -24,8 +24,6 @@ namespace MAD.JobSystemCore
         public int state = 0; //active (state = 1) or inactive (state = 0)
         [JsonIgnore]
         public int uWorker = 0;
-        [JsonIgnore]
-        public DateTime lastIPUpdate = DateTime.Now;
 
         public Guid guid { get; set; }
         public string name { get; set; }

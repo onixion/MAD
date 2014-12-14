@@ -49,7 +49,7 @@ namespace CLIClient
                 _client.Connect(_serverEndPoint);
                 _stream = _client.GetStream();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Could not connect to server!");
             }

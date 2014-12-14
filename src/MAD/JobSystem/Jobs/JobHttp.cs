@@ -37,12 +37,11 @@ namespace MAD.JobSystemCore
         {
             try
             {
-                _request.Timeout = timeout;
                 _request = WebRequest.Create("http://" + targetAddress.ToString() + ":" + port);
+                _request.Timeout = timeout;
+           
                 _response = _request.GetResponse();
                 outp.outState = JobOutput.OutState.Success;
-
-                WebHeaderCollection _collection = _response.Headers;
 
                 _response.Close();
             }

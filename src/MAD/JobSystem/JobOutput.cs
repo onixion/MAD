@@ -14,8 +14,6 @@ namespace MAD.JobSystemCore
 
         public JobOutput()
         {
-            outputs.Add(new OutputDescriptor("IP", typeof(string)));
-            outputs.Add(new OutputDescriptor("IPChange", typeof(string)));
             outputs.Add(new OutputDescriptor("OutState", typeof(string)));
             outputs.Add(new OutputDescriptor("ExDuration", typeof(int)));
         }
