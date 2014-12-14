@@ -19,37 +19,71 @@ namespace MAD.Database
 
         public DB(string DBname)
         {
-            // if file exists
-            SQLiteConnection.CreateFile(DBname);
+            if(!File.Exists(DBname))
+                SQLiteConnection.CreateFile(DBname);
             // connect
             ConnectDB(DBname);
 
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                // GUIDTable 
-                _command.CommandText = "create table if not exists GUIDTable (ID INTEGER auto increment primary key, GUID TEXT);";
-                _command.ExecuteNonQuery();
-
                 // DeviceTable
-                _command.CommandText = "create table if not exists DeviceTable (ID_NODE integer, HOSTNAME text, IP text, MAC text, ONLINE integer, MEMO1 varchar(5), MEMO2 text);";
-                _command.ExecuteNonQuery(); // TODO
+                //_command.CommandText = "create table if not exists DeviceTable (ID_NODE integer, HOSTNAME text, IP text, MAC text, ONLINE integer, MEMO1 varchar(5), MEMO2 text);";
+                //_command.ExecuteNonQuery(); // TODO
 
-                _command.CommandText = "create table if not exists JobTable (ID_NODE integer, ID_JOB integer, JOBNAME integer, JOBTYPE integer, OUTSTATE integer, STARTTIME text, STOPTIME text, DELAYTIME text, OUTDESC text);";
-                _command.ExecuteNonQuery();
-
-                _command.CommandText = "create table if not exists JobNameTable (JOB_ID integer auto increment primary key, NAME text);";
+                // GUIDTable 
+                _command.CommandText = "create table if not exists GUIDTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, GUID TEXT);";
                 _command.ExecuteNonQuery();
 
-                _command.CommandText = "create table if not exists JobTypeTable (JOBTYPE_ID integer auto increment primary key, JOBTYPE text)";
+                // HostTable
+                _command.CommandText = "create table if not exists HostTable (ID integer PRIMARY KEY AUTOINCREMENT, HOST text);";
                 _command.ExecuteNonQuery();
-                /*
-                _command.CommandText = "create table if not exists ProtocolTable (Protocol_ID integer auto increment primary key, Protocol text)";
-                _command.ExecuteNonQuery();
-                */
 
-                _command.CommandText = "create table if not exists OutStateTable (ID INTEGER auto increment primary key, OUTSTATE TEXT);";
+                // IPTable
+                _command.CommandText = "create table if not exists IPTable (ID integer PRIMARY KEY AUTOINCREMENT, IP text);";
                 _command.ExecuteNonQuery();
-                
+
+                // MACTable
+                _command.CommandText = "create table if not exists MACTable (ID integer PRIMARY KEY AUTOINCREMENT, MAC text);";
+                _command.ExecuteNonQuery();
+
+                // JobNameTable
+                _command.CommandText = "create table if not exists JobNameTable (ID integer PRIMARY KEY AUTOINCREMENT, JOBNAME text);";
+                _command.ExecuteNonQuery();
+
+                // JobTypeTable
+                _command.CommandText = "create table if not exists JobTypeTable (ID integer PRIMARY KEY AUTOINCREMENT, JOBTYPE text)";
+                _command.ExecuteNonQuery();
+
+                // ProtocolTable
+                _command.CommandText = "create table if not exists ProtocolTable (ID integer PRIMARY KEY AUTOINCREMENT, PROTOCOL text)";
+                _command.ExecuteNonQuery();
+
+                // OutStateTable
+                _command.CommandText = "create table if not exists OutStateTable (ID integer PRIMARY KEY AUTOINCREMENT, OUTSTATE text);";
+                _command.ExecuteNonQuery();
+
+                // MemoTable
+                _command.CommandText = "create table if not exists MemoTable (ID integer PRIMARY KEY AUTOINCREMENT, MEMO1 text, MEMO2 text);";
+                _command.ExecuteNonQuery();
+
+                // JobTable
+                _command.CommandText = "create table if not exists JobTable (" + 
+                    "ID_NODE integer, " +
+                    "ID_HOST integer, " +
+                    "ID_IP integer, " +
+                    "ID_MAC integer, " +
+                    "ID_JOB integer, " + 
+                    "ID_JOBNAME integer, " +
+                    "ID_JOBTYPE integer, " +
+                    "ID_PROTOCOL integer, " + 
+                    "ID_OUTSTATE integer, " + 
+                    "STARTTIME text, " +
+                    "STOPTIME text, " +
+                    "DELAYTIME text, " +
+                    "OUTDESC text);";
+                _command.ExecuteNonQuery();
+
+                // SummaryTable
                 _command.CommandText = "create table if not exists SummaryTable (ID_NODE integer, STARTTIME text, STOPTIME text, SUCCESS text, AVERAGE_DURATION text, MAX_DURATION text, MIN_DURATION text);";
                 _command.ExecuteNonQuery();
             }
@@ -154,183 +188,238 @@ namespace MAD.Database
             }
         }
 
-        // ---
-
-        public void InsertNode(JobNode node)
-        {
-            try
-            {
-                InsertGUID(node.guid.ToString());
-
-                int _int = GetGUIDID(node.guid.ToString()); // <- NODE ID
-                using (SQLiteCommand _command = new SQLiteCommand(_con))
-                {
-                    _command.CommandText = "select * from DeviceTable where NODEID='" + _int + "';";
-
-                    DataTable _table = _command.ExecuteReader().GetSchemaTable();
-                    DataRowCollection _rows = _table.Rows;
-
-                    if (_rows.Count == 0)
-                    {
-                        // make new datarow
-                        _command.CommandText = "insert into DeviceTable (ID_NODE, HOSTNAME, IP, MAC) values ('" + _int + "', '" + node.name + "', '" + node.ip + "', '" + node.mac + ");";
-                        _command.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        // update
-                        _command.CommandText = "update DeviceTable set HOSTNAME='" + node.name + "', IP='" + node.ip + "', MAC='" + node.mac + "' where ID_NODE='" + _int + "';";
-                        _command.ExecuteNonQuery();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Log("(DB) SQL-Error: " + e.Message, Logger.MessageType.ERROR);
-            }
-        }
-
         public void InsertJob(JobNode node, Job job)
         {
-            InsertJobName(job.name);
+            InsertIDNode(node.guid.ToString());
+            InsertIDHost(node.name);
+            InsertIDIP(node.ip.ToString());
+            InsertIDMac(node.mac.ToString());
+
+            InsertIDJob(job.guid.ToString());
+            InsertIDJobName(job.name);
+            InsertIDJobType(job.type.ToString());
+            InsertIDProtocol(job.type.ToString());
+            InsertIDOutState(job.outp.outState.ToString());
+
+            int _idNode = GetIDNode(node.guid.ToString());
+            int _idHost = GetIDHost(node.name);
+            int _idIP = GetIDIP(node.ip.ToString());
+            int _idMAC = GetIDMac(node.mac.ToString());
+
+            int _idJob = GetIDJob(job.guid.ToString());
+            int _idJobName = GetIDJobName(job.name);
+            int _idJobType = GetIDJobType(job.type.ToString());
+            int _idProtocol = GetIDProtocol(job.prot.ToString());
+            int _idOutState = GetIDOutState(job.outp.outState.ToString());
 
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                //_command.CommandText = "select * from DeviceTable where ID_NODE='" + _id + "';";
-
-                DataTable _table = _command.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                _command.CommandText = "insert into JobTable (ID_NODE, ID_JOB, JOBNAME, JOBTYPE, OUTSTATE, STARTTIME, STOPTIME, DELAYTIME, OUTDESC) values ('"
-                    + GetGUIDID(node.guid.ToString()) + "', '"
-                    + GetGUIDID(job.guid.ToString()) + "', '"
-                    + GetJobNameID(job.name) + "', '"
-                    + GetJobTypeID(job.type.ToString()) + "', '"
-                    + GetOutState(job.outp.outState.ToString()) + "', '"
+                _command.CommandText = "insert into JobTable (ID_NODE, ID_HOST, ID_IP, ID_MAC, ID_JOB, ID_JOBNAME, ID_JOBTYPE, ID_PROTOCOL, ID_OUTSTATE, STARTTIME, STOPTIME, DELAYTIME) values ('"
+                    + _idNode + "', '"
+                    + _idHost + "', '"
+                    + _idIP + "', '"
+                    + _idMAC + "', '"
+                    + _idJob + "', '"
+                    + _idJobName + "', '"
+                    + _idJobType + "', '"
+                    + _idProtocol + "', '"
+                    + _idOutState + "', '"
                     + UnixTimestampFromDateTime(job.tStart) + "', '"
                     + UnixTimestampFromDateTime(job.tStop) + "', '"
-                    + job.tSpan.Milliseconds.ToString() + "', '";
+                    + job.tSpan.Milliseconds.ToString() + "');";
                     // outdesc
                 _command.ExecuteNonQuery();
-
             }
         }
 
-        public bool InsertGUID(string guid)
+        // ------------------------------------------------------------------
+        // UNIVERSELL
+
+        public bool Insert(string tablename, string column, string value)
         {
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                _command.CommandText = "select * from GUIDTable where GUID='" + guid + "';";
+                _command.CommandText = "select * from " + tablename + " where " + column + "='" + value + "';";
 
-                DataTable _table = _command.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count == 0)
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
                 {
-                    _command.CommandText = "insert into GUIDTable (GUID) values ('" + guid + "');";
-                    _command.ExecuteNonQuery();
-                    return true;
+                    if (!_reader.Read())
+                    {
+                        _reader.Close();
+                        _command.CommandText = "insert into " + tablename + " (" + column + ") values ('" + value + "');";
+                        _command.ExecuteNonQuery();
+                        return true;
+                    }
                 }
-                else
-                    return false;
+                return false;
             }
         }
 
-        public int GetGUIDID(string guid)
+        public int GetID(string tablename, string column, string pattern)
         {
             using (SQLiteCommand _commmand = new SQLiteCommand(_con))
             {
-                _commmand.CommandText = "select * from GUIDTable where GUID='" + guid + "';";
+                _commmand.CommandText = "select * from " + tablename + " where " + column + "='" + pattern + "';";
 
-                DataTable _table = _commmand.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count > 0)
+                using (SQLiteDataReader _reader = _commmand.ExecuteReader())
                 {
-                    DataRow _row = _rows[0];
-                    return (int)_row[0];
+                    if (_reader.Read())
+                        return Convert.ToInt32((Int64)_reader["ID"]);
+                    else
+                        return 0;
                 }
-                else
-                    throw new Exception("GUID not found!");
             }
         }
 
-        public int GetOutState(string outstate)
+        // ------------------------------------------------------------------
+
+        #region Get ID node
+
+        public int GetIDNode(string guid)
         {
-            using (SQLiteCommand _commmand = new SQLiteCommand(_con))
-            {
-                _commmand.CommandText = "select * from OutStateTable where GUID='" + outstate + "';";
-
-                DataTable _table = _commmand.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count > 0)
-                {
-                    DataRow _row = _rows[0];
-                    return (int)_row[0];
-                }
-                else
-                    throw new Exception("OutState not found!");
-            }
+            return GetID("GUIDTable", "GUID", guid);
         }
 
-        public bool InsertJobName(string name)
+        public int GetIDHost(string host)
         {
-            using (SQLiteCommand _commmand = new SQLiteCommand(_con))
-            {
-                _commmand.CommandText = "select * from JobNameTable where JOBNAME='" + name + "';";
-
-                DataTable _table = _commmand.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count == 0)
-                {
-                    _commmand.CommandText = "insert into JobNameTable (JOBNAME) values ('" + name + "');";
-                    _commmand.ExecuteNonQuery();
-                    return true;
-                }
-                else
-                    return false;
-            }
+            return GetID("HostTable", "HOST", host);
         }
 
-        public int GetJobNameID(string name)
+        public int GetIDIP(string ip)
         {
-            using (SQLiteCommand _commmand = new SQLiteCommand(_con))
-            {
-                _commmand.CommandText = "select * from JobNameTable where JOBNAME='" + name + "';";
-
-                DataTable _table = _commmand.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count > 0)
-                {
-                    DataRow _row = _rows[0];
-                    return (int)_row[0];
-                }
-                else
-                    throw new Exception("JOBNAME not found!");
-            }
+            return GetID("IPTable", "IP", ip);
         }
 
-        public int GetJobTypeID(string typename)
+        public int GetIDMac(string mac)
         {
-            using (SQLiteCommand _commmand = new SQLiteCommand(_con))
-            {
-                _commmand.CommandText = "select * from JobTypeTable where JOBTYPE='" + typename + "';";
-
-                DataTable _table = _commmand.ExecuteReader().GetSchemaTable();
-                DataRowCollection _rows = _table.Rows;
-
-                if (_rows.Count > 0)
-                {
-                    DataRow _row = _rows[0];
-                    return (int)_row[0];
-                }
-                else
-                    throw new Exception("JOBTYPE not found!");
-            }
+            return GetID("MACTable", "MAC", mac);
         }
+
+        /*
+        public int GetIDOnline(string online)
+        {
+            return GetID("OnlineTable", "ONLINE", online);
+        }
+        */
+        #endregion
+
+        #region Get ID job
+
+        public int GetIDJob(string guid)
+        {
+            return GetID("GUIDTable", "GUID", guid);
+        }
+
+        public int GetIDJobName(string name)
+        {
+            return GetID("JobNameTable", "JOBNAME", name);
+        }
+
+        public int GetIDJobType(string typename)
+        {
+            return GetID("JobTypeTable", "JOBTYPE", typename);
+        }
+
+        public int GetIDProtocol(string protocol)
+        {
+            return GetID("ProtocolTable", "PROTOCOL", protocol);
+        }
+
+        public int GetIDOutState(string outstate)
+        {
+            return GetID("OutStateTable", "OUTSTATE", outstate);
+        }
+
+        #endregion
+
+        #region Insert ID node
+
+        public bool InsertIDNode(string guid)
+        { 
+            if(Insert("GUIDTable", "GUID", guid))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDHost(string host)
+        {
+            if (Insert("HostTable", "HOST", host))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDIP(string ip)
+        {
+            if (Insert("IPTable", "IP", ip))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDMac(string mac)
+        { 
+            if(Insert("MACTable", "MAC", mac))
+                return true;
+            else
+                return false;
+        }
+
+        /*
+        public bool InsertIDOnline(string online)
+        {
+            if (Insert("OnlineTable", "ONLINE", online))
+                return true;
+            else
+                return false;
+        }
+        */
+        #endregion
+
+        #region Insert ID job
+
+        public bool InsertIDJob(string guid)
+        {
+            if (Insert("GUIDTable", "GUID", guid))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDJobName(string name)
+        {
+            if (Insert("JobNameTable", "JOBNAME", name))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDJobType(string type)
+        {
+            if (Insert("JobTypeTable", "JOBTYPE", type))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDProtocol(string protocol)
+        {
+            if (Insert("ProtocolTable", "PROTOCOL", protocol))
+                return true;
+            else
+                return false;
+        }
+
+        public bool InsertIDOutState(string outstate)
+        {
+            if (Insert("OutStateTable", "OUTSTATE", outstate))
+                return true;
+            else
+                return false;
+        }
+
+        #endregion
 
         public void InsertOnline(int online, int nodeID)
         {

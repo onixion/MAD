@@ -8,6 +8,7 @@ using System.Net.Mail;
 using MAD;
 using MAD.Notification;
 using MAD.Logging;
+using MAD.Database;
 
 using Amib.Threading;
 
@@ -34,14 +35,17 @@ namespace MAD.JobSystemCore
         private List<JobNode> _jobNodes;
         private object _jsLock = new object();
 
+        private DB _db;
+
         #endregion
 
         #region constructor
 
-        public JobSchedule(object jsLock, List<JobNode> jobNodes)
+        public JobSchedule(object jsLock, List<JobNode> jobNodes, DB db)
         {
             _jsLock = jsLock;
             _jobNodes = jobNodes;
+            _db = db;
             _workerPool = new SmartThreadPool(_maxThreads);
         }
 
@@ -228,6 +232,8 @@ namespace MAD.JobSystemCore
             // Global OutDescriptors
             _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
             _job.outp.outputs[1].dataObject = _job.tSpan.Milliseconds;
+
+            _db.InsertJob(_node, _job);
 
             if (MadConf.conf.NOTI_ENABLE)
             {

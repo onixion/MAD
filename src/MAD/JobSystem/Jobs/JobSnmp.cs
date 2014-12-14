@@ -22,14 +22,9 @@ namespace MAD.JobSystemCore
         #region methods
         #region Constructors
         public JobSnmp()
-            : base(JobType.SnmpCheck)
+            : base(JobType.SnmpCheck, Protocol.UDP)
         { }
 
-        public JobSnmp(string name, int version)
-            : base(name, JobType.SnmpCheck)
-        {
-            this.version = (uint)version;
-        }
         #endregion
 
         #region FromJob

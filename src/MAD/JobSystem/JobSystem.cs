@@ -15,7 +15,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public const string VERSION = "v3.0.0.0";
+        public const string VERSION = "v3.0.4.0";
         public const int MAXNODES = 100;
 
         private JobSchedule _Schedule { get; set; }
@@ -32,14 +32,16 @@ namespace MAD.JobSystemCore
 
         //private DBHandler _handler;
 
+        private DB _db;
+
         #endregion
 
         #region constructor
 
         public JobSystem(DB db)
         {
-            _Schedule = new JobSchedule(jsLock, _nodes);
-            //_handler = new DBHandler(db._dbConnection);
+            _Schedule = new JobSchedule(jsLock, _nodes, db);
+            _db = db;
         }
 
         #endregion
@@ -80,7 +82,9 @@ namespace MAD.JobSystemCore
             lock (jsLock)
             {
                 if (JobSystem.MAXNODES > _nodes.Count + _loadNodes.Count)
+                {
                     _nodes.AddRange(_loadNodes);
+                }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
             }
@@ -300,7 +304,6 @@ namespace MAD.JobSystemCore
                 if (MAXNODES > _nodes.Count)
                 {
                     _nodes.Add(node);
-                    //_handler.InsertNode(node);
                 }
                 else
                     throw new JobSystemException("Nodes limit reached!", null);
@@ -366,51 +369,6 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public bool UpdateNodeName(int nodeID, string name)
-        {
-            lock (jsLock)
-            {
-                JobNode _node = LGetNode(nodeID);
-                if (_node != null)
-                {
-                    _node.name = name;
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
-
-        public bool UpdateNodeMac(int nodeID, string mac)
-        {
-            lock (jsLock)
-            {
-                JobNode _node = LGetNode(nodeID);
-                if (_node != null)
-                {
-                    _node.mac = mac;
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
-
-        public bool UpdateNodeIP(int nodeID, IPAddress ip)
-        {
-            lock (jsLock)
-            {
-                JobNode _node = LGetNode(nodeID);
-                if (_node != null)
-                {
-                    _node.ip = ip;
-                    return true;
-                }
-                else
-                    return false;
-            }
-        }
-
         public SyncResult SyncNodes(List<ModelHost> currentHosts)
         {
             SyncResult _result = new SyncResult();
@@ -466,8 +424,10 @@ namespace MAD.JobSystemCore
         {
             JobNode _node = JSSerializer.DeserializeNode(fileName);
 
-            lock(jsLock)
+            lock (jsLock)
+            {
                 _nodes.Add(_node);
+            }
         }
 
         #endregion

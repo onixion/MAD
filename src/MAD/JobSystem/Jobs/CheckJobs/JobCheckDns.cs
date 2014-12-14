@@ -12,7 +12,7 @@ namespace MAD.JobSystemCore
     {
         //keine Parameter benötigt 
         public JobCheckDns()
-            : base(JobType.ServiceCheck)
+            : base(JobType.ServiceCheck, Protocol.UDP)
         { }
 
         public override void Execute(System.Net.IPAddress targetAddress)

@@ -23,7 +23,7 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPing()
-            : base(JobType.Ping)
+            : base(JobType.Ping, Protocol.ICMP)
         {
             ttl = 200;
             timeout = 500;

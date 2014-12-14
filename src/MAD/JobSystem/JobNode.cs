@@ -26,6 +26,8 @@ namespace MAD.JobSystemCore
         public int uWorker = 0;
         [JsonIgnore]
         public DateTime lastIPUpdate = DateTime.Now;
+        [JsonIgnore]
+        public bool online;
 
         public Guid guid { get; set; }
         public string name { get; set; }

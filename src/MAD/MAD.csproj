@@ -94,7 +94,7 @@
     <Compile Include="DB\DBSummary.cs" />
     <Compile Include="DB\DBTableInfo.cs" />
     <Compile Include="DB\DB.cs" />
-    <Compile Include="JobSystem\DBHandler.cs" />
+    <Compile Include="JobSystem\JSEventArgs.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
