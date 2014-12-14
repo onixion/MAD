@@ -36,5 +36,12 @@ namespace MAD.GUI
         {
             Application.Exit();
         }
+
+        private void startScanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Show(new ActionScan());
+        }
+
+
     }
 }

@@ -215,6 +215,7 @@
             // 
             resources.ApplyResources(this.startScanToolStripMenuItem, "startScanToolStripMenuItem");
             this.startScanToolStripMenuItem.Name = "startScanToolStripMenuItem";
+            this.startScanToolStripMenuItem.Click += new System.EventHandler(this.startScanToolStripMenuItem_Click);
             // 
             // connectivityCheckToolStripMenuItem
             // 
