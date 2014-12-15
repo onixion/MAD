@@ -45,6 +45,12 @@ namespace MAD.GUI
             _tmp.ShowDialog();
         }
 
+        private void connectivityCheckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ActionConnectivityCheck _tmp = new ActionConnectivityCheck();
+            _tmp.ShowDialog();
+        }
+
 
     }
 }

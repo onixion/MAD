@@ -86,6 +86,7 @@
             // 
             // SubnetmaskDropdown
             // 
+            this.SubnetmaskDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SubnetmaskDropdown.FormattingEnabled = true;
             this.SubnetmaskDropdown.Items.AddRange(new object[] {
             "1",
