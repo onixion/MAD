@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using MAD.Logging;
 
 namespace MAD.Notification
@@ -122,6 +123,7 @@ namespace MAD.Notification
             {
                 try
                 {
+
                     eMailSendingAttempt = tryCounter + ".Attempt";
                     Logger.Log(eMailSendingAttempt, Logger.MessageType.INFORM);
                     SmtpClient client = new SmtpClient();
@@ -129,8 +131,11 @@ namespace MAD.Notification
                     client.Host = smtpClient_special;
                     client.Credentials = new NetworkCredential(eMailFrom_special.ToString(), password_special);
                     client.EnableSsl = true;
-                    client.Send(mail);
+					client.DeliveryMethod = SmtpDeliveryMethod.Network;
                     client.UseDefaultCredentials = false;
+					ServicePointManager.ServerCertificateValidationCallback = delegate(object sender, X509Certificate certificate, X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+					{return true;};
+					client.Send(mail);
                     eMailSendingSucceed = "(" + tryCounter + ".Attempt) Success Sir";
                     Logger.Log(eMailSendingSucceed, Logger.MessageType.INFORM);
                     client.Dispose();
@@ -141,8 +146,16 @@ namespace MAD.Notification
                 {
                     eMailSendingFailed = "(" + tryCounter + ".Attempt) Sending mail failed Sir becuase: " + ex /*.Message*/;
                     Logger.Log(eMailSendingFailed, Logger.MessageType.ERROR);//ex gives a report_intern of problems
-                    client.Dispose();
-                    continue;
+					Logger.ForceWriteToLog();
+					try
+					{
+						client.Dispose();
+						continue;
+					}
+					catch
+					{
+                    	continue;
+					}
                 }
 
             }
