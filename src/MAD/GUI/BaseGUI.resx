@@ -2515,10 +2515,10 @@
 </value>
   </data>
   <data name="startScanToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Strg+Umshalttaste+S</value>
+    <value>Strg+Umschalttaste+S</value>
   </data>
   <data name="startScanToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Strg+Umshalttaste+S</value>
+    <value>Strg+Umschalttaste+S</value>
   </data>
   <data name="startScanToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>270, 22</value>
@@ -2671,10 +2671,10 @@
 </value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Strg+Umshalttaste+C</value>
+    <value>Strg+Umschalttaste+C</value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Strg+Umshalttaste+C</value>
+    <value>Strg+Umschalttaste+C</value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>270, 22</value>
