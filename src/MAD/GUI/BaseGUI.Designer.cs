@@ -76,7 +76,6 @@
             this.aboutToolStripMenuItem});
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            //this.menuStrip.Font = BaseGUI.DEFAULT_FONT;
             // 
             // fileToolStripMenuItem
             // 
@@ -222,6 +221,7 @@
             // 
             resources.ApplyResources(this.connectivityCheckToolStripMenuItem, "connectivityCheckToolStripMenuItem");
             this.connectivityCheckToolStripMenuItem.Name = "connectivityCheckToolStripMenuItem";
+            this.connectivityCheckToolStripMenuItem.Click += new System.EventHandler(this.connectivityCheckToolStripMenuItem_Click);
             // 
             // manuallyCheckNodesToolStripMenuItem
             // 
