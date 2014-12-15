@@ -224,8 +224,8 @@ namespace MAD.Database
                     + _idJobType + "', '"
                     + _idProtocol + "', '"
                     + _idOutState + "', '"
-                    + UnixTimestampFromDateTime(job.tStart) + "', '"
-                    + UnixTimestampFromDateTime(job.tStop) + "', '"
+                    + job.tStart.ToString() + "', '"
+                    + job.tStop.ToString() + "', '"
                     + job.tSpan.Milliseconds.ToString() + "');";
                     // outdesc
                 _command.ExecuteNonQuery();
@@ -449,21 +449,6 @@ namespace MAD.Database
         }
         
         // ---
-
-        private static DateTime TimeFromUnixTimestamp(int unixTimestamp)
-        {
-            DateTime unixYear0 = new DateTime(1970, 1, 1);
-            long unixTimeStampInTicks = unixTimestamp * TimeSpan.TicksPerSecond;
-            DateTime dtUnix = new DateTime(unixYear0.Ticks + unixTimeStampInTicks);
-            return dtUnix;
-        }
-
-        public static long UnixTimestampFromDateTime(DateTime date)
-        {
-            long unixTimestamp = date.Ticks - new DateTime(1970, 1, 1).Ticks;
-            unixTimestamp /= TimeSpan.TicksPerSecond;
-            return unixTimestamp;
-        }
 
         public void Dispose()
         {
