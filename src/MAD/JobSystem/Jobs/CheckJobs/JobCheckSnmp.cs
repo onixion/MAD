@@ -20,7 +20,7 @@ namespace MAD.JobSystemCore
 
         #region constructor
         public JobCheckSnmp()
-            : base(JobType.ServiceCheck)
+            : base(JobType.ServiceCheck, Protocol.UDP)
         {
             outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string), false));
         }

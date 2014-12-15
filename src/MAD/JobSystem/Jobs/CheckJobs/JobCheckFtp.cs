@@ -14,7 +14,7 @@ namespace MAD.JobSystemCore
         public string password; //required parameter
 
         public JobCheckFtp()
-            : base(JobType.ServiceCheck)
+            : base(JobType.ServiceCheck, Protocol.TCP)
         {
             outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string), false));
         }

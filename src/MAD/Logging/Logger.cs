@@ -16,15 +16,18 @@ namespace MAD.Logging
 
         public enum MessageType
         {
-            EMERGENCY,
-            ERROR,
-            WARNING,
-            INFORM
+            EMERGENCY = 5,
+            ERROR = 4,
+            WARNING = 3,
+            INFORM = 2,
+            DEBUG = 1
         }
 
         private static List<string> _logMessages = new List<string>();
 
         private static readonly Object _lockThis = new Object();
+
+        private static uint _logLevel = MadConf.conf.LOG_LEVEL; 
 
         private static bool _force = false;
         #endregion
@@ -33,31 +36,37 @@ namespace MAD.Logging
         
         public static void Log(string message, MessageType type)
         {
-            string _buffer = "";
-            _buffer += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss:fff");
-
-            switch (type)
+            if ((uint)type >= _logLevel)
             {
-                 case MessageType.EMERGENCY:
-                     _buffer += " !EMERGENCY: ";
-                     break;
-                 case MessageType.ERROR:
-                     _buffer += " ERROR: ";
-                     break;
-                 case MessageType.INFORM:
-                     _buffer += " INFORMATION: ";
-                     break;
-                 case MessageType.WARNING:
-                     _buffer += " WARNING: ";
-                     break;
-             }
+                string _buffer = "";
+                _buffer += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss:fff");
 
-             _buffer += message;
-             lock (_lockThis)
-             {
-                 _logMessages.Add(_buffer);
-                 WriteToLog();
-             }           
+                switch (type)
+                {
+                    case MessageType.DEBUG:
+                        _buffer += " DEBUG: ";
+                        break;
+                    case MessageType.EMERGENCY:
+                        _buffer += " !EMERGENCY: ";
+                        break;
+                    case MessageType.ERROR:
+                        _buffer += " ERROR: ";
+                        break;
+                    case MessageType.INFORM:
+                        _buffer += " INFORMATION: ";
+                        break;
+                    case MessageType.WARNING:
+                        _buffer += " WARNING: ";
+                        break;
+                }
+
+                _buffer += message;
+                lock (_lockThis)
+                {
+                    _logMessages.Add(_buffer);
+                    WriteToLog();
+                }
+            }
         }
 
         private static void WriteToLog()

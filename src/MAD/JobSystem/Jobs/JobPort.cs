@@ -16,7 +16,7 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobPort()
-            : base("NULL", JobType.PortScan, new JobTime(), new JobOutput())
+            : base(JobType.PortScan, Protocol.TCP)
         {
             port = 80;
             timeout = 500;

@@ -12,6 +12,8 @@ namespace MAD.JobSystemCore
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
 
+        public enum Protocol { NULL, ICMP, TCP, UDP, RAW }
+
         [JsonIgnore]
         private static object _idLock = new object();
         [JsonIgnore]
@@ -41,6 +43,8 @@ namespace MAD.JobSystemCore
         public JobType type { get; set; }
         public JobTime time { get; set; }
 
+        public Protocol prot { get; set; }
+
         public bool notiFlag = true;
         public JobNotificationSettings settings { get; set; }
         public List<JobRule> rules = new List<JobRule>();
@@ -49,34 +53,37 @@ namespace MAD.JobSystemCore
 
         #region constructors
 
-        protected Job(JobType type)
+        protected Job(JobType type, Protocol protocol)
         {
             InitJob();
 
             this.guid = Guid.NewGuid();
             this.type = type;
+            this.prot = prot;
             this.outp = new JobOutput();
             this.time = new JobTime();
         }
 
-        protected Job(string name, JobType type)
+        protected Job(string name, JobType type, Protocol protocol)
         {
             InitJob();
 
             this.guid = Guid.NewGuid();
             this.name = name;
             this.type = type;
+            this.prot = protocol;
             this.outp = new JobOutput();
             this.time = new JobTime();
         }
 
-        protected Job(string name, JobType type, JobTime time, JobOutput outp)
+        protected Job(string name, JobType type, Protocol protocol, JobTime time, JobOutput outp)
         {
             InitJob();
 
             this.guid = Guid.NewGuid();
             this.name = name;
             this.type = type;
+            this.prot = protocol;
             this.outp = outp;
             this.time = time;
             this.settings = new JobNotificationSettings();

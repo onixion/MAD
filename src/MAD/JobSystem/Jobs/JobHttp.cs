@@ -23,7 +23,7 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHttp() 
-            : base(JobType.Http)
+            : base(JobType.Http, Protocol.TCP)
         {
             this.port = 80;
             this.timeout = 500;

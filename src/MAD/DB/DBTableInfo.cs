@@ -8,14 +8,14 @@ namespace MAD.Database
     public class TableInfo
     {
         public string name;
-        public OType type;
-        public enum OType 
+        public types type;
+        public enum types
         {
             INTEGER,
-            boolean1 
+            TEXT
         }
 
-        public TableInfo(string name, OType type)
+        public TableInfo(string name, types type)
         {
             this.name = name;
             this.type = type;
@@ -30,10 +30,10 @@ namespace MAD.Database
         {
             switch (type)
             {
-                case OType.INTEGER:
+                case types.INTEGER:
                     return "INTERGER";
-                case OType.boolean1:
-                    return "BOOLEAN1";
+                case types.TEXT:
+                    return "TEXT";
 
                 default:
                     throw new Exception();
@@ -51,9 +51,5 @@ namespace MAD.Database
             this.column = column;
             this.data = data;
         }
-    }
-    public class Select
-    {
-        
     }
 }

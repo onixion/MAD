@@ -24,7 +24,7 @@ namespace MAD.JobSystemCore
         #region constructors
 
         public JobHostDetect()
-            : base(JobType.HostDetect)
+            : base(JobType.HostDetect, Protocol.ICMP)
         {
             this.Subnetmask = IPAddress.Parse("255.255.255.0");
         }

@@ -28,6 +28,7 @@ namespace MAD
         public static int Main(string[] args)
         {
             // load config-file
+            
             MadConf.TryCreateDir(DATADIR);
             if (File.Exists(CONFFILE))
             {

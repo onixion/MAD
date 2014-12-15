@@ -75,6 +75,7 @@ namespace MAD
         {
             // logger
             conf.LOG_FILE_DIRECTORY = "." + Path.DirectorySeparatorChar;
+            conf.LOG_LEVEL = 2; 
 
             // jobsystem
             conf.NOTI_ENABLE = true;
@@ -103,6 +104,7 @@ namespace MAD
     {
         // logger
         public string LOG_FILE_DIRECTORY;
+        public uint LOG_LEVEL;
 
         // jobsystem
         public bool NOTI_ENABLE;
