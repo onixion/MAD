@@ -100,7 +100,6 @@ namespace MAD.Database
             _con.Close();
         }
 
-
         //insert data
         public void InsertToTable(string TableName, params Insert[] insdata)
         {
