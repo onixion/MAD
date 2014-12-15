@@ -80,7 +80,8 @@ namespace MAD.Database
                     "STARTTIME text, " +
                     "STOPTIME text, " +
                     "DELAYTIME text, " +
-                    "OUTDESC text);";
+                    "OUTDESC text" +
+                    "ID_MEMO integer);";
                 _command.ExecuteNonQuery();
 
                 // SummaryTable
@@ -150,22 +151,41 @@ namespace MAD.Database
             return TempResult;
         }
         
-        public DataTable ReadEvents()
+        public DataTable ReadJobs(string limitcommand)
         {
-            //string sql = "SELECT GUID, JobNames FROM " + TableName + " INNER JOIN Job_Name_Table ON Event_Table.JOBNAME = Job_Name_Table.JobNames WHERE GUID='" + TableID + "'";
-            //string sql = "SELECT * FROM Job_Name_Table, Job_Type_Table where Job_Name_Table.ID = Job_Type_Table.ID";
-            string sql = "SELECT * FROM event_Table INNER JOIN job_Name_Table ON event_Table.JOBNAME = job_Name_Table.ID INNER JOIN job_Type_Table ON event_Table.JOBTYPE = job_Type_Table.ID INNER JOIN protocol_Table ON event_Table.PROTOCOL = protocol_Table.ID;";
-            SQLiteCommand command = new SQLiteCommand(sql, _con);
-            SQLiteDataReader reader = command.ExecuteReader();
-            /*
-            while (reader.Read())
-                Console.WriteLine("ID: " + reader["ID"] + "\tJobname: " + reader["JobNames"] + "\tID: " + reader["ID"] + "\tJobType: " + reader["JobType"]);
-            Console.ReadLine();
-            command.Dispose();
-            */
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
+            string sql = "select * from JobTable "+
+                         "inner join GUIDTable on JobTable.ID_NODE = GUIDTable.ID "+
+                         "inner join HostTable on JobTable.ID_HOST = HostTable.ID "+
+                         "inner join IPTable on JobTable.ID_IP = IPTable.ID"+
+                         "inner join MACTable on JobTable.ID_MAC = MACTable.ID"+
+                         "inner join GUIDTable on JobTable.ID_JOB = GUIDTable.ID " +
+                         "inner join JobNameTable on JobTable.ID_JOBNAME = JobNameTable.ID"+
+                         "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID"+
+                         "inner join ProtocolTable on JobTable.ID_PPROTOCOL = ProtocolTable.ID" +
+                         "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID"+
+                         "inner join MemoTable on JobTable.ID_Memo = MemoTable.ID "+ limitcommand +";";
+           
+            using (SQLiteCommand command = new SQLiteCommand(sql, _con))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                DataTable TempResult = new DataTable();
+                TempResult.Load(reader);
+
+                return TempResult;
+            }
+        }
+
+        public DataTable ReadTables()
+        {
+            string sql = ".tables";
+            using (SQLiteCommand command = new SQLiteCommand(sql, _con))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                DataTable TempResult = new DataTable();
+                TempResult.Load(reader);
+
+                return TempResult;
+            }
         }
 
         //---
