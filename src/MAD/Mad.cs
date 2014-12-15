@@ -26,6 +26,7 @@ namespace MAD
         public static int Main(string[] args)
         {
             // load config-file
+            
             MadConf.TryCreateDir(DATADIR);
             if (File.Exists(CONFFILE))
             {
@@ -58,6 +59,7 @@ namespace MAD
             js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
+            NotificationGetParams.SetSendMail("huansohn", "huansohn", 3);
 
             // start interface
             if (args.Length == 0)
