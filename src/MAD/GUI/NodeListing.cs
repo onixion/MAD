@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MAD.GUI
 {
-    public partial class NodeListing : Form
+    public partial class NodeListing : BaseGUI
     {
         public NodeListing()
         {

@@ -76,6 +76,7 @@
             this.aboutToolStripMenuItem});
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            //this.menuStrip.Font = BaseGUI.DEFAULT_FONT;
             // 
             // fileToolStripMenuItem
             // 
@@ -215,6 +216,7 @@
             // 
             resources.ApplyResources(this.startScanToolStripMenuItem, "startScanToolStripMenuItem");
             this.startScanToolStripMenuItem.Name = "startScanToolStripMenuItem";
+            this.startScanToolStripMenuItem.Click += new System.EventHandler(this.startScanToolStripMenuItem_Click);
             // 
             // connectivityCheckToolStripMenuItem
             // 

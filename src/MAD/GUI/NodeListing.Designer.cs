@@ -1,6 +1,6 @@
 ﻿namespace MAD.GUI
 {
-    partial class NodeListing
+    partial class NodeListing : BaseGUI
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -72,7 +72,7 @@
             // 
             this.menuStrip1.AutoSize = false;
             this.menuStrip1.BackColor = System.Drawing.Color.DarkCyan;
-            this.menuStrip1.Font = new System.Drawing.Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            //this.menuStrip1.Font =
             this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2);
             this.menuStrip1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
