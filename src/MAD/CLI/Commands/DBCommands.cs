@@ -23,17 +23,10 @@ namespace MAD.CLICore
         {
             if (!OParUsed("t"))
             {
-                output += "<color><yellow>Available Tables:\n";
-                output += "<color><yellow> -> <color><white>GUIDTable\n";
-                output += "<color><yellow> -> <color><white>HostTable\n";
-                output += "<color><yellow> -> <color><white>IPTable\n";
-                output += "<color><yellow> -> <color><white>MacTable\n";
-                output += "<color><yellow> -> <color><white>JobNameTable\n";
-                output += "<color><yellow> -> <color><white>JobTypeTable\n";
-                output += "<color><yellow> -> <color><white>ProtocolTable\n";
-                output += "<color><yellow> -> <color><white>OutStateTable\n";
-                output += "<color><yellow> -> <color><white>JobTable\n";
-                output += "<color><yellow> -> <color><white>SummaryTable\n";
+                DataTable _table = _db.ReadTables();
+
+                DataColumnCollection _columns = _table.Columns;
+                DataRowCollection _rows = _table.Rows;
 
                 return output;
             }
@@ -43,18 +36,15 @@ namespace MAD.CLICore
                 if(OParUsed("r"))
                     _amountOfRows = (int)pars.GetPar("r").argValues[0];
 
-                DataTable _table = _db.ReadTable((string)pars.GetPar("t").argValues[0]);
+                DataTable _table = _db.ReadTable((string)pars.GetPar("t").argValues[0] + " order by ID_RECORD desc limit " + _amountOfRows);
                 DataColumnCollection _columns = _table.Columns;
                 DataRowCollection _rows = _table.Rows;
-
-                if(_amountOfRows > _rows.Count)
-                    _amountOfRows = _rows.Count;
 
                 output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
                 output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetColumnNames(_columns));
                 output += ConsoleTable.GetSplitline(consoleWidth) + "<color><white>";
 
-                for (int i = _rows.Count - _amountOfRows; i < _rows.Count; i++)
+                for (int i = 0; i < _rows.Count; i++)
                     output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetRowValues(_columns, _rows[i]));
             }
 
@@ -62,16 +52,16 @@ namespace MAD.CLICore
         }
     }
 
-    public class DBJob : Command
+    public class DBJobs : Command
     { 
         private DB _db;
 
-        public DBJob(object[] args)
+        public DBJobs(object[] args)
             :base()
         {
             _db = (DB)args[0];
             oPar.Add(new ParOption("r", "AMOUNT-ROWS", "Amount of rows to show.", false, false, new Type[] { typeof(int) }));
-            description = "This command shows you the joined content of the job table.";
+            description = "This command shows the joined content of the job-table.";
         }
 
         public override string Execute(int consoleWidth)
@@ -80,18 +70,15 @@ namespace MAD.CLICore
             if (OParUsed("r"))
                 _amountOfRows = (int)pars.GetPar("r").argValues[0];
 
-            DataTable _table = _db.ReadTable("JobTable");
+            DataTable _table = _db.ReadJobs(""); // " order by ID_RECORD desc limit " + _amountOfRows
             DataColumnCollection _columns = _table.Columns;
             DataRowCollection _rows = _table.Rows;
-
-            if (_amountOfRows > _rows.Count)
-                _amountOfRows = _rows.Count;
 
             output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
             output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetColumnNames(_columns));
             output += ConsoleTable.GetSplitline(consoleWidth) + "<color><white>";
 
-            for (int i = _rows.Count - _amountOfRows; i < _rows.Count; i++)
+            for (int i = 0; i < _rows.Count; i++)
                 output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetRowValues(_columns, _rows[i]));
 
             return output;

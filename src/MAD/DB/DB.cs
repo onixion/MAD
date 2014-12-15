@@ -30,8 +30,12 @@ namespace MAD.Database
                 //_command.CommandText = "create table if not exists DeviceTable (ID_NODE integer, HOSTNAME text, IP text, MAC text, ONLINE integer, MEMO1 varchar(5), MEMO2 text);";
                 //_command.ExecuteNonQuery(); // TODO
 
-                // GUIDTable 
-                _command.CommandText = "create table if not exists GUIDTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, GUID TEXT);";
+                // GUIDNodeTable 
+                _command.CommandText = "create table if not exists GUIDNodeTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, GUID_NODE TEXT);";
+                _command.ExecuteNonQuery();
+
+                // GUIDJobTable 
+                _command.CommandText = "create table if not exists GUIDJobTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, GUID_JOB TEXT);";
                 _command.ExecuteNonQuery();
 
                 // HostTable
@@ -67,7 +71,8 @@ namespace MAD.Database
                 _command.ExecuteNonQuery();
 
                 // JobTable
-                _command.CommandText = "create table if not exists JobTable (" + 
+                _command.CommandText = "create table if not exists JobTable (" +
+                    "ID_RECORD integer PRIMARY KEY AUTOINCREMENT, " +
                     "ID_NODE integer, " +
                     "ID_HOST integer, " +
                     "ID_IP integer, " +
@@ -80,7 +85,7 @@ namespace MAD.Database
                     "STARTTIME text, " +
                     "STOPTIME text, " +
                     "DELAYTIME text, " +
-                    "OUTDESC text" +
+                    "OUTDESC text, " +
                     "ID_MEMO integer);";
                 _command.ExecuteNonQuery();
 
@@ -130,7 +135,7 @@ namespace MAD.Database
         //read entire table
         public DataTable ReadTable(string TableName)
         {
-            string sql = "SELECT * FROM " + TableName + "";
+            string sql = "SELECT * FROM " + TableName + ";";
             SQLiteCommand command = new SQLiteCommand(sql, _con);
             SQLiteDataReader reader = command.ExecuteReader();
             DataTable TempResult = new DataTable();
@@ -142,7 +147,7 @@ namespace MAD.Database
         //read one result from table
         public DataTable ReadResult(string TableName, int TableID)
         {
-            string sql = "SELECT * FROM " + TableName + " WHERE ID='" + TableID + "'";
+            string sql = "SELECT * FROM " + TableName + " WHERE ID='" + TableID + "';";
             SQLiteCommand command = new SQLiteCommand(sql, _con);
             SQLiteDataReader reader = command.ExecuteReader();
             DataTable TempResult = new DataTable();
@@ -152,18 +157,34 @@ namespace MAD.Database
         
         public DataTable ReadJobs(string limitcommand)
         {
-            string sql = "select * from JobTable "+
-                         "inner join GUIDTable on JobTable.ID_NODE = GUIDTable.ID "+
-                         "inner join HostTable on JobTable.ID_HOST = HostTable.ID "+
-                         "inner join IPTable on JobTable.ID_IP = IPTable.ID"+
-                         "inner join MACTable on JobTable.ID_MAC = MACTable.ID"+
-                         "inner join GUIDTable on JobTable.ID_JOB = GUIDTable.ID " +
-                         "inner join JobNameTable on JobTable.ID_JOBNAME = JobNameTable.ID"+
-                         "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID"+
-                         "inner join ProtocolTable on JobTable.ID_PPROTOCOL = ProtocolTable.ID" +
-                         "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID"+
-                         "inner join MemoTable on JobTable.ID_Memo = MemoTable.ID "+ limitcommand +";";
-           
+            string sql = "select " +
+                         "ID_RECORD, " +
+                         "GUIDNodeTable.GUID_NODE, " +
+                         "HostTable.HOST, " +
+                         "IPTable.IP, " +
+                         "MacTable.MAC, " +
+                         "GUIDJobTable.GUID_JOB, " +
+                         "JobNameTable.JOBNAME, " +
+                         "JobTypeTable.JOBTYPE, " +
+                         "ProtocolTable.PROTOCOL, " +
+                         "OutStateTable.OUTSTATE, " +
+                         "STARTTIME, " +
+                         "STOPTIME, " +
+                         "DELAYTIME " +
+                         //"MemoTable.MEMO1 " +
+                        //"MemoTable.MEMO2 " +
+                         "from JobTable " +
+                         "inner join GUIDNodeTable on JobTable.ID_NODE = GUIDNodeTable.ID " +
+                         "inner join HostTable on JobTable.ID_HOST = HostTable.ID " +
+                         "inner join IPTable on JobTable.ID_IP = IPTable.ID " +
+                         "inner join MACTable on JobTable.ID_MAC = MACTable.ID " +
+                         "inner join GUIDJobTable on JobTable.ID_JOB = GUIDJobTable.ID " +
+                         "inner join JobNameTable on JobTable.ID_JOBNAME = JobNameTable.ID " +
+                         "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID " +
+                         "inner join ProtocolTable on JobTable.ID_PROTOCOL = ProtocolTable.ID " +
+                         "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID ";
+                         //"inner join MemoTable on JobTable.ID_MEMO = MemoTable.ID " + limitcommand + ";";
+
             using (SQLiteCommand command = new SQLiteCommand(sql, _con))
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
@@ -217,7 +238,7 @@ namespace MAD.Database
             InsertIDJob(job.guid.ToString());
             InsertIDJobName(job.name);
             InsertIDJobType(job.type.ToString());
-            InsertIDProtocol(job.type.ToString());
+            InsertIDProtocol(job.prot.ToString());
             InsertIDOutState(job.outp.outState.ToString());
 
             int _idNode = GetIDNode(node.guid.ToString());
@@ -233,7 +254,7 @@ namespace MAD.Database
 
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                _command.CommandText = "insert into JobTable (ID_NODE, ID_HOST, ID_IP, ID_MAC, ID_JOB, ID_JOBNAME, ID_JOBTYPE, ID_PROTOCOL, ID_OUTSTATE, STARTTIME, STOPTIME, DELAYTIME) values ('"
+                _command.CommandText = "insert into JobTable (ID_NODE, ID_HOST, ID_IP, ID_MAC, ID_JOB, ID_JOBNAME, ID_JOBTYPE, ID_PROTOCOL, ID_OUTSTATE, STARTTIME, STOPTIME, DELAYTIME, OUTDESC) values ('"
                     + _idNode + "', '"
                     + _idHost + "', '"
                     + _idIP + "', '"
@@ -245,8 +266,8 @@ namespace MAD.Database
                     + _idOutState + "', '"
                     + job.tStart.ToString() + "', '"
                     + job.tStop.ToString() + "', '"
-                    + job.tSpan.Milliseconds.ToString() + "');";
-                    // outdesc
+                    + job.tSpan.Milliseconds.ToString() + "', '"
+                    + job.outp.GetStrings() + "');";
                 _command.ExecuteNonQuery();
             }
         }
@@ -296,7 +317,7 @@ namespace MAD.Database
 
         public int GetIDNode(string guid)
         {
-            return GetID("GUIDTable", "GUID", guid);
+            return GetID("GUIDNodeTable", "GUID_NODE", guid);
         }
 
         public int GetIDHost(string host)
@@ -314,19 +335,13 @@ namespace MAD.Database
             return GetID("MACTable", "MAC", mac);
         }
 
-        /*
-        public int GetIDOnline(string online)
-        {
-            return GetID("OnlineTable", "ONLINE", online);
-        }
-        */
         #endregion
 
         #region Get ID job
 
         public int GetIDJob(string guid)
         {
-            return GetID("GUIDTable", "GUID", guid);
+            return GetID("GUIDJobTable", "GUID_JOB", guid);
         }
 
         public int GetIDJobName(string name)
@@ -355,7 +370,7 @@ namespace MAD.Database
 
         public bool InsertIDNode(string guid)
         { 
-            if(Insert("GUIDTable", "GUID", guid))
+            if(Insert("GUIDNodeTable", "GUID_NODE", guid))
                 return true;
             else
                 return false;
@@ -385,22 +400,13 @@ namespace MAD.Database
                 return false;
         }
 
-        /*
-        public bool InsertIDOnline(string online)
-        {
-            if (Insert("OnlineTable", "ONLINE", online))
-                return true;
-            else
-                return false;
-        }
-        */
         #endregion
 
         #region Insert ID job
 
         public bool InsertIDJob(string guid)
         {
-            if (Insert("GUIDTable", "GUID", guid))
+            if (Insert("GUIDJobTable", "GUID_JOB", guid))
                 return true;
             else
                 return false;
@@ -424,7 +430,7 @@ namespace MAD.Database
 
         public bool InsertIDProtocol(string protocol)
         {
-            if (Insert("ProtocolTable", "PROTOCOL", protocol))
+            if(Insert("ProtocolTable", "PROTOCOL", protocol))
                 return true;
             else
                 return false;
