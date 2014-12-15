@@ -28,7 +28,7 @@ namespace MAD.JobSystemCore
             ttl = 200;
             timeout = 500;
 
-            outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string)));
+            outp.outputs.Add(new OutputDescriptor("IPStatus", typeof(string), false));
             //outp.outputs.Add(new OutputDescriptor("TTL", typeof(int)));
             // Useless, does not work ...
         }

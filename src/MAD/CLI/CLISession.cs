@@ -49,7 +49,6 @@ namespace MAD.CLIServerCore
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-            commands.Add(new CommandOptions("clear", typeof(ClearCommand), null));
             commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
@@ -125,7 +124,7 @@ namespace MAD.CLIServerCore
             */
 
             // Database commands
-            commands.Add(new CommandOptions("db show", typeof(DBShow), new object[] { _db }));
+            commands.Add(new CommandOptions("db show", typeof(DBShowTables), new object[] { _db }));
         }
 
         public void Start()

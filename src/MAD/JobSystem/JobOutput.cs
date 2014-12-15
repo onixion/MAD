@@ -14,8 +14,8 @@ namespace MAD.JobSystemCore
 
         public JobOutput()
         {
-            outputs.Add(new OutputDescriptor("OutState", typeof(string)));
-            outputs.Add(new OutputDescriptor("ExDuration", typeof(int)));
+            outputs.Add(new OutputDescriptor("OutState", typeof(string), true));
+            outputs.Add(new OutputDescriptor("ExDuration", typeof(int), true));
         }
 
         public OutputDescriptor GetOutputDesc(string name)
@@ -24,6 +24,15 @@ namespace MAD.JobSystemCore
                 if (_desc.name == name)
                     return _desc;
             return null;
+        }
+
+        public string GetStrings()
+        { 
+            string _buffer = "";
+            foreach (OutputDescriptor _desc in outputs)
+                if (!_desc.dbIgnore)
+                    _buffer += _desc.GetString() + " ";
+            return _buffer;
         }
     }
 }

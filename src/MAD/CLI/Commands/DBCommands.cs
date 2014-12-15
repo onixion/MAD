@@ -6,11 +6,11 @@ using MAD.Database;
 
 namespace MAD.CLICore
 {
-    public class DBShow : Command
+    public class DBShowTables : Command
     {
         private DB _db;
 
-        public DBShow(object[] args)
+        public DBShowTables(object[] args)
             :base()
         {
             _db = (DB)args[0];
@@ -22,20 +22,29 @@ namespace MAD.CLICore
         {
             if (!OParUsed("t"))
             {
-                output += "<color><yellow>Tables:\n";
+                output += "<color><yellow>Available Tables:\n";
                 output += "<color><yellow> -> <color><white>GUIDTable\n";
-                output += "<color><yellow> -> <color><white>DeviceTable\n";
-                output += "<color><yellow> -> <color><white>EventTable\n";
+                output += "<color><yellow> -> <color><white>HostTable\n";
+                output += "<color><yellow> -> <color><white>IPTable\n";
+                output += "<color><yellow> -> <color><white>MacTable\n";
                 output += "<color><yellow> -> <color><white>JobNameTable\n";
+                output += "<color><yellow> -> <color><white>JobTypeTable\n";
+                output += "<color><yellow> -> <color><white>ProtocolTable\n";
+                output += "<color><yellow> -> <color><white>OutStateTable\n";
+                output += "<color><yellow> -> <color><white>JobTable\n";
                 output += "<color><yellow> -> <color><white>SummaryTable\n";
 
                 return output;
             }
             else
-            { 
-                // check if table exists
-                // read content
-                // create console table
+            {
+                DataTable _table = _db.ReadTable("JobTable");
+
+                DataColumnCollection _columns = _table.Columns;
+                DataRowCollection _rows = _table.Rows;
+
+        
+
             }
 
             return output;

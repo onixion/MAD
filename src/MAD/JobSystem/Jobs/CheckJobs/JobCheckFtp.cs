@@ -16,7 +16,7 @@ namespace MAD.JobSystemCore
         public JobCheckFtp()
             : base(JobType.ServiceCheck)
         {
-            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string)));
+            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string), false));
         }
 
         public override void Execute(IPAddress targetAddress)

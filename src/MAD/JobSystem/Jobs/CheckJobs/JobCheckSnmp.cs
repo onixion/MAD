@@ -22,7 +22,7 @@ namespace MAD.JobSystemCore
         public JobCheckSnmp()
             : base(JobType.ServiceCheck)
         {
-            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string)));
+            outp.outputs.Add(new OutputDescriptor("Additional Information", typeof(string), false));
         }
         #endregion
 

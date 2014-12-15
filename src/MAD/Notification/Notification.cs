@@ -137,7 +137,6 @@ namespace MAD.Notification
                     client.Dispose();
                     continue;
                 }
-
             }
 
             #endregion

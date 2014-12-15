@@ -146,20 +146,6 @@ namespace MAD.CLICore
         }
     }
 
-    public class ClearCommand : Command
-    {
-        public ClearCommand()
-        {
-            description = "This command clears the console.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            Console.Clear();
-            return "";
-        }
-    }
-
     public class InfoCommand : Command
     {
         public InfoCommand()
@@ -213,20 +199,6 @@ namespace MAD.CLICore
                 output += "<color>" + (string) _temp[0] + (string) _temp[0] + "\n";
             
             return output;
-        }
-    }
-
-    public class LoadDefaultConfigCommand : Command
-    {
-        public LoadDefaultConfigCommand()
-        {
-            description = "This command loads the default config-file.";
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            MadConf.SetToDefault();
-            return "<color><green>Default config loaded.";
         }
     }
 

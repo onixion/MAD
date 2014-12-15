@@ -10,6 +10,8 @@ namespace MAD.JobSystemCore
         public Type dataType;
         public object dataObject;
 
+        public bool dbIgnore = false;
+
         #endregion
 
         #region constructors
@@ -17,10 +19,11 @@ namespace MAD.JobSystemCore
         public OutputDescriptor()
         { }
 
-        public OutputDescriptor(string name, Type dataType)
+        public OutputDescriptor(string name, Type dataType, bool dbIgnore)
         {
             this.name = name;
             this.dataType = dataType;
+            this.dbIgnore = dbIgnore;
         }
 
         public OutputDescriptor(string name, Type dataType, object dataObject)
@@ -28,6 +31,11 @@ namespace MAD.JobSystemCore
             this.name = name;
             this.dataType = dataType;
             this.dataObject = dataObject;
+        }
+
+        public string GetString()
+        {
+            return name + ":" + dataType + ":" + Convert.ToString(dataObject); // NOT TESTED
         }
 
         #endregion
