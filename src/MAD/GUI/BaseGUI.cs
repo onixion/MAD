@@ -19,6 +19,8 @@ namespace MAD.GUI
         #region fields
         protected static DB db;
         protected static JobSystem js;
+
+        //protected static Font DEFAULT_FONT = new Font("Microsoft JhengHei UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
         #endregion
 
         public BaseGUI()
@@ -39,7 +41,8 @@ namespace MAD.GUI
 
         private void startScanToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Show(new ActionScan());
+            ActionScan _tmp = new ActionScan();
+            _tmp.ShowDialog();
         }
 
 

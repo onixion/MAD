@@ -21,13 +21,13 @@ namespace MAD.GUI
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            return; 
+            this.Close(); 
         }
 
         private void ScanButton_Click(object sender, EventArgs e)
         {
             InvokeArpReader();
-            return;             
+            this.Close();             
         }
 
         private void InvokeArpReader()

@@ -76,6 +76,7 @@
             this.aboutToolStripMenuItem});
             this.menuStrip.Name = "menuStrip";
             this.menuStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            //this.menuStrip.Font = BaseGUI.DEFAULT_FONT;
             // 
             // fileToolStripMenuItem
             // 
