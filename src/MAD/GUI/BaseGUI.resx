@@ -1584,10 +1584,10 @@
 </value>
   </data>
   <data name="saveAllToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+S</value>
+    <value>Strg+S</value>
   </data>
   <data name="saveAllToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+S</value>
+    <value>Strg+S</value>
   </data>
   <data name="saveAllToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>216, 22</value>
@@ -1908,10 +1908,10 @@
 </value>
   </data>
   <data name="settingsToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+Alt+S</value>
+    <value>Strg+Alt+S</value>
   </data>
   <data name="settingsToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+Alt+S</value>
+    <value>Strg+Alt+S</value>
   </data>
   <data name="settingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>216, 22</value>
@@ -2058,10 +2058,10 @@
 </value>
   </data>
   <data name="exitToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+E</value>
+    <value>Strg+E</value>
   </data>
   <data name="exitToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+E</value>
+    <value>Strg+E</value>
   </data>
   <data name="exitToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>216, 22</value>
@@ -2515,10 +2515,10 @@
 </value>
   </data>
   <data name="startScanToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+Shift+S</value>
+    <value>Strg+Umshalttaste+S</value>
   </data>
   <data name="startScanToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+Shift+S</value>
+    <value>Strg+Umshalttaste+S</value>
   </data>
   <data name="startScanToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>270, 22</value>
@@ -2671,10 +2671,10 @@
 </value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.ShortcutKeyDisplayString" xml:space="preserve">
-    <value>Ctrl+Shift+C</value>
+    <value>Strg+Umshalttaste+C</value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.ShortcutKeys" type="System.Windows.Forms.Keys, System.Windows.Forms">
-    <value>Ctrl+Shift+C</value>
+    <value>Strg+Umshalttaste+C</value>
   </data>
   <data name="connectivityCheckToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
     <value>270, 22</value>
