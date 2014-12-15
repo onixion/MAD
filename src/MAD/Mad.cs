@@ -59,7 +59,6 @@ namespace MAD
             js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
-            NotificationGetParams.SetSendMail("huansohn", "huansohn", 3);
 
             // start interface
             if (args.Length == 0)

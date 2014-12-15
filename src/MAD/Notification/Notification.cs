@@ -131,8 +131,7 @@ namespace MAD.Notification
                     client.Host = smtpClient_special;
                     client.Credentials = new NetworkCredential(eMailFrom_special.ToString(), password_special);
                     client.EnableSsl = true;
-					client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                    client.UseDefaultCredentials = false;
+
 					ServicePointManager.ServerCertificateValidationCallback = delegate(object sender, X509Certificate certificate, X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
 					{return true;};
 					client.Send(mail);
@@ -144,7 +143,7 @@ namespace MAD.Notification
 
                 catch (Exception ex)
                 {
-                    eMailSendingFailed = "(" + tryCounter + ".Attempt) Sending mail failed Sir becuase: " + ex /*.Message*/;
+                    eMailSendingFailed = "(" + tryCounter + ".Attempt) Sending mail failed Sir becuase: " + ex.Message;
                     Logger.Log(eMailSendingFailed, Logger.MessageType.ERROR);//ex gives a report_intern of problems
 					Logger.ForceWriteToLog();
 					try
