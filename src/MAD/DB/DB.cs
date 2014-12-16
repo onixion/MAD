@@ -193,7 +193,7 @@ namespace MAD.Database
 
         public DataTable ReadTables()
         {
-            string sql = ".tables";
+            string sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
             using (SQLiteCommand command = new SQLiteCommand(sql, _con))
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
