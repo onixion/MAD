@@ -17,6 +17,7 @@ namespace MAD.Database
     {
         private SQLiteConnection _con;
         private static readonly DateTime _timeconst =  new DateTime (2000, 1, 1);
+
         public DB(string DBname)
         {
             if(!File.Exists(DBname))
@@ -62,13 +63,13 @@ namespace MAD.Database
                 _command.CommandText = "create table if not exists OutStateTable (ID integer PRIMARY KEY AUTOINCREMENT, OUTSTATE text);";
                 _command.ExecuteNonQuery();
 
-                // MemoTable
-                _command.CommandText = "create table if not exists MemoTable (ID, MEMO1 text, MEMO2 text);";
+                // MemoTable ! ID = ID_NODE
+                _command.CommandText = "create table if not exists MemoTable (ID integer PRIMARY KEY, MEMO1 text, MEMO2 text);";
                 _command.ExecuteNonQuery();
 
                 // JobTable
                 _command.CommandText = "create table if not exists JobTable (" +
-                    "ID_RECORD integer PRIMARY KEY AUTOINCREMENT, " +
+                    "ID integer PRIMARY KEY AUTOINCREMENT, " +
                     "ID_NODE integer, " +
                     "ID_HOST integer, " +
                     "ID_IP integer, " +
@@ -86,7 +87,7 @@ namespace MAD.Database
                 _command.ExecuteNonQuery();
 
                 // SummaryTable
-                _command.CommandText = "create table if not exists SummaryTable (ID_NODE integer, STARTTIME text, STOPTIME text, SUCCESS text, AVERAGE_DURATION text, MAX_DURATION text, MIN_DURATION text);";
+                _command.CommandText = "create table if not exists SummaryTable (ID integer PRIMARY KEY AUTOINCREMENT, ID_NODE integer, STARTTIME text, STOPTIME text, SUCCESSRATE text, AVERAGE_DURATION text, MAX_DURATION text, MIN_DURATION text);";
                 _command.ExecuteNonQuery();
             }
         }
@@ -102,39 +103,102 @@ namespace MAD.Database
             _con.Close();
         }
 
-        public void AddMemoToNode(string guid, string memo1, string memo2, int id)
-        {
-            InsertIDNode(guid); //saftyinstruction
-            int _node_id = GetIDNode(guid);
+        #region memos
 
-            if(Insert)
+        public bool AddMemoToNode(string guid, string memo1, string memo2)
+        {
+            InsertIDNode(guid);
+            int _nodeID = GetIDNode(guid);
+
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                using (SQLiteCommand command = new SQLiteCommand("insert into MemoTable (MEMO1, MEMO2) values (" + memo1 + ", " + memo2 + ");" + _con))
-                    command.ExecuteNonQuery();
+                _command.CommandText = "select * from MemoTable where ID='" + _nodeID + "';";
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                {
+                    if (_reader.Read())
+                    {
+                        // Node hat schon eine Memo
+                        _reader.Close();
+                        _command.CommandText = "update MemoTable set " + 
+                            "MEMO1='" + memo1 + "', " +
+                            "MEMO2='" + memo2 + "' " + 
+                            "where ID='" + _nodeID + "';";
+                        _command.ExecuteNonQuery();
+                    }
+                    else
+                    { 
+                        // Node hat keine Memo
+                        _reader.Close();
+                        _command.CommandText = "insert into MemoTable (ID, MEMO1, MEMO2) values " +
+                            "('" + _nodeID + "', '" + memo1 + "', ' " + memo2 + "');";
+                        _command.ExecuteNonQuery();
+                    }
+                }
             }
-            else
+
+            return true;
+        }
+
+        public string[] GetMemoFromNode(string guid)
+        {
+            int _nodeID = GetIDNode(guid);
+            if (_nodeID == 0)
+                return null;
+
+            string[] _buffer = new string[2];
+
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                int _node_id = GetIDNode(guid);
-                using (SQLiteCommand command = new SQLiteCommand("update MemoTable set MEMO1 = " + memo1 + ", MEMO2  " + memo2 + ") where ID = " + id + ";" + _con))
-                    command.ExecuteNonQuery();                
+                _command.CommandText = "select * from MemoTable where ID='" + _nodeID + "';";
+
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                {
+                    if (_reader.Read())
+                    {
+                        _buffer[0] = (string)_reader["MEMO1"];
+                        _buffer[1] = (string)_reader["MEMO2"];
+                    }
+                }
+            }
+
+            return _buffer;
+        }
+
+        #endregion
+
+        #region read table
+
+        public DataTable ReadTables()
+        {
+            string sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+            using (SQLiteCommand command = new SQLiteCommand(sql, _con))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                DataTable TempResult = new DataTable();
+                TempResult.Load(reader);
+                return TempResult;
             }
         }
 
         public DataTable ReadTable(string TableName)
         {
-            string sql = "SELECT * FROM " + TableName + ";";
-            SQLiteCommand command = new SQLiteCommand(sql, _con);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            command.Dispose();
-            TempResult.Load(reader);
-            return TempResult;  
+            using(SQLiteCommand command = new SQLiteCommand("SELECT * FROM " + TableName + ";", _con))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                DataTable TempResult = new DataTable();
+                TempResult.Load(reader);
+                return TempResult;
+            }
         }
 
-        public DataTable ReadJobs(string limitcommand)
+        #endregion
+
+        #region read jobs
+
+        public DataTable ReadJobs(string subcommand)
         {
             string sql = "select " +
-                         "ID_RECORD, " +
+                         "JobTable.ID, " +
                          "GUIDNodeTable.GUID_NODE, " +
                          "HostTable.HOST, " +
                          "IPTable.IP, " +
@@ -159,7 +223,7 @@ namespace MAD.Database
                          "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID " +
                          "inner join ProtocolTable on JobTable.ID_PROTOCOL = ProtocolTable.ID " +
                          "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID " +
-                         "left join MemoTable on JobTable.ID_MEMO = MemoTable.ID " + limitcommand + ";";
+                         "left join MemoTable on JobTable.ID_MEMO = MemoTable.ID " + subcommand + ";";
 
             using (SQLiteCommand command = new SQLiteCommand(sql, _con))
             using (SQLiteDataReader reader = command.ExecuteReader())
@@ -170,17 +234,9 @@ namespace MAD.Database
             }
         }
 
-        public DataTable ReadTables()
-        {
-            string sql = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
-            using (SQLiteCommand command = new SQLiteCommand(sql, _con))
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-                DataTable TempResult = new DataTable();
-                TempResult.Load(reader);
-                return TempResult;
-            }
-        }
+        #endregion
+
+        #region insert job
 
         public void InsertJob(JobNode node, Job job)
         {
@@ -226,8 +282,9 @@ namespace MAD.Database
             }
         }
 
-        // ------------------------------------------------------------------
-        // UNIVERSELL
+        #endregion
+
+        #region db basics
 
         public bool Insert(string tablename, string column, string value)
         {
@@ -264,8 +321,6 @@ namespace MAD.Database
                 }
             }
         }
-
-        // ------------------------------------------------------------------
 
         #region Get ID node
 
@@ -354,14 +409,6 @@ namespace MAD.Database
                 return false;
         }
 
-        public bool InsertIDMemo(string mac)
-        {
-            if (Insert("MemoTable", "", mac))
-                return true;
-            else
-                return false;
-        }
-
         #endregion
 
         #region Insert ID job
@@ -408,6 +455,50 @@ namespace MAD.Database
 
         #endregion
 
+        #endregion
+
+        #region summarize
+
+        public enum Mode { Daily, Weekly, Monthly };
+
+        public void SummarizeJobTable(DateTime before, Mode mode)
+        {
+            long _madTimeStamp = before.Subtract(_timeconst).Ticks;
+
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
+            {
+                _command.CommandText = "select " + 
+                    "ID_NODE, " + 
+                    "STARTTIME, " + 
+                    "STOPTIME, " +
+                    "DELAYTIME, " + 
+                    "OutStateTable.OUTSTATE " +
+                    "from JobTable " + 
+                    "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID " +
+                    "where 'STARTTIME' <= '" + _madTimeStamp + "';";
+                
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                {
+                    if (_reader.Read())
+                    {
+                        using (DataTable _table = new DataTable())
+                        {
+                            _table.Load(_reader);
+
+
+                        }
+                    }
+                }
+            }
+        }
+
+        public DataTable ReadSummary(int amountRows)
+        {
+            return null;
+        }
+
+        #endregion
+
         #region timstamp
 
         private static DateTime MADTimestampToDateTime(Int64 MADTimeStamp)
@@ -419,6 +510,7 @@ namespace MAD.Database
         {
             return date.Ticks - _timeconst.Ticks;
         }
+
         #endregion
 
         public void Dispose()
