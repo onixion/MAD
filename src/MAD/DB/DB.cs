@@ -16,7 +16,7 @@ namespace MAD.Database
     public class DB
     {
         private SQLiteConnection _con;
-
+        private static readonly DateTime _timeconst =  new DateTime (2000, 1, 1);
         public DB(string DBname)
         {
             if(!File.Exists(DBname))
@@ -63,7 +63,7 @@ namespace MAD.Database
                 _command.ExecuteNonQuery();
 
                 // MemoTable
-                _command.CommandText = "create table if not exists MemoTable (ID integer PRIMARY KEY AUTOINCREMENT, MEMO1 text, MEMO2 text);";
+                _command.CommandText = "create table if not exists MemoTable (ID, MEMO1 text, MEMO2 text);";
                 _command.ExecuteNonQuery();
 
                 // JobTable
@@ -102,45 +102,24 @@ namespace MAD.Database
             _con.Close();
         }
 
-        public void InsertToTable(string TableName, params Insert[] insdata)
+        public void AddMemoToNode(string guid, string memo1, string memo2, int id)
         {
-            // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + "); ...";
-            string sql = "INSERT into " + TableName + " (";
-            for (int i = 0; i < insdata.Length; i++)
-            {
-                sql += insdata[i].column;
-                if (i != insdata.Length - 1)
-                    sql += ",";
-            }
-            sql += ") VALUES ('";
+            InsertIDNode(guid); //saftyinstruction
+            int _node_id = GetIDNode(guid);
 
-            for (int i = 0; i < insdata.Length; i++)
+            if(Insert)
             {
-                sql += insdata[i].data;
-                if (i != insdata.Length - 1)
-                    sql += "','";
-            }
-            sql += "')";
-
-            SQLiteCommand command = new SQLiteCommand(sql, _con);
-            command.ExecuteNonQuery();
-            command.Dispose();
-        }
-
-        public void AddMemoToNode(string guid, string memo1, string memo2)
-        {
-            if (InsertIDNode(guid))
-            {
-                int _node_id = GetIDNode(guid);
-                using (SQLiteCommand command = new SQLiteCommand("insert into GUIDNodeTable (MEMO1, MEMO2) values (" + memo1 + ", " + memo2 + ");" + _con))
+                using (SQLiteCommand command = new SQLiteCommand("insert into MemoTable (MEMO1, MEMO2) values (" + memo1 + ", " + memo2 + ");" + _con))
                     command.ExecuteNonQuery();
             }
             else
             {
-                // update
+                int _node_id = GetIDNode(guid);
+                using (SQLiteCommand command = new SQLiteCommand("update MemoTable set MEMO1 = " + memo1 + ", MEMO2  " + memo2 + ") where ID = " + id + ";" + _con))
+                    command.ExecuteNonQuery();                
             }
         }
- 
+
         public DataTable ReadTable(string TableName)
         {
             string sql = "SELECT * FROM " + TableName + ";";
@@ -239,8 +218,8 @@ namespace MAD.Database
                     + _idJobType + "', '"
                     + _idProtocol + "', '"
                     + _idOutState + "', '"
-                    + job.tStart.ToString() + "', '"
-                    + job.tStop.ToString() + "', '"
+                    + DateTimToMADTimestamp(job.tStart) + "', '"
+                    + DateTimToMADTimestamp(job.tStop) + "', '"
                     + job.tSpan.Milliseconds.ToString() + "', '"
                     + job.outp.GetStrings() + "');";
                 _command.ExecuteNonQuery();
@@ -375,6 +354,14 @@ namespace MAD.Database
                 return false;
         }
 
+        public bool InsertIDMemo(string mac)
+        {
+            if (Insert("MemoTable", "", mac))
+                return true;
+            else
+                return false;
+        }
+
         #endregion
 
         #region Insert ID job
@@ -419,6 +406,19 @@ namespace MAD.Database
                 return false;
         }
 
+        #endregion
+
+        #region timstamp
+
+        private static DateTime MADTimestampToDateTime(Int64 MADTimeStamp)
+        {
+            return _timeconst.AddTicks(MADTimeStamp);
+        }
+
+        public static Int64 DateTimToMADTimestamp(DateTime date)
+        {
+            return date.Ticks - _timeconst.Ticks;
+        }
         #endregion
 
         public void Dispose()
