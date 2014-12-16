@@ -21,15 +21,11 @@ namespace MAD.Database
         {
             if(!File.Exists(DBname))
                 SQLiteConnection.CreateFile(DBname);
-            // connect
-            ConnectDB(DBname);
+
+            Connect(DBname);
 
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
-                // DeviceTable
-                //_command.CommandText = "create table if not exists DeviceTable (ID_NODE integer, HOSTNAME text, IP text, MAC text, ONLINE integer, MEMO1 varchar(5), MEMO2 text);";
-                //_command.ExecuteNonQuery(); // TODO
-
                 // GUIDNodeTable 
                 _command.CommandText = "create table if not exists GUIDNodeTable (ID INTEGER PRIMARY KEY AUTOINCREMENT, GUID_NODE TEXT);";
                 _command.ExecuteNonQuery();
@@ -95,18 +91,17 @@ namespace MAD.Database
             }
         }
 
-        private void ConnectDB(string DBname)
+        private void Connect(string DBname)
         {
             _con = new SQLiteConnection("Data Source=" + DBname);
             _con.Open();
         }
 
-        private void DisconnectDB()
+        private void Disconnect()
         {
             _con.Close();
         }
 
-        //insert data
         public void InsertToTable(string TableName, params Insert[] insdata)
         {
             // sql = "insert into " + TableName + " (IP, port) values (" + IP + ", " + Port + "); ...";
@@ -131,8 +126,21 @@ namespace MAD.Database
             command.ExecuteNonQuery();
             command.Dispose();
         }
-    
-        //read entire table
+
+        public void AddMemoToNode(string guid, string memo1, string memo2)
+        {
+            if (InsertIDNode(guid))
+            {
+                int _node_id = GetIDNode(guid);
+                using (SQLiteCommand command = new SQLiteCommand("insert into GUIDNodeTable (MEMO1, MEMO2) values (" + memo1 + ", " + memo2 + ");" + _con))
+                    command.ExecuteNonQuery();
+            }
+            else
+            {
+                // update
+            }
+        }
+ 
         public DataTable ReadTable(string TableName)
         {
             string sql = "SELECT * FROM " + TableName + ";";
@@ -144,17 +152,6 @@ namespace MAD.Database
             return TempResult;  
         }
 
-        //read one result from table
-        public DataTable ReadResult(string TableName, int TableID)
-        {
-            string sql = "SELECT * FROM " + TableName + " WHERE ID='" + TableID + "';";
-            SQLiteCommand command = new SQLiteCommand(sql, _con);
-            SQLiteDataReader reader = command.ExecuteReader();
-            DataTable TempResult = new DataTable();
-            TempResult.Load(reader);
-            return TempResult;
-        }
-        
         public DataTable ReadJobs(string limitcommand)
         {
             string sql = "select " +
@@ -170,9 +167,9 @@ namespace MAD.Database
                          "OutStateTable.OUTSTATE, " +
                          "STARTTIME, " +
                          "STOPTIME, " +
-                         "DELAYTIME " +
-                         //"MemoTable.MEMO1 " +
-                        //"MemoTable.MEMO2 " +
+                         "DELAYTIME, " +
+                         "MemoTable.MEMO1, " +
+                         "MemoTable.MEMO2 " +
                          "from JobTable " +
                          "inner join GUIDNodeTable on JobTable.ID_NODE = GUIDNodeTable.ID " +
                          "inner join HostTable on JobTable.ID_HOST = HostTable.ID " +
@@ -182,15 +179,14 @@ namespace MAD.Database
                          "inner join JobNameTable on JobTable.ID_JOBNAME = JobNameTable.ID " +
                          "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID " +
                          "inner join ProtocolTable on JobTable.ID_PROTOCOL = ProtocolTable.ID " +
-                         "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID ";
-                         //"inner join MemoTable on JobTable.ID_MEMO = MemoTable.ID " + limitcommand + ";";
+                         "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID " +
+                         "left join MemoTable on JobTable.ID_MEMO = MemoTable.ID " + limitcommand + ";";
 
             using (SQLiteCommand command = new SQLiteCommand(sql, _con))
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 DataTable TempResult = new DataTable();
                 TempResult.Load(reader);
-
                 return TempResult;
             }
         }
@@ -203,28 +199,7 @@ namespace MAD.Database
             {
                 DataTable TempResult = new DataTable();
                 TempResult.Load(reader);
-
                 return TempResult;
-            }
-        }
-
-        //---
-
-        public DataRowCollection Select(string sql)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = sql;
-                return _command.ExecuteReader().GetSchemaTable().Rows;
-            }
-        }
-
-        public void Insert(string sql)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = sql;
-                _command.ExecuteNonQuery();
             }
         }
 
@@ -446,38 +421,9 @@ namespace MAD.Database
 
         #endregion
 
-        public void InsertOnline(int online, int nodeID)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = "update DeviceTable set ONLINE='" + online + "' where ID_NODE='" + nodeID + "';";
-                _command.ExecuteNonQuery();
-            }
-        }
-
-        public void InsertMemo1(string memo, int nodeID)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = "update DeviceTable set MEMO1='" + memo + "' where ID_NODE='" + nodeID + "';";
-                _command.ExecuteNonQuery();
-            }
-        }
-
-        public void InsertMemo2(string memo, int nodeID)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = "update DeviceTable set MEMO2='" + memo + "' where ID_NODE='" + nodeID + "';";
-                _command.ExecuteNonQuery();
-            }
-        }
-        
-        // ---
-
         public void Dispose()
         {
-            DisconnectDB();
+            Disconnect();
         }
     }
 }
