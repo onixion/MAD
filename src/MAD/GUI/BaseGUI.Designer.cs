@@ -79,6 +79,7 @@
             // 
             // fileToolStripMenuItem
             // 
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showToolStripMenuItem,
             this.ShowNewStripSeperator,
@@ -92,14 +93,13 @@
             this.SettingsExitStringSeperators,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
             // 
             // showToolStripMenuItem
             // 
+            resources.ApplyResources(this.showToolStripMenuItem, "showToolStripMenuItem");
             this.showToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showNodesToolStripMenuItem,
             this.showLogToolStripMenuItem});
-            resources.ApplyResources(this.showToolStripMenuItem, "showToolStripMenuItem");
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
             // 
             // showNodesToolStripMenuItem
@@ -114,15 +114,15 @@
             // 
             // ShowNewStripSeperator
             // 
-            this.ShowNewStripSeperator.Name = "ShowNewStripSeperator";
             resources.ApplyResources(this.ShowNewStripSeperator, "ShowNewStripSeperator");
+            this.ShowNewStripSeperator.Name = "ShowNewStripSeperator";
             // 
             // newToolStripMenuItem
             // 
+            resources.ApplyResources(this.newToolStripMenuItem, "newToolStripMenuItem");
             this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newNodeToolStripMenuItem,
             this.newJobToolStripMenuItem});
-            resources.ApplyResources(this.newToolStripMenuItem, "newToolStripMenuItem");
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             // 
             // newNodeToolStripMenuItem
@@ -137,10 +137,10 @@
             // 
             // loadToolStripMenuItem
             // 
+            resources.ApplyResources(this.loadToolStripMenuItem, "loadToolStripMenuItem");
             this.loadToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadNodesToolStripMenuItem,
             this.loadJobsToolStripMenuItem});
-            resources.ApplyResources(this.loadToolStripMenuItem, "loadToolStripMenuItem");
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
             // 
             // loadNodesToolStripMenuItem
@@ -155,10 +155,10 @@
             // 
             // saveToolStripMenuItem
             // 
+            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
             this.saveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveNodesToolStripMenuItem,
             this.saveJobsToolStripMenuItem3});
-            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             // 
             // saveNodesToolStripMenuItem
@@ -183,8 +183,8 @@
             // 
             // OpenDirSettingsStringSperator
             // 
-            this.OpenDirSettingsStringSperator.Name = "OpenDirSettingsStringSperator";
             resources.ApplyResources(this.OpenDirSettingsStringSperator, "OpenDirSettingsStringSperator");
+            this.OpenDirSettingsStringSperator.Name = "OpenDirSettingsStringSperator";
             // 
             // settingsToolStripMenuItem
             // 
@@ -193,8 +193,8 @@
             // 
             // SettingsExitStringSeperators
             // 
-            this.SettingsExitStringSeperators.Name = "SettingsExitStringSeperators";
             resources.ApplyResources(this.SettingsExitStringSeperators, "SettingsExitStringSeperators");
+            this.SettingsExitStringSeperators.Name = "SettingsExitStringSeperators";
             // 
             // exitToolStripMenuItem
             // 
@@ -204,12 +204,12 @@
             // 
             // actionsToolStripMenuItem
             // 
+            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
             this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startScanToolStripMenuItem,
             this.connectivityCheckToolStripMenuItem,
             this.manuallyCheckNodesToolStripMenuItem});
             this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
-            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
             // 
             // startScanToolStripMenuItem
             // 
@@ -230,11 +230,11 @@
             // 
             // aboutToolStripMenuItem
             // 
+            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.helpToolStripMenuItem,
             this.infoToolStripMenuItem});
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             // 
             // helpToolStripMenuItem
             // 
@@ -248,16 +248,16 @@
             // 
             // titlePanel
             // 
+            resources.ApplyResources(this.titlePanel, "titlePanel");
             this.titlePanel.BackColor = System.Drawing.Color.Cyan;
             this.titlePanel.Controls.Add(this.title);
             this.titlePanel.Controls.Add(this.titlePicBox);
-            resources.ApplyResources(this.titlePanel, "titlePanel");
             this.titlePanel.Name = "titlePanel";
             // 
             // title
             // 
-            this.title.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
             resources.ApplyResources(this.title, "title");
+            this.title.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
             this.title.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.title.Name = "title";
             // 

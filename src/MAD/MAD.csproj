@@ -216,6 +216,12 @@
     <EmbeddedResource Include="GUI\ActionScan.resx">
       <DependentUpon>ActionScan.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GUI\BaseGUI.de.resx">
+      <DependentUpon>BaseGUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\BaseGUI.en.resx">
+      <DependentUpon>BaseGUI.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GUI\ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
