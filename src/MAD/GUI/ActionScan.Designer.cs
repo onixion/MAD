@@ -37,6 +37,7 @@
             this.OneShotCheckBox = new System.Windows.Forms.CheckBox();
             this.ScanButton = new System.Windows.Forms.Button();
             this.CancelButton = new System.Windows.Forms.Button();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.titlePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.titlePicBox)).BeginInit();
             this.SuspendLayout();
@@ -167,11 +168,19 @@
             this.CancelButton.UseVisualStyleBackColor = true;
             this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
+            // progressBar1
+            // 
+            this.progressBar1.Location = new System.Drawing.Point(14, 210);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(373, 23);
+            this.progressBar1.TabIndex = 13;
+            // 
             // ActionScan
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(400, 281);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.ScanButton);
             this.Controls.Add(this.OneShotCheckBox);
@@ -193,6 +202,7 @@
             this.Controls.SetChildIndex(this.OneShotCheckBox, 0);
             this.Controls.SetChildIndex(this.ScanButton, 0);
             this.Controls.SetChildIndex(this.CancelButton, 0);
+            this.Controls.SetChildIndex(this.progressBar1, 0);
             this.titlePanel.ResumeLayout(false);
             this.titlePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.titlePicBox)).EndInit();
@@ -212,5 +222,6 @@
         private System.Windows.Forms.CheckBox OneShotCheckBox;
         private System.Windows.Forms.Button ScanButton;
         private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.ProgressBar progressBar1;
     }
 }

@@ -10,6 +10,7 @@ using MAD;
 using MAD.Logging;
 using MAD.Helper;
 using MAD.JobSystemCore;
+using MAD.GUI;
 
 namespace MAD.MacFinders
 {
@@ -46,7 +47,8 @@ namespace MAD.MacFinders
         public static void FloodStart()
         {
             Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
-            InitInterfaces();
+            if (!InitInterfaces())
+                return;
             Thread _listen = new Thread(ListenFloodResponses);
             _listen.Start();
             EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
@@ -56,13 +58,25 @@ namespace MAD.MacFinders
             DeInitInterfaces();
         }
 
-        private static void InitInterfaces()
+        private static bool InitInterfaces()
         {
-            _list = CaptureDeviceList.Instance;
+            try
+            {
+                _list = CaptureDeviceList.Instance;
+            }
+            catch (Exception)
+            {
+                if (!Mad.GUI_USED)
+                    Console.WriteLine("Error: Please check if you have installed WinPcap");
+                else
+                    System.Windows.Forms.MessageBox.Show("Error: Please check if you have installed WinPcap", "ERROR", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return false; 
+            }
             _dev = _list[(int)networkInterface];
             _dev.Open();
 
             _listenDev = _list[(int)networkInterface];
+            return true; 
         }
 
         private static void ListenCheckResponses()
@@ -163,6 +177,7 @@ namespace MAD.MacFinders
                 IPAddress _target = new IPAddress(_targetBytes);
 
                 ExecuteRequests(_ethpac, _target);
+                //Insert value for shit progress bar
             }   
         }
 

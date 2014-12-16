@@ -34,7 +34,13 @@ namespace MAD.GUI
         {
             ARPReader.srcAddress = IPAddress.Parse(LocalIPAddresTextBox.Text);
             ARPReader.netAddress = IPAddress.Parse(NetworkTextBox.Text);
-            ARPReader.subnetMask = Convert.ToUInt32(SubnetmaskDropdown.SelectedIndex);
+            if (SubnetmaskDropdown.SelectedItem != null)
+                ARPReader.subnetMask = Convert.ToUInt32(SubnetmaskDropdown.SelectedItem);
+            else
+            {
+                MessageBox.Show("Please select a value for the subnetmask", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return; 
+            }
             if (OneShotCheckBox.Checked)
             {
                 ARPReader.FloodStart();
@@ -43,6 +49,7 @@ namespace MAD.GUI
             else
                 ARPReader.SteadyStart(BaseGUI.js);
 
+            MessageBox.Show("Updated Nodes. You may want to update the node windows.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return; 
         }
     }

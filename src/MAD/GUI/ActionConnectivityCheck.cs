@@ -40,7 +40,12 @@ namespace MAD.GUI
 
         private void InitializeCheck()
         {
-            string _buffer = ""; 
+            string _buffer = "";
+            if (this.intensityComboBox.SelectedItem == null)
+            {
+                MessageBox.Show("Please choose a value for intensity.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             switch(Convert.ToUInt16(this.intensityComboBox.SelectedItem))
             {
                 case 1: 

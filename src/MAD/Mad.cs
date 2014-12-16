@@ -23,6 +23,7 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
         public static readonly string DBFILE = Path.Combine(DATADIR, "mad.db");
 
+        public static bool GUI_USED = false; 
         [STAThread]
         public static int Main(string[] args)
         {
@@ -42,8 +43,10 @@ namespace MAD
             if (args.Length == 0)
             {
                 BaseGUI.InitGui(js, db);
+                GUI_USED = true; 
                 if (File.Exists(CONFFILE))
                 {
+                    MadConf.LoadConf(CONFFILE);
                     Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
                     Application.Run(new NodeListing());
                     Logger.ForceWriteToLog();
