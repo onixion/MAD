@@ -99,6 +99,34 @@ namespace MAD.Database
             _con.Close();
         }
 
+        #region basic methods
+
+        private int InsertCommand(string command)
+        {
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
+            {
+                _command.CommandText = command;
+                return _command.ExecuteNonQuery();
+            }
+        }
+
+        private DataTable SelectCommand(string command)
+        {
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
+            {
+                _command.CommandText = command;
+
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                {
+                    DataTable _table = new DataTable();
+                    _table.Load(_reader);
+                    return _table;
+                }
+            }
+        }
+
+        #endregion
+
         #region memos
 
         public bool AddMemoToNode(string guid, string memo1, string memo2)
@@ -184,30 +212,6 @@ namespace MAD.Database
                 DataTable TempResult = new DataTable();
                 TempResult.Load(reader);
                 return TempResult;
-            }
-        }
-
-        private int InsertCommand(string command)
-        {
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = command;
-                return _command.ExecuteNonQuery();
-            }
-        }
-
-        private DataTable Read(string command)
-        {
-            using(SQLiteCommand _command = new SQLiteCommand(_con))
-            {
-                _command.CommandText = command;
-
-                using (SQLiteDataReader _reader = _command.ExecuteReader())
-                {
-                    DataTable _table = new DataTable();
-                    _table.Load(_reader);
-                    return _table;
-                }
             }
         }
 
@@ -306,7 +310,7 @@ namespace MAD.Database
 
         #region db basics
 
-        public bool Insert(string tablename, string column, string value)
+        public bool InsertID(string tablename, string column, string value)
         {
             using (SQLiteCommand _command = new SQLiteCommand(_con))
             {
@@ -399,7 +403,7 @@ namespace MAD.Database
 
         public bool InsertIDNode(string guid)
         { 
-            if(Insert("GUIDNodeTable", "GUID_NODE", guid))
+            if(InsertID("GUIDNodeTable", "GUID_NODE", guid))
                 return true;
             else
                 return false;
@@ -407,7 +411,7 @@ namespace MAD.Database
 
         public bool InsertIDHost(string host)
         {
-            if (Insert("HostTable", "HOST", host))
+            if (InsertID("HostTable", "HOST", host))
                 return true;
             else
                 return false;
@@ -415,7 +419,7 @@ namespace MAD.Database
 
         public bool InsertIDIP(string ip)
         {
-            if (Insert("IPTable", "IP", ip))
+            if (InsertID("IPTable", "IP", ip))
                 return true;
             else
                 return false;
@@ -423,7 +427,7 @@ namespace MAD.Database
 
         public bool InsertIDMac(string mac)
         { 
-            if(Insert("MACTable", "MAC", mac))
+            if(InsertID("MACTable", "MAC", mac))
                 return true;
             else
                 return false;
@@ -435,7 +439,7 @@ namespace MAD.Database
 
         public bool InsertIDJob(string guid)
         {
-            if (Insert("GUIDJobTable", "GUID_JOB", guid))
+            if (InsertID("GUIDJobTable", "GUID_JOB", guid))
                 return true;
             else
                 return false;
@@ -443,7 +447,7 @@ namespace MAD.Database
 
         public bool InsertIDJobName(string name)
         {
-            if (Insert("JobNameTable", "JOBNAME", name))
+            if (InsertID("JobNameTable", "JOBNAME", name))
                 return true;
             else
                 return false;
@@ -451,7 +455,7 @@ namespace MAD.Database
 
         public bool InsertIDJobType(string type)
         {
-            if (Insert("JobTypeTable", "JOBTYPE", type))
+            if (InsertID("JobTypeTable", "JOBTYPE", type))
                 return true;
             else
                 return false;
@@ -459,7 +463,7 @@ namespace MAD.Database
 
         public bool InsertIDProtocol(string protocol)
         {
-            if(Insert("ProtocolTable", "PROTOCOL", protocol))
+            if(InsertID("ProtocolTable", "PROTOCOL", protocol))
                 return true;
             else
                 return false;
@@ -467,7 +471,7 @@ namespace MAD.Database
 
         public bool InsertIDOutState(string outstate)
         {
-            if (Insert("OutStateTable", "OUTSTATE", outstate))
+            if (InsertID("OutStateTable", "OUTSTATE", outstate))
                 return true;
             else
                 return false;
@@ -477,9 +481,9 @@ namespace MAD.Database
 
         #endregion
 
-        #region summarize
+        #region summarize methods
 
-        public int[] SummarizeJobTable(DateTime from, DateTime to, long blocksize)
+        public int[] SummarizeJobTable(DateTime from, DateTime to, long blocksize, bool removedSummarizedData)
         {
             TimeSpan _summarytime = to.Subtract(from);
             if (_summarytime.TotalMilliseconds <= 0)
@@ -489,7 +493,7 @@ namespace MAD.Database
             long _stoptimestamp = DB.DateTimToMADTimestamp(to);
 
             // check if summarytime has already been summerized
-            using (DataTable _table = Read("select ID from SummaryTable where " +
+            using (DataTable _table = SelectCommand("select ID from SummaryTable where " +
                 "STARTTIME between " + _starttimestamp + " and " +  _stoptimestamp + 
                 " or " +
                 "STOPTIME between " + _starttimestamp + " and " + _stoptimestamp + ";"))
@@ -515,14 +519,14 @@ namespace MAD.Database
 
                     int _id_node = GetIDNode(_nodes[i].ToString());
 
-                    using (DataTable _table = Read("select * from JobTable " +
+                    using (DataTable _table = SelectCommand("select * from JobTable " +
                         "where STARTTIME between " + _blockStart + " and " + _blockStop + " and ID_NODE=" + _id_node + ";"))
                     {
                         // SUCCESSRATE
                         int _buffer = 0;
                         for (int i2 = 0; i2 < _table.Rows.Count; i2++)
                         {
-                            using (DataTable _outTable = Read("select OUTSTATE from " +
+                            using (DataTable _outTable = SelectCommand("select OUTSTATE from " +
                                 "OutStateTable where ID=" + Convert.ToString(_table.Rows[i2]["ID_OUTSTATE"]) + ";"))
                             {
                                 if ((string)_outTable.Rows[0]["OUTSTATE"] == "Success")
@@ -565,22 +569,25 @@ namespace MAD.Database
                 _blockStop += blocksize;
             }
 
+            if (removedSummarizedData)
+            {
+                InsertCommand("delete from JobTable where STARTTIME between " + _starttimestamp + " and " + _blockStop + ";");
+            }
+
             return new int[]{_rowsSummarizedTotal, _rowsWritten};
         }
 
         private Guid[] ReadNodes(long from, long to)
         {
-            string t = "select distinct ID_NODE from JobTable " +
-                "where STARTTIME between " + from + " and " + to + ";";
-
-            using (DataTable _table = Read(t))
+            using (DataTable _table = SelectCommand("select distinct ID_NODE from JobTable " +
+                "where STARTTIME between " + from + " and " + to + ";"))
             {
                 Guid[] _buffer = new Guid[_table.Rows.Count];
                 for (int i = 0; i < _buffer.Length; i++)
                 {
                     string _temp = Convert.ToString(_table.Rows[i]["ID_NODE"]);
 
-                    using (DataTable _table2 = Read("select GUID_NODE from GUIDNodeTable " +
+                    using (DataTable _table2 = SelectCommand("select GUID_NODE from GUIDNodeTable " +
                         "where ID=" + _temp + ";"))
                     {
                         _buffer[i] = Guid.Parse((string)_table2.Rows[0]["GUID_NODE"]);

@@ -98,6 +98,11 @@ namespace MAD.CLICore
         }
     }
 
+    public class DBJobsDel : Command
+    { 
+        // delete entries in the jobtable
+    }
+
     #region summarize commands
 
     public class DBSumCreate : Command
@@ -111,6 +116,7 @@ namespace MAD.CLICore
             rPar.Add(new ParOption("s", "START-DATE", "", false, false, new Type[] { typeof(DateTime) }));
             rPar.Add(new ParOption("e", "END-DATE", "", false, false, new Type[] { typeof(DateTime) }));
             rPar.Add(new ParOption("b", "BLOCK-SIZE", "Size of each block to summarize the jobs to (e.g. 10y, 10w, 10m, 10d, 5h, 15min, ...).", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("del", "", "Delete the data which have been summarized.", true, false, null)); 
         }
 
         public override string Execute(int consoleWidth)
@@ -147,12 +153,17 @@ namespace MAD.CLICore
                 return "<color><red>Could not parse '" + _buffer + "'!";
 
             int[] _info = _db.SummarizeJobTable((DateTime)pars.GetPar("s").argValues[0],
-                (DateTime)pars.GetPar("e").argValues[0], _blocksize);
+                (DateTime)pars.GetPar("e").argValues[0], _blocksize, OParUsed("del") ? true : false);
 
             output += "<color><yellow>DataRows summerized: <color><white>" + _info[0] + "\n";
             output += "<color><yellow>DataRows written:    <color><white>" + _info[1] + "\n";
             return output;
         }
+    }
+
+    public class DBSumDel : Command
+    { 
+        // delete sum
     }
 
     #endregion
