@@ -6,20 +6,20 @@ MAD is an opensource network monitoring software, which should become an alterna
 ##Things to implement:
 
 - GUI
-- NotificationSystem (E-Mail ...)
-- Database
-- JobSystem (PingRequest, HttpRequest, PortRequest, Arp-Request, SNMP ...)
 - CLI
-- CLI-Server
-- CLI-Client
+- CLI-Server / CLI-Client
+- NotificationSystem (e-mail)
+- Database
+- JobSystem
 
 ##What is currently working?
 
 - CLI working. It can parse command, parameter and arguments. Some commands supports multiple arguments, no arguments and multiple types.
-- JobSystem working. Currently available and working jobs are Ping-Request, PortScan, Http-Request and HostDetection.
+- JobSystem working. Currently available and working jobs are Ping-Request, PortScan, Http-Request, FTPCheck, DNSCheck and SNMP-Request.
 - Jobs can have delaytime or multiple times (with dates) on which they should be executed (JobSystem have a scedule, which decides when a job should be executed)
-- Jobs can define multiple JobRules, which decides when a notification is necessary; every Job can have a own particular E-Mail configuration (if it does not provide any, it uses the global settings)
-- CLIServer/CLIClient working fully (Key-Exchange over RSA2048; AES256)
+- Jobs can define multiple JobRules, which decides when a notification is necessary; every job can have an own particular e-mail configuration (if it does not provide any, it uses the global settings from config)
+- CLIServer/CLIClient working fully (no key-exchange, only AES)
+- Database: the JobScedule stores all job outputs into the database, it is also possible to make a summarize of all stored data
 
 
 
