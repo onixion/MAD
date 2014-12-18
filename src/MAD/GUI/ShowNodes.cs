@@ -9,11 +9,16 @@ using System.Windows.Forms;
 
 namespace MAD.GUI
 {
-    public partial class NodeListing : BaseGUI
+    public partial class ShowNodes : BaseGUI
     {
-        public NodeListing()
+        public ShowNodes()
         {
             InitializeComponent();
+        }
+
+        private void ShowNodes_Load(object sender, EventArgs e)
+        {
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -21,6 +26,15 @@ namespace MAD.GUI
 
         }
 
-    }
+        private void button24_Click(object sender, EventArgs e)
+        {
 
+        }
+
+        private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+    }
 }

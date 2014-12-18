@@ -32,6 +32,7 @@ namespace MAD.GUI
         {
             db = dataBase;
             js = jobSys;
+           
         }
 
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -49,6 +50,20 @@ namespace MAD.GUI
         {
             ActionConnectivityCheck _tmp = new ActionConnectivityCheck();
             _tmp.ShowDialog();
+        }
+
+        private void BaseGUI_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void openWorkingDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string path = System.IO.Directory.GetCurrentDirectory();
+            System.Diagnostics.Process process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = @path;
+            process.StartInfo.Arguments = @" ";
+            process.Start();
         }
 
 

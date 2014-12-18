@@ -45,7 +45,7 @@ namespace MAD
                 if (File.Exists(CONFFILE))
                 {
                     Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                    Application.Run(new NodeListing());
+                    Application.Run(new ShowNodes());
                     Logger.ForceWriteToLog();
                 }
 
