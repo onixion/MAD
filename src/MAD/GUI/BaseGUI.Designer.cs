@@ -68,7 +68,7 @@
             // menuStrip
             // 
             resources.ApplyResources(this.menuStrip, "menuStrip");
-            this.menuStrip.BackColor = System.Drawing.Color.DarkCyan;
+            this.menuStrip.BackColor = System.Drawing.Color.Black;
             this.menuStrip.GripMargin = new System.Windows.Forms.Padding(2);
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
@@ -79,7 +79,6 @@
             // 
             // fileToolStripMenuItem
             // 
-            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showToolStripMenuItem,
             this.ShowNewStripSeperator,
@@ -92,14 +91,16 @@
             this.settingsToolStripMenuItem,
             this.SettingsExitStringSeperators,
             this.exitToolStripMenuItem});
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            this.fileToolStripMenuItem.ForeColor = System.Drawing.Color.Cyan;
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             // 
             // showToolStripMenuItem
             // 
-            resources.ApplyResources(this.showToolStripMenuItem, "showToolStripMenuItem");
             this.showToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showNodesToolStripMenuItem,
             this.showLogToolStripMenuItem});
+            resources.ApplyResources(this.showToolStripMenuItem, "showToolStripMenuItem");
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
             // 
             // showNodesToolStripMenuItem
@@ -114,15 +115,15 @@
             // 
             // ShowNewStripSeperator
             // 
-            resources.ApplyResources(this.ShowNewStripSeperator, "ShowNewStripSeperator");
             this.ShowNewStripSeperator.Name = "ShowNewStripSeperator";
+            resources.ApplyResources(this.ShowNewStripSeperator, "ShowNewStripSeperator");
             // 
             // newToolStripMenuItem
             // 
-            resources.ApplyResources(this.newToolStripMenuItem, "newToolStripMenuItem");
             this.newToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newNodeToolStripMenuItem,
             this.newJobToolStripMenuItem});
+            resources.ApplyResources(this.newToolStripMenuItem, "newToolStripMenuItem");
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             // 
             // newNodeToolStripMenuItem
@@ -137,10 +138,10 @@
             // 
             // loadToolStripMenuItem
             // 
-            resources.ApplyResources(this.loadToolStripMenuItem, "loadToolStripMenuItem");
             this.loadToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadNodesToolStripMenuItem,
             this.loadJobsToolStripMenuItem});
+            resources.ApplyResources(this.loadToolStripMenuItem, "loadToolStripMenuItem");
             this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
             // 
             // loadNodesToolStripMenuItem
@@ -155,10 +156,10 @@
             // 
             // saveToolStripMenuItem
             // 
-            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
             this.saveToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveNodesToolStripMenuItem,
             this.saveJobsToolStripMenuItem3});
+            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             // 
             // saveNodesToolStripMenuItem
@@ -180,11 +181,12 @@
             // 
             resources.ApplyResources(this.openWorkingDirectoryToolStripMenuItem, "openWorkingDirectoryToolStripMenuItem");
             this.openWorkingDirectoryToolStripMenuItem.Name = "openWorkingDirectoryToolStripMenuItem";
+            this.openWorkingDirectoryToolStripMenuItem.Click += new System.EventHandler(this.openWorkingDirectoryToolStripMenuItem_Click);
             // 
             // OpenDirSettingsStringSperator
             // 
-            resources.ApplyResources(this.OpenDirSettingsStringSperator, "OpenDirSettingsStringSperator");
             this.OpenDirSettingsStringSperator.Name = "OpenDirSettingsStringSperator";
+            resources.ApplyResources(this.OpenDirSettingsStringSperator, "OpenDirSettingsStringSperator");
             // 
             // settingsToolStripMenuItem
             // 
@@ -193,8 +195,8 @@
             // 
             // SettingsExitStringSeperators
             // 
-            resources.ApplyResources(this.SettingsExitStringSeperators, "SettingsExitStringSeperators");
             this.SettingsExitStringSeperators.Name = "SettingsExitStringSeperators";
+            resources.ApplyResources(this.SettingsExitStringSeperators, "SettingsExitStringSeperators");
             // 
             // exitToolStripMenuItem
             // 
@@ -204,11 +206,12 @@
             // 
             // actionsToolStripMenuItem
             // 
-            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
             this.actionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.startScanToolStripMenuItem,
             this.connectivityCheckToolStripMenuItem,
             this.manuallyCheckNodesToolStripMenuItem});
+            resources.ApplyResources(this.actionsToolStripMenuItem, "actionsToolStripMenuItem");
+            this.actionsToolStripMenuItem.ForeColor = System.Drawing.Color.Cyan;
             this.actionsToolStripMenuItem.Name = "actionsToolStripMenuItem";
             // 
             // startScanToolStripMenuItem
@@ -230,10 +233,11 @@
             // 
             // aboutToolStripMenuItem
             // 
-            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.helpToolStripMenuItem,
             this.infoToolStripMenuItem});
+            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
+            this.aboutToolStripMenuItem.ForeColor = System.Drawing.Color.Cyan;
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             // 
             // helpToolStripMenuItem
@@ -248,16 +252,16 @@
             // 
             // titlePanel
             // 
-            resources.ApplyResources(this.titlePanel, "titlePanel");
             this.titlePanel.BackColor = System.Drawing.Color.Cyan;
             this.titlePanel.Controls.Add(this.title);
             this.titlePanel.Controls.Add(this.titlePicBox);
+            resources.ApplyResources(this.titlePanel, "titlePanel");
             this.titlePanel.Name = "titlePanel";
             // 
             // title
             // 
-            resources.ApplyResources(this.title, "title");
             this.title.AccessibleRole = System.Windows.Forms.AccessibleRole.TitleBar;
+            resources.ApplyResources(this.title, "title");
             this.title.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.title.Name = "title";
             // 
@@ -271,13 +275,13 @@
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.BackColor = System.Drawing.Color.Black;
             this.Controls.Add(this.titlePanel);
             this.Controls.Add(this.menuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.HelpButton = true;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "BaseGUI";
+            this.Load += new System.EventHandler(this.BaseGUI_Load);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.titlePanel.ResumeLayout(false);

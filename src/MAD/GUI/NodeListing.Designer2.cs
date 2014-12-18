@@ -1,4 +1,6 @@
-﻿namespace MAD.GUI
+﻿using System.Collections.Generic;
+
+namespace MAD.GUI
 {
     
     partial class NodeListing : BaseGUI
@@ -27,6 +29,30 @@
         /// Erforderliche Methode für die Designerunterstützung.
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
+        
+     /*   private System.Collections.Generic.List<System.Windows.Forms.Button> InitButtonNode(int i)
+        {
+            System.Collections.Generic.List<System.Windows.Forms.Button> pervers = new System.Collections.Generic.List<System.Windows.Forms.Button>();
+
+            for (int ii = 0; ii < i; ii++)
+            {
+                System.Windows.Forms.Button _tmpstuff = new System.Windows.Forms.Button();
+
+                _tmpstuff.BackColor = System.Drawing.Color.DarkSlateGray;
+                _tmpstuff.FlatAppearance.BorderSize = 0;
+                _tmpstuff.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                _tmpstuff.Text = ii.ToString();
+                _tmpstuff.Location = new System.Drawing.Point(3, 3);
+                _tmpstuff.Name = "_tmpstuff";
+                _tmpstuff.Size = new System.Drawing.Size(233, 97);
+                _tmpstuff.TabIndex = 0;
+                _tmpstuff.UseVisualStyleBackColor = false;
+                _tmpstuff.Click += new System.EventHandler(this.button1_Click);
+
+                pervers.Add(_tmpstuff);
+            }
+            return pervers;
+        }*/
         
         private void InitializeComponent()
         {
@@ -74,9 +100,9 @@
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Button button1;
         protected System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem actionsToolStripMenuItem;
         protected System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Collections.Generic.List<System.Windows.Forms.Button> buttonNode;
     }
 }

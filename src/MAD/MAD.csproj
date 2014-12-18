@@ -118,14 +118,14 @@
     <Compile Include="GUI\ActionConnectivityCheck.Designer.cs">
       <DependentUpon>ActionConnectivityCheck.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\NodeListing.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\NodeListing.Designer.cs">
-      <DependentUpon>NodeListing.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\BaseGUI.Designer.cs">
       <DependentUpon>BaseGUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\ShowNodes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ShowNodes.Designer.cs">
+      <DependentUpon>ShowNodes.cs</DependentUpon>
     </Compile>
     <Compile Include="JobSystem\DBHandler.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
@@ -216,12 +216,6 @@
     <EmbeddedResource Include="GUI\ActionScan.resx">
       <DependentUpon>ActionScan.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\BaseGUI.de.resx">
-      <DependentUpon>BaseGUI.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\BaseGUI.en.resx">
-      <DependentUpon>BaseGUI.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -232,8 +226,8 @@
     <EmbeddedResource Include="GUI\ActionConnectivityCheck.resx">
       <DependentUpon>ActionConnectivityCheck.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\NodeListing.resx">
-      <DependentUpon>NodeListing.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\ShowNodes.resx">
+      <DependentUpon>ShowNodes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
