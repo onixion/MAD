@@ -130,6 +130,7 @@
             // 
             resources.ApplyResources(this.newNodeToolStripMenuItem, "newNodeToolStripMenuItem");
             this.newNodeToolStripMenuItem.Name = "newNodeToolStripMenuItem";
+            this.newNodeToolStripMenuItem.Click += new System.EventHandler(this.newNodeToolStripMenuItem_Click);
             // 
             // newJobToolStripMenuItem
             // 
@@ -281,7 +282,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip;
             this.Name = "BaseGUI";
-            this.Load += new System.EventHandler(this.BaseGUI_Load);
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
             this.titlePanel.ResumeLayout(false);

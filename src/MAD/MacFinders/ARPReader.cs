@@ -22,14 +22,33 @@ namespace MAD.MacFinders
 
         private static Object lockObj = new Object();
         private static Thread _steady;
+        private static bool _running; 
+
+        private static ActionScan _window; 
 
         public static uint networkInterface = MadConf.conf.arpInterface - 1;
         public static uint subnetMask;
         public static IPAddress netAddress;
         public static IPAddress srcAddress;
 
+        public static bool IsRunning()
+        {
+            return _running;
+        }
+
+        public static void SetWindow(ActionScan scanWindow)
+        {
+            _window = scanWindow;
+        }
+
+        public static void ResetWindow()
+        {
+            _window = null; 
+        }
+
         public static void CheckStart()
         {
+            _running = true; 
             Logger.Log("Start Checking Devices", Logger.MessageType.INFORM);
             InitInterfaces();
             Thread _listen = new Thread(ListenCheckResponses);
@@ -40,22 +59,37 @@ namespace MAD.MacFinders
                 _dummy.status = false;
                 ExecuteRequests(_dummy.hostIP);
             }
-            Thread.Sleep(10000);
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                Thread.Sleep(5000);
+            else
+                Thread.Sleep(100);
             DeInitInterfaces();
+            _running = false; 
         }
 
         public static void FloodStart()
         {
+            _running = true; 
             Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
             if (!InitInterfaces())
                 return;
+            if (_window != null)
+                _window.progressBar1.Value = 5; 
             Thread _listen = new Thread(ListenFloodResponses);
             _listen.Start();
+            if (_window != null)
+                _window.progressBar1.Value = 10;
             EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
             SendRequests();
-            Thread.Sleep(10000);
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                Thread.Sleep(5000);
+            else
+                Thread.Sleep(1000);
             _listen.Join();
             DeInitInterfaces();
+            if (_window != null)
+                _window.progressBar1.Value = 100;
+            _running = false; 
         }
 
         private static bool InitInterfaces()
@@ -133,6 +167,7 @@ namespace MAD.MacFinders
 
         public static void SteadyStart(object jsArg)
         {
+            _running = true; 
             _steady = new Thread(SteadyStartsFunktion);
             _steady.Start(jsArg);
         }
@@ -140,6 +175,7 @@ namespace MAD.MacFinders
         public static void SteadyStop()
         {
             _steady.Abort();
+            _running = false; 
         }
 
         private static void SteadyStartsFunktion(object jsArg)
@@ -177,7 +213,8 @@ namespace MAD.MacFinders
                 IPAddress _target = new IPAddress(_targetBytes);
 
                 ExecuteRequests(_ethpac, _target);
-                //Insert value for shit progress bar
+                if(_window != null)
+                    _window.progressBar1.Value = Convert.ToInt16(10 + (((i * 100) / _hosts) * 0.8));
             }   
         }
 

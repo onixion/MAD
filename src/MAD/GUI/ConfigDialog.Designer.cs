@@ -62,13 +62,14 @@
             // 
             // title
             // 
-            this.title.Size = new System.Drawing.Size(294, 54);
+            this.title.Size = new System.Drawing.Size(279, 51);
             this.title.Text = "Configuration";
             // 
             // NotificSettingsLabel
             // 
             this.NotificSettingsLabel.AutoSize = true;
             this.NotificSettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NotificSettingsLabel.ForeColor = System.Drawing.Color.Cyan;
             this.NotificSettingsLabel.Location = new System.Drawing.Point(12, 95);
             this.NotificSettingsLabel.Name = "NotificSettingsLabel";
             this.NotificSettingsLabel.Size = new System.Drawing.Size(273, 31);
@@ -90,6 +91,7 @@
             // SourceMailLabel
             // 
             this.SourceMailLabel.AutoSize = true;
+            this.SourceMailLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SourceMailLabel.Location = new System.Drawing.Point(27, 148);
             this.SourceMailLabel.Name = "SourceMailLabel";
             this.SourceMailLabel.Size = new System.Drawing.Size(73, 13);
@@ -99,6 +101,7 @@
             // TargetMailLabel
             // 
             this.TargetMailLabel.AutoSize = true;
+            this.TargetMailLabel.ForeColor = System.Drawing.Color.Cyan;
             this.TargetMailLabel.Location = new System.Drawing.Point(247, 148);
             this.TargetMailLabel.Name = "TargetMailLabel";
             this.TargetMailLabel.Size = new System.Drawing.Size(70, 13);
@@ -120,6 +123,7 @@
             // SmtpPassLabel
             // 
             this.SmtpPassLabel.AutoSize = true;
+            this.SmtpPassLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SmtpPassLabel.Location = new System.Drawing.Point(471, 148);
             this.SmtpPassLabel.Name = "SmtpPassLabel";
             this.SmtpPassLabel.Size = new System.Drawing.Size(53, 13);
@@ -140,6 +144,7 @@
             // SmtpSrvLabel
             // 
             this.SmtpSrvLabel.AutoSize = true;
+            this.SmtpSrvLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SmtpSrvLabel.Location = new System.Drawing.Point(27, 216);
             this.SmtpSrvLabel.Name = "SmtpSrvLabel";
             this.SmtpSrvLabel.Size = new System.Drawing.Size(71, 13);
@@ -161,6 +166,7 @@
             // SmtpPortLabel
             // 
             this.SmtpPortLabel.AutoSize = true;
+            this.SmtpPortLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SmtpPortLabel.Location = new System.Drawing.Point(247, 216);
             this.SmtpPortLabel.Name = "SmtpPortLabel";
             this.SmtpPortLabel.Size = new System.Drawing.Size(59, 13);
@@ -182,6 +188,7 @@
             // SnmpIntLabel
             // 
             this.SnmpIntLabel.AutoSize = true;
+            this.SnmpIntLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SnmpIntLabel.Location = new System.Drawing.Point(247, 360);
             this.SnmpIntLabel.Name = "SnmpIntLabel";
             this.SnmpIntLabel.Size = new System.Drawing.Size(94, 13);
@@ -202,6 +209,7 @@
             // ArpIntLabel
             // 
             this.ArpIntLabel.AutoSize = true;
+            this.ArpIntLabel.ForeColor = System.Drawing.Color.Cyan;
             this.ArpIntLabel.Location = new System.Drawing.Point(27, 360);
             this.ArpIntLabel.Name = "ArpIntLabel";
             this.ArpIntLabel.Size = new System.Drawing.Size(97, 13);
@@ -223,6 +231,7 @@
             // 
             this.NetworkSettingsLabel.AutoSize = true;
             this.NetworkSettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.NetworkSettingsLabel.ForeColor = System.Drawing.Color.Cyan;
             this.NetworkSettingsLabel.Location = new System.Drawing.Point(12, 307);
             this.NetworkSettingsLabel.Name = "NetworkSettingsLabel";
             this.NetworkSettingsLabel.Size = new System.Drawing.Size(230, 31);
@@ -233,6 +242,7 @@
             // 
             this.OthersLabel.AutoSize = true;
             this.OthersLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OthersLabel.ForeColor = System.Drawing.Color.Cyan;
             this.OthersLabel.Location = new System.Drawing.Point(12, 460);
             this.OthersLabel.Name = "OthersLabel";
             this.OthersLabel.Size = new System.Drawing.Size(105, 31);
@@ -242,6 +252,7 @@
             // PathToLogFileLabel
             // 
             this.PathToLogFileLabel.AutoSize = true;
+            this.PathToLogFileLabel.ForeColor = System.Drawing.Color.Cyan;
             this.PathToLogFileLabel.Location = new System.Drawing.Point(27, 514);
             this.PathToLogFileLabel.Name = "PathToLogFileLabel";
             this.PathToLogFileLabel.Size = new System.Drawing.Size(115, 13);
@@ -263,6 +274,7 @@
             // EnableNotification
             // 
             this.EnableNotification.AutoSize = true;
+            this.EnableNotification.ForeColor = System.Drawing.Color.Cyan;
             this.EnableNotification.Location = new System.Drawing.Point(474, 235);
             this.EnableNotification.Name = "EnableNotification";
             this.EnableNotification.Size = new System.Drawing.Size(113, 17);
@@ -272,27 +284,32 @@
             // 
             // SafeSettings
             // 
+            this.SafeSettings.BackColor = System.Drawing.Color.Cyan;
+            this.SafeSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.SafeSettings.Location = new System.Drawing.Point(656, 528);
             this.SafeSettings.Name = "SafeSettings";
             this.SafeSettings.Size = new System.Drawing.Size(75, 23);
             this.SafeSettings.TabIndex = 20;
             this.SafeSettings.Text = "Save";
-            this.SafeSettings.UseVisualStyleBackColor = true;
+            this.SafeSettings.UseVisualStyleBackColor = false;
             this.SafeSettings.Click += new System.EventHandler(this.SafeSettings_Click);
             // 
             // UseDefaults
             // 
+            this.UseDefaults.BackColor = System.Drawing.Color.Cyan;
+            this.UseDefaults.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.UseDefaults.Location = new System.Drawing.Point(737, 528);
             this.UseDefaults.Name = "UseDefaults";
             this.UseDefaults.Size = new System.Drawing.Size(75, 23);
             this.UseDefaults.TabIndex = 21;
             this.UseDefaults.Text = "Use Default";
-            this.UseDefaults.UseVisualStyleBackColor = true;
+            this.UseDefaults.UseVisualStyleBackColor = false;
             this.UseDefaults.Click += new System.EventHandler(this.UseDefaults_Click);
             // 
             // logLevelLabel
             // 
             this.logLevelLabel.AutoSize = true;
+            this.logLevelLabel.ForeColor = System.Drawing.Color.Cyan;
             this.logLevelLabel.Location = new System.Drawing.Point(247, 515);
             this.logLevelLabel.Name = "logLevelLabel";
             this.logLevelLabel.Size = new System.Drawing.Size(161, 13);
@@ -341,7 +358,6 @@
             this.Controls.Add(this.NotificSettingsLabel);
             this.Name = "ConfigDialog";
             this.Text = "Config Dialog";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.Controls.SetChildIndex(this.titlePanel, 0);
             this.Controls.SetChildIndex(this.NotificSettingsLabel, 0);
             this.Controls.SetChildIndex(this.SourceMail, 0);

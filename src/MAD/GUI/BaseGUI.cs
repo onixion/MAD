@@ -52,11 +52,6 @@ namespace MAD.GUI
             _tmp.ShowDialog();
         }
 
-        private void BaseGUI_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void openWorkingDirectoryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             string path = System.IO.Directory.GetCurrentDirectory();
@@ -66,6 +61,10 @@ namespace MAD.GUI
             process.Start();
         }
 
-
+        private void newNodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddNodeScreen _tmp = new AddNodeScreen(js);
+            _tmp.ShowDialog();
+        }
     }
 }

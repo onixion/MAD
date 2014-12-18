@@ -97,6 +97,12 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="GUI\AddNodeScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\AddNodeScreen.Designer.cs">
+      <DependentUpon>AddNodeScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\ConfigDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -215,6 +221,9 @@
   <ItemGroup>
     <EmbeddedResource Include="GUI\ActionScan.resx">
       <DependentUpon>ActionScan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\AddNodeScreen.resx">
+      <DependentUpon>AddNodeScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\ConfigDialog.resx">
       <DependentUpon>ConfigDialog.cs</DependentUpon>

@@ -21,11 +21,7 @@ namespace MAD.GUI
         public ConfigDialog()
         {
             InitializeComponent();
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
+            this.menuStrip.Hide();
         }
 
         private void Textbox_TextChanged(object sender, EventArgs e)
@@ -47,6 +43,8 @@ namespace MAD.GUI
             //StartUp.Show();
             this.Dispose();
             this.Close();
+            ShowNodes _tmp = new ShowNodes();
+            _tmp.Show();
         }
 
         private void UseDefaults_Click(object sender, EventArgs e)
@@ -56,6 +54,8 @@ namespace MAD.GUI
             //StartUp.Show();
             this.Dispose();
             this.Close();
+            ShowNodes _tmp = new ShowNodes();
+            _tmp.Show();
         }
 
         private void SetConf()

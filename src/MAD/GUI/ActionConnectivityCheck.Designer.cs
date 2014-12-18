@@ -46,7 +46,7 @@
             // 
             // title
             // 
-            this.title.Size = new System.Drawing.Size(411, 54);
+            this.title.Size = new System.Drawing.Size(393, 51);
             this.title.Text = "Check Connectivity";
             // 
             // intensityComboBox
@@ -68,6 +68,7 @@
             // intensityLabel
             // 
             this.intensityLabel.AutoSize = true;
+            this.intensityLabel.ForeColor = System.Drawing.Color.Cyan;
             this.intensityLabel.Location = new System.Drawing.Point(9, 106);
             this.intensityLabel.Name = "intensityLabel";
             this.intensityLabel.Size = new System.Drawing.Size(112, 13);
@@ -80,10 +81,13 @@
             this.targetIPTextBox.Name = "targetIPTextBox";
             this.targetIPTextBox.Size = new System.Drawing.Size(100, 20);
             this.targetIPTextBox.TabIndex = 7;
+            this.targetIPTextBox.Text = "192.168.1.1";
+            this.targetIPTextBox.TextChanged += new System.EventHandler(this.targetIPTextBox_TextChanged);
             // 
             // targetIPLabel
             // 
             this.targetIPLabel.AutoSize = true;
+            this.targetIPLabel.ForeColor = System.Drawing.Color.Cyan;
             this.targetIPLabel.Location = new System.Drawing.Point(41, 9);
             this.targetIPLabel.Name = "targetIPLabel";
             this.targetIPLabel.Size = new System.Drawing.Size(54, 13);
@@ -102,22 +106,26 @@
             // 
             // checkButton
             // 
+            this.checkButton.BackColor = System.Drawing.Color.Cyan;
+            this.checkButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.checkButton.Location = new System.Drawing.Point(111, 216);
             this.checkButton.Name = "checkButton";
             this.checkButton.Size = new System.Drawing.Size(75, 23);
             this.checkButton.TabIndex = 9;
             this.checkButton.Text = "Check";
-            this.checkButton.UseVisualStyleBackColor = true;
+            this.checkButton.UseVisualStyleBackColor = false;
             this.checkButton.Click += new System.EventHandler(this.checkButton_Click);
             // 
             // cancelButton
             // 
+            this.cancelButton.BackColor = System.Drawing.Color.Cyan;
+            this.cancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cancelButton.Location = new System.Drawing.Point(292, 216);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 10;
             this.cancelButton.Text = "Cancel";
-            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.UseVisualStyleBackColor = false;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // ActionConnectivityCheck

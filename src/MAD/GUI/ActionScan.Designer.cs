@@ -48,12 +48,13 @@
             // 
             // title
             // 
-            this.title.Size = new System.Drawing.Size(303, 54);
+            this.title.Size = new System.Drawing.Size(297, 51);
             this.title.Text = "Scan for hosts";
             // 
             // LocalIPAddressLabel
             // 
             this.LocalIPAddressLabel.AutoSize = true;
+            this.LocalIPAddressLabel.ForeColor = System.Drawing.Color.Cyan;
             this.LocalIPAddressLabel.Location = new System.Drawing.Point(12, 97);
             this.LocalIPAddressLabel.Name = "LocalIPAddressLabel";
             this.LocalIPAddressLabel.Size = new System.Drawing.Size(80, 13);
@@ -67,6 +68,7 @@
             this.LocalIPAddresTextBox.Size = new System.Drawing.Size(100, 20);
             this.LocalIPAddresTextBox.TabIndex = 5;
             this.LocalIPAddresTextBox.Text = "192.168.0.1";
+            this.LocalIPAddresTextBox.TextChanged += new System.EventHandler(this.LocalIPAddresTextBox_TextChanged);
             // 
             // NetworkTextBox
             // 
@@ -75,10 +77,12 @@
             this.NetworkTextBox.Size = new System.Drawing.Size(100, 20);
             this.NetworkTextBox.TabIndex = 7;
             this.NetworkTextBox.Text = "192.168.0.0";
+            this.NetworkTextBox.TextChanged += new System.EventHandler(this.NetworkTextBox_TextChanged);
             // 
             // NetworkLabel
             // 
             this.NetworkLabel.AutoSize = true;
+            this.NetworkLabel.ForeColor = System.Drawing.Color.Cyan;
             this.NetworkLabel.Location = new System.Drawing.Point(144, 97);
             this.NetworkLabel.Name = "NetworkLabel";
             this.NetworkLabel.Size = new System.Drawing.Size(47, 13);
@@ -130,6 +134,7 @@
             // SubnetmaskLabel
             // 
             this.SubnetmaskLabel.AutoSize = true;
+            this.SubnetmaskLabel.ForeColor = System.Drawing.Color.Cyan;
             this.SubnetmaskLabel.Location = new System.Drawing.Point(9, 158);
             this.SubnetmaskLabel.Name = "SubnetmaskLabel";
             this.SubnetmaskLabel.Size = new System.Drawing.Size(66, 13);
@@ -141,6 +146,7 @@
             this.OneShotCheckBox.AutoSize = true;
             this.OneShotCheckBox.Checked = true;
             this.OneShotCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.OneShotCheckBox.ForeColor = System.Drawing.Color.Cyan;
             this.OneShotCheckBox.Location = new System.Drawing.Point(152, 176);
             this.OneShotCheckBox.Name = "OneShotCheckBox";
             this.OneShotCheckBox.Size = new System.Drawing.Size(92, 17);
@@ -150,29 +156,35 @@
             // 
             // ScanButton
             // 
+            this.ScanButton.BackColor = System.Drawing.Color.Cyan;
+            this.ScanButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ScanButton.Location = new System.Drawing.Point(77, 246);
             this.ScanButton.Name = "ScanButton";
             this.ScanButton.Size = new System.Drawing.Size(75, 23);
             this.ScanButton.TabIndex = 11;
             this.ScanButton.Text = "Scan";
-            this.ScanButton.UseVisualStyleBackColor = true;
+            this.ScanButton.UseVisualStyleBackColor = false;
             this.ScanButton.Click += new System.EventHandler(this.ScanButton_Click);
             // 
             // CancelButton
             // 
+            this.CancelButton.BackColor = System.Drawing.Color.Cyan;
+            this.CancelButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.CancelButton.Location = new System.Drawing.Point(228, 246);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(75, 23);
             this.CancelButton.TabIndex = 12;
             this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.UseVisualStyleBackColor = false;
             this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // progressBar1
             // 
+            this.progressBar1.BackColor = System.Drawing.Color.White;
             this.progressBar1.Location = new System.Drawing.Point(14, 210);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(373, 23);
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar1.TabIndex = 13;
             // 
             // ActionScan
@@ -222,6 +234,6 @@
         private System.Windows.Forms.CheckBox OneShotCheckBox;
         private System.Windows.Forms.Button ScanButton;
         private System.Windows.Forms.Button CancelButton;
-        private System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.ProgressBar progressBar1;
     }
 }

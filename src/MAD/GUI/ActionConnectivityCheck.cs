@@ -17,6 +17,8 @@ namespace MAD.GUI
         public ActionConnectivityCheck()
         {
             InitializeComponent();
+            this.menuStrip.Hide();
+            this.intensityComboBox.SelectedIndex = 0; 
         }
 
         private void intensityComboBox_SelectedValueChanged(object sender, EventArgs e)
@@ -67,5 +69,18 @@ namespace MAD.GUI
             MessageBox.Show(_buffer, "Check Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return; 
         }
+
+        private void targetIPTextBox_TextChanged(object sender, EventArgs e)
+        {
+            ToggleButton();
+        }
+
+        private void ToggleButton()
+        {
+            if (targetIPPanel.Visible && String.IsNullOrEmpty(targetIPTextBox.Text))
+                checkButton.Enabled = false;
+            else
+                checkButton.Enabled = true; 
+        }    
     }
 }
