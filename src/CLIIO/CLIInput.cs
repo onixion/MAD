@@ -20,7 +20,7 @@ namespace CLIIO
         private static int _MIN;
         private static int _MAX;
 
-        private static List<string> _cliHistory = new List<string>();
+        private static List<string> _cliHistory = new List<string>() { "db summary create -s 18.12.2014 -e 19.12.2014 -b 24h" };
         private const int _maxHistoryEntries = 5;
         private static int _historyPointer;
 

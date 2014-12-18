@@ -81,20 +81,81 @@ namespace MAD.CLICore
             if (OParUsed("r"))
                 _amountOfRows = (int)pars.GetPar("r").argValues[0];
 
-            DataTable _table = _db.ReadJobs(" order by JobTable.ID desc limit " + _amountOfRows);
-            DataColumnCollection _columns = _table.Columns;
-            DataRowCollection _rows = _table.Rows;
+            using (DataTable _table = _db.ReadJobs(" order by JobTable.ID desc limit " + _amountOfRows))
+            {
+                DataColumnCollection _columns = _table.Columns;
+                DataRowCollection _rows = _table.Rows;
 
-            output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
-            output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetColumnNames(_columns));
-            output += ConsoleTable.GetSplitline(consoleWidth) + "<color><white>";
+                output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+                output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetColumnNames(_columns));
+                output += ConsoleTable.GetSplitline(consoleWidth) + "<color><white>";
 
-            for (int i = 0; i < _rows.Count; i++)
-                output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetRowValues(_columns, _rows[i]));
+                for (int i = 0; i < _rows.Count; i++)
+                    output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetRowValues(_columns, _rows[i]));
 
+                return output;
+            }
+        }
+    }
+
+    #region summarize commands
+
+    public class DBSumCreate : Command
+    {
+        private DB _db;
+
+        public DBSumCreate(object[] args)
+        {
+            _db = (DB)args[0];
+
+            rPar.Add(new ParOption("s", "START-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+            rPar.Add(new ParOption("e", "END-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+            rPar.Add(new ParOption("b", "BLOCK-SIZE", "Size of each block to summarize the jobs to (e.g. 10y, 10w, 10m, 10d, 5h, 15min, ...).", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            // parsing blocksize
+            long _blocksize = 0;
+            string _buffer = (string)pars.GetPar("b").argValues[0];
+            string[] _buffer2;
+            if ((_buffer2 = _buffer.Split(new string[] { "min" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(0, Convert.ToInt32(_buffer2[0]), 0).TotalMilliseconds;
+            }
+            else if ((_buffer2 = _buffer.Split(new string[] { "h" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(Convert.ToInt32(_buffer2[0]), 0, 0).TotalMilliseconds;
+            }
+            else if ((_buffer2 = _buffer.Split(new string[] { "d" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(Convert.ToInt32(_buffer2[0]), 0, 0, 0).TotalMilliseconds;
+            }
+            else if ((_buffer2 = _buffer.Split(new string[] { "w" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(Convert.ToInt32(_buffer2[0]) * 7, 0, 0, 0).TotalMilliseconds;
+            }
+            else if ((_buffer2 = _buffer.Split(new string[] { "m" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(Convert.ToInt32(_buffer2[0]) * 30, 0, 0, 0).TotalMilliseconds;
+            }
+            else if ((_buffer2 = _buffer.Split(new string[] { "y" }, StringSplitOptions.None)).Length == 2)
+            {
+                _blocksize = (long)new TimeSpan(Convert.ToInt32(_buffer2[0]) * 365, 0, 0).TotalMilliseconds;
+            }
+            else
+                return "<color><red>Could not parse '" + _buffer + "'!";
+
+            int[] _info = _db.SummarizeJobTable((DateTime)pars.GetPar("s").argValues[0],
+                (DateTime)pars.GetPar("e").argValues[0], _blocksize);
+
+            output += "<color><yellow>DataRows summerized: <color><white>" + _info[0] + "\n";
+            output += "<color><yellow>DataRows written:    <color><white>" + _info[1] + "\n";
             return output;
         }
     }
+
+    #endregion
 
     #region memo commands
 

@@ -233,7 +233,8 @@ namespace MAD.CLICore
          *  System.UInt32
          *  System.String
          *  System.Net.IPAddress
-         *  System.Net.NetworkInformation.PhysicalAddress */
+         *  System.Net.NetworkInformation.PhysicalAddress 
+         *  System.DateTime */
         public static object Convert(string value, Type convertType)
         {
             try
@@ -256,6 +257,8 @@ namespace MAD.CLICore
                         return System.Net.NetworkInformation.PhysicalAddress.Parse(value);
                     case "System.Net.Mail.MailAddress":
                         return new System.Net.Mail.MailAddress(value);
+                    case "System.DateTime":
+                        return DateTime.Parse(value);
                     default:
                         return null;
                 }

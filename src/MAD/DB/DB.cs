@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using System.Data.Common;
-using System.Data.SQLite; //include SQLite database library
 using System.IO;  
 using System.Data;
+using System.Data.SQLite;
 
 using MAD.JobSystemCore;
 using MAD.Logging;
-
 
 namespace MAD.Database
 { 
@@ -182,12 +178,36 @@ namespace MAD.Database
 
         public DataTable ReadTable(string TableName)
         {
-            using(SQLiteCommand command = new SQLiteCommand("SELECT * FROM " + TableName + ";", _con))
+            using(SQLiteCommand command = new SQLiteCommand("select * from " + TableName + ";", _con))
             using (SQLiteDataReader reader = command.ExecuteReader())
             {
                 DataTable TempResult = new DataTable();
                 TempResult.Load(reader);
                 return TempResult;
+            }
+        }
+
+        private int InsertCommand(string command)
+        {
+            using (SQLiteCommand _command = new SQLiteCommand(_con))
+            {
+                _command.CommandText = command;
+                return _command.ExecuteNonQuery();
+            }
+        }
+
+        private DataTable Read(string command)
+        {
+            using(SQLiteCommand _command = new SQLiteCommand(_con))
+            {
+                _command.CommandText = command;
+
+                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                {
+                    DataTable _table = new DataTable();
+                    _table.Load(_reader);
+                    return _table;
+                }
             }
         }
 
@@ -459,36 +479,115 @@ namespace MAD.Database
 
         #region summarize
 
-        public enum Mode { Daily, Weekly, Monthly };
-
-        public void SummarizeJobTable(DateTime before, Mode mode)
+        public int[] SummarizeJobTable(DateTime from, DateTime to, long blocksize)
         {
-            long _madTimeStamp = before.Subtract(_timeconst).Ticks;
+            TimeSpan _summarytime = to.Subtract(from);
+            if (_summarytime.TotalMilliseconds <= 0)
+                throw new Exception("Times are invalid!");
 
-            using (SQLiteCommand _command = new SQLiteCommand(_con))
+            long _starttimestamp = DB.DateTimToMADTimestamp(from);
+            long _stoptimestamp = DB.DateTimToMADTimestamp(to);
+
+            // check if summarytime has already been summerized
+            using (DataTable _table = Read("select ID from SummaryTable where " +
+                "STARTTIME between " + _starttimestamp + " and " +  _stoptimestamp + 
+                " or " +
+                "STOPTIME between " + _starttimestamp + " and " + _stoptimestamp + ";"))
             {
-                _command.CommandText = "select " + 
-                    "ID_NODE, " + 
-                    "STARTTIME, " + 
-                    "STOPTIME, " +
-                    "DELAYTIME, " + 
-                    "OutStateTable.OUTSTATE " +
-                    "from JobTable " + 
-                    "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID " +
-                    "where 'STARTTIME' <= '" + _madTimeStamp + "';";
-                
-                using (SQLiteDataReader _reader = _command.ExecuteReader())
+                if (_table.Rows.Count > 0)
+                    throw new Exception("This time has already been summerized before!");
+            }
+
+            int _rowsSummarizedTotal = 0;
+            int _rowsWritten = 0;
+
+            long _blockStart = _starttimestamp; // begin of a certain block
+            long _blockStop = _starttimestamp + blocksize; // end of a certain block
+
+            while (_blockStop <= _stoptimestamp)
+            {
+                // get all nodes in block
+                Guid[] _nodes = ReadNodes(_blockStart, _blockStop);
+
+                for (int i = 0; i < _nodes.Length; i++)
                 {
-                    if (_reader.Read())
+                    // Now we need to generate one datarow for each node.
+
+                    int _id_node = GetIDNode(_nodes[i].ToString());
+
+                    using (DataTable _table = Read("select * from JobTable " +
+                        "where STARTTIME between " + _blockStart + " and " + _blockStop + " and ID_NODE=" + _id_node + ";"))
                     {
-                        using (DataTable _table = new DataTable())
+                        // SUCCESSRATE
+                        int _buffer = 0;
+                        for (int i2 = 0; i2 < _table.Rows.Count; i2++)
                         {
-                            _table.Load(_reader);
+                            using (DataTable _outTable = Read("select OUTSTATE from " +
+                                "OutStateTable where ID=" + Convert.ToString(_table.Rows[i2]["ID_OUTSTATE"]) + ";"))
+                            {
+                                if ((string)_outTable.Rows[0]["OUTSTATE"] == "Success")
+                                    _buffer += 1;
+                            }
 
-
+                            _rowsSummarizedTotal++;
                         }
+                        int _successrate = Convert.ToInt32(((decimal)_buffer / (decimal)_table.Rows.Count) * (decimal)100);
+
+                        // AVERAVE_DURATION, MAX_DURATION, MIN_DURATION
+                        _buffer = 0;
+                        int _average = 0;
+                        int _max = 0;
+                        int _min = 10000;
+                        for (int i2 = 0; i2 < _table.Rows.Count; i2++)
+                        {
+                            _buffer = (int)(Convert.ToUInt64(_table.Rows[i2]["DELAYTIME"]));
+
+                            if (_buffer > _max)
+                                _max = _buffer;
+                            if (_buffer < _min)
+                                _min = _buffer;
+
+                            _average += _buffer;
+                        }
+                        _average = _average / _table.Rows.Count;
+
+                        InsertCommand("insert into SummaryTable (ID_NODE, STARTTIME, STOPTIME, " +
+                            "SUCCESSRATE, AVERAGE_DURATION, MAX_DURATION, MIN_DURATION) values " +
+                            "(" + _id_node + ", " + _blockStart + ", " + _blockStop + ", " + 
+                            _successrate + ", " + _average + ", " + _max + ", " + _min + ");");
+
+                        _rowsWritten++;
                     }
                 }
+
+                // set pointers to the next block
+                _blockStart = _blockStop;
+                _blockStop += blocksize;
+            }
+
+            return new int[]{_rowsSummarizedTotal, _rowsWritten};
+        }
+
+        private Guid[] ReadNodes(long from, long to)
+        {
+            string t = "select distinct ID_NODE from JobTable " +
+                "where STARTTIME between " + from + " and " + to + ";";
+
+            using (DataTable _table = Read(t))
+            {
+                Guid[] _buffer = new Guid[_table.Rows.Count];
+                for (int i = 0; i < _buffer.Length; i++)
+                {
+                    string _temp = Convert.ToString(_table.Rows[i]["ID_NODE"]);
+
+                    using (DataTable _table2 = Read("select GUID_NODE from GUIDNodeTable " +
+                        "where ID=" + _temp + ";"))
+                    {
+                        _buffer[i] = Guid.Parse((string)_table2.Rows[0]["GUID_NODE"]);
+                    }
+                }
+
+                return _buffer;
             }
         }
 
@@ -501,14 +600,14 @@ namespace MAD.Database
 
         #region timstamp
 
-        private static DateTime MADTimestampToDateTime(Int64 MADTimeStamp)
+        public static DateTime MADTimestampToDateTime(Int64 MADTimeStamp)
         {
-            return _timeconst.AddTicks(MADTimeStamp);
+            return _timeconst.AddMilliseconds(MADTimeStamp);
         }
 
         public static Int64 DateTimToMADTimestamp(DateTime date)
         {
-            return date.Ticks - _timeconst.Ticks;
+            return Convert.ToInt64((date - _timeconst).TotalMilliseconds);
         }
 
         #endregion
