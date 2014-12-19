@@ -107,6 +107,7 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("db show", typeof(DBShowTables), new object[] { db }));
             commands.Add(new CommandOptions("db jobs", typeof(DBJobs), new object[] { db }));
             commands.Add(new CommandOptions("db summary create", typeof(DBSumCreate), new object[] { db }));
+            commands.Add(new CommandOptions("db summary delete", typeof(DBSumDel), new object[] { db }));
             commands.Add(new CommandOptions("db add memo", typeof(DBMemoAdd), new object[] { js, db }));
             commands.Add(new CommandOptions("db show memo", typeof(DBMemoShow), new object[] { js, db }));
 

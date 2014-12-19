@@ -101,6 +101,11 @@ namespace MAD.CLICore
     public class DBJobsDel : Command
     { 
         // delete entries in the jobtable
+
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #region summarize commands
@@ -162,8 +167,23 @@ namespace MAD.CLICore
     }
 
     public class DBSumDel : Command
-    { 
-        // delete sum
+    {
+        private DB _db;
+
+        public DBSumDel(object[] args)
+        {
+            _db = (DB)args[0];
+
+            rPar.Add(new ParOption("s", "START-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+            rPar.Add(new ParOption("e", "END-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            int _rows = _db.SummarizeDelete((DateTime)pars.GetPar("s").argValues[0],
+                (DateTime)pars.GetPar("e").argValues[0]);
+            return "<color><green>" + _rows + " DataRows deleted.";
+        }
     }
 
     #endregion

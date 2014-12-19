@@ -598,6 +598,13 @@ namespace MAD.Database
             }
         }
 
+        public int SummarizeDelete(DateTime from, DateTime to)
+        {
+            return InsertCommand("delete from SummaryTable where " +
+                "where STARTTIME >= " + DateTimToMADTimestamp(from) + " and " +
+                "STOPTIME <= " + DateTimToMADTimestamp(to) + ";");
+        }
+
         public DataTable ReadSummary(int amountRows)
         {
             return null;
