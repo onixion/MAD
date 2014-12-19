@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.IO;
+using System.Xml;
 
 using MadNet;
 using CLIIO;
@@ -10,8 +11,7 @@ namespace CLIClient
 {
     public class Program
     {
-        /* ARGS => <server-ip>   <server-port> <aes-pass> */
-        /* ARGS => <server-host> <server-port> <aes-pass> */
+        private static string CONFIG_FILE = "madclient.conf";
 
         static int Main(string[] args)
         {
@@ -19,92 +19,29 @@ namespace CLIClient
             int _serverPort = 0;
             string _aesPass = null;
 
-            if (args.Length == 3)
+            if (args.Length != 0)
+                Program.CONFIG_FILE = args[0];
+
+            try
             {
-                try
+                if (File.Exists(Program.CONFIG_FILE))
                 {
-                    if (!IPAddress.TryParse(args[0], out _serverIp))
-                    {
-                        CLIOutput.WriteToConsole("<color><yellow>Resolving hostname ...");
-
-                        IPAddress[] _ips = Dns.GetHostAddresses(args[0]);
-                        if (_ips.Length == 0)
-                        {
-                            CLIOutput.WriteToConsole("<color><red>Could not resolve '" + args[0] + "' ...");
-                            CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
-                            return 0;
-                        }
-                        _serverIp = _ips[0];
-                    }
-
-                    try { _serverPort = Int32.Parse(args[1]); }
-                    catch (Exception)
-                    {
-                        CLIOutput.WriteToConsole("<color><red>Could not parse '" + args[1] + "' into an interger!");
-                        throw new Exception();
-                    }
-
-                    _aesPass = args[2];
+                    ConfigReader.ReadConfig(Program.CONFIG_FILE, out _serverIp, out _serverPort, out _aesPass);
                 }
-                catch (Exception)
+                else
                 {
-                    CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
-                    Console.ReadKey();
-                    return 0;
+                    ConfigReader.CreateConfig(Program.CONFIG_FILE);
+                    ConfigReader.ReadConfig(Program.CONFIG_FILE, out _serverIp, out _serverPort, out _aesPass);
                 }
             }
-            else if (args.Length > 3)
-                CLIOutput.WriteToConsole("To many args! .. switching to CLI-Setup-Assistent ..");
-            else
+            catch (Exception e)
             {
-                string _consoleInput;
-
-                while (true)
-                {
-                    CLIOutput.WriteToConsole("<color><yellow>1.) Server-IP (or hostname): ");
-                    _consoleInput = Console.ReadLine();
-
-                    if (!IPAddress.TryParse(_consoleInput, out _serverIp))
-                    {
-                        CLIOutput.WriteToConsole("<color><yellow>Resolving hostname ... ");
-
-                        try
-                        {
-                            IPAddress[] _ips = Dns.GetHostAddresses(_consoleInput);
-                            _serverIp = _ips[0];
-
-                            CLIOutput.WriteToConsole("<color><white>" + _serverIp.ToString() + "\n");
-                            break;
-                        }
-                        catch (Exception)
-                        {
-                            CLIOutput.WriteToConsole("<color><red> Could not resolve hostname '" + _consoleInput + "'\n");
-                        }
-                    }
-                    else
-                        break;
-                }
-
-                while (true)
-                {
-                    CLIOutput.WriteToConsole("<color><yellow>2.) Server-Port: ");
-
-                    try
-                    {
-                        _serverPort = Int32.Parse(Console.ReadLine());
-                        break;
-                    }
-                    catch (Exception)
-                    {
-                        CLIOutput.WriteToConsole("<color><red>No port-number!\n");
-                    }
-                }
-
-                CLIOutput.WriteToConsole("<color><yellow>3.) AES-Key: ");
-                _aesPass = CLIInput.ReadHidden();
+                CLIOutput.WriteToConsole("<color><red>Exception: " + e.Message);
+                return 0;
             }
 
-            Console.WriteLine();
+            CLIOutput.WriteToConsole("<color><yellow>IPAddress: <color><white>" + _serverIp.ToString() + "\n");
+            CLIOutput.WriteToConsole("<color><yellow>Port:      <color><white>" + _serverPort + "\n");
 
             CLIClient _client = new CLIClient(new IPEndPoint(_serverIp, _serverPort), _aesPass);
 
@@ -118,18 +55,72 @@ namespace CLIClient
 
                 _client.StartRemoteCLI();
             }
+            catch (System.Security.Cryptography.CryptographicException)
+            {
+                CLIOutput.WriteToConsole("<color><red>CryptographicExecption: AES-key is wrong!\n");
+            }
             catch (Exception e)
             {
-                if (e is System.Security.Cryptography.CryptographicException)
-                    CLIOutput.WriteToConsole("<color><red>CryptographicExecption: AES-key is wrong!\n");
-                else
-                    CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "!\n");
-
-                CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
-                Console.ReadKey();
+                CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "!\n");
             }
 
+            CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
+            Console.ReadKey();
+
             return 0;
+        }
+    }
+
+    public static class ConfigReader
+    {
+        public static void CreateConfig(string filename)
+        {
+            using (FileStream _file = new FileStream(filename,
+                FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                XmlWriterSettings _settings = new XmlWriterSettings();
+                _settings.ConformanceLevel = ConformanceLevel.Auto;
+                _settings.Indent = true;
+
+                using (XmlWriter _writer = XmlWriter.Create(_file, _settings))
+                {
+                    _writer.WriteStartDocument();
+                    _writer.WriteStartElement("MadClient");
+
+                    _writer.WriteElementString("target", "127.0.0.1");
+                    _writer.WriteElementString("port", "2222");
+                    _writer.WriteElementString("pass", "PASSWORD");
+
+                    _writer.WriteEndElement();
+                    _writer.WriteEndDocument();
+                }
+            }
+        }
+
+        public static void ReadConfig(string filename, out IPAddress ip,
+            out int port, out string pass)
+        {
+            using (FileStream _file = new FileStream(filename,
+                    FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                using (XmlReader _reader = XmlReader.Create(_file))
+                {
+                    _reader.Read();
+                    _reader.Read();
+                    _reader.Read();
+                    _reader.Read();
+
+                    string _buffer = _reader.ReadElementString("target");
+                    if (!IPAddress.TryParse(_buffer, out ip))
+                    {
+                        IPAddress[] _temp = Dns.GetHostAddresses(_buffer);
+                        ip = _temp[0];
+                    }
+
+                    port = Int32.Parse(_reader.ReadElementString("port"));
+                    pass = _reader.ReadElementString("pass");
+                }
+            }
         }
     }
 }
