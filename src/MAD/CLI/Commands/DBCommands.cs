@@ -280,7 +280,18 @@ namespace MAD.CLICore
             string[] _buffer = new string[columns.Count];
 
             for (int i = 0; i < _buffer.Length; i++)
-                _buffer[i] = row[columns[i]].ToString();
+            {
+                // not nice, but works for now
+                if (columns[i].ColumnName == "STARTTIME" ||
+                    columns[i].ColumnName == "STOPTIME")
+                {
+                    _buffer[i] = DB.MADTimestampToDateTime(Int64.Parse(row[columns[i]].ToString())).ToString("HH:mm:ss:fff dd.MM.yyyy");
+                }
+                else
+                {
+                    _buffer[i] = row[columns[i]].ToString();
+                }
+            }
 
             return _buffer;
         }
