@@ -68,7 +68,7 @@ namespace MAD.JobSystemCore
                     if (_split.Length == 1)
                     {
                         // 19:30 | Daily at 19:30
-                        ParseHourMinute(_split[0], ref _hour, ref _minute);
+                        ParseHourMinute(_split[0], _hour, _minute);
                         _buffer.Add(new JobTimeHandler(_hour, _minute));
                     }
                     else if (_split.Length == 2)
@@ -77,8 +77,8 @@ namespace MAD.JobSystemCore
                          * JOB WILL NOT BE TRIGGERED IF THE DAY DOES
                          * NOT EXIST FOR THIS MONTH! e.g. 31 Febuary */
 
-                        ParseHourMinute(_split[1], ref _hour, ref _minute);
-                        ParseYearMonthDay(_split[0], ref _year, ref _month, ref _day);
+                        ParseHourMinute(_split[1], _hour, _minute);
+                        ParseYearMonthDay(_split[0], _year, _month, _day);
 
                         if (_month == 0 && _year == 0)
                         {
@@ -103,7 +103,7 @@ namespace MAD.JobSystemCore
             return _buffer;
         }
 
-        private static void ParseHourMinute(string data, ref int hour, ref int minute)
+        private static void ParseHourMinute(string data, int hour, int minute)
         {
             string[] _split = data.Split(new char[] { ':' });
 
@@ -137,7 +137,7 @@ namespace MAD.JobSystemCore
                 throw new Exception("Syntax-Error! Maybe too many ':'?");
         }
 
-        private static void ParseYearMonthDay(string data, ref int year, ref int month, ref int day)
+        private static void ParseYearMonthDay(string data, int year, int month, int day)
         {
             string[] _split = data.Split(new char[]{'.'});
             
@@ -221,7 +221,7 @@ namespace MAD.JobSystemCore
         public string GetValues()
         {
             if (type == TimeMethod.Relative)
-                return jobDelay.delayTime.ToString();
+                return jobDelay.delayTimeRemaining.ToString() + "/" + jobDelay.delayTime.ToString() + "ms";
             else if (type == TimeMethod.Absolute)
             {
                 string _temp = "";

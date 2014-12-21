@@ -45,7 +45,7 @@ namespace MAD.CLICore
 
                 string _dataTable = (string)pars.GetPar("t").argValues[0];
 
-                using (DataTable _table = _db.ReadTable(" (select * from " + _dataTable + " order by ID desc limit " + _amountOfRows + ") order by ID asc" )) 
+                using (DataTable _table = _db.SelectAllFromTable(" (select * from " + _dataTable + " order by ID desc limit " + _amountOfRows + ") order by ID asc" )) 
                 {
                     DataColumnCollection _columns = _table.Columns;
                     DataRowCollection _rows = _table.Rows;
@@ -81,7 +81,7 @@ namespace MAD.CLICore
             if (OParUsed("r"))
                 _amountOfRows = (int)pars.GetPar("r").argValues[0];
 
-            using (DataTable _table = _db.ReadJobs(" order by JobTable.ID desc limit " + _amountOfRows))
+            using (DataTable _table = _db.GetJobTable(" order by JobTable.ID desc limit " + _amountOfRows))
             {
                 DataColumnCollection _columns = _table.Columns;
                 DataRowCollection _rows = _table.Rows;
@@ -180,7 +180,7 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            int _rows = _db.SummarizeDelete((DateTime)pars.GetPar("s").argValues[0],
+            int _rows = _db.DeleteFromSummaryTable((DateTime)pars.GetPar("s").argValues[0],
                 (DateTime)pars.GetPar("e").argValues[0]);
             return "<color><green>" + _rows + " DataRows deleted.";
         }

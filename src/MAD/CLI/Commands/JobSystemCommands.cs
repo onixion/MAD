@@ -744,18 +744,18 @@ namespace MAD.CLICore
 
             while (true)
             {
-                _buffer = SplitByOperator(data, "=");
-                if (_buffer.Length == 2)
-                {
-                    _rule.oper = JobRule.Operation.Equal;
-                    _operatorKnown = true;
-                    break;
-                }
-
                 _buffer = SplitByOperator(data, "!=");
                 if (_buffer.Length == 2)
                 {
                     _rule.oper = JobRule.Operation.NotEqual;
+                    _operatorKnown = true;
+                    break;
+                }
+
+                _buffer = SplitByOperator(data, "=");
+                if (_buffer.Length == 2)
+                {
+                    _rule.oper = JobRule.Operation.Equal;
                     _operatorKnown = true;
                     break;
                 }

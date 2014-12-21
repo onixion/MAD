@@ -104,7 +104,7 @@ namespace MAD.JobSystemCore
                                         {
                                             if (_job.type != Job.JobType.NULL)
                                             {
-                                                Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] preparing for execution.", Logger.MessageType.INFORM);
+                                                //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] preparing for execution.", Logger.MessageType.INFORM);
 
                                                 _node.uWorker++;
                                                 _job.state = 2;
@@ -113,7 +113,7 @@ namespace MAD.JobSystemCore
                                                 _holder.node = _node;
                                                 _holder.job = _job;
 
-                                                Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] started execution.", Logger.MessageType.INFORM);
+                                                //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] started execution.", Logger.MessageType.INFORM);
 
                                                 JobThreadStart(_holder);
                                             }
@@ -285,7 +285,7 @@ namespace MAD.JobSystemCore
                 }
             }
 
-            Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] stopped execution.", Logger.MessageType.INFORM);
+            //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] stopped execution.", Logger.MessageType.INFORM);
 
             _job.state = 1;
             _node.uWorker--;
