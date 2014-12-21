@@ -200,9 +200,9 @@ namespace MAD.Database
             }
         }
 
-        public DataTable GetSummaryTable()
+        public DataTable GetSummaryTable(string subcommand)
         {
-                throw new NotImplementedException();
+            throw new NotImplementedException(); // TODO
         }
 
         #endregion
