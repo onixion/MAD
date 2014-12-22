@@ -11,7 +11,6 @@ namespace MAD.JobSystemCore
         #region members
 
         public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
-
         public enum Protocol { NULL, ICMP, TCP, UDP, RAW }
 
         [JsonIgnore]
@@ -27,8 +26,7 @@ namespace MAD.JobSystemCore
         /* This INT represents the state of the job.
          * state = 0 | stopped
          * state = 1 | waiting
-         * state = 2 | working
-         * state = 3 | execption */
+         * state = 2 | working */
         [JsonIgnore]
         public JobOutput outp { get; set; }
         [JsonIgnore]

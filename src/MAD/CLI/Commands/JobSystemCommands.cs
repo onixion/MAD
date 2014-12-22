@@ -690,6 +690,11 @@ namespace MAD.CLICore
                 if (_argType == typeof(int))
                 {
                     _buffer.type = JobTime.TimeMethod.Relative;
+
+
+
+
+
                     _buffer.jobDelay = new JobDelayHandler((int)c.pars.GetPar("t").argValues[0]);
                 }
                 else if (_argType == typeof(string))
