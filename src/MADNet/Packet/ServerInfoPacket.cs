@@ -12,7 +12,7 @@ namespace MadNet
         public ServerInfoPacket(NetworkStream stream)
             : base(stream, 5) { }
 
-        public ServerInfoPacket(NetworkStream stream, byte[] serverHeader, byte[] serverVersion)
+        public ServerInfoPacket(NetworkStream stream, byte[] serverHeader, byte[] serverVersion, byte[] serverTime)
             : base(stream, 5)
         {
             this.serverHeader = serverHeader;

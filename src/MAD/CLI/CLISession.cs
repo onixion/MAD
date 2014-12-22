@@ -129,6 +129,13 @@ namespace MAD.CLIServerCore
 
         public void Start()
         {
+            using(DataStringPacket _packet = new DataStringPacket(_stream))
+            {
+                _packet.ReceivePacket(_aes);
+                _packet.data = GetBanner( System.Convert.ToInt32(_packet.data));
+                _packet.SendPacket(_aes);
+            }
+
             using (CLIPacket _cliP = new CLIPacket(_stream))
             {
                 Command _command = null;

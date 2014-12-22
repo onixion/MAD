@@ -31,17 +31,25 @@ namespace CLIClient
                 else
                 {
                     ConfigReader.CreateConfig(Program.CONFIG_FILE);
-                    ConfigReader.ReadConfig(Program.CONFIG_FILE, out _serverIp, out _serverPort, out _aesPass);
+                    CLIOutput.WriteToConsole("<color><white>No config found.\n");
+                    CLIOutput.WriteToConsole("<color><white>Creating default config at '" + Program.CONFIG_FILE + "'.\n");
+                    CLIOutput.WriteToConsole("<color><white>Edit file as needed and start client ... \n");
+                    CLIOutput.WriteToConsole("<color><gray>Press any key to close ...\n");
+                    Console.ReadKey(false);
+                    return 0;
                 }
             }
             catch (Exception e)
             {
-                CLIOutput.WriteToConsole("<color><red>Exception: " + e.Message);
+                CLIOutput.WriteToConsole("<color><red>(ERROR) " + e.Message + "\n" + e.StackTrace);
                 return 0;
             }
 
-            CLIOutput.WriteToConsole("<color><yellow>IPAddress: <color><white>" + _serverIp.ToString() + "\n");
+            CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_') + "\n");
+            CLIOutput.WriteToConsole("<color><yellow>Address:   <color><white>" + _serverIp.ToString() + "\n");
             CLIOutput.WriteToConsole("<color><yellow>Port:      <color><white>" + _serverPort + "\n");
+            CLIOutput.WriteToConsole("<color><yellow>Pass:      <color><white>" + "".PadLeft(_aesPass.Length, '*') + "\n");
+            CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_') + "\n");
 
             CLIClient _client = new CLIClient(new IPEndPoint(_serverIp, _serverPort), _aesPass);
 
@@ -50,21 +58,22 @@ namespace CLIClient
                 _client.Connect();
                 _client.GetServerInfo();
 
-                CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER:   " + _client.serverHeader + "\n");
-                CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:  " + _client.serverVersion + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-HEADER:   <color><white>" + _client.serverHeader + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>SERVER-VERSION:  <color><white>" + _client.serverVersion + "\n");
+                CLIOutput.WriteToConsole("<color><yellow>" + "".PadLeft(Console.BufferWidth, '_') + "\n");
 
                 _client.StartRemoteCLI();
             }
             catch (System.Security.Cryptography.CryptographicException)
             {
-                CLIOutput.WriteToConsole("<color><red>CryptographicExecption: AES-key is wrong!\n");
+                CLIOutput.WriteToConsole("<color><red>(ERROR) Password wrong!\n");
             }
             catch (Exception e)
             {
-                CLIOutput.WriteToConsole("<color><red>Execption: " + e.Message + "!\n");
+                CLIOutput.WriteToConsole("<color><red>(ERROR) " + e.Message + "\n");
             }
 
-            CLIOutput.WriteToConsole("<color><red>Press any key to close ...");
+            CLIOutput.WriteToConsole("<color><gray>\nPress any key to close ...");
             Console.ReadKey();
 
             return 0;

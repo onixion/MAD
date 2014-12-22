@@ -75,6 +75,14 @@ namespace CLIClient
         {
             if (_client.Connected)
             {
+                using (DataStringPacket _packet = new DataStringPacket(_stream))
+                {
+                    _packet.data = Convert.ToString(Console.BufferWidth);
+                    _packet.SendPacket(_aes);
+                    _packet.ReceivePacket(_aes);
+                    CLIOutput.WriteToConsole(_packet.data + "\n");
+                }
+
                 using (CLIPacket _cliP = new CLIPacket(_stream))
                 {
                     _cliP.serverAnswer = "";
