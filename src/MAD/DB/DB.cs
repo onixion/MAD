@@ -19,7 +19,7 @@ namespace MAD.Database
             if (!File.Exists(DBname))
             {
                 Console.WriteLine("(DB) No database found at '" + DBname + "'!");
-                Console.WriteLine("(DB) Creating new one ... DONE.");
+                Console.WriteLine("(DB) Creating new one.");
                 SQLiteConnection.CreateFile(DBname);
             }
 

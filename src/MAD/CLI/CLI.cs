@@ -32,7 +32,6 @@ namespace MAD.CLICore
             commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-
             commands.Add(new CommandOptions("conf", typeof(ConfShowCommand), null));
             
             // INTERNET CONECTIVITY

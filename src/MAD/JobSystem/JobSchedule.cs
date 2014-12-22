@@ -73,8 +73,11 @@ namespace MAD.JobSystemCore
                 if (_state == 1)
                 {
                     _state = 2;
+                    _cycleThread.Join(_cycleTime + 100);
 
-                    _cycleThread.Join();
+                    if(_cycleThread.ThreadState != ThreadState.Stopped)
+                        _cycleThread.Abort();
+
                     _workerPool.WaitForIdle(_maxTimeToWaitForIdle);
                     _workerPool.Cancel();
 
@@ -98,28 +101,22 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    if (_job.state == 1 || _job.state == 2)
+                                    if (JobTimeCheck(_job, _nowTime))
                                     {
-                                        if (JobTimeCheck(_job, _nowTime))
+                                        if (_job.type != Job.JobType.NULL)
                                         {
-                                            if (_job.type != Job.JobType.NULL)
-                                            {
-                                                //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] preparing for execution.", Logger.MessageType.INFORM);
+                                            _node.uWorker++;
+                                            _job.state = 2;
 
-                                                _node.uWorker++;
-                                                _job.state = 2;
+                                            JobHolder _holder = new JobHolder();
+                                            _holder.node = _node;
+                                            _holder.job = _job;
 
-                                                JobHolder _holder = new JobHolder();
-                                                _holder.node = _node;
-                                                _holder.job = _job;
-
-                                                //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] started execution.", Logger.MessageType.INFORM);
-
-                                                JobThreadStart(_holder);
-                                            }
+                                            JobThreadStart(_holder);
                                         }
                                     }
                                 }
+
                             }
                         }
                     }
@@ -217,78 +214,75 @@ namespace MAD.JobSystemCore
             JobNode _node = _holder.node;
             Job _job = _holder.job;
 
-            _job.tStart = DateTime.Now;
-            try 
+            try
             {
-                _job.Execute(_node.ip); 
-            }
-            catch (Exception)
-            { 
-                _job.state = 3; 
-            }
-            _job.tStop = DateTime.Now;
-            _job.tSpan = _job.tStop.Subtract(_job.tStart);
+                _job.tStart = DateTime.Now;
+                _job.Execute(_node.ip);
+                _job.tStop = DateTime.Now;
+                _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
-            // Global OutDescriptors
-            _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
-            _job.outp.outputs[1].dataObject = _job.tSpan.Milliseconds;
+                // Global OutDescriptors
+                _job.outp.outputs[0].dataObject = _job.outp.outState.ToString();
+                _job.outp.outputs[1].dataObject = _job.tSpan.Milliseconds;
 
-            _db.InsertJob(_node, _job);
+                _db.InsertJob(_node, _job);
 
-            if (MadConf.conf.NOTI_ENABLE)
-            {
-                if (_job.notiFlag)
+                if (MadConf.conf.NOTI_ENABLE)
                 {
-                    List<JobRule> _bRules = GetBrokenRules(_job);
-                    if (_bRules.Count != 0)
+                    if (_job.notiFlag)
                     {
-                        string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ip.ToString()
-                            + "') finished with a not expected result!");
-
-                        string _mailContent = "";
-                        _mailContent += "JobNode-GUID: '" + _node.guid + "'\n";
-                        _mailContent += "JobNode-ID:   '" + _node.id + "'\n";
-                        _mailContent += "JobNode-IP:   '" + _node.ip.ToString() + "'\n";
-                        _mailContent += "JobNode-MAC:  '" + _node.mac.ToString() + "'\n\n";
-                        _mailContent += GenJobInfo(_job);
-                        _mailContent += GenBrokenRulesText(_job.outp, _bRules);
-
-                        // ___________________________________________________
-
-                        if (_job.settings == null)
+                        List<JobRule> _bRules = GetBrokenRules(_job);
+                        if (_bRules.Count != 0)
                         {
-                            NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
-                        }
-                        else
-                        {
-                            if (_job.settings.login == null)
+                            string _mailSubject = GenMailSubject(_job, "Job (target='" + _holder.node.ip.ToString()
+                                + "') finished with a not expected result!");
+
+                            string _mailContent = "";
+                            _mailContent += "JobNode-GUID: '" + _node.guid + "'\n";
+                            _mailContent += "JobNode-ID:   '" + _node.id + "'\n";
+                            _mailContent += "JobNode-IP:   '" + _node.ip.ToString() + "'\n";
+                            _mailContent += "JobNode-MAC:  '" + _node.mac.ToString() + "'\n\n";
+                            _mailContent += GenJobInfo(_job);
+                            _mailContent += GenBrokenRulesText(_job.outp, _bRules);
+
+                            if (_job.settings == null)
                             {
                                 NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
                             }
                             else
                             {
-                                if (_job.settings.login.smtpAddr == null || _job.settings.login.port == 0)
+                                if (_job.settings.login == null)
                                 {
                                     NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
                                 }
                                 else
                                 {
-                                    NotificationGetParams.SetSendMail(_job.settings.mailAddr, _mailSubject,
-                                        _mailContent, 3, _job.settings.login.smtpAddr, _job.settings.login.mail,
-                                        _job.settings.login.password, _job.settings.login.port);
+                                    if (_job.settings.login.smtpAddr == null || _job.settings.login.port == 0)
+                                    {
+                                        NotificationGetParams.SetSendMail(_mailSubject, _mailContent, 3);
+                                    }
+                                    else
+                                    {
+                                        NotificationGetParams.SetSendMail(_job.settings.mailAddr, _mailSubject,
+                                            _mailContent, 3, _job.settings.login.smtpAddr, _job.settings.login.mail,
+                                            _job.settings.login.password, _job.settings.login.port);
+                                    }
                                 }
-                            }     
+                            }
                         }
-
-                        // ___________________________________________________
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Logger.Log("(JobSchedule) Job threw a exception: " + e.ToString() + "\n" + e.StackTrace, Logger.MessageType.ERROR);
+            }
+            finally
+            {
+                _job.state = 1;
+                _node.uWorker--;
+            }
 
-            //Logger.Log("(SCHEDULE) JOB [ID:" + _job.id + ", GUID:" + _job.guid + "] stopped execution.", Logger.MessageType.INFORM);
-
-            _job.state = 1;
-            _node.uWorker--;
             return null;
         }
 
