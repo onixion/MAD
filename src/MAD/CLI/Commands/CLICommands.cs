@@ -39,9 +39,9 @@ namespace MAD.CLICore
             {
                 output += "<color><yellow>Type 'help -id <COMMAND-ID>' to get more information about a command.\n";
                 output += "<color><yellow>Available Commands:\n\n<color><white>";
-                
-                string[] _buffer2 = new string[3];
+
                 int i2 = 0;
+                string[] _buffer2 = new string[3] { "", "", "" };
                 for(int i = 0; i < _commands.Count; i++)
                 {
                     _buffer2[i2] = "[" + i + "] " + _commands[i].command;
@@ -50,10 +50,7 @@ namespace MAD.CLICore
                     {
                         i2 = -1;
                         output += ConsoleTable.FormatStringArray(consoleWidth, _buffer2);
-                        _buffer2 = new string[3];
-                        _buffer2[0] = "";
-                        _buffer2[1] = "";
-                        _buffer2[2] = "";
+                        _buffer2 = new string[3] { "", "", "" };
                     }
 
                     if(i == _commands.Count - 1)
