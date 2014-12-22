@@ -49,10 +49,9 @@ namespace MAD.CLIServerCore
             // GENERAL
             commands.Add(new CommandOptions("exit", typeof(ExitCommand), null));
             commands.Add(new CommandOptions("help", typeof(HelpCommand), new object[] { commands }));
-            commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
+            //commands.Add(new CommandOptions("set-width", typeof(SetWidthCommand), null));
             commands.Add(new CommandOptions("colortest", typeof(ColorTestCommand), null));
             commands.Add(new CommandOptions("info", typeof(InfoCommand), null));
-
             commands.Add(new CommandOptions("conf", typeof(ConfShowCommand), null));
 
             // INTERNET CONECTIVITY
@@ -89,7 +88,7 @@ namespace MAD.CLIServerCore
             commands.Add(new CommandOptions("node remove", typeof(JobSystemRemoveNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node edit", typeof(JobSystemEditNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node start", typeof(JobSystemStartNodeCommand), new object[] { _js }));
-            commands.Add(new CommandOptions("node stop", typeof(JobSystemStartNodeCommand), new object[] { _js }));
+            commands.Add(new CommandOptions("node stop", typeof(JobSystemStopNodeCommand), new object[] { _js }));
             //commands.Add(new CommandOptions("node sync", typeof(JobSystemSyncNodeCommand), new object[] { js, macFeeder }));
             commands.Add(new CommandOptions("node save", typeof(JobSystemSaveNodeCommand), new object[] { _js }));
             commands.Add(new CommandOptions("node load", typeof(JobSystemLoadNodeCommand), new object[] { _js }));
@@ -125,6 +124,11 @@ namespace MAD.CLIServerCore
 
             // Database commands
             commands.Add(new CommandOptions("db show", typeof(DBShowTables), new object[] { _db }));
+            commands.Add(new CommandOptions("db jobs", typeof(DBJobs), new object[] { _db }));
+            commands.Add(new CommandOptions("db summary create", typeof(DBSumCreate), new object[] { _db }));
+            commands.Add(new CommandOptions("db summary delete", typeof(DBSumDel), new object[] { _db }));
+            commands.Add(new CommandOptions("db add memo", typeof(DBMemoAdd), new object[] { _js, _db }));
+            commands.Add(new CommandOptions("db show memo", typeof(DBMemoShow), new object[] { _js, _db }));
         }
 
         public void Start()
