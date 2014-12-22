@@ -83,8 +83,7 @@ namespace MAD.Database
                     "STARTTIME text, " +
                     "STOPTIME text, " +
                     "DELAYTIME text, " +
-                    "OUTDESC text, " +
-                    "ID_MEMO integer);";
+                    "OUTDESC text);";
                 _command.ExecuteNonQuery();
 
                 // SummaryTable
