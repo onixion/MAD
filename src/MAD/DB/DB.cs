@@ -201,12 +201,31 @@ namespace MAD.Database
 
         public DataTable GetSummaryTable(string subcommand)
         {
-            throw new NotImplementedException(); // TODO
+            string sql = "select " +
+             "SummaryTable.ID, " +
+             "GUIDNodeTable.GUID_NODE, " +
+             "SummaryTable.STARTTIME, " +
+             "SummaryTable.STOPTIME, " +
+             "SummaryTable.SUCCESSRATE, " + 
+             "SummaryTable.AVERAGE_DURATION, " +
+             "SummaryTable.MAX_DURATION, " +
+             "SummaryTable.MIN_DURATION " +
+             "from SummaryTable " +
+             "inner join GUIDNodeTable on SummaryTable.ID_NODE = GUIDNodeTable.ID " +
+             "" + subcommand + ";";
+
+            using (SQLiteCommand command = new SQLiteCommand(sql, _con))
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+                DataTable TempResult = new DataTable();
+                TempResult.Load(reader);
+                return TempResult;
+            }
         }
 
         #endregion
 
-        #region insert job method
+        #region job method
 
         public void InsertJob(JobNode node, Job job)
         {
@@ -244,12 +263,17 @@ namespace MAD.Database
                     + _idJobType + "', '"
                     + _idProtocol + "', '"
                     + _idOutState + "', '"
-                    + DateTimToMADTimestamp(job.tStart) + "', '"
-                    + DateTimToMADTimestamp(job.tStop) + "', '"
+                    + DateTimeToMADTimestamp(job.tStart) + "', '"
+                    + DateTimeToMADTimestamp(job.tStop) + "', '"
                     + job.tSpan.Milliseconds.ToString() + "', '"
                     + job.outp.GetStrings() + "');";
                 _command.ExecuteNonQuery();
             }
+        }
+
+        public int DeleteAllFromJobTable()
+        {
+            return InsertCommand("delete from JobTable;");
         }
 
         #endregion
@@ -435,8 +459,8 @@ namespace MAD.Database
             if (_summarytime.TotalMilliseconds <= 0)
                 throw new Exception("Times are invalid!");
 
-            long _starttimestamp = DB.DateTimToMADTimestamp(from);
-            long _stoptimestamp = DB.DateTimToMADTimestamp(to);
+            long _starttimestamp = DB.DateTimeToMADTimestamp(from);
+            long _stoptimestamp = DB.DateTimeToMADTimestamp(to);
 
             // check if summarytime has already been summerized
             using (DataTable _table = SelectCommand("select ID from SummaryTable where " +
@@ -547,8 +571,13 @@ namespace MAD.Database
         public int DeleteFromSummaryTable(DateTime from, DateTime to)
         {
             return InsertCommand("delete from SummaryTable " +
-                "where STARTTIME >= " + DateTimToMADTimestamp(from) + " and " +
-                "STOPTIME <= " + DateTimToMADTimestamp(to) + ";");
+                "where STARTTIME >= " + DateTimeToMADTimestamp(from) + " and " +
+                "STOPTIME <= " + DateTimeToMADTimestamp(to) + ";");
+        }
+
+        public int DeleteAllFromSummaryTable()
+        {
+            return InsertCommand("delete from SummaryTable;");
         }
 
         #endregion
@@ -616,14 +645,14 @@ namespace MAD.Database
 
         #region timstamp
 
-        // We use our own timestamp. It counts the milliseconds since 1.1.2010
+        // We use our own timestamp. It counts the milliseconds since 1.1.2010.
 
         public static DateTime MADTimestampToDateTime(Int64 MADTimeStamp)
         {
             return _timeconst.AddMilliseconds(MADTimeStamp);
         }
 
-        public static Int64 DateTimToMADTimestamp(DateTime date)
+        public static Int64 DateTimeToMADTimestamp(DateTime date)
         {
             return Convert.ToInt64((date - _timeconst).TotalMilliseconds);
         }

@@ -98,17 +98,58 @@ namespace MAD.CLICore
         }
     }
 
-    public class DBJobsDel : Command
-    { 
-        // delete entries in the jobtable
+    public class DBJobsDelAll : Command
+    {
+        private DB _db;
+
+        public DBJobsDelAll(object[] args)
+        {
+            _db = (DB) args[0];
+            description = "This command deletes all datarows from the JobTable.";
+        }
 
         public override string Execute(int consoleWidth)
         {
-            throw new NotImplementedException();
+            return "<color><green>" + _db.DeleteAllFromJobTable() + " rows deleted.";
         }
     }
 
     #region summarize commands
+
+    public class DBSumShow : Command
+    {
+        private DB _db;
+
+        public DBSumShow(object[] args)
+        {
+            _db = (DB)args[0];
+
+            oPar.Add(new ParOption("r", "AMOUNT-ROWS", "Amount of rows to show.", false, false, new Type[] { typeof(int) }));
+            description = "This command shows the joined content of the summary-table.";
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            int _amountOfRows = 10;
+            if (OParUsed("r"))
+                _amountOfRows = (int)pars.GetPar("r").argValues[0];
+
+            using (DataTable _table = _db.GetSummaryTable(" order by SummaryTable.ID desc limit " + _amountOfRows))
+            {
+                DataColumnCollection _columns = _table.Columns;
+                DataRowCollection _rows = _table.Rows;
+
+                output += "<color><yellow>" + ConsoleTable.GetSplitline(consoleWidth);
+                output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetColumnNames(_columns));
+                output += ConsoleTable.GetSplitline(consoleWidth) + "<color><white>";
+
+                for (int i = 0; i < _rows.Count; i++)
+                    output += ConsoleTable.FormatStringArray(consoleWidth, DBCLIHelper.GetRowValues(_columns, _rows[i]));
+
+                return output;
+            }
+        }
+    }
 
     public class DBSumCreate : Command
     {
@@ -183,6 +224,21 @@ namespace MAD.CLICore
             int _rows = _db.DeleteFromSummaryTable((DateTime)pars.GetPar("s").argValues[0],
                 (DateTime)pars.GetPar("e").argValues[0]);
             return "<color><green>" + _rows + " DataRows deleted.";
+        }
+    }
+
+    public class DBSumDelAll : Command
+    {
+        private DB _db;
+
+        public DBSumDelAll(object[] args)
+        {
+            _db = (DB)args[0];
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            return "<color><green>" + _db.DeleteAllFromSummaryTable() + " rows deleted.";
         }
     }
 
