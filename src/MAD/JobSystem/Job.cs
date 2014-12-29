@@ -10,7 +10,7 @@ namespace MAD.JobSystemCore
     {
         #region members
 
-        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck }
+        public enum JobType { NULL, Ping, PortScan, Http, HostDetect, ServiceCheck, SnmpCheck, Probe }
         public enum Protocol { NULL, ICMP, TCP, UDP, RAW }
 
         [JsonIgnore]
