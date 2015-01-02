@@ -22,7 +22,10 @@ namespace MadProbe
 
             Console.WriteLine("AES-PASS: " + "".PadLeft(MadConf.conf.aesPass.Length, '*'));
             Console.WriteLine("Port:     " + MadConf.conf.port + "\n");
-            Console.WriteLine("Started. Listening ...");
+
+            MadProbe _probe = new MadProbe(MadConf.conf.aesPass, MadConf.conf.port);
+            Console.WriteLine("Probe started successfully.");
+            _probe.Start();
         }
     }
 }

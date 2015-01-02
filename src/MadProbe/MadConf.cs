@@ -75,6 +75,8 @@ namespace MadProbe
         {
             conf.aesPass = "PASSWORD";
             conf.port = 2221;
+
+            conf.probename = "DefaultProbe";
         }
 
         #endregion
@@ -85,6 +87,8 @@ namespace MadProbe
     {
         public string aesPass;
         public int port;
+
+        public string probename;
     }
 
     /* json converters */
