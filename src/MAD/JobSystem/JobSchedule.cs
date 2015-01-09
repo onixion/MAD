@@ -101,18 +101,21 @@ namespace MAD.JobSystemCore
                             {
                                 foreach (Job _job in _node.jobs)
                                 {
-                                    if (JobTimeCheck(_job, _nowTime))
+                                    if (_job.state == 1)
                                     {
-                                        if (_job.type != Job.JobType.NULL)
+                                        if (JobTimeCheck(_job, _nowTime))
                                         {
-                                            _node.uWorker++;
-                                            _job.state = 2;
+                                            if (_job.type != Job.JobType.NULL)
+                                            {
+                                                _node.uWorker++;
+                                                _job.state = 2;
 
-                                            JobHolder _holder = new JobHolder();
-                                            _holder.node = _node;
-                                            _holder.job = _job;
+                                                JobHolder _holder = new JobHolder();
+                                                _holder.node = _node;
+                                                _holder.job = _job;
 
-                                            JobThreadStart(_holder);
+                                                JobThreadStart(_holder);
+                                            }
                                         }
                                     }
                                 }
