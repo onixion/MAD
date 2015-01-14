@@ -549,24 +549,6 @@ namespace MAD.JobSystemCore
 
         #endregion
 
-        #region Database-only
-
-        private void DBWriteNode(JobNode node)
-        {
-            /* This method will save a given node into the db.
-             * It will check if the node already exists in the
-             * database. If it exists it will update the old
-             * entry, else It will create a new entry. */
-        }
-
-        private void DBWriteJob(Job job)
-        { 
-            /* This method will save a given job. It does not
-             * check if the job already exists. */
-        }
-
-        #endregion
-
         #region CLI-only
 
         public string GetJSStats()

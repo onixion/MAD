@@ -90,7 +90,6 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
-    <Compile Include="JobSystem\Jobs\JobProbe.cs" />
     <Compile Include="JobSystem\JSEventArgs.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
