@@ -15,7 +15,7 @@ namespace MAD.CLIServerCore
         private Thread _listenThread;
         private SmartThreadPool _threadPool = new SmartThreadPool();
 
-        private bool _listenThreadRunning = false;
+        protected bool _listenThreadRunning = false;
         private object _lock = new object();
 
         public bool IsListening { get { return _listenThreadRunning; } }

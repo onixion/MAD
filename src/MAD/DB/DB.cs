@@ -173,9 +173,9 @@ namespace MAD.Database
                          "JobTypeTable.JOBTYPE, " +
                          "ProtocolTable.PROTOCOL, " +
                          "OutStateTable.OUTSTATE, " +
-                         "STARTTIME, " +
-                         "STOPTIME, " +
-                         "DELAYTIME, " +
+                         "JobTable.STARTTIME, " +
+                         "JobTable.STOPTIME, " +
+                         "JobTable.DELAYTIME, " +
                          "MemoTable.MEMO1, " +
                          "MemoTable.MEMO2 " +
                          "from JobTable " +
@@ -188,7 +188,7 @@ namespace MAD.Database
                          "inner join JobTypeTable on JobTable.ID_JOBTYPE = JobTypeTable.ID " +
                          "inner join ProtocolTable on JobTable.ID_PROTOCOL = ProtocolTable.ID " +
                          "inner join OutStateTable on JobTable.ID_OUTSTATE = OutStateTable.ID " +
-                         "left join MemoTable on JobTable.ID_NODE = MemoTable.ID " + subcommand + ";";
+                         "left join MemoTable on JobTable.ID_NODE = MemoTable.ID " + subcommand + ";"; ;
 
             using (SQLiteCommand command = new SQLiteCommand(sql, _con))
             using (SQLiteDataReader reader = command.ExecuteReader())

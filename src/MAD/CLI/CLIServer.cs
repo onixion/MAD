@@ -34,14 +34,14 @@ namespace MAD.CLIServerCore
 
         public CLIServer(JobSystem js, DHCPReader dhcpReader, DB db)
         {
-            _aes = new AES(MadConf.conf.AES_PASS);
-
             _serverHeader = MadConf.conf.SERVER_HEADER;
             serverPort = MadConf.conf.SERVER_PORT;
 
             _js = js;
             _dhcpReader = dhcpReader;
             _db = db;
+
+            _aes = new AES(MadConf.conf.AES_PASS);
         }
 
         #endregion
@@ -98,13 +98,19 @@ namespace MAD.CLIServerCore
             }
             catch (Exception e)
             {
-                Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Execption: " + e.Message);
-                Logger.Log(" Execption: " + e.Message, Logger.MessageType.ERROR);
+                if (_listenThreadRunning)
+                {
+                    Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Execption: " + e.Message);
+                    Logger.Log(" Execption: " + e.Message, Logger.MessageType.ERROR);
+                }
             }
             finally
             {
-                Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") disconnected.");
-                Logger.Log("Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
+                if (_listenThreadRunning)
+                {
+                    Console.WriteLine("[" + MadNetHelper.GetTimeStamp() + "] Client (" + _clientEndPoint.Address + ") disconnected.");
+                    Logger.Log("Client (" + _clientEndPoint.Address + ") disconnected.", Logger.MessageType.INFORM);
+                }
             }
 
             return null;

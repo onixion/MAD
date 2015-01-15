@@ -23,6 +23,7 @@ namespace MadNet
 
         public byte[] Encrypt(byte[] data)
         {
+            
             if (data != null)
             {
                 if (data.Length != 0)

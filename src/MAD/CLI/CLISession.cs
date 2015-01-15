@@ -11,6 +11,8 @@ using MAD.CLICore;
 using MAD.JobSystemCore;
 using MAD.Logging;
 
+using MiscUtil.IO;
+
 using MadNet;
 
 namespace MAD.CLIServerCore
@@ -139,6 +141,7 @@ namespace MAD.CLIServerCore
 
         public void Start()
         {
+            
             using(DataStringPacket _packet = new DataStringPacket(_stream))
             {
                 _packet.ReceivePacket(_aes);

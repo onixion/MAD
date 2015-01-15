@@ -7,7 +7,108 @@ using MAD.Database;
 
 namespace MAD.CLICore
 {
-    public class DBShowTables : Command
+    public class DBSelectParameters : Command
+    {
+        public DBSelectParameters()
+        {
+            oPar.Add(new ParOption("id", "DATAROW-ID", "Show all datarows with this/those id(s).", false, false, new Type[] { typeof(string) }));
+            oPar.Add(new ParOption("c", "COUNT-ROWS", "Amount of the last rows to show.", false, false, new Type[] { typeof(int) }));
+            oPar.Add(new ParOption("b", "BEGIN-DATE", "Show all datarows since this date.", false, false, new Type[] { typeof(DateTime) }));
+            oPar.Add(new ParOption("e", "END-DATE", "Show all datarows before this date.", false, false, new Type[] { typeof(DateTime) }));
+            oPar.Add(new ParOption("m", "DISPLAY-MODE", "Show all datarows before this date.", false, false, new Type[] { typeof(string) }));
+        }
+
+        public override string Execute(int consoleWidth)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected string GetSQLSubCommand(string tablename, bool joined)
+        {
+            string _buffer = " ";
+
+            // ID
+            if (OParUsed("id"))
+            {
+                string[] _buffer2 = pars.GetPar("id").argValues[0].ToString().Split(new string[] { "-" }, StringSplitOptions.None);
+                int _idMIN = 0;
+                int _idMAX = 0;
+
+                if (_buffer2.Length == 2)
+                {
+                    _idMIN = Convert.ToInt32(_buffer2[0]);
+                    _idMAX = Convert.ToInt32(_buffer2[1]);
+                }
+                else if (_buffer2.Length == 1)
+                {
+                    _idMIN = Convert.ToInt32(_buffer2[0]);
+                    _idMAX = Convert.ToInt32(_buffer2[0]);
+                }
+                else
+                {
+                    throw new Exception("Could not parse '" + (string)pars.GetPar("id").argValues[0] + "' into an ID.");
+                }
+
+                if(joined)
+                    _buffer += "where " + tablename + ".ID>='" + _idMIN + "' and " + tablename + ".ID<='" + _idMAX + "' ";
+                else
+                    _buffer += "where ID>='" + _idMIN + "' and ID<='" + _idMAX + "' ";
+            }
+
+            // BEGIN-DATE & END-DATE
+            if (OParUsed("b") && OParUsed("e"))
+            {
+                if (OParUsed("id"))
+                    _buffer += "and ";
+                else
+                    _buffer += "where ";
+
+                _buffer += "STARTTIME>='" + DB.DateTimeToMADTimestamp((DateTime)pars.GetPar("b").argValues[0]) + "'" +
+                    " and STARTTIME<='" + DB.DateTimeToMADTimestamp((DateTime)pars.GetPar("e").argValues[0]) + "' ";
+            }
+            else
+            {
+                if (OParUsed("b"))
+                {
+                    if (OParUsed("id"))
+                        _buffer += "and ";
+                    else
+                        _buffer += "where ";
+
+                    _buffer += "STARTTIME>='" + DB.DateTimeToMADTimestamp((DateTime)pars.GetPar("b").argValues[0]) + "' ";
+                }
+
+                if (OParUsed("e"))
+                {
+                    if (OParUsed("id"))
+                        _buffer += "and ";
+                    else
+                        _buffer += "where ";
+
+                    _buffer += "STARTTIME<='" + DB.DateTimeToMADTimestamp((DateTime)pars.GetPar("e").argValues[0]) + "' ";
+                }
+            }
+
+            if (OParUsed("c"))
+            {
+                if(joined)
+                    _buffer += "order by " + tablename + ".ID desc limit " + (int)pars.GetPar("c").argValues[0];
+                else
+                    _buffer += "order by ID desc limit " + (int)pars.GetPar("c").argValues[0];
+            }
+            else
+            {
+                if (joined)
+                    _buffer += "order by " + tablename + ".ID desc limit 20";
+                else
+                    _buffer += "order by ID desc limit 20";
+            }
+
+            return _buffer;
+        }
+    }
+
+    public class DBShowTables : DBSelectParameters
     {
         private DB _db;
 
@@ -16,7 +117,6 @@ namespace MAD.CLICore
         {
             _db = (DB)args[0];
             oPar.Add(new ParOption("t", "TABLE-NAME", "Name of the table.", false, false, new Type[] { typeof(string) }));
-            oPar.Add(new ParOption("r", "AMOUNT-ROWS", "Amount of rows to show.", false, false, new Type[] { typeof(int) }));
             description = "This command shows you the raw content of a specific table.";
         }
 
@@ -39,13 +139,9 @@ namespace MAD.CLICore
             }
             else
             {
-                int _amountOfRows = 20;
-                if(OParUsed("r"))
-                    _amountOfRows = (int)pars.GetPar("r").argValues[0];
-
                 string _dataTable = (string)pars.GetPar("t").argValues[0];
 
-                using (DataTable _table = _db.SelectAllFromTable(" (select * from " + _dataTable + " order by ID desc limit " + _amountOfRows + ") order by ID asc" )) 
+                using (DataTable _table = _db.SelectAllFromTable(_dataTable + GetSQLSubCommand(_dataTable,false)))
                 {
                     DataColumnCollection _columns = _table.Columns;
                     DataRowCollection _rows = _table.Rows;
@@ -63,7 +159,7 @@ namespace MAD.CLICore
         }
     }
 
-    public class DBJobs : Command
+    public class DBJobs : DBSelectParameters
     { 
         private DB _db;
 
@@ -71,17 +167,12 @@ namespace MAD.CLICore
             :base()
         {
             _db = (DB)args[0];
-            oPar.Add(new ParOption("r", "AMOUNT-ROWS", "Amount of rows to show.", false, false, new Type[] { typeof(int) }));
             description = "This command shows the joined content of the job-table.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            int _amountOfRows = 10;
-            if (OParUsed("r"))
-                _amountOfRows = (int)pars.GetPar("r").argValues[0];
-
-            using (DataTable _table = _db.GetJobTable(" order by JobTable.ID desc limit " + _amountOfRows))
+            using (DataTable _table = _db.GetJobTable(GetSQLSubCommand("JobTable", true)))
             {
                 DataColumnCollection _columns = _table.Columns;
                 DataRowCollection _rows = _table.Rows;
@@ -116,25 +207,19 @@ namespace MAD.CLICore
 
     #region summarize commands
 
-    public class DBSumShow : Command
+    public class DBSumShow : DBSelectParameters
     {
         private DB _db;
 
         public DBSumShow(object[] args)
         {
             _db = (DB)args[0];
-
-            oPar.Add(new ParOption("r", "AMOUNT-ROWS", "Amount of rows to show.", false, false, new Type[] { typeof(int) }));
             description = "This command shows the joined content of the summary-table.";
         }
 
         public override string Execute(int consoleWidth)
         {
-            int _amountOfRows = 10;
-            if (OParUsed("r"))
-                _amountOfRows = (int)pars.GetPar("r").argValues[0];
-
-            using (DataTable _table = _db.GetSummaryTable(" order by SummaryTable.ID desc limit " + _amountOfRows))
+            using (DataTable _table = _db.GetSummaryTable(GetSQLSubCommand("SummaryTable",true)))
             {
                 DataColumnCollection _columns = _table.Columns;
                 DataRowCollection _rows = _table.Rows;
@@ -159,7 +244,7 @@ namespace MAD.CLICore
         {
             _db = (DB)args[0];
 
-            rPar.Add(new ParOption("s", "START-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+            rPar.Add(new ParOption("b", "BEGIN-DATE", "", false, false, new Type[] { typeof(DateTime) }));
             rPar.Add(new ParOption("e", "END-DATE", "", false, false, new Type[] { typeof(DateTime) }));
             rPar.Add(new ParOption("b", "BLOCK-SIZE", "Size of each block to summarize the jobs to (e.g. 10y, 10w, 10m, 10d, 5h, 15min, ...).", false, false, new Type[] { typeof(string) }));
             oPar.Add(new ParOption("del", "", "Delete the data which have been summarized.", true, false, null)); 
@@ -215,7 +300,7 @@ namespace MAD.CLICore
         {
             _db = (DB)args[0];
 
-            rPar.Add(new ParOption("s", "START-DATE", "", false, false, new Type[] { typeof(DateTime) }));
+            rPar.Add(new ParOption("b", "BEGIN-DATE", "", false, false, new Type[] { typeof(DateTime) }));
             rPar.Add(new ParOption("e", "END-DATE", "", false, false, new Type[] { typeof(DateTime) }));
         }
 
