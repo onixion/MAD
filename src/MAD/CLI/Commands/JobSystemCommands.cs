@@ -590,12 +590,13 @@ namespace MAD.CLICore
         public JobSystemStartJobCommand(object[] args)
         {
             _js = (JobSystem)args[0];
-            rPar.Add(new ParOption("id", "<JOB-ID>", "Id of the job.", false, false, new Type[] { typeof(int) }));
-            description = "This command sets the job to active.";
+            rPar.Add(new ParOption("id", "<JOB-ID>", "Id of the job(s).", false, true, new Type[] { typeof(int) }));
+            description = "This command sets the job(s) to active.";
         }
 
         public override string Execute(int consoleWidth)
         {
+            for(
             _js.StartJob((int)pars.GetPar("id").argValues[0]);
             return "<color><green>Job is active.";
         }

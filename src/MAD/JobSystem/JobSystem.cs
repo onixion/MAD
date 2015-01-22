@@ -238,6 +238,37 @@ namespace MAD.JobSystemCore
             }
         }
 
+        public string ResultMessage(int result)
+        {
+            switch (result)
+            { 
+                case 1:
+                    return "JobSystem not available.";
+                case 2:
+                    return "JobSystem intern error.";
+                case 3:
+                    return "Nodes limit reached.";
+                case 4:
+                    return "Jobs limit reached.";
+
+                case 50:
+                    return "Node does not exist.";
+                case 51:
+                    return "Node already running.";
+
+                case 70:
+                    return "Job does not exist.";
+                case 71:
+                    return "Job already running.";
+                case 72:
+                    return "Job already stopped.";
+
+
+                default:
+                    return "";
+            }
+        }
+
         #endregion
 
         #region nodes handling
@@ -434,7 +465,7 @@ namespace MAD.JobSystemCore
 
         #region jobs handling
 
-        public Job LGetJob(int id, out JobNode node)
+        public Job LGetJob(int id, ref JobNode node)
         {
             for (int i = 0; i < _nodes.Count; i++)
                 for (int i2 = 0; i2 < _nodes[i].jobs.Count; i2++)
@@ -443,53 +474,52 @@ namespace MAD.JobSystemCore
                         node = _nodes[i];
                         return _nodes[i].jobs[i2];
                     }
-            node = null;
             return null;
         }
 
-        public void StartJob(int id)
+        public void StartJob(int id, ref int result)
         {
             lock (jsLock)
             {
-                JobNode _node;
-                Job _job = LGetJob(id, out _node);
+                JobNode _node = null;
+                Job _job = LGetJob(id, ref _node);
                 if (_job != null)
                 {
-                        if (_job.state == 0)
-                            _job.state = 1;
-                        else
-                            throw new JobException("Job already active!", null);
+                    if (_job.state == 0)
+                        _job.state = 1;
+                    else
+                        result = 71;
                 }
                 else
-                    throw new JobException("Job does not exist!", null);
+                    result = 70;
             }
 
             if (OnJobStatusChange != null)
                 OnJobStatusChange.Invoke(null, null);
         }
 
-        public void StopJob(int id)
+        public void StopJob(int id, ref int result)
         {
             lock (jsLock)
             {
-                JobNode _node;
-                Job _job = LGetJob(id, out _node);
+                JobNode _node = null;
+                Job _job = LGetJob(id, ref _node);
                 if (_job != null)
                 {
                     if (_job.state == 1)
                         _job.state = 0;
                     else
-                        throw new JobException("Job already inactive!", null);
+                        result = 73;
                 }
                 else
-                    throw new JobException("Job does not exist!", null);
+                    result = 70;
             }
 
             if (OnJobStatusChange != null)
                 OnJobStatusChange.Invoke(null, null);
         }
 
-        public void AddJobToNode(int nodeId, Job job)
+        public void AddJobToNode(int nodeId, Job job, ref int result)
         {
             lock (jsLock)
             {
@@ -499,17 +529,17 @@ namespace MAD.JobSystemCore
                     if (JobNode.MAXJOBS > _node.jobs.Count)
                         _node.jobs.Add(job);
                     else
-                        throw new JobSystemException("Jobs limit reached!", null);
+                        result = 4;
                 }
                 else
-                    throw new JobNodeException("Node does not exist!", null);
+                    result = 50;
             }
 
             if (OnJobCountChange != null)
                 OnJobCountChange.Invoke(null, null);
         }
 
-        public void RemoveJob(int id)
+        public void RemoveJob(int id, ref int result)
         {
             lock (jsLock)
             {
@@ -529,8 +559,8 @@ namespace MAD.JobSystemCore
                         }
                     }
                 }
-                if(_success != false)
-                    throw new JobException("Job does not exist!", null);
+                if (_success != false)
+                    result = 70;
             }
         }
 
@@ -538,8 +568,8 @@ namespace MAD.JobSystemCore
         {
             lock (jsLock)
             {
-                JobNode _node;
-                Job _job = LGetJob(id, out _node);
+                JobNode _node = null;
+                Job _job = LGetJob(id, ref  _node);
                 if (_job != null)
                     return true;
                 else
