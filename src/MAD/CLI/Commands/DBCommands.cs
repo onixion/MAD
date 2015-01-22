@@ -342,15 +342,21 @@ namespace MAD.CLICore
             _db = (DB)args[1];
 
             rPar.Add(new ParOption("id", "NODE-ID", "ID of the node.", false, false, new Type[] { typeof(int) }));
-            rPar.Add(new ParOption("m1", "MEMO1", "First memo to attach to node.", false, false, new Type[] { typeof(string) }));
-            rPar.Add(new ParOption("m2", "MEMO2", "Second memo to attach to node.", false, false, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("m1", "MEMO1", "First memo to attach to node.", false, true, new Type[] { typeof(string) }));
+            rPar.Add(new ParOption("m2", "MEMO2", "Second memo to attach to node.", false, true, new Type[] { typeof(string) }));
         }
 
         public override string Execute(int consoleWidth)
         {
             int _id = (int)pars.GetPar("id").argValues[0];
-            string _memo1 = (string)pars.GetPar("m1").argValues[0];
-            string _memo2 = (string)pars.GetPar("m2").argValues[0];
+            string _memo1 = "";
+            string _memo2 = "";
+
+            foreach (string _temp in (string[])pars.GetPar("m1").argValues)
+                _memo1 += _temp + " ";
+            
+            foreach (string _temp in (string[])pars.GetPar("m2").argValues)
+                 _memo2 += _temp + " ";
 
             string _guid = "";
 

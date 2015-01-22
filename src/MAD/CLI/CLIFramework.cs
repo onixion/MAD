@@ -31,7 +31,7 @@ namespace MAD.CLICore
             CommandOptions _commandOptions = GetCommandOptions(_commandInput);
 
             if (_commandOptions == null)
-                return CLIError.Error(CLIError.ErrorType.CommandError, "Command '" + _commandInput + "' not know!", true);
+                return CLIError.Error(CLIError.ErrorType.CommandError, "Command '" + _commandInput + "' not known!", true);
 
             ParInput _parInput = GetParamtersFromInput(cliInput);
             Type _commandType = _commandOptions.commandType;
