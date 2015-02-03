@@ -596,9 +596,20 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            for(
-            _js.StartJob((int)pars.GetPar("id").argValues[0]);
-            return "<color><green>Job is active.";
+            Parameter _par = pars.GetPar("id");
+            for (int i = 0; i < _par.argValues.Length; i++)
+            {
+                try
+                {
+                    _js.StartJob((int)_par.argValues[i]);
+                    output += "<color><green>Job (ID=" + (int)_par.argValues[i] + ") active.\n";
+                }
+                catch (Exception e)
+                {
+                    output += "<color><red>" + e.Message + "\n";
+                }
+            }
+            return output;
         }
     }
 
@@ -615,8 +626,20 @@ namespace MAD.CLICore
 
         public override string Execute(int consoleWidth)
         {
-            _js.StopJob((int)pars.GetPar("id").argValues[0]);
-            return "<color><green>Job is inactive.";
+            Parameter _par = pars.GetPar("id");
+            for (int i = 0; i < _par.argValues.Length; i++)
+            {
+                try
+                {
+                    _js.StopJob((int)_par.argValues[i]);
+                    output += "<color><green>Job (ID=" + (int)_par.argValues[i] + ") inactive.\n";
+                }
+                catch (Exception e)
+                {
+                    output += "<color><red>" + e.Message + "\n";
+                }
+            }
+            return output;
         }
     }
 
