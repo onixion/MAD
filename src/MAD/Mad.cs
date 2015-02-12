@@ -43,10 +43,30 @@ namespace MAD
             if (args.Length == 0)
             {
                 GUI_USED = true; 
-                MadConf.LoadConf(CONFFILE);
-                    Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                    Application.Run(new BaseGUIrebulid());
-                    Logger.ForceWriteToLog();
+                if (File.Exists(CONFFILE))
+                {
+                    try
+                    {
+                        MadConf.LoadConf(CONFFILE);
+                        GUILogic.configStatus = "Config loaded.";                        
+                    }
+                    catch
+                    {
+                        MadConf.SetToDefault();
+                        MadConf.SaveConf(CONFFILE);
+                        GUILogic.configStatus = "Error loading Config. Default-Config loaded.";
+                    }
+                }
+                else
+                {
+                    MadConf.SetToDefault();
+                    MadConf.SaveConf(CONFFILE);
+                    GUILogic.configStatus = "No Config-file found. Default-Config loaded.";
+                }
+
+                Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
+                Application.Run(new BaseGUIrebulid());
+                Logger.ForceWriteToLog();
                 
             }
             else if (args.Length == 1)

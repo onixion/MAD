@@ -5,8 +5,8 @@ using System.Text;
 
 namespace MAD.GUI
 {
-    public partial class BaseGUIrebulid
+    public static class GUILogic
     {
-
+        public static string configStatus;
     }
 }

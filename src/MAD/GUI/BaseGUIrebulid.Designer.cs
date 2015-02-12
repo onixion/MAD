@@ -35,8 +35,12 @@
             this.labelTopBoxTitle = new System.Windows.Forms.Label();
             this.panelSeperator = new System.Windows.Forms.Panel();
             this.listBoxNodes = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.buttonReload = new System.Windows.Forms.Button();
             this.toolTipNodeListing = new System.Windows.Forms.ToolTip(this.components);
+            this.labelConfigStatusTitle = new System.Windows.Forms.Label();
+            this.labelConfigStatus = new System.Windows.Forms.Label();
+            this.labelLastReloadTimeTitle = new System.Windows.Forms.Label();
+            this.labelLastReloadTime = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.SuspendLayout();
@@ -87,24 +91,25 @@
             this.listBoxNodes.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
             this.listBoxNodes.FormattingEnabled = true;
             this.listBoxNodes.ItemHeight = 38;
-            this.listBoxNodes.Location = new System.Drawing.Point(12, 89);
+            this.listBoxNodes.Location = new System.Drawing.Point(12, 127);
             this.listBoxNodes.Name = "listBoxNodes";
-            this.listBoxNodes.Size = new System.Drawing.Size(363, 418);
+            this.listBoxNodes.Size = new System.Drawing.Size(363, 380);
             this.listBoxNodes.TabIndex = 2;
             this.toolTipNodeListing.SetToolTip(this.listBoxNodes, "Please choose one \r\nof the listed Nodes \r\nin order to get Information.");
             // 
-            // button1
+            // buttonReload
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.button1.ForeColor = System.Drawing.SystemColors.Control;
-            this.button1.Location = new System.Drawing.Point(11, 520);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(364, 30);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Reload";
-            this.button1.UseVisualStyleBackColor = false;
+            this.buttonReload.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.buttonReload.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonReload.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.buttonReload.ForeColor = System.Drawing.SystemColors.Control;
+            this.buttonReload.Location = new System.Drawing.Point(11, 520);
+            this.buttonReload.Name = "buttonReload";
+            this.buttonReload.Size = new System.Drawing.Size(364, 30);
+            this.buttonReload.TabIndex = 3;
+            this.buttonReload.Text = "Reload";
+            this.buttonReload.UseVisualStyleBackColor = false;
+            this.buttonReload.Click += new System.EventHandler(this.buttonReload_Click);
             // 
             // toolTipNodeListing
             // 
@@ -112,23 +117,65 @@
             this.toolTipNodeListing.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.toolTipNodeListing.Tag = "";
             // 
+            // labelConfigStatusTitle
+            // 
+            this.labelConfigStatusTitle.AutoSize = true;
+            this.labelConfigStatusTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+            this.labelConfigStatusTitle.Location = new System.Drawing.Point(12, 82);
+            this.labelConfigStatusTitle.Name = "labelConfigStatusTitle";
+            this.labelConfigStatusTitle.Size = new System.Drawing.Size(111, 17);
+            this.labelConfigStatusTitle.TabIndex = 4;
+            this.labelConfigStatusTitle.Text = "Config-Status:";
+            // 
+            // labelConfigStatus
+            // 
+            this.labelConfigStatus.AutoSize = true;
+            this.labelConfigStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.labelConfigStatus.Location = new System.Drawing.Point(108, 82);
+            this.labelConfigStatus.Name = "labelConfigStatus";
+            this.labelConfigStatus.Size = new System.Drawing.Size(0, 17);
+            this.labelConfigStatus.TabIndex = 5;
+            // 
+            // labelLastReloadTimeTitle
+            // 
+            this.labelLastReloadTimeTitle.AutoSize = true;
+            this.labelLastReloadTimeTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold);
+            this.labelLastReloadTimeTitle.Location = new System.Drawing.Point(12, 101);
+            this.labelLastReloadTimeTitle.Name = "labelLastReloadTimeTitle";
+            this.labelLastReloadTimeTitle.Size = new System.Drawing.Size(100, 17);
+            this.labelLastReloadTimeTitle.TabIndex = 6;
+            this.labelLastReloadTimeTitle.Text = "Last Reload:";
+            // 
+            // labelLastReloadTime
+            // 
+            this.labelLastReloadTime.AutoSize = true;
+            this.labelLastReloadTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.labelLastReloadTime.Location = new System.Drawing.Point(97, 101);
+            this.labelLastReloadTime.Name = "labelLastReloadTime";
+            this.labelLastReloadTime.Size = new System.Drawing.Size(0, 17);
+            this.labelLastReloadTime.TabIndex = 7;
+            // 
             // BaseGUIrebulid
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 562);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.labelLastReloadTime);
+            this.Controls.Add(this.labelLastReloadTimeTitle);
+            this.Controls.Add(this.labelConfigStatus);
+            this.Controls.Add(this.labelConfigStatusTitle);
+            this.Controls.Add(this.buttonReload);
             this.Controls.Add(this.listBoxNodes);
             this.Controls.Add(this.panelSeperator);
             this.Controls.Add(this.panelTop);
             this.MaximizeBox = false;
             this.Name = "BaseGUIrebulid";
             this.Text = "BaseGUIrebulid";
-            this.Load += new System.EventHandler(this.BaseGUIrebulid_Load);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -139,7 +186,11 @@
         private System.Windows.Forms.PictureBox pictureBoxTopPanel;
         private System.Windows.Forms.Panel panelSeperator;
         private System.Windows.Forms.ListBox listBoxNodes;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button buttonReload;
         private System.Windows.Forms.ToolTip toolTipNodeListing;
+        private System.Windows.Forms.Label labelConfigStatusTitle;
+        private System.Windows.Forms.Label labelConfigStatus;
+        private System.Windows.Forms.Label labelLastReloadTimeTitle;
+        private System.Windows.Forms.Label labelLastReloadTime;
     }
 }

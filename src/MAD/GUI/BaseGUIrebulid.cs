@@ -14,6 +14,12 @@ namespace MAD.GUI
         public BaseGUIrebulid()
         {
             InitializeComponent();
+            labelConfigStatus.Text = GUILogic.configStatus;
+        }
+
+        private void buttonReload_Click(object sender, EventArgs e)
+        {
+            labelLastReloadTime.Text = DateTime.Now.ToLongTimeString();
         }
 
     }
