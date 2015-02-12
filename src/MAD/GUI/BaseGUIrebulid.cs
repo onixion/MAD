@@ -7,13 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MAD.GUI_rebuild
+namespace MAD.GUI
 {
-    public partial class BaseGUI : Form
+    public partial class BaseGUIrebulid : Form
     {
-        public BaseGUI()
+        public BaseGUIrebulid()
         {
             InitializeComponent();
         }
+
     }
 }

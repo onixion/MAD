@@ -66,10 +66,5 @@ namespace MAD.GUI
             AddNodeScreen _tmp = new AddNodeScreen(js);
             _tmp.ShowDialog();
         }
-
-        private void titlePicBox_Click(object sender, EventArgs e)
-        {
-
-        }
     }
 }

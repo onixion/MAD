@@ -97,41 +97,14 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
-    <Compile Include="GUI\AddNodeScreen.cs">
+    <Compile Include="GUI\BaseGUIrebulid.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\AddNodeScreen.Designer.cs">
-      <DependentUpon>AddNodeScreen.cs</DependentUpon>
+    <Compile Include="GUI\BaseGUIrebulid.Designer.cs">
+      <DependentUpon>BaseGUIrebulid.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ConfigDialog.cs">
+    <Compile Include="GUI\GUINodelisting.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ConfigDialog.Designer.cs">
-      <DependentUpon>ConfigDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\BaseGUI.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ActionScan.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ActionScan.Designer.cs">
-      <DependentUpon>ActionScan.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\ActionConnectivityCheck.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ActionConnectivityCheck.Designer.cs">
-      <DependentUpon>ActionConnectivityCheck.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\BaseGUI.Designer.cs">
-      <DependentUpon>BaseGUI.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\ShowNodes.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ShowNodes.Designer.cs">
-      <DependentUpon>ShowNodes.cs</DependentUpon>
     </Compile>
     <Compile Include="JobSystem\DBHandler.cs" />
     <Compile Include="DB\DB_Table_Info.cs" />
@@ -213,30 +186,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GUI\READ_ME.txt" />
     <Content Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GUI\ActionScan.resx">
-      <DependentUpon>ActionScan.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\AddNodeScreen.resx">
-      <DependentUpon>AddNodeScreen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ConfigDialog.resx">
-      <DependentUpon>ConfigDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\BaseGUI.resx">
-      <DependentUpon>BaseGUI.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ActionConnectivityCheck.resx">
-      <DependentUpon>ActionConnectivityCheck.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ShowNodes.resx">
-      <DependentUpon>ShowNodes.cs</DependentUpon>
+    <EmbeddedResource Include="GUI\BaseGUIrebulid.resx">
+      <DependentUpon>BaseGUIrebulid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

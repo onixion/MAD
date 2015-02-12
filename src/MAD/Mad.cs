@@ -42,20 +42,12 @@ namespace MAD
             // start interface
             if (args.Length == 0)
             {
-                BaseGUI.InitGui(js, db);
                 GUI_USED = true; 
-                if (File.Exists(CONFFILE))
-                {
-                    MadConf.LoadConf(CONFFILE);
+                MadConf.LoadConf(CONFFILE);
                     Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                    Application.Run(new ShowNodes());
+                    Application.Run(new BaseGUIrebulid());
                     Logger.ForceWriteToLog();
-                }
-
-                else
-                {
-                    Application.Run(new ConfigDialog());
-                }
+                
             }
             else if (args.Length == 1)
             {
