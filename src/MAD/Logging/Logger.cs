@@ -73,7 +73,10 @@ namespace MAD.Logging
         {
             if (_logMessages.Count >= buffer || _force)
             {
-                File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + Path.DirectorySeparatorChar + logFileName, _logMessages.ToArray());
+                if (String.IsNullOrEmpty(MadConf.conf.LOG_FILE_DIRECTORY) || MadConf.conf.LOG_FILE_DIRECTORY.ToString().Contains("."))
+                    File.AppendAllLines(logFileName, _logMessages.ToArray());
+                else
+                    File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + Path.DirectorySeparatorChar + logFileName, _logMessages.ToArray());
                 _logMessages.Clear();
             }
         }

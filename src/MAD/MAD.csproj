@@ -51,12 +51,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SnmpSharpNet">
       <HintPath>..\..\lib\SnmpSharpNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.SQLite, Version=1.0.79.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\lib\Newtonsoft.Json.dll</HintPath>
@@ -91,6 +100,25 @@
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
     <Compile Include="JobSystem\JSEventArgs.cs" />
+    <Compile Include="GUI\ActionScan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ActionScan.designer.cs">
+      <DependentUpon>ActionScan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\ArpScanWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\ArpScanWindow.Designer.cs">
+      <DependentUpon>ArpScanWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\MainWindow.Designer.cs">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\GUILogic.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
@@ -126,6 +154,11 @@
     <Compile Include="Notification\NotificationGetParams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MacFinders\ModelHost.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -167,6 +200,154 @@
     <Content Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GUI\ActionScan.resx">
+      <DependentUpon>ActionScan.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\ArpScanWindow.resx">
+      <DependentUpon>ArpScanWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\MainWindow.resx">
+      <DependentUpon>MainWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\DataSources\MAD.CLICore.ArpReaderStart.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CatchBasicInfoPrintHostsCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CatchBasicInfoSetTimeIntervallCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CatchBasicInfoStartCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CatchBasicInfoStopCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ChangeBufferSize.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ChangeLogFileName.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CheckList.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ClearCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLI.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIError+ErrorType.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIError.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIFramework.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIServerInfo.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIServerStart.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CLIServerStop.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ColorTestCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.Command.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.CommandOptions.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ConfShowCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ConnectivityTestCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ConsoleTable.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.DBInsertTest.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.DBSelect.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ExitCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.HelpCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.InfoCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobAddCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobInfoCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobOutDescInfoCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobScheduleStartCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobScheduleStopCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddCheckDnsCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddCheckFtpCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddCheckSnmpCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddHostDetectCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddHttpCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddPingCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddPortCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemAddReadTrafficCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemEditJobCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemEditNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemLoadNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemLoadTableCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemRemoveJobCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemRemoveNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemSaveNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemSaveTableCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemSetJobMailSettingsCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStartJobCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStartNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStatusCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStatusJobsCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStatusNodesCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStopJobCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.JobSystemStopNodeCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.LoadDefaultConfigCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ManuallySyncNodesCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.NotificationConCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.Parameter.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ParInput.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.ParOption.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.PrintArpReadyInterfaces.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.SetMailSettingsCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.SetWidthCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.SnmpCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.SnmpInterfaceCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLICore.StopArpReaderCommand.datasource" />
+    <None Include="Properties\DataSources\MAD.CLIServerCore.CLIServer.datasource" />
+    <None Include="Properties\DataSources\MAD.CLIServerCore.CLISession.datasource" />
+    <None Include="Properties\DataSources\MAD.CLIServerCore.Server.datasource" />
+    <None Include="Properties\DataSources\MAD.Database.DB.datasource" />
+    <None Include="Properties\DataSources\MAD.Database.Insert.datasource" />
+    <None Include="Properties\DataSources\MAD.Database.Select.datasource" />
+    <None Include="Properties\DataSources\MAD.Database.TableInfo+OType.datasource" />
+    <None Include="Properties\DataSources\MAD.Database.TableInfo.datasource" />
+    <None Include="Properties\DataSources\Mad.datasource" />
+    <None Include="Properties\DataSources\MAD.GUI.BaseGUIrebulid.datasource" />
+    <None Include="Properties\DataSources\MAD.Helper.NetworkHelper+securityLvl.datasource" />
+    <None Include="Properties\DataSources\MAD.Helper.NetworkHelper+securityModel.datasource" />
+    <None Include="Properties\DataSources\MAD.Helper.NetworkHelper+snmpProtocols.datasource" />
+    <None Include="Properties\DataSources\MAD.Helper.NetworkHelper.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.DBHandler.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.IPAddressConverter.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.Job+JobType.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.Job.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobCheckDns.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobCheckFtp.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobCheckSnmp.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobDelayHandler.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobException.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobHolder.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobHostDetect.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobHttp.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobNode.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobNodeException.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobNotificationSettings.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobOutput+OutState.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobOutput.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobPing.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobPort.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobRule+Operation.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobRule.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobSchedule.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobScheduleException.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobSnmp.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobSystem.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobSystemException.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobTime+TimeMethod.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobTime.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobTimeHandler+TimeType.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JobTimeHandler.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.JSSerializer.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.MacAddressConverter.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.MailAddressConverter.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.OutputDescriptor.datasource" />
+    <None Include="Properties\DataSources\MAD.JobSystemCore.SyncResult.datasource" />
+    <None Include="Properties\DataSources\MAD.Logging.Logger+MessageType.datasource" />
+    <None Include="Properties\DataSources\MAD.Logging.Logger.datasource" />
+    <None Include="Properties\DataSources\MAD.MacFinders.ARPReader.datasource" />
+    <None Include="Properties\DataSources\MAD.MacFinders.DHCPReader.datasource" />
+    <None Include="Properties\DataSources\MAD.MacFinders.ModelHost.datasource" />
+    <None Include="Properties\DataSources\MAD.Notification.MailLogin.datasource" />
+    <None Include="Properties\DataSources\MAD.Notification.NotificationGetParams.datasource" />
+    <None Include="Properties\DataSources\MAD.Notification.NotificationSend.datasource" />
+    <None Include="Properties\DataSources\MAD.Notification.NotificPackIn.datasource" />
+    <None Include="Properties\DataSources\MAD.Properties.Resources.datasource" />
+    <None Include="Properties\DataSources\MadConf.datasource" />
+    <None Include="Properties\DataSources\MadConfigFile.datasource" />
+    <None Include="Properties\DataSources\MailAddressConverter.datasource" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
