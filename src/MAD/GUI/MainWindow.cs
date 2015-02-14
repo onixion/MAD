@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace MAD.GUI
 {
-    public partial class BaseGUIrebulid : Form
+    public partial class MainWindow : Form
     {
-        public BaseGUIrebulid()
+        public MainWindow()
         {
             InitializeComponent();
             labelConfigStatus.Text = GUILogic.configStatus;

@@ -8,5 +8,6 @@ namespace MAD.GUI
     public static class GUILogic
     {
         public static string configStatus;
+
     }
 }

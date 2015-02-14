@@ -34,7 +34,7 @@ namespace MAD
             // init components
             DB db = new DB(DBFILE);
             JobSystem js = new JobSystem(db);
-            js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
+            js. OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
  
@@ -65,7 +65,7 @@ namespace MAD
                 }
 
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                Application.Run(new BaseGUIrebulid());
+                Application.Run(new MainWindow());
                 Logger.ForceWriteToLog();
                 
             }

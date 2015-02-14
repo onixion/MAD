@@ -1,6 +1,6 @@
 ﻿namespace MAD.GUI
 {
-    partial class BaseGUIrebulid
+    partial class MainWindow
     {
         /// <summary>
         /// Erforderliche Designervariable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BaseGUIrebulid));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.panelTop = new System.Windows.Forms.Panel();
             this.pictureBoxTopPanel = new System.Windows.Forms.PictureBox();
             this.labelTopBoxTitle = new System.Windows.Forms.Label();
