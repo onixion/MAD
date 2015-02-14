@@ -269,6 +269,28 @@ namespace MAD.JobSystemCore
             }
         }
 
+        public List<JobNodeInfo> GetNodesAndJobS()
+        {
+            List<JobNodeInfo> nodes = new List<JobNodeInfo>();
+
+            lock (jsLock)
+            {
+                foreach (JobNode node in _nodes)
+                {
+                    List<JobInfo> jobs = new List<JobInfo>();
+
+                    foreach(Job job in node.jobs)
+                    {
+                        jobs.Add(new JobInfo(job.id, job.guid, job.name, job.type.ToString(), job.outp.outState.ToString()));
+                    }
+
+                    nodes.Add(new JobNodeInfo(node.id, node.guid, node.name, node.ip, node.mac.ToString(), node.state, jobs));
+                }
+            }
+            
+            return nodes;
+        }
+
         #endregion
 
         #region nodes handling

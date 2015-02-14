@@ -99,6 +99,8 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="JobSystem\JobInfo.cs" />
+    <Compile Include="JobSystem\JobNodeInfo.cs" />
     <Compile Include="JobSystem\JSEventArgs.cs" />
     <Compile Include="GUI\ActionScan.cs">
       <SubType>Form</SubType>
