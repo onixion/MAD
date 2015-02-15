@@ -20,15 +20,15 @@ namespace MAD.GUI
     {
         #region Decleration
 
-        protected static JobSystem js;
-        protected static DB db;
+        protected static JobSystem _js;
+        protected static DB _db;
         private bool validEntering = false;
 
 
-        public static void InitGui(JobSystem jobSys, DB dataBase)
+        public static void InitGUI(JobSystem jobSys, DB dataBase)
         {
-            db = dataBase;
-            js = jobSys;
+            _db = dataBase;
+            _js = jobSys;
         }
 
         #endregion
@@ -129,30 +129,22 @@ namespace MAD.GUI
         
         private void buttonStartScan_Click(object sender, EventArgs e)
         {
-            if (checkBoxOneScan.Checked == true)
+            if (0 < comboBoxSubnetmask.SelectedIndex && comboBoxSubnetmask.SelectedIndex < 25)
             {
-                progressBarArpScan.Visible = true;
-            }
-
-            InvokeArpReader();
-
-            if (validEntering == true)
-            {
-                if (checkBoxOneScan.Checked)
+                if (checkBoxOneScan.Checked == true)
                 {
-                    MainWindow MainWindow = new MainWindow();
-                    MainWindow.Show();
-                    this.Close();
+                    progressBarArpScan.Visible = true;
                 }
 
-                else
+                InvokeArpReader();
+
+                if (validEntering == true)
                 {
-                    MainWindow MainWindow = new MainWindow();
-                    MainWindow.Show();
-                    this.Hide();
+                    GUILogic.RunBehind();
                 }
             }
-           
+            else
+                MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         #endregion
@@ -171,19 +163,19 @@ namespace MAD.GUI
                 {
                     ARPReader.SetWindow(this);
                     ARPReader.FloodStart();
-                    js.SyncNodes(ModelHost.hostList);
+                    _js.SyncNodes(ModelHost.hostList);
                     ARPReader.ResetWindow();
 
                 }
                 else
-                    ARPReader.SteadyStart(js);
+                    ARPReader.SteadyStart(_js);
 
                 validEntering = true;
             }
 
             catch
             {
-                MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Wrong input!", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error);
+                MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 validEntering = false;
             }
 

@@ -114,9 +114,7 @@
     <Compile Include="GUI\MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\GUILogic.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="GUI\GUILogic.cs" />
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />

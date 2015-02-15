@@ -67,10 +67,9 @@ namespace MAD
                     MainWindow.configStatus = "No Config-file found. Default-Config loaded.";
                 }
 
-                ArpScanWindow.InitGui(js, db);
                 GUI_USED = true;
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                Application.Run(new ArpScanWindow());
+                GUILogic.RunGUI(js,db);
                 Logger.ForceWriteToLog();
                 
             }

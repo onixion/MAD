@@ -278,7 +278,7 @@ namespace MAD.JobSystemCore
                 foreach (JobNode node in _nodes)
                 {
                     List<JobInfo> jobs = new List<JobInfo>();
-
+                    
                     foreach(Job job in node.jobs)
                     {
                         jobs.Add(new JobInfo(job.id, job.guid, job.name, job.type.ToString(), job.outp.outState.ToString()));

@@ -143,6 +143,8 @@
             // 
             // comboBoxSubnetmask
             // 
+            this.comboBoxSubnetmask.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxSubnetmask.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.comboBoxSubnetmask.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.comboBoxSubnetmask.FormattingEnabled = true;
             this.comboBoxSubnetmask.Items.AddRange(new object[] {
@@ -195,7 +197,7 @@
             this.buttonStartScan.ForeColor = System.Drawing.SystemColors.Control;
             this.buttonStartScan.Location = new System.Drawing.Point(14, 212);
             this.buttonStartScan.Name = "buttonStartScan";
-            this.buttonStartScan.Size = new System.Drawing.Size(224, 31);
+            this.buttonStartScan.Size = new System.Drawing.Size(228, 31);
             this.buttonStartScan.TabIndex = 13;
             this.buttonStartScan.Text = "Start Scan";
             this.buttonStartScan.UseVisualStyleBackColor = false;
