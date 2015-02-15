@@ -269,7 +269,7 @@ namespace MAD.JobSystemCore
             }
         }
 
-        public List<JobNodeInfo> GetNodesAndJobS()
+        public List<JobNodeInfo> GetNodesAndJobs()
         {
             List<JobNodeInfo> nodes = new List<JobNodeInfo>();
 

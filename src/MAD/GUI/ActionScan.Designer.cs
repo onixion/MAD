@@ -26,7 +26,7 @@
          private void InitializeComponent()
          {
             this.LocalIPAddressLabel = new System.Windows.Forms.Label();
-            this.LocalIPAddresTextBox = new System.Windows.Forms.TextBox();
+            this.LocalIPAddressTextBox = new System.Windows.Forms.TextBox();
             this.NetworkTextBox = new System.Windows.Forms.TextBox();
             this.NetworkLabel = new System.Windows.Forms.Label();
             this.SubnetmaskDropdown = new System.Windows.Forms.ComboBox();
@@ -47,12 +47,12 @@
             // 
             // LocalIPAddresTextBox
             // 
-            this.LocalIPAddresTextBox.Location = new System.Drawing.Point(12, 113);
-            this.LocalIPAddresTextBox.Name = "LocalIPAddresTextBox";
-            this.LocalIPAddresTextBox.Size = new System.Drawing.Size(100, 20);
-            this.LocalIPAddresTextBox.TabIndex = 5;
-            this.LocalIPAddresTextBox.Text = "192.168.0.1";
-            this.LocalIPAddresTextBox.TextChanged += new System.EventHandler(this.LocalIPAddresTextBox_TextChanged);
+            this.LocalIPAddressTextBox.Location = new System.Drawing.Point(12, 113);
+            this.LocalIPAddressTextBox.Name = "LocalIPAddresTextBox";
+            this.LocalIPAddressTextBox.Size = new System.Drawing.Size(100, 20);
+            this.LocalIPAddressTextBox.TabIndex = 5;
+            this.LocalIPAddressTextBox.Text = "192.168.0.1";
+            this.LocalIPAddressTextBox.TextChanged += new System.EventHandler(this.LocalIPAddresTextBox_TextChanged);
             // 
             // NetworkTextBox
             // 
@@ -165,7 +165,7 @@
             this.Controls.Add(this.SubnetmaskDropdown);
             this.Controls.Add(this.NetworkTextBox);
             this.Controls.Add(this.NetworkLabel);
-            this.Controls.Add(this.LocalIPAddresTextBox);
+            this.Controls.Add(this.LocalIPAddressTextBox);
             this.Controls.Add(this.LocalIPAddressLabel);
             this.Name = "ActionScan";
             this.Text = "Scan";
@@ -175,7 +175,7 @@
          }
          #endregion
          private System.Windows.Forms.Label LocalIPAddressLabel;
-         private System.Windows.Forms.TextBox LocalIPAddresTextBox;
+         private System.Windows.Forms.TextBox LocalIPAddressTextBox;
          private System.Windows.Forms.TextBox NetworkTextBox;
          private System.Windows.Forms.Label NetworkLabel;
          private System.Windows.Forms.ComboBox SubnetmaskDropdown;

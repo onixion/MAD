@@ -42,6 +42,7 @@
             this.buttonStartScan = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.checkBoxOneScan = new System.Windows.Forms.CheckBox();
+            this.progressBarArpScan = new System.Windows.Forms.ProgressBar();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.SuspendLayout();
@@ -192,7 +193,7 @@
             this.buttonStartScan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStartScan.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.buttonStartScan.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStartScan.Location = new System.Drawing.Point(14, 191);
+            this.buttonStartScan.Location = new System.Drawing.Point(14, 212);
             this.buttonStartScan.Name = "buttonStartScan";
             this.buttonStartScan.Size = new System.Drawing.Size(224, 31);
             this.buttonStartScan.TabIndex = 13;
@@ -204,7 +205,7 @@
             // 
             this.checkBoxOneScan.AutoSize = true;
             this.checkBoxOneScan.ForeColor = System.Drawing.Color.DarkGray;
-            this.checkBoxOneScan.Location = new System.Drawing.Point(14, 168);
+            this.checkBoxOneScan.Location = new System.Drawing.Point(14, 160);
             this.checkBoxOneScan.Name = "checkBoxOneScan";
             this.checkBoxOneScan.Size = new System.Drawing.Size(170, 17);
             this.checkBoxOneScan.TabIndex = 14;
@@ -212,11 +213,22 @@
             this.checkBoxOneScan.UseVisualStyleBackColor = true;
             this.checkBoxOneScan.CheckedChanged += new System.EventHandler(this.checkBoxOneScan_CheckedChanged);
             // 
+            // progressBarArpScan
+            // 
+            this.progressBarArpScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.progressBarArpScan.Location = new System.Drawing.Point(14, 183);
+            this.progressBarArpScan.Name = "progressBarArpScan";
+            this.progressBarArpScan.Size = new System.Drawing.Size(224, 23);
+            this.progressBarArpScan.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBarArpScan.TabIndex = 15;
+            this.progressBarArpScan.Visible = false;
+            // 
             // ArpScanWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(251, 234);
+            this.ClientSize = new System.Drawing.Size(251, 255);
+            this.Controls.Add(this.progressBarArpScan);
             this.Controls.Add(this.checkBoxOneScan);
             this.Controls.Add(this.buttonStartScan);
             this.Controls.Add(this.comboBoxSubnetmask);
@@ -245,7 +257,7 @@
         private System.Windows.Forms.PictureBox pictureBoxTopPanel;
         private System.Windows.Forms.Label labelTopBoxTitle;
         private System.Windows.Forms.Label labelLocalIPTitle;
-        private System.Windows.Forms.TextBox textBoxLocalIP;
+        public System.Windows.Forms.TextBox textBoxLocalIP;
         private System.Windows.Forms.TextBox textBoxNetwork;
         private System.Windows.Forms.Label labelNetworkTitle;
         private System.Windows.Forms.Label labelSubnetTitle;
@@ -253,5 +265,6 @@
         private System.Windows.Forms.Button buttonStartScan;
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox checkBoxOneScan;
+        public System.Windows.Forms.ProgressBar progressBarArpScan;
     }
 }

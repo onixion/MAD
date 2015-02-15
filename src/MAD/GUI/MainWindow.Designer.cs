@@ -115,7 +115,6 @@
             // 
             this.toolTipNodeListing.BackColor = System.Drawing.SystemColors.Control;
             this.toolTipNodeListing.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.toolTipNodeListing.Tag = "";
             // 
             // labelConfigStatusTitle
             // 
@@ -152,10 +151,11 @@
             this.labelLastReloadTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.labelLastReloadTime.Location = new System.Drawing.Point(97, 101);
             this.labelLastReloadTime.Name = "labelLastReloadTime";
-            this.labelLastReloadTime.Size = new System.Drawing.Size(0, 17);
+            this.labelLastReloadTime.Size = new System.Drawing.Size(149, 17);
             this.labelLastReloadTime.TabIndex = 7;
+            this.labelLastReloadTime.Text = "Please press \"Reload\"";
             // 
-            // BaseGUIrebulid
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -169,8 +169,9 @@
             this.Controls.Add(this.panelSeperator);
             this.Controls.Add(this.panelTop);
             this.MaximizeBox = false;
-            this.Name = "BaseGUIrebulid";
+            this.Name = "MainWindow";
             this.Text = "BaseGUIrebulid";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).EndInit();

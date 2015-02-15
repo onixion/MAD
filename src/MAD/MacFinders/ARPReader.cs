@@ -8,6 +8,7 @@ using MAD;
 using MAD.Logging;
 using MAD.Helper;
 using MAD.JobSystemCore;
+using MAD.GUI;
 namespace MAD.MacFinders
 {
     static class ARPReader
@@ -17,12 +18,27 @@ namespace MAD.MacFinders
         private static ICaptureDevice _listenDev;
         private static Object lockObj = new Object();
         private static Thread _steady;
+        private static bool _running;
+        private static ArpScanWindow _window;
         public static uint networkInterface = MadConf.conf.arpInterface - 1;
         public static uint subnetMask;
         public static IPAddress netAddress;
         public static IPAddress srcAddress;
+        public static bool IsRunning()
+        {
+            return _running;
+        }
+        public static void SetWindow(ArpScanWindow scanWindow)
+        {
+            _window = scanWindow;
+        }
+        public static void ResetWindow()
+        {
+            _window = null;
+        }
         public static void CheckStart()
         {
+            _running = true;
             Logger.Log("Start Checking Devices", Logger.MessageType.INFORM);
             InitInterfaces();
             Thread _listen = new Thread(ListenCheckResponses);
@@ -33,27 +49,55 @@ namespace MAD.MacFinders
                 _dummy.status = false;
                 ExecuteRequests(_dummy.hostIP);
             }
-            Thread.Sleep(10000);
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                Thread.Sleep(5000);
+            else
+                Thread.Sleep(100);
             DeInitInterfaces();
+            _running = false;
         }
         public static void FloodStart()
         {
+            _running = true;
             Logger.Log("Start ArpReader", Logger.MessageType.INFORM);
-            InitInterfaces();
+            if (!InitInterfaces())
+                return;
+            if (_window != null)
+                _window.progressBarArpScan.Value = 5;
             Thread _listen = new Thread(ListenFloodResponses);
             _listen.Start();
+            if (_window != null)
+                _window.progressBarArpScan.Value = 10;
             EthernetPacket _ethpac = NetworkHelper.CreateArpBasePacket(_dev.MacAddress);
             SendRequests();
-            Thread.Sleep(10000);
-            _listen.Join();
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                Thread.Sleep(5000);
+            else
+                Thread.Sleep(1000);
             DeInitInterfaces();
+            _listen.Join();            
+            if (_window != null)
+                _window.progressBarArpScan.Value = 100;
+            _running = false;
         }
-        private static void InitInterfaces()
+        private static bool InitInterfaces()
         {
-            _list = CaptureDeviceList.Instance;
+            try
+            {
+                _list = CaptureDeviceList.Instance;
+            }
+            catch (Exception)
+            {
+                if (!Mad.GUI_USED)
+                    Console.WriteLine("Error: Please check if you have installed WinPcap");
+                else
+                    System.Windows.Forms.MessageBox.Show("Error: Please check if you have installed WinPcap", "ERROR", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return false;
+            }
             _dev = _list[(int)networkInterface];
             _dev.Open();
             _listenDev = _list[(int)networkInterface];
+            return true;
         }
         private static void ListenCheckResponses()
         {
@@ -69,11 +113,51 @@ namespace MAD.MacFinders
         }
         private static void DeInitInterfaces()
         {
-            _dev.Close();
-            _listenDev.StopCapture();
-            _listenDev.Close();
-            _dev = null;
-            _listenDev = null;
+            try
+            {
+                _listenDev.StopCapture();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Bug that the shitty developer wasn't able to fix. Error Message: " + ex.Message, Logger.MessageType.ERROR);
+            }
+
+            try
+            {
+                _dev.Close(); 
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Bug that the shitty developer wasn't able to fix. Error Message: " + ex.Message, Logger.MessageType.ERROR);
+            }
+
+            try
+            {
+                _listenDev.Close();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Bug that the shitty developer wasn't able to fix. Error Message: " + ex.Message, Logger.MessageType.ERROR);
+            }
+
+            try
+            {
+                _dev = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Bug that the shitty developer wasn't able to fix. Error Message: " + ex.Message, Logger.MessageType.ERROR);
+            }
+
+            try
+            {
+                _listenDev = null;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log("Bug that the shitty developer wasn't able to fix. Error Message: " + ex.Message, Logger.MessageType.ERROR);
+            }
+            
         }
         public static string ListInterfaces()
         {
@@ -100,12 +184,14 @@ namespace MAD.MacFinders
         }
         public static void SteadyStart(object jsArg)
         {
+            _running = true;
             _steady = new Thread(SteadyStartsFunktion);
             _steady.Start(jsArg);
         }
         public static void SteadyStop()
         {
             _steady.Abort();
+            _running = false;
         }
         private static void SteadyStartsFunktion(object jsArg)
         {
@@ -134,6 +220,8 @@ namespace MAD.MacFinders
                 Array.Reverse(_targetBytes);
                 IPAddress _target = new IPAddress(_targetBytes);
                 ExecuteRequests(_ethpac, _target);
+                if (_window != null)
+                    _window.progressBarArpScan.Value = Convert.ToInt16(10 + (((i * 100) / _hosts) * 0.8));
             }
         }
         public static void ExecuteRequests(IPAddress destIP)

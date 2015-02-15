@@ -102,12 +102,6 @@
     <Compile Include="JobSystem\JobInfo.cs" />
     <Compile Include="JobSystem\JobNodeInfo.cs" />
     <Compile Include="JobSystem\JSEventArgs.cs" />
-    <Compile Include="GUI\ActionScan.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="GUI\ActionScan.designer.cs">
-      <DependentUpon>ActionScan.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\ArpScanWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -120,7 +114,9 @@
     <Compile Include="GUI\MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\GUILogic.cs" />
+    <Compile Include="GUI\GUILogic.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="MacFinders\ARPReader.cs" />
     <Compile Include="MacFinders\DHCPReader.cs" />
     <Compile Include="Helper\NetworkHelper.cs" />
@@ -204,9 +200,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="GUI\ActionScan.resx">
-      <DependentUpon>ActionScan.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="GUI\ArpScanWindow.resx">
       <DependentUpon>ArpScanWindow.cs</DependentUpon>
     </EmbeddedResource>

@@ -26,6 +26,8 @@ namespace MAD
 
         public static bool restart = false;
 
+        public static bool GUI_USED = false; 
+
         [STAThread]
         public static int Main(string[] args)
         {
@@ -36,7 +38,7 @@ namespace MAD
             // init components
             DB db = new DB(DBFILE);
             JobSystem js = new JobSystem(db);
-            js. OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
+            js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
  
@@ -49,24 +51,26 @@ namespace MAD
                     try
                     {
                         MadConf.LoadConf(CONFFILE);
-                        GUILogic.configStatus = "Config loaded.";                        
+                        MainWindow.configStatus = "Config loaded.";                        
                     }
                     catch
                     {
                         MadConf.SetToDefault();
                         MadConf.SaveConf(CONFFILE);
-                        GUILogic.configStatus = "Error loading Config. Default-Config loaded.";
+                        MainWindow.configStatus = "Error loading Config. Default-Config loaded.";
                     }
                 }
                 else
                 {
                     MadConf.SetToDefault();
                     MadConf.SaveConf(CONFFILE);
-                    GUILogic.configStatus = "No Config-file found. Default-Config loaded.";
+                    MainWindow.configStatus = "No Config-file found. Default-Config loaded.";
                 }
 
+                ArpScanWindow.InitGui(js, db);
+                GUI_USED = true;
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                Application.Run(new MainWindow());
+                Application.Run(new ArpScanWindow());
                 Logger.ForceWriteToLog();
                 
             }

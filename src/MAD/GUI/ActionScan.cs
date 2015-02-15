@@ -30,7 +30,7 @@ namespace MAD.GUI
         }
         private void InvokeArpReader()
         {
-            ARPReader.srcAddress = IPAddress.Parse(LocalIPAddresTextBox.Text);
+            ARPReader.srcAddress = IPAddress.Parse(LocalIPAddressTextBox.Text);
             ARPReader.netAddress = IPAddress.Parse(NetworkTextBox.Text);
             ARPReader.subnetMask = Convert.ToUInt32(SubnetmaskDropdown.SelectedIndex);
             if (OneShotCheckBox.Checked)

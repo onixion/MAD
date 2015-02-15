@@ -92,7 +92,7 @@ namespace MAD
             conf.SERVER_PORT = 2222;
             conf.AES_PASS = "PASSWORT";
 
-            conf.arpInterface = 4;
+            conf.arpInterface = 2;
             conf.snmpInterface = "12";
         }
 
