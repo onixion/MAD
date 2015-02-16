@@ -79,6 +79,8 @@ namespace MAD.GUI
             labelInfoIP.Text = _nodes[listBoxNodes.SelectedIndex].ip.ToString();
             labelInfoName.Text = _nodes[listBoxNodes.SelectedIndex].name;
             labelInfoState.Text = _js.NodeState(_nodes[listBoxNodes.SelectedIndex].state);
+            textBoxInfoJobsMemo1.Text = _nodes[listBoxNodes.SelectedIndex].memo1;
+            textBoxInfoJobsMemo2.Text = _nodes[listBoxNodes.SelectedIndex].memo2;
 
 
 
