@@ -352,11 +352,17 @@ namespace MAD.CLICore
             string _memo1 = "";
             string _memo2 = "";
 
-            foreach (string _temp in (string[])pars.GetPar("m1").argValues)
-                _memo1 += _temp + " ";
-            
-            foreach (string _temp in (string[])pars.GetPar("m2").argValues)
-                 _memo2 += _temp + " ";
+            object[] args = pars.GetPar("m1").argValues;
+            for (int i = 0; i < args.Length; i++)
+            {
+                _memo1 += (string)args[i] + " ";
+            }
+
+            args = pars.GetPar("m2").argValues;
+            for (int i = 0; i < args.Length; i++)
+            {
+                _memo2 += (string)args[i] + " ";
+            }
 
             string _guid = "";
 
