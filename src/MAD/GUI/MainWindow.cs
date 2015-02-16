@@ -29,6 +29,7 @@ namespace MAD.GUI
         protected static MAD.CLICore.CLI cli;
         public static Thread _CLITHREAD;
         private static int _countNode;
+        private static int _countJob;
         Info _Info = new Info();
                
         private List<JobNodeInfo> _nodes = new List<JobNodeInfo>();
@@ -79,6 +80,8 @@ namespace MAD.GUI
             labelInfoName.Text = _nodes[listBoxNodes.SelectedIndex].name;
             labelInfoState.Text = _js.NodeState(_nodes[listBoxNodes.SelectedIndex].state);
 
+
+
             if (_js.NodeState(_nodes[listBoxNodes.SelectedIndex].state) == "Active")
             {
                 this.pictureBoxLightGreenOn.Visible = true;
@@ -95,9 +98,11 @@ namespace MAD.GUI
                 this.pictureBoxLightRedoff.Visible = false;
             }
 
+            _countJob = 0;
             foreach (JobInfo jf in _nodes[listBoxNodes.SelectedIndex].jobs)
             {
-                this.listBoxInfoJobs.Items.Add(jf.name);
+                _countJob++;
+                this.listBoxInfoJobs.Items.Add(_countJob.ToString() + ".) " + jf.name);
             }
             
         }
@@ -118,6 +123,11 @@ namespace MAD.GUI
             labelInfoJobsType.Text = _nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].type;
         }
 
+        private void buttonInfo_Click(object sender, EventArgs e)
+        {
+            _Info.ShowDialog(this);
+        }
+
         #endregion Events
 
         #region Logic
@@ -135,10 +145,7 @@ namespace MAD.GUI
 
         #endregion 
 
-        private void buttonInfo_Click(object sender, EventArgs e)
-        {
-            _Info.ShowDialog(this);
-        }
+        
 
         
 

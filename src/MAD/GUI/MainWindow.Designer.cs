@@ -61,7 +61,10 @@
             this.labelInfoJobsID = new System.Windows.Forms.Label();
             this.labelInfoJobsTitle = new System.Windows.Forms.Label();
             this.tableLayoutPanelInfoGeneral = new System.Windows.Forms.TableLayoutPanel();
+            this.textBoxInfoJobsMemo2 = new System.Windows.Forms.TextBox();
             this.labelInfoTitleMac = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleMemo2 = new System.Windows.Forms.Label();
+            this.textBoxInfoJobsMemo1 = new System.Windows.Forms.TextBox();
             this.labelInfoState = new System.Windows.Forms.Label();
             this.labelInfoName = new System.Windows.Forms.Label();
             this.labelInfoIP = new System.Windows.Forms.Label();
@@ -72,6 +75,7 @@
             this.labelInfoTitleGUID = new System.Windows.Forms.Label();
             this.labelInfoTitleIP = new System.Windows.Forms.Label();
             this.labelInfoTitleName = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleMemo1 = new System.Windows.Forms.Label();
             this.labelInfoTitleState = new System.Windows.Forms.Label();
             this.labelInformationTitle = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
@@ -250,7 +254,7 @@
             this.listBoxInfoJobs.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.listBoxInfoJobs.FormattingEnabled = true;
             this.listBoxInfoJobs.ItemHeight = 18;
-            this.listBoxInfoJobs.Location = new System.Drawing.Point(21, 241);
+            this.listBoxInfoJobs.Location = new System.Drawing.Point(22, 294);
             this.listBoxInfoJobs.Margin = new System.Windows.Forms.Padding(0);
             this.listBoxInfoJobs.Name = "listBoxInfoJobs";
             this.listBoxInfoJobs.Size = new System.Drawing.Size(124, 164);
@@ -260,7 +264,7 @@
             // pictureBoxLightRedoff
             // 
             this.pictureBoxLightRedoff.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightRedoff.Image")));
-            this.pictureBoxLightRedoff.Location = new System.Drawing.Point(411, 121);
+            this.pictureBoxLightRedoff.Location = new System.Drawing.Point(463, 122);
             this.pictureBoxLightRedoff.Name = "pictureBoxLightRedoff";
             this.pictureBoxLightRedoff.Size = new System.Drawing.Size(56, 56);
             this.pictureBoxLightRedoff.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -270,7 +274,7 @@
             // pictureBoxLightRedOn
             // 
             this.pictureBoxLightRedOn.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightRedOn.Image")));
-            this.pictureBoxLightRedOn.Location = new System.Drawing.Point(411, 121);
+            this.pictureBoxLightRedOn.Location = new System.Drawing.Point(463, 122);
             this.pictureBoxLightRedOn.Name = "pictureBoxLightRedOn";
             this.pictureBoxLightRedOn.Size = new System.Drawing.Size(56, 56);
             this.pictureBoxLightRedOn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -281,7 +285,7 @@
             // pictureBoxLightGreenOn
             // 
             this.pictureBoxLightGreenOn.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightGreenOn.Image")));
-            this.pictureBoxLightGreenOn.Location = new System.Drawing.Point(411, 52);
+            this.pictureBoxLightGreenOn.Location = new System.Drawing.Point(463, 52);
             this.pictureBoxLightGreenOn.Name = "pictureBoxLightGreenOn";
             this.pictureBoxLightGreenOn.Size = new System.Drawing.Size(56, 56);
             this.pictureBoxLightGreenOn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -292,7 +296,7 @@
             // pictureBoxLightGreenOff
             // 
             this.pictureBoxLightGreenOff.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightGreenOff.Image")));
-            this.pictureBoxLightGreenOff.Location = new System.Drawing.Point(411, 52);
+            this.pictureBoxLightGreenOff.Location = new System.Drawing.Point(463, 52);
             this.pictureBoxLightGreenOff.Name = "pictureBoxLightGreenOff";
             this.pictureBoxLightGreenOff.Size = new System.Drawing.Size(56, 56);
             this.pictureBoxLightGreenOff.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -302,7 +306,7 @@
             // panelSeperatorInformation
             // 
             this.panelSeperatorInformation.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panelSeperatorInformation.Location = new System.Drawing.Point(0, 202);
+            this.panelSeperatorInformation.Location = new System.Drawing.Point(0, 246);
             this.panelSeperatorInformation.Name = "panelSeperatorInformation";
             this.panelSeperatorInformation.Size = new System.Drawing.Size(533, 3);
             this.panelSeperatorInformation.TabIndex = 2;
@@ -311,7 +315,7 @@
             // 
             this.tableLayoutPanelInfoJobs.ColumnCount = 2;
             this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.25519F));
-            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7448F));
+            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.74481F));
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsOutstate, 1, 3);
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsType, 1, 2);
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleGUID, 0, 0);
@@ -320,22 +324,24 @@
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsGUID, 1, 0);
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleOutstate, 0, 3);
             this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsID, 1, 1);
-            this.tableLayoutPanelInfoJobs.Location = new System.Drawing.Point(145, 241);
+            this.tableLayoutPanelInfoJobs.Location = new System.Drawing.Point(146, 294);
             this.tableLayoutPanelInfoJobs.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanelInfoJobs.Name = "tableLayoutPanelInfoJobs";
             this.tableLayoutPanelInfoJobs.RowCount = 4;
-            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanelInfoJobs.Size = new System.Drawing.Size(374, 79);
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 23.94366F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 23.94366F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.35212F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 26.76058F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanelInfoJobs.Size = new System.Drawing.Size(374, 87);
             this.tableLayoutPanelInfoJobs.TabIndex = 18;
             // 
             // labelInfoJobsOutstate
             // 
             this.labelInfoJobsOutstate.AutoSize = true;
             this.labelInfoJobsOutstate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsOutstate.Location = new System.Drawing.Point(86, 57);
+            this.labelInfoJobsOutstate.Location = new System.Drawing.Point(86, 62);
             this.labelInfoJobsOutstate.Name = "labelInfoJobsOutstate";
             this.labelInfoJobsOutstate.Size = new System.Drawing.Size(0, 16);
             this.labelInfoJobsOutstate.TabIndex = 24;
@@ -344,7 +350,7 @@
             // 
             this.labelInfoJobsType.AutoSize = true;
             this.labelInfoJobsType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsType.Location = new System.Drawing.Point(86, 38);
+            this.labelInfoJobsType.Location = new System.Drawing.Point(86, 40);
             this.labelInfoJobsType.Name = "labelInfoJobsType";
             this.labelInfoJobsType.Size = new System.Drawing.Size(0, 16);
             this.labelInfoJobsType.TabIndex = 24;
@@ -363,7 +369,7 @@
             // 
             this.labelInfoJobsTitleID.AutoSize = true;
             this.labelInfoJobsTitleID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsTitleID.Location = new System.Drawing.Point(3, 19);
+            this.labelInfoJobsTitleID.Location = new System.Drawing.Point(3, 20);
             this.labelInfoJobsTitleID.Name = "labelInfoJobsTitleID";
             this.labelInfoJobsTitleID.Size = new System.Drawing.Size(27, 16);
             this.labelInfoJobsTitleID.TabIndex = 3;
@@ -373,7 +379,7 @@
             // 
             this.labelInfoJobsTitleType.AutoSize = true;
             this.labelInfoJobsTitleType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsTitleType.Location = new System.Drawing.Point(3, 38);
+            this.labelInfoJobsTitleType.Location = new System.Drawing.Point(3, 40);
             this.labelInfoJobsTitleType.Name = "labelInfoJobsTitleType";
             this.labelInfoJobsTitleType.Size = new System.Drawing.Size(48, 16);
             this.labelInfoJobsTitleType.TabIndex = 2;
@@ -392,7 +398,7 @@
             // 
             this.labelInfoJobsTitleOutstate.AutoSize = true;
             this.labelInfoJobsTitleOutstate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsTitleOutstate.Location = new System.Drawing.Point(3, 57);
+            this.labelInfoJobsTitleOutstate.Location = new System.Drawing.Point(3, 62);
             this.labelInfoJobsTitleOutstate.Name = "labelInfoJobsTitleOutstate";
             this.labelInfoJobsTitleOutstate.Size = new System.Drawing.Size(69, 16);
             this.labelInfoJobsTitleOutstate.TabIndex = 11;
@@ -402,7 +408,7 @@
             // 
             this.labelInfoJobsID.AutoSize = true;
             this.labelInfoJobsID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoJobsID.Location = new System.Drawing.Point(86, 19);
+            this.labelInfoJobsID.Location = new System.Drawing.Point(86, 20);
             this.labelInfoJobsID.Name = "labelInfoJobsID";
             this.labelInfoJobsID.Size = new System.Drawing.Size(0, 16);
             this.labelInfoJobsID.TabIndex = 13;
@@ -411,7 +417,7 @@
             // 
             this.labelInfoJobsTitle.AutoSize = true;
             this.labelInfoJobsTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold);
-            this.labelInfoJobsTitle.Location = new System.Drawing.Point(217, 208);
+            this.labelInfoJobsTitle.Location = new System.Drawing.Point(227, 252);
             this.labelInfoJobsTitle.Name = "labelInfoJobsTitle";
             this.labelInfoJobsTitle.Size = new System.Drawing.Size(69, 29);
             this.labelInfoJobsTitle.TabIndex = 16;
@@ -421,9 +427,11 @@
             // tableLayoutPanelInfoGeneral
             // 
             this.tableLayoutPanelInfoGeneral.ColumnCount = 2;
-            this.tableLayoutPanelInfoGeneral.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 62F));
+            this.tableLayoutPanelInfoGeneral.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 69F));
             this.tableLayoutPanelInfoGeneral.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanelInfoGeneral.Controls.Add(this.textBoxInfoJobsMemo2, 1, 7);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoTitleMac, 0, 0);
+            this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoJobsTitleMemo2, 0, 7);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoState, 1, 5);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoName, 1, 4);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoIP, 1, 3);
@@ -434,18 +442,34 @@
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoTitleGUID, 0, 2);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoTitleIP, 0, 3);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoTitleName, 0, 4);
+            this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoJobsTitleMemo1, 0, 6);
             this.tableLayoutPanelInfoGeneral.Controls.Add(this.labelInfoTitleState, 0, 5);
+            this.tableLayoutPanelInfoGeneral.Controls.Add(this.textBoxInfoJobsMemo1, 1, 6);
             this.tableLayoutPanelInfoGeneral.Location = new System.Drawing.Point(15, 52);
             this.tableLayoutPanelInfoGeneral.Name = "tableLayoutPanelInfoGeneral";
-            this.tableLayoutPanelInfoGeneral.RowCount = 6;
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.Size = new System.Drawing.Size(341, 125);
+            this.tableLayoutPanelInfoGeneral.RowCount = 8;
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.8F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.8F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.8F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17.6F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
+            this.tableLayoutPanelInfoGeneral.Size = new System.Drawing.Size(420, 188);
             this.tableLayoutPanelInfoGeneral.TabIndex = 15;
+            // 
+            // textBoxInfoJobsMemo2
+            // 
+            this.textBoxInfoJobsMemo2.BackColor = System.Drawing.Color.White;
+            this.textBoxInfoJobsMemo2.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxInfoJobsMemo2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            this.textBoxInfoJobsMemo2.Location = new System.Drawing.Point(72, 162);
+            this.textBoxInfoJobsMemo2.Multiline = true;
+            this.textBoxInfoJobsMemo2.Name = "textBoxInfoJobsMemo2";
+            this.textBoxInfoJobsMemo2.ReadOnly = true;
+            this.textBoxInfoJobsMemo2.Size = new System.Drawing.Size(345, 23);
+            this.textBoxInfoJobsMemo2.TabIndex = 27;
             // 
             // labelInfoTitleMac
             // 
@@ -457,11 +481,33 @@
             this.labelInfoTitleMac.TabIndex = 1;
             this.labelInfoTitleMac.Text = "MAC:";
             // 
+            // labelInfoJobsTitleMemo2
+            // 
+            this.labelInfoJobsTitleMemo2.AutoSize = true;
+            this.labelInfoJobsTitleMemo2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleMemo2.Location = new System.Drawing.Point(3, 159);
+            this.labelInfoJobsTitleMemo2.Name = "labelInfoJobsTitleMemo2";
+            this.labelInfoJobsTitleMemo2.Size = new System.Drawing.Size(62, 16);
+            this.labelInfoJobsTitleMemo2.TabIndex = 26;
+            this.labelInfoJobsTitleMemo2.Text = "Memo2:";
+            // 
+            // textBoxInfoJobsMemo1
+            // 
+            this.textBoxInfoJobsMemo1.BackColor = System.Drawing.Color.White;
+            this.textBoxInfoJobsMemo1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxInfoJobsMemo1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            this.textBoxInfoJobsMemo1.Location = new System.Drawing.Point(72, 134);
+            this.textBoxInfoJobsMemo1.Multiline = true;
+            this.textBoxInfoJobsMemo1.Name = "textBoxInfoJobsMemo1";
+            this.textBoxInfoJobsMemo1.ReadOnly = true;
+            this.textBoxInfoJobsMemo1.Size = new System.Drawing.Size(345, 22);
+            this.textBoxInfoJobsMemo1.TabIndex = 24;
+            // 
             // labelInfoState
             // 
             this.labelInfoState.AutoSize = true;
             this.labelInfoState.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoState.Location = new System.Drawing.Point(65, 100);
+            this.labelInfoState.Location = new System.Drawing.Point(72, 110);
             this.labelInfoState.Name = "labelInfoState";
             this.labelInfoState.Size = new System.Drawing.Size(0, 16);
             this.labelInfoState.TabIndex = 10;
@@ -470,7 +516,7 @@
             // 
             this.labelInfoName.AutoSize = true;
             this.labelInfoName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoName.Location = new System.Drawing.Point(65, 80);
+            this.labelInfoName.Location = new System.Drawing.Point(72, 87);
             this.labelInfoName.Name = "labelInfoName";
             this.labelInfoName.Size = new System.Drawing.Size(0, 16);
             this.labelInfoName.TabIndex = 11;
@@ -479,7 +525,7 @@
             // 
             this.labelInfoIP.AutoSize = true;
             this.labelInfoIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoIP.Location = new System.Drawing.Point(65, 60);
+            this.labelInfoIP.Location = new System.Drawing.Point(72, 65);
             this.labelInfoIP.Name = "labelInfoIP";
             this.labelInfoIP.Size = new System.Drawing.Size(0, 16);
             this.labelInfoIP.TabIndex = 12;
@@ -488,7 +534,7 @@
             // 
             this.labelInfoID.AutoSize = true;
             this.labelInfoID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoID.Location = new System.Drawing.Point(65, 20);
+            this.labelInfoID.Location = new System.Drawing.Point(72, 21);
             this.labelInfoID.Name = "labelInfoID";
             this.labelInfoID.Size = new System.Drawing.Size(0, 16);
             this.labelInfoID.TabIndex = 14;
@@ -497,7 +543,7 @@
             // 
             this.labelInfoMAC.AutoSize = true;
             this.labelInfoMAC.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoMAC.Location = new System.Drawing.Point(65, 0);
+            this.labelInfoMAC.Location = new System.Drawing.Point(72, 0);
             this.labelInfoMAC.Name = "labelInfoMAC";
             this.labelInfoMAC.Size = new System.Drawing.Size(0, 16);
             this.labelInfoMAC.TabIndex = 5;
@@ -506,7 +552,7 @@
             // 
             this.labelInfoTitleID.AutoSize = true;
             this.labelInfoTitleID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoTitleID.Location = new System.Drawing.Point(3, 20);
+            this.labelInfoTitleID.Location = new System.Drawing.Point(3, 21);
             this.labelInfoTitleID.Name = "labelInfoTitleID";
             this.labelInfoTitleID.Size = new System.Drawing.Size(27, 16);
             this.labelInfoTitleID.TabIndex = 2;
@@ -516,7 +562,7 @@
             // 
             this.labelInfoGUID.AutoSize = true;
             this.labelInfoGUID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoGUID.Location = new System.Drawing.Point(65, 40);
+            this.labelInfoGUID.Location = new System.Drawing.Point(72, 43);
             this.labelInfoGUID.Name = "labelInfoGUID";
             this.labelInfoGUID.Size = new System.Drawing.Size(0, 16);
             this.labelInfoGUID.TabIndex = 13;
@@ -525,7 +571,7 @@
             // 
             this.labelInfoTitleGUID.AutoSize = true;
             this.labelInfoTitleGUID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoTitleGUID.Location = new System.Drawing.Point(3, 40);
+            this.labelInfoTitleGUID.Location = new System.Drawing.Point(3, 43);
             this.labelInfoTitleGUID.Name = "labelInfoTitleGUID";
             this.labelInfoTitleGUID.Size = new System.Drawing.Size(49, 16);
             this.labelInfoTitleGUID.TabIndex = 9;
@@ -535,7 +581,7 @@
             // 
             this.labelInfoTitleIP.AutoSize = true;
             this.labelInfoTitleIP.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoTitleIP.Location = new System.Drawing.Point(3, 60);
+            this.labelInfoTitleIP.Location = new System.Drawing.Point(3, 65);
             this.labelInfoTitleIP.Name = "labelInfoTitleIP";
             this.labelInfoTitleIP.Size = new System.Drawing.Size(26, 16);
             this.labelInfoTitleIP.TabIndex = 6;
@@ -545,17 +591,28 @@
             // 
             this.labelInfoTitleName.AutoSize = true;
             this.labelInfoTitleName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoTitleName.Location = new System.Drawing.Point(3, 80);
+            this.labelInfoTitleName.Location = new System.Drawing.Point(3, 87);
             this.labelInfoTitleName.Name = "labelInfoTitleName";
             this.labelInfoTitleName.Size = new System.Drawing.Size(53, 16);
             this.labelInfoTitleName.TabIndex = 8;
             this.labelInfoTitleName.Text = "Name:";
             // 
+            // labelInfoJobsTitleMemo1
+            // 
+            this.labelInfoJobsTitleMemo1.AutoSize = true;
+            this.labelInfoJobsTitleMemo1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleMemo1.Location = new System.Drawing.Point(3, 131);
+            this.labelInfoJobsTitleMemo1.Name = "labelInfoJobsTitleMemo1";
+            this.labelInfoJobsTitleMemo1.Padding = new System.Windows.Forms.Padding(0, 2, 0, 0);
+            this.labelInfoJobsTitleMemo1.Size = new System.Drawing.Size(62, 16);
+            this.labelInfoJobsTitleMemo1.TabIndex = 25;
+            this.labelInfoJobsTitleMemo1.Text = "Memo1:";
+            // 
             // labelInfoTitleState
             // 
             this.labelInfoTitleState.AutoSize = true;
             this.labelInfoTitleState.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelInfoTitleState.Location = new System.Drawing.Point(3, 100);
+            this.labelInfoTitleState.Location = new System.Drawing.Point(3, 110);
             this.labelInfoTitleState.Name = "labelInfoTitleState";
             this.labelInfoTitleState.Size = new System.Drawing.Size(48, 16);
             this.labelInfoTitleState.TabIndex = 7;
@@ -656,5 +713,9 @@
         private System.Windows.Forms.Label labelInfoJobsGUID;
         private System.Windows.Forms.Label labelInfoJobsID;
         private System.Windows.Forms.Button buttonInfo;
+        private System.Windows.Forms.TextBox textBoxInfoJobsMemo2;
+        private System.Windows.Forms.TextBox textBoxInfoJobsMemo1;
+        private System.Windows.Forms.Label labelInfoJobsTitleMemo2;
+        private System.Windows.Forms.Label labelInfoJobsTitleMemo1;
     }
 }
