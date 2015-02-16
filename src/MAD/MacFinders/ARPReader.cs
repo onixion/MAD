@@ -200,7 +200,7 @@ namespace MAD.MacFinders
                 JobSystem _js = (JobSystem)jsArg;
                 FloodStart();
                 _js.SyncNodes(ModelHost.hostList);
-                Thread.Sleep(300000);
+                Thread.Sleep(3000);
             }
         }
         private static void SendRequests()

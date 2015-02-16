@@ -31,6 +31,8 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.panelTop = new System.Windows.Forms.Panel();
+            this.buttonInfo = new System.Windows.Forms.Button();
+            this.buttonCLI = new System.Windows.Forms.Button();
             this.pictureBoxTopPanel = new System.Windows.Forms.PictureBox();
             this.labelTopBoxTitle = new System.Windows.Forms.Label();
             this.panelSeperator = new System.Windows.Forms.Panel();
@@ -42,6 +44,22 @@
             this.labelLastReloadTimeTitle = new System.Windows.Forms.Label();
             this.labelLastReloadTime = new System.Windows.Forms.Label();
             this.panelInformation = new System.Windows.Forms.Panel();
+            this.listBoxInfoJobs = new System.Windows.Forms.ListBox();
+            this.pictureBoxLightRedoff = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLightRedOn = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLightGreenOn = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLightGreenOff = new System.Windows.Forms.PictureBox();
+            this.panelSeperatorInformation = new System.Windows.Forms.Panel();
+            this.tableLayoutPanelInfoJobs = new System.Windows.Forms.TableLayoutPanel();
+            this.labelInfoJobsOutstate = new System.Windows.Forms.Label();
+            this.labelInfoJobsType = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleGUID = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleID = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleType = new System.Windows.Forms.Label();
+            this.labelInfoJobsGUID = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitleOutstate = new System.Windows.Forms.Label();
+            this.labelInfoJobsID = new System.Windows.Forms.Label();
+            this.labelInfoJobsTitle = new System.Windows.Forms.Label();
             this.tableLayoutPanelInfoGeneral = new System.Windows.Forms.TableLayoutPanel();
             this.labelInfoTitleMac = new System.Windows.Forms.Label();
             this.labelInfoState = new System.Windows.Forms.Label();
@@ -56,21 +74,22 @@
             this.labelInfoTitleName = new System.Windows.Forms.Label();
             this.labelInfoTitleState = new System.Windows.Forms.Label();
             this.labelInformationTitle = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.listBoxInfoJobs = new System.Windows.Forms.ListBox();
-            this.tableLayoutPanelInfoJobs = new System.Windows.Forms.TableLayoutPanel();
-            this.listBoxInfoJobStates = new System.Windows.Forms.ListBox();
-            this.listBoxInfoJobStateContent = new System.Windows.Forms.ListBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.panelInformation.SuspendLayout();
-            this.tableLayoutPanelInfoGeneral.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightRedoff)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightRedOn)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightGreenOn)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightGreenOff)).BeginInit();
             this.tableLayoutPanelInfoJobs.SuspendLayout();
+            this.tableLayoutPanelInfoGeneral.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panelTop.Controls.Add(this.buttonInfo);
+            this.panelTop.Controls.Add(this.buttonCLI);
             this.panelTop.Controls.Add(this.pictureBoxTopPanel);
             this.panelTop.Controls.Add(this.labelTopBoxTitle);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
@@ -78,6 +97,34 @@
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(884, 75);
             this.panelTop.TabIndex = 0;
+            // 
+            // buttonInfo
+            // 
+            this.buttonInfo.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.buttonInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.buttonInfo.Location = new System.Drawing.Point(651, 25);
+            this.buttonInfo.Name = "buttonInfo";
+            this.buttonInfo.Size = new System.Drawing.Size(83, 30);
+            this.buttonInfo.TabIndex = 11;
+            this.buttonInfo.Text = "Info";
+            this.buttonInfo.UseVisualStyleBackColor = false;
+            this.buttonInfo.Click += new System.EventHandler(this.buttonInfo_Click);
+            // 
+            // buttonCLI
+            // 
+            this.buttonCLI.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonCLI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonCLI.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.buttonCLI.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.buttonCLI.Location = new System.Drawing.Point(740, 25);
+            this.buttonCLI.Name = "buttonCLI";
+            this.buttonCLI.Size = new System.Drawing.Size(132, 30);
+            this.buttonCLI.TabIndex = 10;
+            this.buttonCLI.Text = "CLI";
+            this.buttonCLI.UseVisualStyleBackColor = false;
+            this.buttonCLI.Click += new System.EventHandler(this.buttonCLI_Click);
             // 
             // pictureBoxTopPanel
             // 
@@ -103,20 +150,20 @@
             // panelSeperator
             // 
             this.panelSeperator.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.panelSeperator.Location = new System.Drawing.Point(390, 75);
+            this.panelSeperator.Location = new System.Drawing.Point(350, 75);
             this.panelSeperator.Name = "panelSeperator";
             this.panelSeperator.Size = new System.Drawing.Size(3, 488);
             this.panelSeperator.TabIndex = 1;
             // 
             // listBoxNodes
             // 
-            this.listBoxNodes.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.listBoxNodes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.listBoxNodes.Font = new System.Drawing.Font("Microsoft Sans Serif", 25F);
             this.listBoxNodes.FormattingEnabled = true;
             this.listBoxNodes.ItemHeight = 38;
             this.listBoxNodes.Location = new System.Drawing.Point(12, 127);
             this.listBoxNodes.Name = "listBoxNodes";
-            this.listBoxNodes.Size = new System.Drawing.Size(363, 380);
+            this.listBoxNodes.Size = new System.Drawing.Size(321, 382);
             this.listBoxNodes.TabIndex = 2;
             this.toolTipNodeListing.SetToolTip(this.listBoxNodes, "Please choose one \r\nof the listed Nodes \r\nin order to get Information.");
             this.listBoxNodes.SelectedIndexChanged += new System.EventHandler(this.listBoxNodes_SelectedIndexChanged);
@@ -129,7 +176,7 @@
             this.buttonReload.ForeColor = System.Drawing.SystemColors.Control;
             this.buttonReload.Location = new System.Drawing.Point(11, 520);
             this.buttonReload.Name = "buttonReload";
-            this.buttonReload.Size = new System.Drawing.Size(364, 30);
+            this.buttonReload.Size = new System.Drawing.Size(322, 30);
             this.buttonReload.TabIndex = 3;
             this.buttonReload.Text = "Reload";
             this.buttonReload.UseVisualStyleBackColor = false;
@@ -181,15 +228,195 @@
             // 
             // panelInformation
             // 
+            this.panelInformation.Controls.Add(this.listBoxInfoJobs);
+            this.panelInformation.Controls.Add(this.pictureBoxLightRedoff);
+            this.panelInformation.Controls.Add(this.pictureBoxLightRedOn);
+            this.panelInformation.Controls.Add(this.pictureBoxLightGreenOn);
+            this.panelInformation.Controls.Add(this.pictureBoxLightGreenOff);
+            this.panelInformation.Controls.Add(this.panelSeperatorInformation);
             this.panelInformation.Controls.Add(this.tableLayoutPanelInfoJobs);
-            this.panelInformation.Controls.Add(this.label1);
+            this.panelInformation.Controls.Add(this.labelInfoJobsTitle);
             this.panelInformation.Controls.Add(this.tableLayoutPanelInfoGeneral);
             this.panelInformation.Controls.Add(this.labelInformationTitle);
             this.panelInformation.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelInformation.Location = new System.Drawing.Point(393, 75);
+            this.panelInformation.Location = new System.Drawing.Point(353, 75);
             this.panelInformation.Name = "panelInformation";
-            this.panelInformation.Size = new System.Drawing.Size(491, 487);
+            this.panelInformation.Size = new System.Drawing.Size(531, 487);
             this.panelInformation.TabIndex = 9;
+            // 
+            // listBoxInfoJobs
+            // 
+            this.listBoxInfoJobs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.listBoxInfoJobs.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.listBoxInfoJobs.FormattingEnabled = true;
+            this.listBoxInfoJobs.ItemHeight = 18;
+            this.listBoxInfoJobs.Location = new System.Drawing.Point(21, 241);
+            this.listBoxInfoJobs.Margin = new System.Windows.Forms.Padding(0);
+            this.listBoxInfoJobs.Name = "listBoxInfoJobs";
+            this.listBoxInfoJobs.Size = new System.Drawing.Size(124, 164);
+            this.listBoxInfoJobs.TabIndex = 17;
+            this.listBoxInfoJobs.SelectedIndexChanged += new System.EventHandler(this.listBoxInfoJobs_SelectedIndexChanged);
+            // 
+            // pictureBoxLightRedoff
+            // 
+            this.pictureBoxLightRedoff.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightRedoff.Image")));
+            this.pictureBoxLightRedoff.Location = new System.Drawing.Point(411, 121);
+            this.pictureBoxLightRedoff.Name = "pictureBoxLightRedoff";
+            this.pictureBoxLightRedoff.Size = new System.Drawing.Size(56, 56);
+            this.pictureBoxLightRedoff.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxLightRedoff.TabIndex = 23;
+            this.pictureBoxLightRedoff.TabStop = false;
+            // 
+            // pictureBoxLightRedOn
+            // 
+            this.pictureBoxLightRedOn.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightRedOn.Image")));
+            this.pictureBoxLightRedOn.Location = new System.Drawing.Point(411, 121);
+            this.pictureBoxLightRedOn.Name = "pictureBoxLightRedOn";
+            this.pictureBoxLightRedOn.Size = new System.Drawing.Size(56, 56);
+            this.pictureBoxLightRedOn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxLightRedOn.TabIndex = 22;
+            this.pictureBoxLightRedOn.TabStop = false;
+            this.pictureBoxLightRedOn.Visible = false;
+            // 
+            // pictureBoxLightGreenOn
+            // 
+            this.pictureBoxLightGreenOn.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightGreenOn.Image")));
+            this.pictureBoxLightGreenOn.Location = new System.Drawing.Point(411, 52);
+            this.pictureBoxLightGreenOn.Name = "pictureBoxLightGreenOn";
+            this.pictureBoxLightGreenOn.Size = new System.Drawing.Size(56, 56);
+            this.pictureBoxLightGreenOn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxLightGreenOn.TabIndex = 21;
+            this.pictureBoxLightGreenOn.TabStop = false;
+            this.pictureBoxLightGreenOn.Visible = false;
+            // 
+            // pictureBoxLightGreenOff
+            // 
+            this.pictureBoxLightGreenOff.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxLightGreenOff.Image")));
+            this.pictureBoxLightGreenOff.Location = new System.Drawing.Point(411, 52);
+            this.pictureBoxLightGreenOff.Name = "pictureBoxLightGreenOff";
+            this.pictureBoxLightGreenOff.Size = new System.Drawing.Size(56, 56);
+            this.pictureBoxLightGreenOff.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxLightGreenOff.TabIndex = 20;
+            this.pictureBoxLightGreenOff.TabStop = false;
+            // 
+            // panelSeperatorInformation
+            // 
+            this.panelSeperatorInformation.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panelSeperatorInformation.Location = new System.Drawing.Point(0, 202);
+            this.panelSeperatorInformation.Name = "panelSeperatorInformation";
+            this.panelSeperatorInformation.Size = new System.Drawing.Size(533, 3);
+            this.panelSeperatorInformation.TabIndex = 2;
+            // 
+            // tableLayoutPanelInfoJobs
+            // 
+            this.tableLayoutPanelInfoJobs.ColumnCount = 2;
+            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.25519F));
+            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.7448F));
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsOutstate, 1, 3);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsType, 1, 2);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleGUID, 0, 0);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleID, 0, 1);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleType, 0, 2);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsGUID, 1, 0);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsTitleOutstate, 0, 3);
+            this.tableLayoutPanelInfoJobs.Controls.Add(this.labelInfoJobsID, 1, 1);
+            this.tableLayoutPanelInfoJobs.Location = new System.Drawing.Point(145, 241);
+            this.tableLayoutPanelInfoJobs.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanelInfoJobs.Name = "tableLayoutPanelInfoJobs";
+            this.tableLayoutPanelInfoJobs.RowCount = 4;
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanelInfoJobs.Size = new System.Drawing.Size(374, 79);
+            this.tableLayoutPanelInfoJobs.TabIndex = 18;
+            // 
+            // labelInfoJobsOutstate
+            // 
+            this.labelInfoJobsOutstate.AutoSize = true;
+            this.labelInfoJobsOutstate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsOutstate.Location = new System.Drawing.Point(86, 57);
+            this.labelInfoJobsOutstate.Name = "labelInfoJobsOutstate";
+            this.labelInfoJobsOutstate.Size = new System.Drawing.Size(0, 16);
+            this.labelInfoJobsOutstate.TabIndex = 24;
+            // 
+            // labelInfoJobsType
+            // 
+            this.labelInfoJobsType.AutoSize = true;
+            this.labelInfoJobsType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsType.Location = new System.Drawing.Point(86, 38);
+            this.labelInfoJobsType.Name = "labelInfoJobsType";
+            this.labelInfoJobsType.Size = new System.Drawing.Size(0, 16);
+            this.labelInfoJobsType.TabIndex = 24;
+            // 
+            // labelInfoJobsTitleGUID
+            // 
+            this.labelInfoJobsTitleGUID.AutoSize = true;
+            this.labelInfoJobsTitleGUID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleGUID.Location = new System.Drawing.Point(3, 0);
+            this.labelInfoJobsTitleGUID.Name = "labelInfoJobsTitleGUID";
+            this.labelInfoJobsTitleGUID.Size = new System.Drawing.Size(49, 16);
+            this.labelInfoJobsTitleGUID.TabIndex = 10;
+            this.labelInfoJobsTitleGUID.Text = "GUID:";
+            // 
+            // labelInfoJobsTitleID
+            // 
+            this.labelInfoJobsTitleID.AutoSize = true;
+            this.labelInfoJobsTitleID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleID.Location = new System.Drawing.Point(3, 19);
+            this.labelInfoJobsTitleID.Name = "labelInfoJobsTitleID";
+            this.labelInfoJobsTitleID.Size = new System.Drawing.Size(27, 16);
+            this.labelInfoJobsTitleID.TabIndex = 3;
+            this.labelInfoJobsTitleID.Text = "ID:";
+            // 
+            // labelInfoJobsTitleType
+            // 
+            this.labelInfoJobsTitleType.AutoSize = true;
+            this.labelInfoJobsTitleType.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleType.Location = new System.Drawing.Point(3, 38);
+            this.labelInfoJobsTitleType.Name = "labelInfoJobsTitleType";
+            this.labelInfoJobsTitleType.Size = new System.Drawing.Size(48, 16);
+            this.labelInfoJobsTitleType.TabIndex = 2;
+            this.labelInfoJobsTitleType.Text = "Type:";
+            // 
+            // labelInfoJobsGUID
+            // 
+            this.labelInfoJobsGUID.AutoSize = true;
+            this.labelInfoJobsGUID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsGUID.Location = new System.Drawing.Point(86, 0);
+            this.labelInfoJobsGUID.Name = "labelInfoJobsGUID";
+            this.labelInfoJobsGUID.Size = new System.Drawing.Size(0, 16);
+            this.labelInfoJobsGUID.TabIndex = 12;
+            // 
+            // labelInfoJobsTitleOutstate
+            // 
+            this.labelInfoJobsTitleOutstate.AutoSize = true;
+            this.labelInfoJobsTitleOutstate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsTitleOutstate.Location = new System.Drawing.Point(3, 57);
+            this.labelInfoJobsTitleOutstate.Name = "labelInfoJobsTitleOutstate";
+            this.labelInfoJobsTitleOutstate.Size = new System.Drawing.Size(69, 16);
+            this.labelInfoJobsTitleOutstate.TabIndex = 11;
+            this.labelInfoJobsTitleOutstate.Text = "Outstate:";
+            // 
+            // labelInfoJobsID
+            // 
+            this.labelInfoJobsID.AutoSize = true;
+            this.labelInfoJobsID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelInfoJobsID.Location = new System.Drawing.Point(86, 19);
+            this.labelInfoJobsID.Name = "labelInfoJobsID";
+            this.labelInfoJobsID.Size = new System.Drawing.Size(0, 16);
+            this.labelInfoJobsID.TabIndex = 13;
+            // 
+            // labelInfoJobsTitle
+            // 
+            this.labelInfoJobsTitle.AutoSize = true;
+            this.labelInfoJobsTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold);
+            this.labelInfoJobsTitle.Location = new System.Drawing.Point(217, 208);
+            this.labelInfoJobsTitle.Name = "labelInfoJobsTitle";
+            this.labelInfoJobsTitle.Size = new System.Drawing.Size(69, 29);
+            this.labelInfoJobsTitle.TabIndex = 16;
+            this.labelInfoJobsTitle.Text = "Jobs";
+            this.labelInfoJobsTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // tableLayoutPanelInfoGeneral
             // 
@@ -217,7 +444,7 @@
             this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanelInfoGeneral.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-            this.tableLayoutPanelInfoGeneral.Size = new System.Drawing.Size(452, 125);
+            this.tableLayoutPanelInfoGeneral.Size = new System.Drawing.Size(341, 125);
             this.tableLayoutPanelInfoGeneral.TabIndex = 15;
             // 
             // labelInfoTitleMac
@@ -345,64 +572,6 @@
             this.labelInformationTitle.Text = "Information";
             this.labelInformationTitle.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Bold);
-            this.label1.Location = new System.Drawing.Point(15, 212);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(76, 29);
-            this.label1.TabIndex = 16;
-            this.label1.Text = "Jobs:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // listBoxInfoJobs
-            // 
-            this.listBoxInfoJobs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBoxInfoJobs.FormattingEnabled = true;
-            this.listBoxInfoJobs.Location = new System.Drawing.Point(0, 0);
-            this.listBoxInfoJobs.Margin = new System.Windows.Forms.Padding(0);
-            this.listBoxInfoJobs.Name = "listBoxInfoJobs";
-            this.listBoxInfoJobs.Size = new System.Drawing.Size(148, 197);
-            this.listBoxInfoJobs.TabIndex = 17;
-            // 
-            // tableLayoutPanelInfoJobs
-            // 
-            this.tableLayoutPanelInfoJobs.ColumnCount = 3;
-            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanelInfoJobs.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanelInfoJobs.Controls.Add(this.listBoxInfoJobStateContent, 2, 0);
-            this.tableLayoutPanelInfoJobs.Controls.Add(this.listBoxInfoJobStates, 1, 0);
-            this.tableLayoutPanelInfoJobs.Controls.Add(this.listBoxInfoJobs, 0, 0);
-            this.tableLayoutPanelInfoJobs.Location = new System.Drawing.Point(21, 241);
-            this.tableLayoutPanelInfoJobs.Margin = new System.Windows.Forms.Padding(0);
-            this.tableLayoutPanelInfoJobs.Name = "tableLayoutPanelInfoJobs";
-            this.tableLayoutPanelInfoJobs.RowCount = 1;
-            this.tableLayoutPanelInfoJobs.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanelInfoJobs.Size = new System.Drawing.Size(446, 207);
-            this.tableLayoutPanelInfoJobs.TabIndex = 18;
-            // 
-            // listBoxInfoJobStates
-            // 
-            this.listBoxInfoJobStates.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBoxInfoJobStates.FormattingEnabled = true;
-            this.listBoxInfoJobStates.Location = new System.Drawing.Point(148, 0);
-            this.listBoxInfoJobStates.Margin = new System.Windows.Forms.Padding(0);
-            this.listBoxInfoJobStates.Name = "listBoxInfoJobStates";
-            this.listBoxInfoJobStates.Size = new System.Drawing.Size(148, 197);
-            this.listBoxInfoJobStates.TabIndex = 18;
-            // 
-            // listBoxInfoJobStateContent
-            // 
-            this.listBoxInfoJobStateContent.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.listBoxInfoJobStateContent.FormattingEnabled = true;
-            this.listBoxInfoJobStateContent.Location = new System.Drawing.Point(296, 0);
-            this.listBoxInfoJobStateContent.Margin = new System.Windows.Forms.Padding(0);
-            this.listBoxInfoJobStateContent.Name = "listBoxInfoJobStateContent";
-            this.listBoxInfoJobStateContent.Size = new System.Drawing.Size(150, 197);
-            this.listBoxInfoJobStateContent.TabIndex = 19;
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -417,18 +586,25 @@
             this.Controls.Add(this.listBoxNodes);
             this.Controls.Add(this.panelSeperator);
             this.Controls.Add(this.panelTop);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainWindow";
-            this.Text = "BaseGUIrebulid";
+            this.Text = "MAD - Networkmonitoring | Nodes";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).EndInit();
             this.panelInformation.ResumeLayout(false);
             this.panelInformation.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightRedoff)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightRedOn)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightGreenOn)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLightGreenOff)).EndInit();
+            this.tableLayoutPanelInfoJobs.ResumeLayout(false);
+            this.tableLayoutPanelInfoJobs.PerformLayout();
             this.tableLayoutPanelInfoGeneral.ResumeLayout(false);
             this.tableLayoutPanelInfoGeneral.PerformLayout();
-            this.tableLayoutPanelInfoJobs.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -463,9 +639,22 @@
         private System.Windows.Forms.Label labelInfoState;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanelInfoGeneral;
         private System.Windows.Forms.ListBox listBoxInfoJobs;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelInfoJobsTitle;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanelInfoJobs;
-        private System.Windows.Forms.ListBox listBoxInfoJobStateContent;
-        private System.Windows.Forms.ListBox listBoxInfoJobStates;
+        private System.Windows.Forms.Button buttonCLI;
+        private System.Windows.Forms.Panel panelSeperatorInformation;
+        private System.Windows.Forms.PictureBox pictureBoxLightGreenOn;
+        private System.Windows.Forms.PictureBox pictureBoxLightGreenOff;
+        private System.Windows.Forms.PictureBox pictureBoxLightRedoff;
+        private System.Windows.Forms.PictureBox pictureBoxLightRedOn;
+        private System.Windows.Forms.Label labelInfoJobsTitleID;
+        private System.Windows.Forms.Label labelInfoJobsTitleType;
+        private System.Windows.Forms.Label labelInfoJobsTitleGUID;
+        private System.Windows.Forms.Label labelInfoJobsTitleOutstate;
+        private System.Windows.Forms.Label labelInfoJobsOutstate;
+        private System.Windows.Forms.Label labelInfoJobsType;
+        private System.Windows.Forms.Label labelInfoJobsGUID;
+        private System.Windows.Forms.Label labelInfoJobsID;
+        private System.Windows.Forms.Button buttonInfo;
     }
 }

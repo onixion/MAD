@@ -147,6 +147,11 @@ namespace MAD.GUI
                 MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        private void buttonSkip_Click(object sender, EventArgs e)
+        {
+            GUILogic.RunBehind();
+        }
+
         #endregion
 
         #region Logic
@@ -185,6 +190,7 @@ namespace MAD.GUI
 
         #endregion
 
+    
 
     }
 }

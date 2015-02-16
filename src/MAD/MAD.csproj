@@ -79,6 +79,7 @@
     <Reference Include="System.Data.SQLite">
       <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +100,12 @@
     <Compile Include="CLI\ConsoleTable.cs" />
     <Compile Include="CLI\Server.cs" />
     <Compile Include="DB\DB.cs" />
+    <Compile Include="GUI\Info.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\Info.Designer.cs">
+      <DependentUpon>Info.cs</DependentUpon>
+    </Compile>
     <Compile Include="JobSystem\JobInfo.cs" />
     <Compile Include="JobSystem\JobNodeInfo.cs" />
     <Compile Include="JobSystem\JSEventArgs.cs" />
@@ -200,6 +207,9 @@
   <ItemGroup>
     <EmbeddedResource Include="GUI\ArpScanWindow.resx">
       <DependentUpon>ArpScanWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GUI\Info.resx">
+      <DependentUpon>Info.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GUI\MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>

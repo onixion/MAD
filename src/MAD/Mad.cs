@@ -69,7 +69,7 @@ namespace MAD
 
                 GUI_USED = true;
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
-                GUILogic.RunGUI(js,db);
+                GUILogic.RunGUI(js,db, dhcpReader);
                 Logger.ForceWriteToLog();
                 
             }

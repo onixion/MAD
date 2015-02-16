@@ -43,6 +43,7 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.checkBoxOneScan = new System.Windows.Forms.CheckBox();
             this.progressBarArpScan = new System.Windows.Forms.ProgressBar();
+            this.buttonSkip = new System.Windows.Forms.Button();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.SuspendLayout();
@@ -195,9 +196,9 @@
             this.buttonStartScan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStartScan.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.buttonStartScan.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStartScan.Location = new System.Drawing.Point(14, 212);
+            this.buttonStartScan.Location = new System.Drawing.Point(126, 212);
             this.buttonStartScan.Name = "buttonStartScan";
-            this.buttonStartScan.Size = new System.Drawing.Size(228, 31);
+            this.buttonStartScan.Size = new System.Drawing.Size(112, 31);
             this.buttonStartScan.TabIndex = 13;
             this.buttonStartScan.Text = "Start Scan";
             this.buttonStartScan.UseVisualStyleBackColor = false;
@@ -225,11 +226,26 @@
             this.progressBarArpScan.TabIndex = 15;
             this.progressBarArpScan.Visible = false;
             // 
+            // buttonSkip
+            // 
+            this.buttonSkip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.buttonSkip.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonSkip.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            this.buttonSkip.ForeColor = System.Drawing.SystemColors.Control;
+            this.buttonSkip.Location = new System.Drawing.Point(14, 212);
+            this.buttonSkip.Name = "buttonSkip";
+            this.buttonSkip.Size = new System.Drawing.Size(112, 31);
+            this.buttonSkip.TabIndex = 16;
+            this.buttonSkip.Text = "Skip";
+            this.buttonSkip.UseVisualStyleBackColor = false;
+            this.buttonSkip.Click += new System.EventHandler(this.buttonSkip_Click);
+            // 
             // ArpScanWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(251, 255);
+            this.Controls.Add(this.buttonSkip);
             this.Controls.Add(this.progressBarArpScan);
             this.Controls.Add(this.checkBoxOneScan);
             this.Controls.Add(this.buttonStartScan);
@@ -244,7 +260,7 @@
             this.MaximizeBox = false;
             this.Name = "ArpScanWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ArpScanWindow";
+            this.Text = "MAD - Networkmonitoring | Scan for Devices";
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).EndInit();
@@ -268,5 +284,6 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox checkBoxOneScan;
         public System.Windows.Forms.ProgressBar progressBarArpScan;
+        private System.Windows.Forms.Button buttonSkip;
     }
 }
