@@ -622,7 +622,7 @@ namespace MAD.Database
                 if (_nodeID == 0)
                         return null;
 
-                string[] _buffer = new string[2];
+                string[] _buffer = new string[2] { "", "" };
 
                 using (SQLiteCommand _command = new SQLiteCommand(_con))
                 {
