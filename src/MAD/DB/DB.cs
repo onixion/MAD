@@ -607,7 +607,7 @@ namespace MAD.Database
                                 {
                                         _reader.Close();
                                         _command.CommandText = "insert into MemoTable (ID, MEMO1, MEMO2) values " +
-                                            "('" + _nodeID + "', '" + memo1 + "', ' " + memo2 + "');";
+                                            "('" + _nodeID + "', '" + memo1 + "', '" + memo2 + "');";
                                         _command.ExecuteNonQuery();
                                 }
                         }
