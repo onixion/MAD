@@ -275,6 +275,7 @@ namespace MAD.JobSystemCore
 
             lock (jsLock)
             {
+                string[] buffer;
                 foreach (JobNode node in _nodes)
                 {
                     List<JobInfo> jobs = new List<JobInfo>();
@@ -284,7 +285,9 @@ namespace MAD.JobSystemCore
                         jobs.Add(new JobInfo(job.id, job.guid, job.name, job.type.ToString(), job.outp.outState.ToString()));
                     }
 
-                    nodes.Add(new JobNodeInfo(node.id, node.guid, node.name, node.ip, node.mac.ToString(), node.state, jobs));
+                    buffer = _db.GetMemoFromNode(node.guid.ToString());
+
+                    nodes.Add(new JobNodeInfo(node.id, node.guid, node.name, node.ip, node.mac.ToString(), node.state, buffer[0], buffer[1], jobs));
                 }
             }
             

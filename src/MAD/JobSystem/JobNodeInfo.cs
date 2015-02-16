@@ -24,10 +24,16 @@ namespace MAD.JobSystemCore
         private int _state;
         public int state { get { return _state; } }
 
+        private string _memo1;
+        public string memo1 { get { return _memo1; } }
+
+        private string _memo2;
+        public string memo2 { get { return _memo2; } }
+
         private List<JobInfo> _jobs;
         public List<JobInfo> jobs { get { return _jobs; } }
 
-        public JobNodeInfo(int id, Guid guid, string name, IPAddress ip, string mac, int state, List<JobInfo> jobs)
+        public JobNodeInfo(int id, Guid guid, string name, IPAddress ip, string mac, int state, string memo1, string memo2, List<JobInfo> jobs)
         {
             _id = id;
             _guid = guid;
@@ -35,6 +41,8 @@ namespace MAD.JobSystemCore
             _ip = ip;
             _mac = mac;
             _state = state;
+            _memo1 = memo1;
+            _memo2 = memo2;
             _jobs = jobs;
         }
     }
