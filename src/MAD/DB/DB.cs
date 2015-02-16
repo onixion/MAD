@@ -620,7 +620,10 @@ namespace MAD.Database
         {
                 int _nodeID = GetIDNode(guid);
                 if (_nodeID == 0)
-                        return null;
+                {
+                    InsertIDNode(guid);
+                    _nodeID = GetIDNode(guid);
+                }
 
                 string[] _buffer = new string[2] { "", "" };
 
