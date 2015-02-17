@@ -232,6 +232,7 @@
             this.Controls.Add(this.panelTop);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Info";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MAD Networkmonitoring | Info";
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();

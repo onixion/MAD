@@ -140,16 +140,12 @@ namespace MAD.GUI
 
                 if (validEntering == true)
                 {
-                    GUILogic.RunBehind();
+                    this.progressBarArpScan.Value = 0;
+                    this.Close();
                 }
             }
             else
                 MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-
-        private void buttonSkip_Click(object sender, EventArgs e)
-        {
-            GUILogic.RunBehind();
         }
 
         #endregion

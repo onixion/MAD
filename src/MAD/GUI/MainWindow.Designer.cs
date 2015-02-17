@@ -31,6 +31,7 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.panelTop = new System.Windows.Forms.Panel();
+            this.buttonScan = new System.Windows.Forms.Button();
             this.buttonInfo = new System.Windows.Forms.Button();
             this.buttonCLI = new System.Windows.Forms.Button();
             this.pictureBoxTopPanel = new System.Windows.Forms.PictureBox();
@@ -64,7 +65,6 @@
             this.textBoxInfoJobsMemo2 = new System.Windows.Forms.TextBox();
             this.labelInfoTitleMac = new System.Windows.Forms.Label();
             this.labelInfoJobsTitleMemo2 = new System.Windows.Forms.Label();
-            this.textBoxInfoJobsMemo1 = new System.Windows.Forms.TextBox();
             this.labelInfoState = new System.Windows.Forms.Label();
             this.labelInfoName = new System.Windows.Forms.Label();
             this.labelInfoIP = new System.Windows.Forms.Label();
@@ -77,6 +77,7 @@
             this.labelInfoTitleName = new System.Windows.Forms.Label();
             this.labelInfoJobsTitleMemo1 = new System.Windows.Forms.Label();
             this.labelInfoTitleState = new System.Windows.Forms.Label();
+            this.textBoxInfoJobsMemo1 = new System.Windows.Forms.TextBox();
             this.labelInformationTitle = new System.Windows.Forms.Label();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
@@ -92,6 +93,7 @@
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.panelTop.Controls.Add(this.buttonScan);
             this.panelTop.Controls.Add(this.buttonInfo);
             this.panelTop.Controls.Add(this.buttonCLI);
             this.panelTop.Controls.Add(this.pictureBoxTopPanel);
@@ -102,15 +104,29 @@
             this.panelTop.Size = new System.Drawing.Size(884, 75);
             this.panelTop.TabIndex = 0;
             // 
+            // buttonScan
+            // 
+            this.buttonScan.BackColor = System.Drawing.SystemColors.Control;
+            this.buttonScan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonScan.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
+            this.buttonScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.buttonScan.Location = new System.Drawing.Point(676, 25);
+            this.buttonScan.Name = "buttonScan";
+            this.buttonScan.Size = new System.Drawing.Size(95, 30);
+            this.buttonScan.TabIndex = 12;
+            this.buttonScan.Text = "Scan";
+            this.buttonScan.UseVisualStyleBackColor = false;
+            this.buttonScan.Click += new System.EventHandler(this.buttonScan_Click);
+            // 
             // buttonInfo
             // 
             this.buttonInfo.BackColor = System.Drawing.SystemColors.Control;
             this.buttonInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.buttonInfo.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.buttonInfo.Location = new System.Drawing.Point(651, 25);
+            this.buttonInfo.Location = new System.Drawing.Point(575, 25);
             this.buttonInfo.Name = "buttonInfo";
-            this.buttonInfo.Size = new System.Drawing.Size(83, 30);
+            this.buttonInfo.Size = new System.Drawing.Size(95, 30);
             this.buttonInfo.TabIndex = 11;
             this.buttonInfo.Text = "Info";
             this.buttonInfo.UseVisualStyleBackColor = false;
@@ -122,9 +138,9 @@
             this.buttonCLI.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonCLI.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.buttonCLI.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.buttonCLI.Location = new System.Drawing.Point(740, 25);
+            this.buttonCLI.Location = new System.Drawing.Point(777, 25);
             this.buttonCLI.Name = "buttonCLI";
-            this.buttonCLI.Size = new System.Drawing.Size(132, 30);
+            this.buttonCLI.Size = new System.Drawing.Size(95, 30);
             this.buttonCLI.TabIndex = 10;
             this.buttonCLI.Text = "CLI";
             this.buttonCLI.UseVisualStyleBackColor = false;
@@ -491,18 +507,6 @@
             this.labelInfoJobsTitleMemo2.TabIndex = 26;
             this.labelInfoJobsTitleMemo2.Text = "Memo2:";
             // 
-            // textBoxInfoJobsMemo1
-            // 
-            this.textBoxInfoJobsMemo1.BackColor = System.Drawing.Color.White;
-            this.textBoxInfoJobsMemo1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBoxInfoJobsMemo1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
-            this.textBoxInfoJobsMemo1.Location = new System.Drawing.Point(72, 134);
-            this.textBoxInfoJobsMemo1.Multiline = true;
-            this.textBoxInfoJobsMemo1.Name = "textBoxInfoJobsMemo1";
-            this.textBoxInfoJobsMemo1.ReadOnly = true;
-            this.textBoxInfoJobsMemo1.Size = new System.Drawing.Size(345, 22);
-            this.textBoxInfoJobsMemo1.TabIndex = 24;
-            // 
             // labelInfoState
             // 
             this.labelInfoState.AutoSize = true;
@@ -604,7 +608,7 @@
             this.labelInfoJobsTitleMemo1.Location = new System.Drawing.Point(3, 131);
             this.labelInfoJobsTitleMemo1.Name = "labelInfoJobsTitleMemo1";
             this.labelInfoJobsTitleMemo1.Padding = new System.Windows.Forms.Padding(0, 2, 0, 0);
-            this.labelInfoJobsTitleMemo1.Size = new System.Drawing.Size(62, 16);
+            this.labelInfoJobsTitleMemo1.Size = new System.Drawing.Size(62, 18);
             this.labelInfoJobsTitleMemo1.TabIndex = 25;
             this.labelInfoJobsTitleMemo1.Text = "Memo1:";
             // 
@@ -617,6 +621,18 @@
             this.labelInfoTitleState.Size = new System.Drawing.Size(48, 16);
             this.labelInfoTitleState.TabIndex = 7;
             this.labelInfoTitleState.Text = "State:";
+            // 
+            // textBoxInfoJobsMemo1
+            // 
+            this.textBoxInfoJobsMemo1.BackColor = System.Drawing.Color.White;
+            this.textBoxInfoJobsMemo1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.textBoxInfoJobsMemo1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F);
+            this.textBoxInfoJobsMemo1.Location = new System.Drawing.Point(72, 134);
+            this.textBoxInfoJobsMemo1.Multiline = true;
+            this.textBoxInfoJobsMemo1.Name = "textBoxInfoJobsMemo1";
+            this.textBoxInfoJobsMemo1.ReadOnly = true;
+            this.textBoxInfoJobsMemo1.Size = new System.Drawing.Size(345, 22);
+            this.textBoxInfoJobsMemo1.TabIndex = 24;
             // 
             // labelInformationTitle
             // 
@@ -647,6 +663,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "MainWindow";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MAD - Networkmonitoring | Nodes";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.panelTop.ResumeLayout(false);
@@ -717,5 +734,6 @@
         private System.Windows.Forms.TextBox textBoxInfoJobsMemo1;
         private System.Windows.Forms.Label labelInfoJobsTitleMemo2;
         private System.Windows.Forms.Label labelInfoJobsTitleMemo1;
+        private System.Windows.Forms.Button buttonScan;
     }
 }

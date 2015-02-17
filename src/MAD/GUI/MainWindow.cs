@@ -30,6 +30,7 @@ namespace MAD.GUI
         public static Thread _CLITHREAD;
         private static int _countNode;
         private static int _countJob;
+        static ArpScanWindow _Scan = new ArpScanWindow();
         Info _Info = new Info();
                
         private List<JobNodeInfo> _nodes = new List<JobNodeInfo>();
@@ -38,7 +39,7 @@ namespace MAD.GUI
         #endregion
         
         public MainWindow()
-        {            
+        {
             InitializeComponent();
             labelConfigStatus.Text = configStatus;
         }
@@ -130,6 +131,11 @@ namespace MAD.GUI
             _Info.ShowDialog(this);
         }
 
+        private void buttonScan_Click(object sender, EventArgs e)
+        {
+            Scan();
+        }
+
         #endregion Events
 
         #region Logic
@@ -142,10 +148,15 @@ namespace MAD.GUI
 
             cli = new CLI(_js, _dhcp, _db);
             _CLITHREAD = new Thread(new ThreadStart(cli.Start));
-
         }
 
+        private static void Scan()
+        {
+            _Scan.ShowDialog();
+        }
         #endregion 
+
+        
 
         
 

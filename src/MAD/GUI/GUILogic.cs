@@ -22,19 +22,7 @@ namespace MAD.GUI
         {
             ArpScanWindow.InitGUI(jobSys, dataBase);
             MainWindow.InitGUI(jobSys, dataBase, dhcp);
-            Application.Run(_ArpScanWindow);           
-        }
-
-        public static void ExitArp()
-        {
-            _MainWindow.ShowDialog();
-            _ArpScanWindow.Close();           
-        }
-
-        public static void RunBehind()
-        {
-            _ArpScanWindow.Hide();
-            _MainWindow.ShowDialog();
+            Application.Run(_MainWindow);           
         }
     }
 }

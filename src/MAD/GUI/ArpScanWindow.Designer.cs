@@ -43,7 +43,8 @@
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.checkBoxOneScan = new System.Windows.Forms.CheckBox();
             this.progressBarArpScan = new System.Windows.Forms.ProgressBar();
-            this.buttonSkip = new System.Windows.Forms.Button();
+            this.labelNetDevTitle = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.SuspendLayout();
@@ -181,7 +182,7 @@
             "30",
             "31",
             "32"});
-            this.comboBoxSubnetmask.Location = new System.Drawing.Point(134, 118);
+            this.comboBoxSubnetmask.Location = new System.Drawing.Point(134, 115);
             this.comboBoxSubnetmask.Name = "comboBoxSubnetmask";
             this.comboBoxSubnetmask.Size = new System.Drawing.Size(104, 23);
             this.comboBoxSubnetmask.TabIndex = 12;
@@ -196,9 +197,9 @@
             this.buttonStartScan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.buttonStartScan.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
             this.buttonStartScan.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonStartScan.Location = new System.Drawing.Point(126, 212);
+            this.buttonStartScan.Location = new System.Drawing.Point(14, 237);
             this.buttonStartScan.Name = "buttonStartScan";
-            this.buttonStartScan.Size = new System.Drawing.Size(112, 31);
+            this.buttonStartScan.Size = new System.Drawing.Size(224, 31);
             this.buttonStartScan.TabIndex = 13;
             this.buttonStartScan.Text = "Start Scan";
             this.buttonStartScan.UseVisualStyleBackColor = false;
@@ -208,7 +209,7 @@
             // 
             this.checkBoxOneScan.AutoSize = true;
             this.checkBoxOneScan.ForeColor = System.Drawing.Color.DarkGray;
-            this.checkBoxOneScan.Location = new System.Drawing.Point(14, 160);
+            this.checkBoxOneScan.Location = new System.Drawing.Point(14, 185);
             this.checkBoxOneScan.Name = "checkBoxOneScan";
             this.checkBoxOneScan.Size = new System.Drawing.Size(170, 17);
             this.checkBoxOneScan.TabIndex = 14;
@@ -219,33 +220,77 @@
             // progressBarArpScan
             // 
             this.progressBarArpScan.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.progressBarArpScan.Location = new System.Drawing.Point(14, 183);
+            this.progressBarArpScan.Location = new System.Drawing.Point(14, 208);
             this.progressBarArpScan.Name = "progressBarArpScan";
             this.progressBarArpScan.Size = new System.Drawing.Size(224, 23);
             this.progressBarArpScan.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBarArpScan.TabIndex = 15;
             this.progressBarArpScan.Visible = false;
             // 
-            // buttonSkip
+            // labelNetDevTitle
             // 
-            this.buttonSkip.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.buttonSkip.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonSkip.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            this.buttonSkip.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonSkip.Location = new System.Drawing.Point(14, 212);
-            this.buttonSkip.Name = "buttonSkip";
-            this.buttonSkip.Size = new System.Drawing.Size(112, 31);
-            this.buttonSkip.TabIndex = 16;
-            this.buttonSkip.Text = "Skip";
-            this.buttonSkip.UseVisualStyleBackColor = false;
-            this.buttonSkip.Click += new System.EventHandler(this.buttonSkip_Click);
+            this.labelNetDevTitle.AutoSize = true;
+            this.labelNetDevTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold);
+            this.labelNetDevTitle.Location = new System.Drawing.Point(11, 143);
+            this.labelNetDevTitle.Name = "labelNetDevTitle";
+            this.labelNetDevTitle.Size = new System.Drawing.Size(110, 15);
+            this.labelNetDevTitle.TabIndex = 17;
+            this.labelNetDevTitle.Text = "Network Device:";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBox1.Enabled = false;
+            this.comboBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+            "32"});
+            this.comboBox1.Location = new System.Drawing.Point(134, 140);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(104, 23);
+            this.comboBox1.TabIndex = 18;
+            this.comboBox1.Text = "Default";
+            this.toolTip.SetToolTip(this.comboBox1, "Please choose a Subnet");
             // 
             // ArpScanWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(251, 255);
-            this.Controls.Add(this.buttonSkip);
+            this.ClientSize = new System.Drawing.Size(251, 283);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.labelNetDevTitle);
             this.Controls.Add(this.progressBarArpScan);
             this.Controls.Add(this.checkBoxOneScan);
             this.Controls.Add(this.buttonStartScan);
@@ -256,7 +301,7 @@
             this.Controls.Add(this.textBoxLocalIP);
             this.Controls.Add(this.labelLocalIPTitle);
             this.Controls.Add(this.panelTop);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
             this.Name = "ArpScanWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -284,6 +329,7 @@
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.CheckBox checkBoxOneScan;
         public System.Windows.Forms.ProgressBar progressBarArpScan;
-        private System.Windows.Forms.Button buttonSkip;
+        private System.Windows.Forms.Label labelNetDevTitle;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
