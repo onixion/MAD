@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Net;
 
+using SharpPcap;
+
 using MAD;
 using MAD.MacFinders;
 using MAD.JobSystemCore;
@@ -148,6 +150,12 @@ namespace MAD.GUI
                 MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        private void ArpScanWindow_Load(object sender, EventArgs e)
+        {
+            ComboBoxNWDloadContent();
+        }
+
+
         #endregion
 
         #region Logic
@@ -160,6 +168,11 @@ namespace MAD.GUI
                 ARPReader.srcAddress = IPAddress.Parse(textBoxLocalIP.Text);
                 ARPReader.netAddress = IPAddress.Parse(textBoxNetwork.Text);
                 ARPReader.subnetMask = Convert.ToUInt32(comboBoxSubnetmask.SelectedItem);
+                if (this.comboBoxNWD.SelectedItem.ToString() != "Default")
+                {
+                    ARPReader.networkInterface = (uint)this.comboBoxNWD.SelectedItem;
+                }
+ 
                 if (checkBoxOneScan.Checked)
                 {
                     ARPReader.SetWindow(this);
@@ -184,8 +197,27 @@ namespace MAD.GUI
             return;
         }
 
+        private void ComboBoxNWDloadContent()
+        {
+            CaptureDeviceList _list = CaptureDeviceList.Instance;
+            List<object> devList = new List<object>();
+
+            for(int i = 0; i <= _list.Count; i++)
+            {
+                int devNr = i+1;
+                devList.Add(devNr);
+            }
+
+            this.comboBoxNWD.Items.Clear();
+            this.comboBoxNWD.Items.Add("Default");
+
+            object[] devs = devList.ToArray();
+            this.comboBoxNWD.Items.AddRange(devs);
+        }
+
         #endregion
 
+        
     
 
     }

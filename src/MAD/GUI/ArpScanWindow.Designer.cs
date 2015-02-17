@@ -41,10 +41,10 @@
             this.comboBoxSubnetmask = new System.Windows.Forms.ComboBox();
             this.buttonStartScan = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.comboBoxNWD = new System.Windows.Forms.ComboBox();
             this.checkBoxOneScan = new System.Windows.Forms.CheckBox();
             this.progressBarArpScan = new System.Windows.Forms.ProgressBar();
             this.labelNetDevTitle = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).BeginInit();
             this.SuspendLayout();
@@ -205,6 +205,19 @@
             this.buttonStartScan.UseVisualStyleBackColor = false;
             this.buttonStartScan.Click += new System.EventHandler(this.buttonStartScan_Click);
             // 
+            // comboBoxNWD
+            // 
+            this.comboBoxNWD.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxNWD.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.comboBoxNWD.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.comboBoxNWD.FormattingEnabled = true;
+            this.comboBoxNWD.Location = new System.Drawing.Point(134, 140);
+            this.comboBoxNWD.Name = "comboBoxNWD";
+            this.comboBoxNWD.Size = new System.Drawing.Size(104, 23);
+            this.comboBoxNWD.TabIndex = 18;
+            this.comboBoxNWD.Text = "Default";
+            this.toolTip.SetToolTip(this.comboBoxNWD, "Please choose a Subnet");
+            // 
             // checkBoxOneScan
             // 
             this.checkBoxOneScan.AutoSize = true;
@@ -237,59 +250,12 @@
             this.labelNetDevTitle.TabIndex = 17;
             this.labelNetDevTitle.Text = "Network Device:";
             // 
-            // comboBox1
-            // 
-            this.comboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.comboBox1.Enabled = false;
-            this.comboBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.comboBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16",
-            "17",
-            "18",
-            "19",
-            "20",
-            "21",
-            "22",
-            "23",
-            "24",
-            "25",
-            "26",
-            "27",
-            "28",
-            "29",
-            "30",
-            "31",
-            "32"});
-            this.comboBox1.Location = new System.Drawing.Point(134, 140);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(104, 23);
-            this.comboBox1.TabIndex = 18;
-            this.comboBox1.Text = "Default";
-            this.toolTip.SetToolTip(this.comboBox1, "Please choose a Subnet");
-            // 
             // ArpScanWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(251, 283);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.comboBoxNWD);
             this.Controls.Add(this.labelNetDevTitle);
             this.Controls.Add(this.progressBarArpScan);
             this.Controls.Add(this.checkBoxOneScan);
@@ -306,6 +272,7 @@
             this.Name = "ArpScanWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "MAD - Networkmonitoring | Scan for Devices";
+            this.Load += new System.EventHandler(this.ArpScanWindow_Load);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTopPanel)).EndInit();
@@ -330,6 +297,6 @@
         private System.Windows.Forms.CheckBox checkBoxOneScan;
         public System.Windows.Forms.ProgressBar progressBarArpScan;
         private System.Windows.Forms.Label labelNetDevTitle;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox comboBoxNWD;
     }
 }
