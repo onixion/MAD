@@ -73,7 +73,7 @@ namespace MAD.MacFinders
             if (Environment.OSVersion.Platform == PlatformID.Unix)
                 Thread.Sleep(5000);
             else
-                Thread.Sleep(10000);
+                Thread.Sleep(20000);
             DeInitInterfaces();
             _listen.Join();            
             if (_window != null)

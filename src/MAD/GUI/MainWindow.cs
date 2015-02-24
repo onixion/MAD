@@ -123,6 +123,13 @@ namespace MAD.GUI
             labelInfoJobsGUID.Text = _nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].guid.ToString();
             labelInfoJobsID.Text = _nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].id.ToString();
             labelInfoJobsOutstate.Text = _nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].outstate;
+            if (_nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].outstate == "Success")
+            {
+                labelInfoJobsOutstate.ForeColor = Color.DarkGreen;
+            }
+
+            else
+                labelInfoJobsOutstate.ForeColor = Color.DarkRed;
             labelInfoJobsType.Text = _nodes[listBoxNodes.SelectedIndex].jobs[listBoxInfoJobs.SelectedIndex].type;
         }
 
@@ -155,12 +162,6 @@ namespace MAD.GUI
             _Scan.ShowDialog();
         }
         #endregion 
-
-        
-
-        
-
-        
 
     }
 }

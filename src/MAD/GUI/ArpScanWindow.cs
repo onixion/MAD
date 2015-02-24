@@ -170,7 +170,7 @@ namespace MAD.GUI
                 ARPReader.subnetMask = Convert.ToUInt32(comboBoxSubnetmask.SelectedItem);
                 if (this.comboBoxNWD.SelectedItem.ToString() != "Default")
                 {
-                    ARPReader.networkInterface = (uint)this.comboBoxNWD.SelectedItem;
+                    ARPReader.networkInterface = Convert.ToUInt16(this.comboBoxNWD.SelectedItem.ToString()) - (uint) 1;
                 }
  
                 if (checkBoxOneScan.Checked)
@@ -179,8 +179,8 @@ namespace MAD.GUI
                     ARPReader.FloodStart();
                     _js.SyncNodes(ModelHost.hostList);
                     ARPReader.ResetWindow();
-
                 }
+
                 else
                     ARPReader.SteadyStart(_js);
 
