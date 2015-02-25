@@ -46,7 +46,8 @@ namespace MAD.JobSystemCore
             switch (version)
             {
                 case 1:
-                    //Falls der zu blöd war zu verstehen dass lei 2 und 3 unterstützt werden dann a freundliche nachricht dass des nit geht
+                    outp.outState = JobOutput.OutState.Failed;
+                    Logging.Logger.Log("No Support for Version 1", Logging.Logger.MessageType.ERROR);
                     break;
                 case 2:
                     ExecuteRequest(_target, NetworkHelper.GetSNMPV2Param(NetworkHelper.SNMP_COMMUNITY_STRING));
@@ -79,7 +80,8 @@ namespace MAD.JobSystemCore
 
                 if (_octetsResult.Pdu.ErrorStatus != 0)
                 {
-                    //Fehlermeldung 
+                    outp.outState = JobOutput.OutState.Failed;
+                    Logging.Logger.Log("Something went wrong with reading the traffic. The Error Status of SNMP was not equal 0, but " + _octetsResult.Pdu.ErrorStatus.ToString(), Logging.Logger.MessageType.ERROR);
                 }
                 else
                 {
@@ -94,11 +96,15 @@ namespace MAD.JobSystemCore
                     {
                         outp.GetOutputDesc("Bytes").dataObject = _result;
                     }
+
+                    outp.outState = JobOutput.OutState.Success;
+                    Logging.Logger.Log("Traffic Read reports Success", Logging.Logger.MessageType.DEBUG);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Fehlermeldung 
+                outp.outState = JobOutput.OutState.Failed;
+                Logging.Logger.Log("Something went wrong with reading the traffic. The message is: " + ex.Message, Logging.Logger.MessageType.ERROR);
             }
 
         }
@@ -116,22 +122,33 @@ namespace MAD.JobSystemCore
             {
                 SnmpV3Packet _octetsResult = (SnmpV3Packet)target.Request(octets, param);
 
-                uint _result = (uint)Convert.ToUInt64(_octetsResult.ScopedPdu.VbList[0].Value.ToString()) - _lastRecord;
-                _lastRecord = (uint)Convert.ToUInt64(_octetsResult.ScopedPdu.VbList[0].Value.ToString());
-
                 if (_octetsResult.ScopedPdu.ErrorStatus != 0)
                 {
-                    //Fehlermeldung
+                    outp.outState = JobOutput.OutState.Failed;
+                    Logging.Logger.Log("Something went wrong with reading the traffic. The Error Status of SNMP was not equal 0, but " + _octetsResult.ScopedPdu.ErrorStatus.ToString(), Logging.Logger.MessageType.ERROR);
                 }
                 else
                 {
-                    Console.WriteLine("Output since the last run: {0}", _result.ToString());
-                    //Ausgabe nach dem Muster.. wie oben 
+                    uint _result = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString()) - _lastRecord;
+                    _lastRecord = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString());
+
+                    if (firstRun)
+                    {
+                        outp.GetOutputDesc("Bytes").dataObject = 0;
+                    }
+                    else
+                    {
+                        outp.GetOutputDesc("Bytes").dataObject = _result;
+                    }
+
+                    outp.outState = JobOutput.OutState.Success;
+                    Logging.Logger.Log("Traffic Read reports Success", Logging.Logger.MessageType.DEBUG);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Fehlermeldung
+                outp.outState = JobOutput.OutState.Failed;
+                Logging.Logger.Log("Something went wrong with reading the traffic. The message is: " + ex.Message, Logging.Logger.MessageType.ERROR);
             }
 
         }
