@@ -17,13 +17,25 @@ namespace MAD.JobSystemCore
 
         private const string _ifEntryString = "1.3.6.1.2.1.2.2.1";
         private static uint _lastRecord = 0;
+        private bool firstRun = true; 
         #endregion
 
         #region methods
         #region Constructors
         public JobSnmp()
             : base(JobType.SnmpCheck, Protocol.UDP)
-        { }
+        { 
+            outp.outputs.Add(new OutputDescriptor("TimeIntervall", typeof(int), this.time.jobDelay.delayTime));
+            outp.outputs.Add(new OutputDescriptor("Bytes", typeof(uint), false));
+        }
+
+        public JobSnmp(uint interfaceNr)
+            : base(JobType.SnmpCheck, Protocol.UDP)
+        {
+            outp.outputs.Add(new OutputDescriptor("TimeIntervall", typeof(int), this.time.jobDelay.delayTime));
+            outp.outputs.Add(new OutputDescriptor("Bytes", typeof(uint), false));
+            ifEntryNr = interfaceNr.ToString();
+        }
 
         #endregion
 
@@ -54,7 +66,6 @@ namespace MAD.JobSystemCore
 
         private void ExecuteRequest(UdpTarget _target, AgentParameters _param)
         {
-
             const string _outOctetsString = "1.3.6.1.2.1.2.2.1.16";
 
             Oid _outOctets = new Oid(_outOctetsString + "." + ifEntryNr);
@@ -74,8 +85,15 @@ namespace MAD.JobSystemCore
                 {
                     uint _result = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString()) - _lastRecord;
                     _lastRecord = (uint)Convert.ToUInt64(_octetsResult.Pdu.VbList[0].Value.ToString());
-                    Console.WriteLine("Output since the last run: {0}", _result.ToString());
-                    //Ausgabe nach dem Muster.. wie oben 
+                    
+                    if (firstRun)
+                    {
+                        outp.GetOutputDesc("Bytes").dataObject = 0;
+                    }
+                    else
+                    {
+                        outp.GetOutputDesc("Bytes").dataObject = _result;
+                    }
                 }
             }
             catch (Exception)
@@ -87,7 +105,6 @@ namespace MAD.JobSystemCore
 
         private void ExecuteRequest(UdpTarget target, SecureAgentParameters param)
         {
-
             string outOctetsString = "1.3.6.1.2.1.2.2.1.16";
 
             Oid outOctets = new Oid(outOctetsString + "." + ifEntryNr);

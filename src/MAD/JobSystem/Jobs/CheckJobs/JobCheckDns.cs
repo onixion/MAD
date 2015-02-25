@@ -10,7 +10,15 @@ namespace MAD.JobSystemCore
 {
     class JobCheckDns : Job
     {
+        private string _hostname = MadConf.conf.defaultHostname; 
+
         //keine Parameter benötigt 
+        public JobCheckDns(string hostname)
+            : base(JobType.ServiceCheck, Protocol.UDP)
+        {
+            _hostname = hostname;
+        }
+
         public JobCheckDns()
             : base(JobType.ServiceCheck, Protocol.UDP)
         { }
@@ -19,7 +27,7 @@ namespace MAD.JobSystemCore
         {
             try
             {
-                IPHostEntry _tmp = Dns.GetHostEntry("www.google.com");
+                IPHostEntry _tmp = Dns.GetHostEntry(_hostname);
                 Logger.Log("DNS Service seems to work", Logger.MessageType.INFORM);
                 outp.outState = JobOutput.OutState.Success;
             }

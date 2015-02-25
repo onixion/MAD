@@ -94,6 +94,7 @@ namespace MAD
 
             conf.arpInterface = 2;
             conf.snmpInterface = "12";
+            conf.defaultHostname = "www.google.at";
         }
 
         #endregion
@@ -124,6 +125,7 @@ namespace MAD
         // networking vars
         public uint arpInterface;
 		public string snmpInterface;
+        public string defaultHostname;
     }
 
     /* json converters */
