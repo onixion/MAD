@@ -45,7 +45,6 @@
             this.labelLastReloadTimeTitle = new System.Windows.Forms.Label();
             this.labelLastReloadTime = new System.Windows.Forms.Label();
             this.panelInformation = new System.Windows.Forms.Panel();
-            this.buttonGraphs = new System.Windows.Forms.Button();
             this.listBoxInfoJobs = new System.Windows.Forms.ListBox();
             this.pictureBoxLightRedoff = new System.Windows.Forms.PictureBox();
             this.pictureBoxLightRedOn = new System.Windows.Forms.PictureBox();
@@ -249,7 +248,6 @@
             // 
             // panelInformation
             // 
-            this.panelInformation.Controls.Add(this.buttonGraphs);
             this.panelInformation.Controls.Add(this.listBoxInfoJobs);
             this.panelInformation.Controls.Add(this.pictureBoxLightRedoff);
             this.panelInformation.Controls.Add(this.pictureBoxLightRedOn);
@@ -265,20 +263,6 @@
             this.panelInformation.Name = "panelInformation";
             this.panelInformation.Size = new System.Drawing.Size(531, 487);
             this.panelInformation.TabIndex = 9;
-            // 
-            // buttonGraphs
-            // 
-            this.buttonGraphs.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.buttonGraphs.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonGraphs.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.buttonGraphs.ForeColor = System.Drawing.SystemColors.Control;
-            this.buttonGraphs.Location = new System.Drawing.Point(398, 445);
-            this.buttonGraphs.Name = "buttonGraphs";
-            this.buttonGraphs.Size = new System.Drawing.Size(122, 30);
-            this.buttonGraphs.TabIndex = 10;
-            this.buttonGraphs.Text = "Graphs";
-            this.buttonGraphs.UseVisualStyleBackColor = false;
-            this.buttonGraphs.Click += new System.EventHandler(this.buttonGraphs_Click);
             // 
             // listBoxInfoJobs
             // 
@@ -752,6 +736,5 @@
         private System.Windows.Forms.Label labelInfoJobsTitleMemo2;
         private System.Windows.Forms.Label labelInfoJobsTitleMemo1;
         private System.Windows.Forms.Button buttonScan;
-        private System.Windows.Forms.Button buttonGraphs;
     }
 }
