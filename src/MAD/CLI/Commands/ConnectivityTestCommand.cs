@@ -172,7 +172,7 @@ namespace MAD.CLICore
 
 			try
 			{
-				WebRequest _request = WebRequest.Create("http://www.google.com:80");
+				WebRequest _request = WebRequest.Create("http://www.orf.at:80");
 				WebResponse _response = _request.GetResponse();
 				_success++;
 				_httpExceptionMessage += "Successful";

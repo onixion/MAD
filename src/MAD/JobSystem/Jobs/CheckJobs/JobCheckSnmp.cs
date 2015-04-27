@@ -63,21 +63,12 @@ namespace MAD.JobSystemCore
             {
                 SnmpV2Packet _nameResult = (SnmpV2Packet)target.Request(_namePacket, param);
 
-                if (_nameResult.Pdu.VbList[0].Value.ToString().ToLowerInvariant() == System.Environment.MachineName.ToLowerInvariant())
-                {
-                    outp.outState = JobOutput.OutState.Success;
-                    Logger.Log("SNMP Service seems to work", Logger.MessageType.INFORM);
-                }
-                else
-                {
-                    Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                    outp.outState = JobOutput.OutState.Failed;
-                }
+                outp.outState = JobOutput.OutState.Success;
             }
             catch (Exception)
             {
                 Logger.Log("SNMP Service seems to be dead", Logger.MessageType.ERROR);
-                outp.outState = JobOutput.OutState.Exception;
+                outp.outState = JobOutput.OutState.Failed;
             }
         }
 

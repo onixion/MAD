@@ -1094,11 +1094,16 @@ namespace MAD.CLICore
             : base()
         {
             _js = (JobSystem)args[0];
+            oPar.Add(new ParOption("m", "HOSTNAME", "hostname to resolve", false, false, new Type[]{typeof(string)}));
         }
 
         public override string Execute(int consoleWidth)
         {
-            JobCheckDns _job = new JobCheckDns();
+            JobCheckDns _job;
+            if(OParUsed("m"))
+                _job = new JobCheckDns(pars.GetPar("m").argValues[0].ToString());
+            else
+                _job = new JobCheckDns();
 
             _job.name = (string)pars.GetPar("n").argValues[0];
             _job.time = ParseJobTime(this);
