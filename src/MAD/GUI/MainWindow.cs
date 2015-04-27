@@ -31,6 +31,7 @@ namespace MAD.GUI
         private static int _countNode;
         private static int _countJob;
         static ArpScanWindow _Scan = new ArpScanWindow();
+        static GraphWindow _Graph = new GraphWindow();
         Info _Info = new Info();
                
         private List<JobNodeInfo> _nodes = new List<JobNodeInfo>();
@@ -143,6 +144,11 @@ namespace MAD.GUI
             Scan();
         }
 
+        private void buttonGraphs_Click(object sender, EventArgs e)
+        {
+            Graphs();
+        }
+
         #endregion Events
 
         #region Logic
@@ -161,7 +167,14 @@ namespace MAD.GUI
         {
             _Scan.ShowDialog();
         }
+
+        private static void Graphs()
+        {
+            _Graph.ShowDialog();
+        }
         #endregion 
+
+        
 
     }
 }

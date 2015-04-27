@@ -19,7 +19,7 @@ namespace MAD.MacFinders
         private static Object lockObj = new Object();
         private static Thread _steady;
         private static bool _running;
-        private static ArpScanWindow _window;
+        public static ArpScanWindow _window;
         public static uint networkInterface = MadConf.conf.arpInterface - 1;
         public static uint subnetMask;
         public static IPAddress netAddress;
@@ -77,7 +77,8 @@ namespace MAD.MacFinders
             DeInitInterfaces();
             _listen.Join();            
             if (_window != null)
-                _window.progressBarArpScan.Value = 100;
+                
+            _window.progressBarArpScan.Value = 100;
             _running = false;
         }
         private static bool InitInterfaces()

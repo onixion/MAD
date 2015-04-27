@@ -168,9 +168,9 @@ namespace MAD.GUI
                 ARPReader.srcAddress = IPAddress.Parse(textBoxLocalIP.Text);
                 ARPReader.netAddress = IPAddress.Parse(textBoxNetwork.Text);
                 ARPReader.subnetMask = Convert.ToUInt32(comboBoxSubnetmask.SelectedItem);
-                if (this.comboBoxNWD.SelectedItem.ToString() != "Default")
+                if (this.comboBoxNWD.Text != "Default")
                 {
-                    ARPReader.networkInterface = Convert.ToUInt16(this.comboBoxNWD.SelectedItem.ToString()) - (uint) 1;
+                    ARPReader.networkInterface = Convert.ToUInt16(this.comboBoxNWD.SelectedItem.ToString()) - (uint)1;
                 }
  
                 if (checkBoxOneScan.Checked)
@@ -216,9 +216,6 @@ namespace MAD.GUI
         }
 
         #endregion
-
-        
-    
 
     }
 }
