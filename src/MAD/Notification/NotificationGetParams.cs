@@ -43,21 +43,24 @@ namespace MAD.Notification
         #endregion
 
         #region Methods
-        //Method to send mail with mail parameters (dynamic (have to set for every mail))
 
-        //#1 for default Origin
+        //#1 for default Source and Receiver
         public static bool SetSendMail(string subject, string body, int retryCounter,
-            bool highPriority = false, MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
+            bool highPriority = false, MailAddress[] eMailToCC = null, 
+            MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
             return NotificationGetParams.SetSendMail(null, subject, body, retryCounter, null, null, null, null,
                 highPriority, eMailToCC, eMailToBCC, eMailAttachment);
         } 
         
-        //#2 for Special Orign - the only one which is used (contains #1)
-        public static bool SetSendMail(MailAddress[] eMailTo, string subject, string body, int retryCounter, string smtpClient_special, MailAddress eMailFrom_special, string password_special, int? port_special,
-            bool highPriority = false, MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
+        //#2 for Special Orign and Reveiver
+        public static bool SetSendMail(MailAddress[] eMailTo, string subject, string body, 
+            int retryCounter, string smtpClient_special, MailAddress eMailFrom_special, 
+            string password_special, int? port_special, bool highPriority = false, 
+            MailAddress[] eMailToCC = null, MailAddress[] eMailToBCC = null, Attachment[] eMailAttachment = null)
         {
             NotificPackIn NotificPackIn = new NotificPackIn();
+
             NotificPackIn.eMailToPackIn = eMailTo;
             NotificPackIn.subjectPackIn = subject;
             NotificPackIn.bodyPackIn = body;
@@ -87,7 +90,7 @@ namespace MAD.Notification
 
                 catch(Exception ex)
                 {
-                    Logging.Logger.Log("Failed to send Mail because:" + ex, Logging.Logger.MessageType.ERROR);
+                    Logging.Logger.Log("Sorry sir but I failed to send the Mail because:" + ex, Logging.Logger.MessageType.ERROR);
                     return true;
                 }
             }
