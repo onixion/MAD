@@ -735,6 +735,6 @@
         private System.Windows.Forms.TextBox textBoxInfoJobsMemo1;
         private System.Windows.Forms.Label labelInfoJobsTitleMemo2;
         private System.Windows.Forms.Label labelInfoJobsTitleMemo1;
-        private System.Windows.Forms.Button buttonScan;
+        public System.Windows.Forms.Button buttonScan;
     }
 }
