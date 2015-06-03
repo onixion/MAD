@@ -67,7 +67,6 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="InternalInterfaces.cs" />
     <Compile Include="PriorityQueue.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SmartThreadPool.cs" />
     <Compile Include="STPEventWaitHandle.cs" />
     <Compile Include="STPPerformanceCounter.cs" />
@@ -82,6 +81,9 @@
     <Compile Include="WorkItemsGroup.cs" />
     <Compile Include="WorkItemsGroupBase.cs" />
     <Compile Include="WorkItemsQueue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <Import Project="sign.proj" Condition="'$(Configuration)|$(Platform)' == 'Publish|AnyCPU'" />
