@@ -39,7 +39,6 @@ namespace MAD.CLICore
 
             // LOGGER
             commands.Add(new CommandOptions("change logBuffer", typeof(ChangeBufferSize), null));
-            commands.Add(new CommandOptions("change logName", typeof(ChangeLogFileName), null));
 
             // MAC AND IP READER
             commands.Add(new CommandOptions("dhcp reader start", typeof(CatchBasicInfoStartCommand), new object[] { dhcpReader }));                             //Outdated!

@@ -72,7 +72,7 @@ namespace MAD
         public static void SetToDefault()
         {
             // logger
-            conf.LOG_FILE_DIRECTORY = "." + Path.DirectorySeparatorChar;
+            conf.LOGPATH = Path.Combine(Mad.DATADIR, "log.txt");
             conf.LOG_LEVEL = 2;
 
             // jobsystem
@@ -102,7 +102,7 @@ namespace MAD
     public class MadConfigFile
     {
         // logger
-        public string LOG_FILE_DIRECTORY;
+        public string LOGPATH;
         public uint LOG_LEVEL;
 
         // jobsystem

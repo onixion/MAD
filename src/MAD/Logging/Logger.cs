@@ -11,8 +11,8 @@ namespace MAD.Logging
         #region fields
         
         public static uint buffer = 20;
-
-        public static string logFileName = "log.txt";
+        public static FileStream file;
+        public static TextWriter writer;
 
         public enum MessageType
         {
@@ -24,22 +24,31 @@ namespace MAD.Logging
         }
 
         private static List<string> _logMessages = new List<string>();
-
-        private static readonly Object _lockThis = new Object();
-
+        private static Object _lockThis = new Object();
         private static uint _logLevel = MadConf.conf.LOG_LEVEL; 
-
-        private static bool _force = false;
+        
         #endregion
 
         #region methods
-        
+
+        public static void Init()
+        {
+            file = new FileStream(MadConf.conf.LOGPATH, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read);
+            writer = new StreamWriter(file);
+        }
+
+        public static void Dispose()
+        {
+            file.Flush();
+            writer.Close();
+            file.Close();
+        }
+
         public static void Log(string message, MessageType type)
         {
             if ((uint)type >= _logLevel)
             {
-                string _buffer = "";
-                _buffer += DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss:fff");
+                string _buffer = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss:fff");
 
                 switch (type)
                 {
@@ -47,37 +56,32 @@ namespace MAD.Logging
                         _buffer += " DEBUG: ";
                         break;
                     case MessageType.EMERGENCY:
-                        _buffer += " !EMERGENCY: ";
+                        _buffer += " EMER.: ";
                         break;
                     case MessageType.ERROR:
                         _buffer += " ERROR: ";
                         break;
                     case MessageType.INFORM:
-                        _buffer += " INFORMATION: ";
+                        _buffer += " INFO:  ";
                         break;
                     case MessageType.WARNING:
-                        _buffer += " WARNING: ";
+                        _buffer += " WARN.: ";
+                        break;
+                    default:
                         break;
                 }
 
-                _buffer += message;
+                _logMessages.Add(_buffer);
+
                 lock (_lockThis)
                 {
-                    _logMessages.Add(_buffer);
-                    WriteToLog();
+                    if (_logMessages.Count >= buffer)
+                    {
+                        foreach(string temp in _logMessages)
+                            writer.WriteLine(temp);
+                        _logMessages.Clear();
+                    }
                 }
-            }
-        }
-
-        private static void WriteToLog()
-        {
-            if (_logMessages.Count >= buffer || _force)
-            {
-                if (String.IsNullOrEmpty(MadConf.conf.LOG_FILE_DIRECTORY) || MadConf.conf.LOG_FILE_DIRECTORY.ToString().Contains("."))
-                    File.AppendAllLines(logFileName, _logMessages.ToArray());
-                else
-                    File.AppendAllLines(MadConf.conf.LOG_FILE_DIRECTORY + Path.DirectorySeparatorChar + logFileName, _logMessages.ToArray());
-                _logMessages.Clear();
             }
         }
 
@@ -85,9 +89,9 @@ namespace MAD.Logging
         {
             lock (_lockThis)
             {
-                _force = true;
-                WriteToLog();
-                _force = false;
+                foreach (string temp in _logMessages)
+                    writer.WriteLine(temp);
+                _logMessages.Clear();
             }
         }
         #endregion 

@@ -23,9 +23,7 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
         public static readonly string DBFILE = Path.Combine(DATADIR, "mad.db");
 
-
         public static bool restart = false;
-
         public static bool GUI_USED = false; 
 
         [STAThread]
@@ -33,12 +31,6 @@ namespace MAD
         {
             if(!Directory.Exists(DATADIR))
                 Directory.CreateDirectory(DATADIR);
-            
-            DB db = new DB(DBFILE);
-            JobSystem js = new JobSystem(db);
-            js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
-            ModelHost.Init(ref js);
-            DHCPReader dhcpReader = new DHCPReader(js);
 
             if (File.Exists(CONFFILE))
             {
@@ -66,41 +58,22 @@ namespace MAD
                 Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
                 Console.WriteLine("(CONFIG) Default config may not use all possible features!");
             }
+            
+            Logger.Init();
+            DB db = new DB(DBFILE);
+            JobSystem js = new JobSystem(db);
+            js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
+            ModelHost.Init(ref js);
+            DHCPReader dhcpReader = new DHCPReader(js);
 
-            // start interface
             if (args.Length == 0)
             {
-                if (File.Exists(CONFFILE))
-                {
-                    try
-                    {
-                        MadConf.LoadConf(CONFFILE);
-                                                
-                    }
-                    catch
-                    {
-                        MadConf.SetToDefault();
-                        MadConf.SaveConf(CONFFILE);
-                        
-                    }
-                }
-                else
-                {
-                    MadConf.SetToDefault();
-                    MadConf.SaveConf(CONFFILE);
-                    MainWindow.configStatus = "No Config-file found. Default-Config loaded.";
-                }
-
                 GUI_USED = true;
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
                 GUILogic.RunGUI(js,db, dhcpReader);
-                Logger.ForceWriteToLog();
-                
             }
             else if (args.Length == 1)
             {
-                
-
                 switch (args[0])
                 {
                     case "-cli":
@@ -108,7 +81,6 @@ namespace MAD
                         CLI cli = new CLI(js, dhcpReader, db);
                         cli.Start();
                         break;
-
                     case "-cliserver":
                         Logger.Log("Programm Start. CLI Server Start.", Logger.MessageType.INFORM);
                         try
@@ -117,14 +89,14 @@ namespace MAD
                             cliServer.Start();
 
                             Console.WriteLine("(SERVER) Listening on port " + cliServer.serverPort + " ...");
-                            Logger.Log("CLIServer started on port " + cliServer.serverPort, Logger.MessageType.INFORM);
+                            Logger.Log("CLIServer started on port " + cliServer.serverPort + " ..", Logger.MessageType.INFORM);
 
                             Console.ReadKey(false);
                             cliServer.Stop();
                             cliServer.Dispose();
 
                             Console.WriteLine("(SERVER) Stopped.");
-                            Logger.Log("Server stopped", Logger.MessageType.INFORM);
+                            Logger.Log("Server stopped.", Logger.MessageType.INFORM);
                         }
                         catch (Exception e)
                         {
@@ -134,12 +106,9 @@ namespace MAD
 
                         PressAnyKeyToClose();
                         break;
-
                     default:
                         Console.WriteLine("ERROR! Argument '" + args[0] + "' not known!");
                         Logger.Log("Programm Aborted. False Call Argument!", Logger.MessageType.EMERGENCY);
-                        Logger.ForceWriteToLog();
-                        PressAnyKeyToClose();
                         break;
                 }
             }
@@ -147,7 +116,6 @@ namespace MAD
             {
                 Console.WriteLine("ERROR! Too many arguments!");
                 Logger.Log("Programm Aborted. Too many arguments!", Logger.MessageType.EMERGENCY);
-                Logger.ForceWriteToLog();
                 PressAnyKeyToClose();
             }
 
@@ -156,6 +124,7 @@ namespace MAD
 
             Logger.Log("Programm Exited Successfully. See Ya!", Logger.MessageType.INFORM);
             Logger.ForceWriteToLog();
+            Logger.Dispose();
 
             if (restart)
                 Application.Restart();

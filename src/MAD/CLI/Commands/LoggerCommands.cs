@@ -24,22 +24,4 @@ namespace MAD.CLICore
             return "Successfully changed buffer size"; 
         }
     }
-
-    class ChangeLogFileName : Command
-    {
-        public ChangeLogFileName()
-        {
-            rPar.Add(new ParOption("n", "NAME", "The name of the Logfile, has to be changed every reboot", false, false, new Type[] { typeof(string) }));
-        }
-
-        public override string Execute(int consoleWidth)
-        {
-            string _newName = (string)pars.GetPar("n").argValues[0];
-
-            Logger.logFileName = _newName;
-            Logger.Log("Successfully changed name of Logfile", Logger.MessageType.INFORM);
-
-            return "Successfully changed name of Logfile";
-        }
-    }
 }
