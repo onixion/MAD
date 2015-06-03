@@ -71,16 +71,13 @@ namespace MAD.Logging
                         break;
                 }
 
-                _logMessages.Add(_buffer);
+                _logMessages.Add(_buffer + message);
 
-                lock (_lockThis)
+                if (_logMessages.Count >= buffer)
                 {
-                    if (_logMessages.Count >= buffer)
-                    {
-                        foreach(string temp in _logMessages)
+                    foreach(string temp in _logMessages)
                             writer.WriteLine(temp);
-                        _logMessages.Clear();
-                    }
+                    _logMessages.Clear();
                 }
             }
         }
