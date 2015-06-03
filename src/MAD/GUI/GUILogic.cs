@@ -15,12 +15,13 @@ namespace MAD.GUI
 {
     public static class GUILogic
     {
+        public static bool SteadyActivated;
         public static MainWindow _MainWindow = new MainWindow();
         public static ArpScanWindow _ArpScanWindow = new ArpScanWindow();
 
         public static void RunGUI(JobSystem jobSys, DB dataBase, DHCPReader dhcp)
         {
-            ArpScanWindow.InitGUI(jobSys, dataBase);
+            ArpScanWindow.InitGUI(jobSys, dataBase, _MainWindow);
             MainWindow.InitGUI(jobSys, dataBase, dhcp);
             Application.Run(_MainWindow);           
         }

@@ -24,21 +24,24 @@ namespace MAD.GUI
 
         protected static JobSystem _js;
         protected static DB _db;
+        protected static MainWindow _mw;
         private bool validEntering = false;
 
 
-        public static void InitGUI(JobSystem jobSys, DB dataBase)
+        public static void InitGUI(JobSystem jobSys, DB dataBase, MainWindow mainWindow)
         {
             _db = dataBase;
             _js = jobSys;
+            _mw = mainWindow;
         }
 
         #endregion
 
         public ArpScanWindow()
         {
-            InitializeComponent();
+            InitializeComponent();           
         }
+
 
         #region Events
 
@@ -131,7 +134,7 @@ namespace MAD.GUI
         
         private void buttonStartScan_Click(object sender, EventArgs e)
         {
-            if (0 < comboBoxSubnetmask.SelectedIndex && comboBoxSubnetmask.SelectedIndex < 25)
+            if (0 < comboBoxSubnetmask.SelectedIndex && comboBoxSubnetmask.SelectedIndex < 33)
             {
                 if (checkBoxOneScan.Checked == true)
                 {
@@ -142,19 +145,28 @@ namespace MAD.GUI
 
                 if (validEntering == true)
                 {
+                    this.textBoxLocalIP.Text = "";
+                    this.textBoxNetwork.Text = "";
+                    this.comboBoxSubnetmask.SelectedIndex = -1;
+                    this.comboBoxSubnetmask.Text = "Please Choose";
+                    this.comboBoxNWD.SelectedIndex = -1;
+                    this.comboBoxNWD.Text = "Default";
+                    this.checkBoxOneScan.Checked = false;
                     this.progressBarArpScan.Value = 0;
+                    this.buttonStartScan.Enabled = false;
                     this.Close();
                 }
             }
             else
                 MessageBox.Show("Please check the fields again, your enterings seem to be incorrect", "Ups...Something went wrong", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+
         }
 
         private void ArpScanWindow_Load(object sender, EventArgs e)
         {
             ComboBoxNWDloadContent();
         }
-
 
         #endregion
 
@@ -172,7 +184,7 @@ namespace MAD.GUI
                 {
                     ARPReader.networkInterface = Convert.ToUInt16(this.comboBoxNWD.SelectedItem.ToString()) - (uint)1;
                 }
- 
+
                 if (checkBoxOneScan.Checked)
                 {
                     ARPReader.SetWindow(this);
@@ -182,8 +194,11 @@ namespace MAD.GUI
                 }
 
                 else
+                {
                     ARPReader.SteadyStart(_js);
-
+                    GUILogic.SteadyActivated = true;
+                    _mw.buttonScan.Enabled = false;
+                }
                 validEntering = true;
             }
 

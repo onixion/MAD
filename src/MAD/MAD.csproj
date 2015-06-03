@@ -55,6 +55,12 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="SnmpSharpNet">
       <HintPath>..\..\lib\SnmpSharpNet.dll</HintPath>
@@ -194,6 +200,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="favicon.ico" />
     <Content Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
