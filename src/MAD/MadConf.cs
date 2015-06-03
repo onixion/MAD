@@ -25,17 +25,6 @@ namespace MAD
 
         #region methods
 
-        public static bool TryCreateDir(string dirPath)
-        {
-            if (!Directory.Exists(dirPath))
-            {
-                Directory.CreateDirectory(dirPath);
-                return true;
-            }
-            else
-                return false;
-        }
-
         public static void SaveConf(string filePath)
         {
             JsonSerializer _ser = new JsonSerializer();
@@ -58,16 +47,25 @@ namespace MAD
                 _ser.Serialize(_writer, conf);
         }
 
-        public static void LoadConf(string filePath)
+        public static bool LoadConf(string filePath)
         {
-            JsonSerializer _ser = new JsonSerializer();
-            _ser.Converters.Add(new MailAddressConverter());
-
-            using (FileStream _file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (StreamReader _reader = new StreamReader(_file))
+            try
             {
-                JsonReader _jReader = new JsonTextReader(_reader);
-                conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
+                JsonSerializer _ser = new JsonSerializer();
+                _ser.Converters.Add(new MailAddressConverter());
+
+                using (FileStream _file = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (StreamReader _reader = new StreamReader(_file))
+                {
+                    JsonReader _jReader = new JsonTextReader(_reader);
+                    conf = (MadConfigFile)_ser.Deserialize(_jReader, typeof(MadConfigFile));
+                }
+
+                return true;
+            }
+            catch(Exception)
+            {
+                return false;
             }
         }
 

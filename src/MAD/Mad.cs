@@ -31,17 +31,41 @@ namespace MAD
         [STAThread]
         public static int Main(string[] args)
         {
-            // load config-file
-            MadConf.TryCreateDir(DATADIR);
+            if(!Directory.Exists(DATADIR))
+                Directory.CreateDirectory(DATADIR);
             
-
-            // init components
             DB db = new DB(DBFILE);
             JobSystem js = new JobSystem(db);
             js.OnNodeCountChange += new EventHandler(ModelHost.SyncHostList);
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
- 
+
+            if (File.Exists(CONFFILE))
+            {
+                try
+                {
+                    MadConf.LoadConf(CONFFILE);
+
+                    Console.WriteLine("(CONFIG) Config loaded.");
+                    MainWindow.configStatus = "Config loaded.";
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("(CONFIG) Config could not be loaded: " + e.Message);
+                    MadConf.SetToDefault();
+                    Console.WriteLine("(CONFIG) Config could not be loaded. Using default config.");
+                    MainWindow.configStatus = "Loaded default config.";
+                }
+            }
+            else
+            {
+                Console.WriteLine("(CONFIG) No config file found!");
+                MadConf.SetToDefault();
+                Console.WriteLine("(CONFIG) Loaded default config.");
+                MadConf.SaveConf(CONFFILE);
+                Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
+                Console.WriteLine("(CONFIG) Default config may not use all possible features!");
+            }
 
             // start interface
             if (args.Length == 0)
@@ -51,13 +75,13 @@ namespace MAD
                     try
                     {
                         MadConf.LoadConf(CONFFILE);
-                        MainWindow.configStatus = "Config loaded.";                        
+                                                
                     }
                     catch
                     {
                         MadConf.SetToDefault();
                         MadConf.SaveConf(CONFFILE);
-                        MainWindow.configStatus = "Error loading Config. Default-Config loaded.";
+                        
                     }
                 }
                 else
@@ -75,30 +99,7 @@ namespace MAD
             }
             else if (args.Length == 1)
             {
-                if (File.Exists(CONFFILE))
-                {
-                    try
-                    {   
-                        MadConf.LoadConf(CONFFILE);
-                        Console.WriteLine("(CONFIG) Config loaded.");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("(CONFIG) Config could not be loaded: " + e.Message);
-                        MadConf.SetToDefault();
-                        Console.WriteLine("(CONFIG) Loaded default config.");
-                        Console.WriteLine("(CONFIG) Default config does not use all possible features!");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("(CONFIG) No config file found!");
-                    MadConf.SetToDefault();
-                    Console.WriteLine("(CONFIG) Loaded default config.");
-                    MadConf.SaveConf(CONFFILE);
-                    Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
-                    Console.WriteLine("(CONFIG) Default config may not use all possible features!");
-                }
+                
 
                 switch (args[0])
                 {

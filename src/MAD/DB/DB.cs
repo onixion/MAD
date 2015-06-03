@@ -18,7 +18,7 @@ namespace MAD.Database
         {
             if (!File.Exists(DBname))
             {
-                Console.WriteLine("(DB) No database found at '" + DBname + "'!");
+                Console.WriteLine("(DB) No database found at '" + DBname + "'.");
                 Console.WriteLine("(DB) Creating new one.");
                 SQLiteConnection.CreateFile(DBname);
             }
@@ -373,34 +373,22 @@ namespace MAD.Database
 
         public bool InsertIDNode(string guid)
         { 
-            if(InsertID("GUIDNodeTable", "GUID_NODE", guid))
-                return true;
-            else
-                return false;
+            return InsertID("GUIDNodeTable", "GUID_NODE", guid);
         }
 
         public bool InsertIDHost(string host)
         {
-            if (InsertID("HostTable", "HOST", host))
-                return true;
-            else
-                return false;
+            return InsertID("HostTable", "HOST", host);
         }
 
         public bool InsertIDIP(string ip)
         {
-            if (InsertID("IPTable", "IP", ip))
-                return true;
-            else
-                return false;
+            return InsertID("IPTable", "IP", ip);
         }
 
         public bool InsertIDMac(string mac)
-        { 
-            if(InsertID("MACTable", "MAC", mac))
-                return true;
-            else
-                return false;
+        {
+            return InsertID("MACTable", "MAC", mac);
         }
 
         #endregion
@@ -409,42 +397,27 @@ namespace MAD.Database
 
         public bool InsertIDJob(string guid)
         {
-            if (InsertID("GUIDJobTable", "GUID_JOB", guid))
-                return true;
-            else
-                return false;
+            return InsertID("GUIDJobTable", "GUID_JOB", guid);
         }
 
         public bool InsertIDJobName(string name)
         {
-            if (InsertID("JobNameTable", "JOBNAME", name))
-                return true;
-            else
-                return false;
+            return InsertID("JobNameTable", "JOBNAME", name);
         }
 
         public bool InsertIDJobType(string type)
         {
-            if (InsertID("JobTypeTable", "JOBTYPE", type))
-                return true;
-            else
-                return false;
+            return InsertID("JobTypeTable", "JOBTYPE", type);
         }
 
         public bool InsertIDProtocol(string protocol)
         {
-            if(InsertID("ProtocolTable", "PROTOCOL", protocol))
-                return true;
-            else
-                return false;
+            return InsertID("ProtocolTable", "PROTOCOL", protocol);
         }
 
         public bool InsertIDOutState(string outstate)
         {
-            if (InsertID("OutStateTable", "OUTSTATE", outstate))
-                return true;
-            else
-                return false;
+            return InsertID("OutStateTable", "OUTSTATE", outstate);
         }
 
         #endregion

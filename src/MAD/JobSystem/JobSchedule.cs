@@ -220,7 +220,17 @@ namespace MAD.JobSystemCore
             try
             {
                 _job.tStart = DateTime.Now;
-                _job.Execute(_node.ip);
+
+                try
+                {
+                    _job.Execute(_node.ip);
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("(JOB-THREAD) Job threw a exception: " + e.Message, Logger.MessageType.ERROR);
+                    _job.outp.outState = JobOutput.OutState.Exception;
+                }
+
                 _job.tStop = DateTime.Now;
                 _job.tSpan = _job.tStop.Subtract(_job.tStart);
 
@@ -278,7 +288,7 @@ namespace MAD.JobSystemCore
             }
             catch (Exception e)
             {
-                Logger.Log("(JobSchedule) Job threw a exception: " + e.ToString() + "\n" + e.StackTrace, Logger.MessageType.ERROR);
+                Logger.Log("(JobSchedule) JOB-THREAD-EXCEPTION: " + e.ToString() + "\n" + e.StackTrace, Logger.MessageType.ERROR);
             }
             finally
             {
@@ -318,10 +328,10 @@ namespace MAD.JobSystemCore
                     _data = (string)"NULL";
 
                 _buffer += "#" + _count + ".) Broken-Rule\n";
-                _buffer += "-> OutDescriptor: " + _rule.outDescName + "\n";
-                _buffer += "-> Operation:     " + _rule.oper.ToString() + "\n";
-                _buffer += "-> CompareValue:  '" + _rule.compareValue.ToString() + "'\n";
-                _buffer += "=> CurrentValue:  '" + _data.ToString() + "'\n\n";
+                _buffer += "  -> OutDescriptor: " + _rule.outDescName + "\n";
+                _buffer += "  -> Operation:     " + _rule.oper.ToString() + "\n";
+                _buffer += "  -> CompareValue:  '" + _rule.compareValue.ToString() + "'\n";
+                _buffer += "  => CurrentValue:  '" + _data.ToString() + "'\n\n";
                 _count++;
             }
             return _buffer;
