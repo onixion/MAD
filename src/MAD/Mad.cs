@@ -66,8 +66,6 @@ namespace MAD
             ModelHost.Init(ref js);
             DHCPReader dhcpReader = new DHCPReader(js);
 
-            Logger.Log("GAY", Logger.MessageType.DEBUG);
-
             if (args.Length == 0)
             {
                 GUI_USED = true;
