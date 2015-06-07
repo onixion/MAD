@@ -75,10 +75,13 @@ namespace MAD.Logging
 
                 if (_logMessages.Count >= buffer)
                 {
-                    foreach(string temp in _logMessages)
-                            writer.WriteLine(temp);
-                    _logMessages.Clear();
-                }
+					lock(_lockThis)
+					{
+						foreach(string temp in _logMessages)
+                            	writer.WriteLine(temp);
+                    	_logMessages.Clear();
+					}
+				}
             }
         }
 
