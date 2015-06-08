@@ -23,7 +23,6 @@ namespace MAD
         public static readonly string CONFFILE = Path.Combine(DATADIR, "mad.conf");
         public static readonly string DBFILE = Path.Combine(DATADIR, "mad.db");
 
-
         public static bool restart = false;
 
         public static bool GUI_USED = false; 
@@ -65,42 +64,19 @@ namespace MAD
                 MadConf.SaveConf(CONFFILE);
                 Console.WriteLine("(CONFIG) Saved default config to '" + CONFFILE + "'.");
                 Console.WriteLine("(CONFIG) Default config may not use all possible features!");
+                MainWindow.configStatus = "No Config-file found. Default-Config loaded.";
             }
 
             // start interface
             if (args.Length == 0)
             {
-                if (File.Exists(CONFFILE))
-                {
-                    try
-                    {
-                        MadConf.LoadConf(CONFFILE);
-                                                
-                    }
-                    catch
-                    {
-                        MadConf.SetToDefault();
-                        MadConf.SaveConf(CONFFILE);
-                        
-                    }
-                }
-                else
-                {
-                    MadConf.SetToDefault();
-                    MadConf.SaveConf(CONFFILE);
-                    MainWindow.configStatus = "No Config-file found. Default-Config loaded.";
-                }
-
                 GUI_USED = true;
                 Logger.Log("Programm Start. GUI Start.", Logger.MessageType.INFORM);
                 GUILogic.RunGUI(js,db, dhcpReader);
                 Logger.ForceWriteToLog();
-                
             }
             else if (args.Length == 1)
             {
-                
-
                 switch (args[0])
                 {
                     case "-cli":
