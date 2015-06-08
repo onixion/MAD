@@ -19,8 +19,10 @@
 		Linux: Mono installieren und im Projektverzeichnis den Befehl 'xbuild' ausführen
 
 	Programme:
-		src/MAD ... Hauptprogramm, CLI, CLI-Server, GUI, Jobsystem, Datenbank
-		src/CLIClient ... CLIClient für den CLI-Server
+		src/MAD 	... Hauptprogramm, CLI, CLI-Server, GUI, Jobsystem, Datenbank
+		src/MadNet 	... eigene Bibliothek für das Empfangen und Senden von Paketen, AES
+		src/CLIIO 	... eigene Bibliothek für das Lesen und Schreiben auf die Konsole
+		src/CLIClient 	... CLIClient für den CLI-Server
 
 	(Dieses Verzeichnis ist auch online unter 'https://www.github.com/onixion/MAD.git' erreichbar.)
 		
