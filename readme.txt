@@ -20,7 +20,7 @@
 		Windows: Projekt mit Visual Studio (C#) öffnen und kompilieren
 		Linux: Mono und Monodevelop installieren; src/MAD.proj mit Monodevelop öffnen und kompilieren
 		
-		(Hinweis: Programm braucht Root rechte zum starten.)
+		(Hinweis: Programm braucht Rootrechte zum starten.)
 
 	Programme:
 		src/MAD 	... Hauptprogramm, CLI, CLI-Server, GUI, Jobsystem, Datenbank
